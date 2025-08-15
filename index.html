@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLD OUT IMPROV - Live Comedy & Shopping!</title>
+    <title>SOLD OUT! Comedy Show</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap');
         
@@ -107,8 +107,6 @@
             font-size: 2.5rem;
             color: var(--comic-yellow);
             text-shadow: 4px 4px 0px var(--comic-red), 8px 8px 0px var(--comic-blue);
-            transform: rotate(-5deg);
-            animation: pulse 2s infinite alternate;
         }
 
         @keyframes pulse {
@@ -159,27 +157,36 @@
             padding: 4rem 2rem;
             text-align: center;
             position: relative;
-            background: linear-gradient(135deg, var(--comic-blue), var(--comic-purple));
+            background: #F0F0F0;
             border-bottom: 8px solid var(--comic-yellow);
         }
 
-        .hero-title {
-            font-family: 'Bangers', cursive;
-            font-size: clamp(3rem, 8vw, 6rem);
-            color: var(--comic-white);
-            text-shadow: 6px 6px 0px var(--comic-black), 12px 12px 0px var(--comic-red);
+        .hero-logo {
+            max-width: 400px;
+            width: 100%;
+            height: auto;
             margin-bottom: 1rem;
-            animation: bounce 3s infinite;
+            animation: stamp 4s infinite;
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+        @keyframes stamp {
+            0%, 90%, 100% { 
+                transform: translateY(0px) scale(1); 
+            }
+            5% { 
+                transform: translateY(-15px) scale(0.95); 
+            }
+            15% { 
+                transform: translateY(0px) scale(1.1); 
+            }
+            25% { 
+                transform: translateY(0px) scale(1); 
+            }
         }
 
         .hero-subtitle {
             font-size: 1.8rem;
-            color: var(--comic-yellow);
+            color: var(--comic-blue);
             font-weight: 700;
             text-shadow: 2px 2px 0px var(--comic-black);
             margin-bottom: 2rem;
@@ -190,7 +197,7 @@
             background: var(--comic-red);
             color: var(--comic-white);
             padding: 1.5rem 3rem;
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 700;
             text-transform: uppercase;
             border: 6px solid var(--comic-black);
@@ -203,6 +210,7 @@
             box-shadow: 8px 8px 0px var(--comic-black);
             position: relative;
             overflow: hidden;
+            font-family: 'Bangers', cursive;
         }
 
         .cta-button::before {
@@ -241,8 +249,8 @@
             font-size: 3rem;
             text-align: center;
             margin-bottom: 2rem;
-            color: var(--comic-black);
-            text-shadow: 3px 3px 0px var(--comic-yellow);
+            color: var(--comic-white);
+            text-shadow: 3px 3px 0px var(--comic-black);
         }
 
         .content-grid {
@@ -308,21 +316,58 @@
 
         .show-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
+            padding: 1rem;
+            background: var(--comic-white);
+            border: 8px solid var(--comic-black);
+            box-shadow: 12px 12px 0px var(--comic-black);
+            position: relative;
+        }
+
+        .show-grid::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 60px;
+            height: 60px;
+            background-image: radial-gradient(circle, var(--comic-red) 2px, transparent 2px);
+            background-size: 8px 8px;
+            opacity: 0.3;
         }
 
         .show-card {
             background: var(--comic-white);
             color: var(--comic-black);
-            padding: 1.5rem;
+            padding: 1.2rem;
             border: 4px solid var(--comic-black);
-            transform: skew(-2deg);
+            transform: rotate(1deg);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 6px 6px 0px var(--comic-black);
+            margin: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            min-height: 200px;
+        }
+
+        .show-card::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 25px;
+            height: 25px;
+            background-image: radial-gradient(circle, var(--comic-blue) 1.5px, transparent 1.5px);
+            background-size: 5px 5px;
+            opacity: 0.4;
         }
 
         .show-card::after {
@@ -331,42 +376,77 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 8px;
+            height: 6px;
             background: repeating-linear-gradient(
                 90deg,
                 var(--comic-red) 0px,
-                var(--comic-red) 10px,
-                var(--comic-yellow) 10px,
-                var(--comic-yellow) 20px
+                var(--comic-red) 8px,
+                var(--comic-yellow) 8px,
+                var(--comic-yellow) 16px
             );
         }
 
         .show-card:hover {
-            transform: skew(0deg) scale(1.05);
+            transform: rotate(0deg) translateY(-3px);
+            box-shadow: 10px 10px 0px var(--comic-black);
+        }
+
+        .show-card:nth-child(even) {
+            background: var(--comic-yellow);
+            transform: rotate(-1deg);
+        }
+
+        .show-card:nth-child(3n) {
+            background: var(--comic-green);
+            color: var(--comic-white);
+            transform: rotate(1.5deg);
+        }
+
+        .show-card:nth-child(4n) {
+            background: var(--comic-purple);
+            color: var(--comic-white);
+            transform: rotate(-0.5deg);
         }
 
         .show-day {
             font-family: 'Bangers', cursive;
-            font-size: 1.5rem;
+            font-size: 2rem;
             color: var(--comic-blue);
             margin-bottom: 0.5rem;
         }
 
         .show-time {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--comic-red);
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .show-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: auto;
         }
 
         .show-type {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 0.5rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0;
+            display: block;
+            margin: 0;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid var(--comic-black);
+            box-shadow: 4px 4px 0px var(--comic-black);
+            transform: skew(-3deg);
+            text-align: center;
+            min-height: 44px;
+            line-height: 1.2;
         }
 
         .show-type.online {
@@ -375,10 +455,22 @@
             border: 2px solid var(--comic-black);
         }
 
+        .show-type.online:hover {
+            background: var(--comic-purple);
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0px var(--comic-black);
+        }
+
         .show-type.in-person {
             background: var(--comic-green);
             color: var(--comic-white);
             border: 2px solid var(--comic-black);
+        }
+
+        .show-type.in-person:hover {
+            background: var(--comic-orange);
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0px var(--comic-black);
         }
 
         /* Reviews Section */
@@ -403,7 +495,7 @@
 
         .review-card:nth-child(even) {
             transform: rotate(-1deg);
-            background: var(--comic-yellow);
+            background: var(--comic-white);
         }
 
         .review-card:nth-child(3) {
@@ -422,7 +514,7 @@
         }
 
         .review-card:nth-child(6) {
-            background: var(--comic-orange);
+            background: var(--comic-green);
             color: var(--comic-white);
         }
 
@@ -448,8 +540,24 @@
         }
 
         .stars {
-            font-size: 1.5rem;
+            font-size: 2rem;
             margin-bottom: 1rem;
+            padding: 2px;
+            line-height: 1.2;
+        }
+
+        .stars .filled-star {
+            color: #FFD700;
+            text-shadow: 
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+        }
+
+        .stars .empty-star {
+            color: #E0E0E0;
+            font-weight: normal;
         }
 
         .review-text {
@@ -494,7 +602,7 @@
             justify-content: center;
             width: 60px;
             height: 60px;
-            background: var(--comic-red);
+            background: #E4405F;
             border: 4px solid var(--comic-white);
             text-decoration: none;
             font-size: 1.5rem;
@@ -523,7 +631,8 @@
 
         .social-link:hover {
             transform: rotate(0deg) scale(1.1);
-            background: var(--comic-blue);
+            background: #F0F0F0;
+            color: var(--comic-black);
         }
 
         .social-link:nth-child(2) {
@@ -532,16 +641,20 @@
         }
 
         .social-link:nth-child(2):hover {
-            background: var(--comic-purple);
+            transform: rotate(0deg) scale(1.1);
+            background: #F0F0F0;
+            color: var(--comic-black);
         }
 
         .social-link:nth-child(3) {
-            background: var(--comic-green);
+            background: #000000;
             transform: rotate(5deg);
         }
 
         .social-link:nth-child(3):hover {
-            background: var(--comic-orange);
+            transform: rotate(0deg) scale(1.1);
+            background: #F0F0F0;
+            color: var(--comic-black);
         }
 
         .footer-text {
@@ -592,8 +705,8 @@
                 font-size: 2rem;
             }
             
-            .hero-title {
-                font-size: 3rem;
+            .hero-logo {
+                max-width: 300px;
             }
             
             .hero-subtitle {
@@ -612,10 +725,9 @@
         <header>
             <div class="header-dots"></div>
             <nav>
-                <div class="logo">SOLD OUT!</div>
+                <div class="logo">SOLD OUT! Comedy Show</div>
                 <div class="hamburger"></div>
                 <ul class="nav-links">
-                    <li><a href="#about">About</a></li>
                     <li><a href="#shows">Shows</a></li>
                     <li><a href="#shop">Shop</a></li>
                     <li><a href="#contact">Contact</a></li>
@@ -625,11 +737,11 @@
 
         <section class="hero">
             <div class="dots-overlay"></div>
-            <h1 class="hero-title">SOLD OUT IMPROV</h1>
-            <p class="hero-subtitle">Live Comedy Meets Live Shopping!</p>
-            <a href="#shows" class="cta-button">Watch Now!</a>
+            <img src="images/soldoutlogo.png" alt="SOLD OUT! Comedy Show" class="hero-logo">
+            <p class="hero-subtitle">Live Comedy Meets Live Shopping</p>
+            <a href="#shows" class="cta-button">TRAILER</a>
         </section>
-
+        
         <section class="section" id="about">
             <h2 class="section-title">How It Works</h2>
             <div class="content-grid">
@@ -645,90 +757,126 @@
                     <h3>Audience Participation</h3>
                     <p>Your suggestions drive our scenes! Chat with us live, suggest scenarios, and watch as we bring your wildest ideas to life through comedy gold.</p>
                 </div>
+                <div class="content-card">
+                    <h3>Audience Participation</h3>
+                    <p>Your suggestions drive our scenes! Chat with us live, suggest scenarios, and watch as we bring your wildest ideas to life through comedy gold.</p>
+                </div>
+                <div class="content-card">
+                    <h3>Audience Participation</h3>
+                    <p>Your suggestions drive our scenes! Chat with us live, suggest scenarios, and watch as we bring your wildest ideas to life through comedy gold.</p>
+                </div>
+                <div class="content-card">
+                    <h3>Audience Participation</h3>
+                    <p>Your suggestions drive our scenes! Chat with us live, suggest scenarios, and watch as we bring your wildest ideas to life through comedy gold.</p>
+                </div>
             </div>
         </section>
 
         <section class="section show-times" id="shows">
-            <h2 class="section-title" style="color: var(--comic-white);">Show Schedule</h2>
+            <h2 class="section-title">Show Schedule</h2>
             <div class="show-grid">
                 <div class="show-card">
-                    <div class="show-day">Monday</div>
-                    <div class="show-time">8:00 PM EST</div>
-                    <div class="show-type online">ONLINE ONLY</div>
+                    <div>
+                        <div class="show-day">TUESDAY</div>
+                        <div class="show-time">Aug 19, 2025 7:30 PM CT</div>
+                    </div>
+                    <div class="show-buttons">
+                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                    </div>
                 </div>
                 <div class="show-card">
-                    <div class="show-day">Wednesday</div>
-                    <div class="show-time">8:00 PM EST</div>
-                    <div class="show-type in-person">IN-PERSON AUDIENCE</div>
+                    <div>
+                        <div class="show-day">THURSDAY</div>
+                        <div class="show-time">Aug 21, 2025 8:00 PM CT</div>
+                    </div>
+                    <div class="show-buttons">
+                        <a href="https://brownpapertickets.com/" class="show-type in-person" target="_blank">LIVE AUDIENCE</a>
+                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                    </div>
                 </div>
                 <div class="show-card">
-                    <div class="show-day">Friday</div>
-                    <div class="show-time">9:00 PM EST</div>
-                    <div class="show-type online">ONLINE ONLY</div>
+                    <div>
+                        <div class="show-day">FRIDAY</div>
+                        <div class="show-time">Aug 22, 2025 9:30 PM CT</div>
+                    </div>
+                    <div class="show-buttons">
+                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                    </div>
                 </div>
                 <div class="show-card">
-                    <div class="show-day">Saturday</div>
-                    <div class="show-time">7:00 PM EST</div>
-                    <div class="show-type in-person">IN-PERSON AUDIENCE</div>
+                    <div>
+                        <div class="show-day">SATURDAY</div>
+                        <div class="show-time">Aug 23, 2025 6:00 PM CT</div>
+                    </div>
+                    <div class="show-buttons">
+                        <a href="https://brownpapertickets.com/" class="show-type in-person" target="_blank">LIVE AUDIENCE</a>
+                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                    </div>
+                </div>
+                <div class="show-card">
+                    <div>
+                        <div class="show-day">SUNDAY</div>
+                        <div class="show-time">Aug 24, 2025 7:00 PM CT</div>
+                    </div>
+                    <div class="show-buttons">
+                        <a href="https://brownpapertickets.com/" class="show-type in-person" target="_blank">LIVE AUDIENCE</a>
+                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                    </div>
+                </div>
+                <div class="show-card">
+                    <div>
+                        <div class="show-day">MONDAY</div>
+                        <div class="show-time">Aug 25, 2025 8:30 PM CT</div>
+                    </div>
+                    <div class="show-buttons">
+                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                    </div>
                 </div>
             </div>
         </section>
-
-        <section class="section" id="shop">
-            <h2 class="section-title">Live Shopping Experience</h2>
-            <div class="content-grid">
-                <div class="content-card">
-                    <h3>Comedy Merch</h3>
-                    <p>T-shirts, mugs, stickers, and more featuring our most popular bits and inside jokes. Wear your comedy fandom with pride!</p>
-                </div>
-                <div class="content-card">
-                    <h3>Flash Sales</h3>
-                    <p>Lightning-fast deals that pop up during our shows! Keep your eyes peeled for surprise discounts and limited-time offers that sell out fast.</p>
-                </div>
-                <div class="content-card">
-                    <h3>Audience Requests</h3>
-                    <p>Purchase custom improv scenes! Want us to perform your dream scenario? Buy a request slot and watch us bring your idea to comedic life!</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="section reviews-section" style="background: var(--comic-green); color: var(--comic-white);">
-            <h2 class="section-title" style="color: var(--comic-white); text-shadow: 3px 3px 0px var(--comic-black);">The Fake Reviews Are In</h2>
+        
+        <section class="section reviews-section" style="background: var(--comic-orange); color: var(--comic-white);">
+            <h2 class="section-title">The Fake Reviews Are In</h2>
             <div class="reviews-grid">
                 <div class="review-card">
-                    <div class="stars">⭐</div>
-                    <p class="review-text">"I can't believe they used comic sans on their website"</p>
+                    <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+                    <p class="review-text">"I can't believe they didn't use comic sans on their website"</p>
                     <div class="reviewer">- Karen M.</div>
                 </div>
                 <div class="review-card">
-                    <div class="stars">⭐⭐</div>
+                    <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
                     <p class="review-text">"I thought I was going to Trader Joe's"</p>
                     <div class="reviewer">- Confused Customer</div>
                 </div>
                 <div class="review-card">
-                    <div class="stars">⭐⭐⭐</div>
+                    <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
                     <p class="review-text">"They sold me a banana for $47. It wasn't even ripe."</p>
                     <div class="reviewer">- Fruit Enthusiast</div>
                 </div>
                 <div class="review-card">
-                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
                     <p class="review-text">"I came for the improv but left with 12 kitchen knives. Still confused."</p>
                     <div class="reviewer">- Sharp Shopper</div>
                 </div>
                 <div class="review-card">
-                    <div class="stars">⭐⭐⭐⭐</div>
+                    <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
                     <p class="review-text">"My grandmother called during the show and bought a treadmill. She's 94."</p>
                     <div class="reviewer">- Concerned Grandchild</div>
                 </div>
                 <div class="review-card">
-                    <div class="stars">⭐⭐</div>
+                    <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
                     <p class="review-text">"It makes QVC look like Masterpiece Theater"</p>
                     <div class="reviewer">- TV Critic</div>
                 </div>
                 <div class="review-card">
-                    <div class="stars">⭐</div>
+                    <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
                     <p class="review-text">"Charlie Babbitt squeezed and pulled and hurt my neck in 1988"</p>
                     <div class="reviewer">- Rain Man</div>
+                </div>
+                <div class="review-card">
+                    <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+                    <p class="review-text">"If tickets are still available, you can't be sold out! How can you be sold out if tickets are still available?!"</p>
+                    <div class="reviewer">- Floyd</div>
                 </div>
             </div>
         </section>
@@ -736,15 +884,15 @@
         <footer id="contact">
             <div class="footer-content">
                 <div class="social-links">
-                    <a href="https://www.instagram.com/soldoutimprovcomedy" class="social-link" title="Follow us on Instagram">IG</a>
+                    <a href="https://www.instagram.com/soldoutcomedyshow" class="social-link" title="Follow us on Instagram">IG</a>
                     <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Like us on Facebook">FB</a>
                     <a href="https://x.com/soldoutcomedy" class="social-link" title="Follow us on X">X</a>
                 </div>
                 <p class="footer-text">
-                    Ready to laugh and shop? Join us for the most entertaining shopping experience on the internet!
+                    Shilling for Schillings
                 </p>
                 <div class="copyright">
-                    <p>&copy; 2025 Sold Out Improv. All rights reserved. | Comedy guaranteed, products while supplies last!</p>
+                    <p>&copy; 2025 SOLD OUT! Comedy Show</p>
                 </div>
             </div>
         </footer>
