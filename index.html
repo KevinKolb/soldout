@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLD OUT IMPROV - Live Comedy & Shopping!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --comic-red: #FF3B3B;
+            --comic-blue: #4A90E2;
+            --comic-yellow: #FFD93D;
+            --comic-purple: #9013FE;
+            --comic-green: #4CAF50;
+            --comic-orange: #FF9500;
+            --comic-black: #2C2C2C;
+            --comic-white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(45deg, var(--comic-yellow) 0%, var(--comic-orange) 50%, var(--comic-red) 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Ben Day Dots Background */
+        .dots-bg {
+            position: relative;
+        }
+
+        .dots-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle, var(--comic-black) 1px, transparent 1px);
+            background-size: 8px 8px;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .dots-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle, var(--comic-blue) 1.5px, transparent 1.5px);
+            background-size: 12px 12px;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* Header */
+        header {
+            background: var(--comic-black);
+            border-bottom: 8px solid var(--comic-yellow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-dots {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle, var(--comic-red) 2px, transparent 2px);
+            background-size: 20px 20px;
+            opacity: 0.1;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            width: 40px;
+            height: 40px;
+            background-image: url('images/hamburger.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: 0.3s;
+        }
+
+        .hamburger.active {
+            transform: rotate(90deg);
+        }
+
+        .logo {
+            font-family: 'Bangers', cursive;
+            font-size: 2.5rem;
+            color: var(--comic-yellow);
+            text-shadow: 4px 4px 0px var(--comic-red), 8px 8px 0px var(--comic-blue);
+            transform: rotate(-5deg);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: rotate(-5deg) scale(1); }
+            100% { transform: rotate(-5deg) scale(1.05); }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--comic-white);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 1rem;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--comic-red);
+            transform: skew(-10deg) scaleX(0);
+            transition: transform 0.3s ease;
+            z-index: -1;
+        }
+
+        .nav-links a:hover::before {
+            transform: skew(-10deg) scaleX(1);
+        }
+
+        .nav-links a:hover {
+            color: var(--comic-white);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(135deg, var(--comic-blue), var(--comic-purple));
+            border-bottom: 8px solid var(--comic-yellow);
+        }
+
+        .hero-title {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(3rem, 8vw, 6rem);
+            color: var(--comic-white);
+            text-shadow: 6px 6px 0px var(--comic-black), 12px 12px 0px var(--comic-red);
+            margin-bottom: 1rem;
+            animation: bounce 3s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .hero-subtitle {
+            font-size: 1.8rem;
+            color: var(--comic-yellow);
+            font-weight: 700;
+            text-shadow: 2px 2px 0px var(--comic-black);
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+        }
+
+        .cta-button {
+            background: var(--comic-red);
+            color: var(--comic-white);
+            padding: 1.5rem 3rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 6px solid var(--comic-black);
+            border-radius: 0;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transform: skew(-5deg);
+            transition: all 0.3s ease;
+            box-shadow: 8px 8px 0px var(--comic-black);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: skew(-5deg) translateY(-4px);
+            box-shadow: 12px 12px 0px var(--comic-black);
+        }
+
+        .cta-button:active {
+            transform: skew(-5deg) translateY(2px);
+            box-shadow: 4px 4px 0px var(--comic-black);
+        }
+
+        /* Content Sections */
+        .section {
+            padding: 4rem 2rem;
+            position: relative;
+        }
+
+        .section-title {
+            font-family: 'Bangers', cursive;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--comic-black);
+            text-shadow: 3px 3px 0px var(--comic-yellow);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .content-card {
+            background: var(--comic-white);
+            border: 6px solid var(--comic-black);
+            padding: 2rem;
+            position: relative;
+            transform: rotate(1deg);
+            transition: all 0.3s ease;
+            box-shadow: 8px 8px 0px var(--comic-black);
+        }
+
+        .content-card:nth-child(even) {
+            transform: rotate(-1deg);
+            background: var(--comic-yellow);
+        }
+
+        .content-card::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 40px;
+            height: 40px;
+            background-image: radial-gradient(circle, var(--comic-red) 2px, transparent 2px);
+            background-size: 6px 6px;
+        }
+
+        .content-card:hover {
+            transform: rotate(0deg) translateY(-10px);
+            box-shadow: 12px 12px 0px var(--comic-black);
+        }
+
+        .content-card h3 {
+            font-family: 'Bangers', cursive;
+            font-size: 2rem;
+            color: var(--comic-red);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 0px var(--comic-black);
+        }
+
+        .content-card p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: var(--comic-black);
+            font-weight: 400;
+        }
+
+        /* Show Times */
+        .show-times {
+            background: var(--comic-purple);
+            color: var(--comic-white);
+            text-align: center;
+        }
+
+        .show-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .show-card {
+            background: var(--comic-white);
+            color: var(--comic-black);
+            padding: 1.5rem;
+            border: 4px solid var(--comic-black);
+            transform: skew(-2deg);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .show-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--comic-red) 0px,
+                var(--comic-red) 10px,
+                var(--comic-yellow) 10px,
+                var(--comic-yellow) 20px
+            );
+        }
+
+        .show-card:hover {
+            transform: skew(0deg) scale(1.05);
+        }
+
+        .show-day {
+            font-family: 'Bangers', cursive;
+            font-size: 1.5rem;
+            color: var(--comic-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .show-time {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--comic-red);
+            margin-bottom: 0.5rem;
+        }
+
+        .show-type {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .show-type.online {
+            background: var(--comic-blue);
+            color: var(--comic-white);
+            border: 2px solid var(--comic-black);
+        }
+
+        .show-type.in-person {
+            background: var(--comic-green);
+            color: var(--comic-white);
+            border: 2px solid var(--comic-black);
+        }
+
+        /* Reviews Section */
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .review-card {
+            background: var(--comic-white);
+            color: var(--comic-black);
+            padding: 1.5rem;
+            border: 4px solid var(--comic-black);
+            transform: rotate(1deg);
+            transition: all 0.3s ease;
+            box-shadow: 6px 6px 0px var(--comic-black);
+            position: relative;
+        }
+
+        .review-card:nth-child(even) {
+            transform: rotate(-1deg);
+            background: var(--comic-yellow);
+        }
+
+        .review-card:nth-child(3) {
+            background: var(--comic-blue);
+            color: var(--comic-white);
+        }
+
+        .review-card:nth-child(4) {
+            background: var(--comic-red);
+            color: var(--comic-white);
+        }
+
+        .review-card:nth-child(5) {
+            background: var(--comic-purple);
+            color: var(--comic-white);
+        }
+
+        .review-card:nth-child(6) {
+            background: var(--comic-orange);
+            color: var(--comic-white);
+        }
+
+        .review-card:nth-child(7) {
+            background: var(--comic-red);
+            color: var(--comic-white);
+        }
+
+        .review-card:hover {
+            transform: rotate(0deg) translateY(-5px);
+            box-shadow: 10px 10px 0px var(--comic-black);
+        }
+
+        .review-card::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 30px;
+            height: 30px;
+            background-image: radial-gradient(circle, var(--comic-red) 1px, transparent 1px);
+            background-size: 4px 4px;
+        }
+
+        .stars {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-text {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+            font-weight: 400;
+        }
+
+        .reviewer {
+            font-weight: 700;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--comic-black);
+            color: var(--comic-white);
+            padding: 3rem 2rem 1rem;
+            position: relative;
+            border-top: 8px solid var(--comic-yellow);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 60px;
+            height: 60px;
+            background: var(--comic-red);
+            border: 4px solid var(--comic-white);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--comic-white);
+            transition: all 0.3s ease;
+            transform: rotate(5deg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-link::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle, var(--comic-yellow) 1px, transparent 1px);
+            background-size: 4px 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .social-link:hover::before {
+            opacity: 0.3;
+        }
+
+        .social-link:hover {
+            transform: rotate(0deg) scale(1.1);
+            background: var(--comic-blue);
+        }
+
+        .social-link:nth-child(2) {
+            background: var(--comic-blue);
+            transform: rotate(-5deg);
+        }
+
+        .social-link:nth-child(2):hover {
+            background: var(--comic-purple);
+        }
+
+        .social-link:nth-child(3) {
+            background: var(--comic-green);
+            transform: rotate(5deg);
+        }
+
+        .social-link:nth-child(3):hover {
+            background: var(--comic-orange);
+        }
+
+        .footer-text {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            border-top: 2px solid var(--comic-yellow);
+            padding-top: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hamburger {
+                display: flex;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                height: 100vh;
+                width: 250px;
+                background: var(--comic-black);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2rem;
+                transition: right 0.3s ease;
+                z-index: 1000;
+                border-left: 8px solid var(--comic-yellow);
+            }
+            
+            .nav-links.active {
+                right: 0;
+            }
+            
+            .nav-links a {
+                font-size: 1.5rem;
+                padding: 1rem;
+            }
+            
+            .logo {
+                font-size: 2rem;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.4rem;
+            }
+            
+            .social-links {
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dots-bg">
+        <header>
+            <div class="header-dots"></div>
+            <nav>
+                <div class="logo">SOLD OUT!</div>
+                <div class="hamburger"></div>
+                <ul class="nav-links">
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#shows">Shows</a></li>
+                    <li><a href="#shop">Shop</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <div class="dots-overlay"></div>
+            <h1 class="hero-title">SOLD OUT IMPROV</h1>
+            <p class="hero-subtitle">Live Comedy Meets Live Shopping!</p>
+            <a href="#shows" class="cta-button">Watch Now!</a>
+        </section>
+
+        <section class="section" id="about">
+            <h2 class="section-title">How It Works</h2>
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>Live Improv Comedy</h3>
+                    <p>Watch our talented comedians create hilarious scenes, characters, and stories on the spot. Every show is unique, unrehearsed, and guaranteed to make you laugh until your sides hurt!</p>
+                </div>
+                <div class="content-card">
+                    <h3>Interactive Shopping</h3>
+                    <p>Buy amazing products live during our shows! From comedy merchandise to surprise deals, you can shop while you watch and become part of the performance.</p>
+                </div>
+                <div class="content-card">
+                    <h3>Audience Participation</h3>
+                    <p>Your suggestions drive our scenes! Chat with us live, suggest scenarios, and watch as we bring your wildest ideas to life through comedy gold.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section show-times" id="shows">
+            <h2 class="section-title" style="color: var(--comic-white);">Show Schedule</h2>
+            <div class="show-grid">
+                <div class="show-card">
+                    <div class="show-day">Monday</div>
+                    <div class="show-time">8:00 PM EST</div>
+                    <div class="show-type online">ONLINE ONLY</div>
+                </div>
+                <div class="show-card">
+                    <div class="show-day">Wednesday</div>
+                    <div class="show-time">8:00 PM EST</div>
+                    <div class="show-type in-person">IN-PERSON AUDIENCE</div>
+                </div>
+                <div class="show-card">
+                    <div class="show-day">Friday</div>
+                    <div class="show-time">9:00 PM EST</div>
+                    <div class="show-type online">ONLINE ONLY</div>
+                </div>
+                <div class="show-card">
+                    <div class="show-day">Saturday</div>
+                    <div class="show-time">7:00 PM EST</div>
+                    <div class="show-type in-person">IN-PERSON AUDIENCE</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="shop">
+            <h2 class="section-title">Live Shopping Experience</h2>
+            <div class="content-grid">
+                <div class="content-card">
+                    <h3>Comedy Merch</h3>
+                    <p>T-shirts, mugs, stickers, and more featuring our most popular bits and inside jokes. Wear your comedy fandom with pride!</p>
+                </div>
+                <div class="content-card">
+                    <h3>Flash Sales</h3>
+                    <p>Lightning-fast deals that pop up during our shows! Keep your eyes peeled for surprise discounts and limited-time offers that sell out fast.</p>
+                </div>
+                <div class="content-card">
+                    <h3>Audience Requests</h3>
+                    <p>Purchase custom improv scenes! Want us to perform your dream scenario? Buy a request slot and watch us bring your idea to comedic life!</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section reviews-section" style="background: var(--comic-green); color: var(--comic-white);">
+            <h2 class="section-title" style="color: var(--comic-white); text-shadow: 3px 3px 0px var(--comic-black);">The Fake Reviews Are In</h2>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="stars">⭐</div>
+                    <p class="review-text">"I can't believe they used comic sans on their website"</p>
+                    <div class="reviewer">- Karen M.</div>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐</div>
+                    <p class="review-text">"I thought I was going to Trader Joe's"</p>
+                    <div class="reviewer">- Confused Customer</div>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐</div>
+                    <p class="review-text">"They sold me a banana for $47. It wasn't even ripe."</p>
+                    <div class="reviewer">- Fruit Enthusiast</div>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p class="review-text">"I came for the improv but left with 12 kitchen knives. Still confused."</p>
+                    <div class="reviewer">- Sharp Shopper</div>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐</div>
+                    <p class="review-text">"My grandmother called during the show and bought a treadmill. She's 94."</p>
+                    <div class="reviewer">- Concerned Grandchild</div>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐</div>
+                    <p class="review-text">"It makes QVC look like Masterpiece Theater"</p>
+                    <div class="reviewer">- TV Critic</div>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐</div>
+                    <p class="review-text">"Charlie Babbitt squeezed and pulled and hurt my neck in 1988"</p>
+                    <div class="reviewer">- Rain Man</div>
+                </div>
+            </div>
+        </section>
+
+        <footer id="contact">
+            <div class="footer-content">
+                <div class="social-links">
+                    <a href="https://www.instagram.com/soldoutimprovcomedy" class="social-link" title="Follow us on Instagram">IG</a>
+                    <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Like us on Facebook">FB</a>
+                    <a href="https://x.com/soldoutcomedy" class="social-link" title="Follow us on X">X</a>
+                </div>
+                <p class="footer-text">
+                    Ready to laugh and shop? Join us for the most entertaining shopping experience on the internet!
+                </p>
+                <div class="copyright">
+                    <p>&copy; 2025 Sold Out Improv. All rights reserved. | Comedy guaranteed, products while supplies last!</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for nav links
+            const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                    
+                    // Close mobile menu after clicking a link
+                    const hamburger = document.querySelector('.hamburger');
+                    const navLinksContainer = document.querySelector('.nav-links');
+                    hamburger.classList.remove('active');
+                    navLinksContainer.classList.remove('active');
+                });
+            });
+
+            // Hamburger menu toggle
+            const hamburger = document.querySelector('.hamburger');
+            const navLinksContainer = document.querySelector('.nav-links');
+            
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                navLinksContainer.classList.toggle('active');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!hamburger.contains(e.target) && !navLinksContainer.contains(e.target)) {
+                    hamburger.classList.remove('active');
+                    navLinksContainer.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
