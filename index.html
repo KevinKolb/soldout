@@ -255,7 +255,7 @@
 
         .content-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(12, 1fr);
             gap: 2rem;
             max-width: 1200px;
             margin: 0 auto;
@@ -269,6 +269,35 @@
             transform: rotate(1deg);
             transition: all 0.3s ease;
             box-shadow: 8px 8px 0px var(--comic-black);
+        }
+
+        /* Different card sizes */
+        .content-card:nth-child(1) {
+            grid-column: span 4;
+        }
+
+        .content-card:nth-child(2) {
+            grid-column: span 4;
+        }
+
+        .content-card:nth-child(3) {
+            grid-column: span 4;
+        }
+
+        .content-card:nth-child(4) {
+            grid-column: span 8; /* Twice as wide */
+        }
+
+        .content-card:nth-child(5) {
+            grid-column: span 4;
+        }
+
+        .content-card:nth-child(6) {
+            grid-column: span 4;
+        }
+
+        .content-card:nth-child(7) {
+            grid-column: span 4;
         }
 
         .content-card:nth-child(even) {
@@ -305,6 +334,52 @@
             line-height: 1.6;
             color: var(--comic-black);
             font-weight: 400;
+        }
+
+        .content-card ul {
+            margin: 1rem 0;
+            padding-left: 1.5rem;
+        }
+
+        .content-card li {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        /* Special styling for the trash card */
+        .trash-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .trash-section h4 {
+            font-family: 'Bangers', cursive;
+            font-size: 1.3rem;
+            color: var(--comic-blue);
+            margin-bottom: 0.8rem;
+            text-shadow: 1px 1px 0px var(--comic-black);
+        }
+
+        .options-list {
+            margin: 1rem 0;
+        }
+
+        .options-list li {
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .final-note {
+            border-top: 3px solid var(--comic-red);
+            padding-top: 1rem;
+            text-align: center;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--comic-red);
+            margin-top: 0.5rem;
         }
 
         /* Show Times */
@@ -657,6 +732,18 @@
             color: var(--comic-black);
         }
 
+        .social-link:nth-child(4) {
+            background: #FFF351;
+            transform: rotate(-5deg);
+            color: #000 !important; /* Light gray override */
+}
+
+        .social-link:nth-child(4):hover {
+            transform: rotate(0deg) scale(1.1);
+            background: #F0F0F0;
+            color: #000 !important; /* Keep light gray on hover */
+}
+
         .footer-text {
             font-size: 1.1rem;
             margin-bottom: 1rem;
@@ -717,6 +804,44 @@
                 flex-wrap: wrap;
                 gap: 1rem;
             }
+
+            /* Mobile responsive for varied card sizes */
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-card:nth-child(1),
+            .content-card:nth-child(2),
+            .content-card:nth-child(3),
+            .content-card:nth-child(4),
+            .content-card:nth-child(5),
+            .content-card:nth-child(6),
+            .content-card:nth-child(7) {
+                grid-column: span 1;
+            }
+        }
+
+        /* Tablet responsive for varied card sizes */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: repeat(8, 1fr);
+            }
+
+            .content-card:nth-child(1),
+            .content-card:nth-child(2),
+            .content-card:nth-child(3) {
+                grid-column: span 4;
+            }
+
+            .content-card:nth-child(4) {
+                grid-column: span 8; /* Full width on tablet */
+            }
+
+            .content-card:nth-child(5),
+            .content-card:nth-child(6),
+            .content-card:nth-child(7) {
+                grid-column: span 4;
+            }
         }
     </style>
 </head>
@@ -730,7 +855,7 @@
                 <ul class="nav-links">
                     <li><a href="#shows">Shows</a></li>
                     <li><a href="#shop">Shop</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#contact">Socials</a></li>
                 </ul>
             </nav>
         </header>
@@ -739,7 +864,7 @@
             <div class="dots-overlay"></div>
             <img src="images/soldoutlogo.png" alt="SOLD OUT! Comedy Show" class="hero-logo">
             <p class="hero-subtitle">Live Comedy Meets Live Shopping</p>
-            <a href="#shows" class="cta-button">TRAILER</a>
+            <a href="https://youtu.be/dQw4w9WgXcQ?si=x3E9RKR8gP0PYgeb" class="cta-button">TRAILER</a>
         </section>
         
         <section class="section" id="about">
@@ -756,18 +881,63 @@
                 <div class="content-card">
                     <h3>Audience Participation</h3>
                     <p>Your suggestions drive our scenes! Chat with us live, suggest scenarios, and watch as we bring your wildest ideas to life through comedy gold.</p>
+                    
+                    <p><strong>Phones OUT, not away!</strong> We actually encourage you to use your phone during the show – chat with us live, bid on items, and become part of the interactive experience.</p>
+                    
+                    <p>Bring items to sell and jump into the action! Whether you're hawking your own treasures or helping fellow audience members move their merchandise, you're always invited to join the selling shenanigans on stage.</p>
                 </div>
                 <div class="content-card">
-                    <h3>Audience Participation</h3>
-                    <p>Your suggestions drive our scenes! Chat with us live, suggest scenarios, and watch as we bring your wildest ideas to life through comedy gold.</p>
+                   <h3>One Person's Trash is Another Person's Punchline</h3>
+                   
+                   <div class="trash-section">
+                       <h4>Bring an item for us to sell. You have 3 options:</h4>
+                       <ul class="options-list">
+                           <li><strong>Trade it</strong> for your admission ticket (yes, really!)</li>
+                           <li><strong>Donate it</strong> for the laughs</li>
+                           <li><strong>Consign it</strong> and maybe make some cash while you're crying with laughter</li>
+                       </ul>
+                   </div>
+                   
+                   <div class="trash-section">
+                       <p>Why list your junk on apps with strangers who ghost you after asking "Is this still available?" 47 times? At SOLD OUT!, your stuff becomes instant comedy gold as our improvisers turn real merchandise into unhinged theatrical madness.</p>
+                   </div>
+                   
+                   <div class="trash-section">
+                       <h4>How It Works:</h4>
+                       <p>Pack your item in a mail-ready box (yes, like you're actually going to ship it) with your name and minimum price written INSIDE the box. Don't make us hunt for it.</p>
+                       
+                       <p>Then sit back as comedians transform your mundane possessions into comedy legends – that dusty bread maker becomes a time machine, your exercise ball transforms into a crystal ball for terrible life advice, your forgotten juicer stars in a medical drama!</p>
+                   </div>
+                   
+                   <div class="trash-section">
+                       <h4>The Wild Card Factor:</h4>
+                       <p>You don't control which skit your item crashes into – could be a soap opera, could be a cooking show gone wrong. But here's the twist: want to jump onstage and help sell your own stuff? We'll pull you into the improv madness! Or stay seated and watch the chaos unfold. Your choice, your comfort level, your soon-to-be-legendary item.</p>
+                   </div>
+                   
+                   <div class="trash-section final-note">
+                       <p>Your stuff finally gets the dramatic exit it deserves. And unlike your garage sale, people will actually show up.</p>
+                       <p class="tagline"><em>Because selling should be entertaining, not excruciating.</em></p>
+                   </div>
                 </div>
                 <div class="content-card">
-                    <h3>Audience Participation</h3>
-                    <p>Your suggestions drive our scenes! Chat with us live, suggest scenarios, and watch as we bring your wildest ideas to life through comedy gold.</p>
+                    <h3>Phone Zone Freedom!</h3>
+                    <p>No it's not rude! Keep your phone out during the show, we don't care! You can use your phone to participate in the show:</p>
+                    
+                    <ul>
+                        <li><strong>Use it to buy stuff!</strong></li>
+                        <li><strong>Chat along with the online audience!</strong></li>
+                        <li><strong>Play Candy Crush!</strong></li>
+                    </ul>
+                    
+                    <p>Finally, a show where being glued to your screen is part of the experience, not a social faux pas! That's french for "My bad."</p>
                 </div>
                 <div class="content-card">
-                    <h3>Audience Participation</h3>
-                    <p>Your suggestions drive our scenes! Chat with us live, suggest scenarios, and watch as we bring your wildest ideas to life through comedy gold.</p>
+                    <h3>Live Stream Magic</h3>
+                    <p>Can't make it in person? Join us online! Our live streams let you participate from anywhere, shop exclusive deals, and interact with comedians and audience members in real-time.</p>
+                </div>
+                <div class="content-card">
+                    <h3>Surprise Guests</h3>
+                    <p>You never know who might drop by! Local celebrities, surprise performers, and special guests often join our shows to add even more unpredictable fun to the mix.</p>
                 </div>
             </div>
         </section>
@@ -777,11 +947,12 @@
             <div class="show-grid">
                 <div class="show-card">
                     <div>
-                        <div class="show-day">TUESDAY</div>
-                        <div class="show-time">Aug 19, 2025 7:30 PM CT</div>
+                        <div class="show-day">FRIDAY</div>
+                        <div class="show-time">Oct 3, 2025 7:45 PM CT</div>
                     </div>
                     <div class="show-buttons">
-                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                        <a href="https://brownpapertickets.com/" class="show-type in-person" target="_blank">LIVE AUDIENCE</a>
+                        <a href="https://www.whatnot.com/live/e74f6f91-a1b9-4147-8222-511b3264b5de?app=web&invitedBy=soldoutcomedyshow&sender_id=24510767" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
                     </div>
                 </div>
                 <div class="show-card">
@@ -871,7 +1042,7 @@
                 <div class="review-card">
                     <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
                     <p class="review-text">"Charlie Babbitt squeezed and pulled and hurt my neck in 1988"</p>
-                    <div class="reviewer">- Rain Man</div>
+                    <div class="reviewer">- Raymond Babbitt</div>
                 </div>
                 <div class="review-card">
                     <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
@@ -887,9 +1058,10 @@
                     <a href="https://www.instagram.com/soldoutcomedyshow" class="social-link" title="Follow us on Instagram">IG</a>
                     <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Like us on Facebook">FB</a>
                     <a href="https://x.com/soldoutcomedy" class="social-link" title="Follow us on X">X</a>
+                    <a href="https://www.whatnot.com/user/soldoutcomedyshow" class="social-link" title="Watch us on Whatnot">WN</a>
                 </div>
                 <p class="footer-text">
-                    Shilling for Schillings
+                    blame kevin kolb
                 </p>
                 <div class="copyright">
                     <p>&copy; 2025 SOLD OUT! Comedy Show</p>
