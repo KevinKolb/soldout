@@ -109,11 +109,6 @@
             text-shadow: 4px 4px 0px var(--comic-red), 8px 8px 0px var(--comic-blue);
         }
 
-        @keyframes pulse {
-            0% { transform: rotate(-5deg) scale(1); }
-            100% { transform: rotate(-5deg) scale(1.05); }
-        }
-
         .nav-links {
             display: flex;
             list-style: none;
@@ -285,7 +280,7 @@
         }
 
         .content-card:nth-child(4) {
-            grid-column: span 8; /* Twice as wide */
+            grid-column: span 8;
         }
 
         .content-card:nth-child(5) {
@@ -384,168 +379,278 @@
 
         /* Show Times */
         .show-times {
-            background: var(--comic-purple);
+            background: linear-gradient(135deg, var(--comic-purple) 0%, #6b21a8 50%, var(--comic-black) 100%);
             color: var(--comic-white);
-            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .show-times::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, var(--comic-yellow) 2px, transparent 2px),
+                radial-gradient(circle at 75% 75%, var(--comic-red) 1px, transparent 1px);
+            background-size: 40px 40px, 60px 60px;
+            opacity: 0.05;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(10px, -10px) rotate(1deg); }
+            66% { transform: translate(-5px, 5px) rotate(-1deg); }
         }
 
         .show-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            max-width: 900px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 1rem;
-            background: var(--comic-white);
-            border: 8px solid var(--comic-black);
-            box-shadow: 12px 12px 0px var(--comic-black);
+            padding: 2rem;
             position: relative;
+            z-index: 2;
         }
 
-        .show-grid::before {
-            content: '';
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 60px;
-            height: 60px;
-            background-image: radial-gradient(circle, var(--comic-red) 2px, transparent 2px);
-            background-size: 8px 8px;
-            opacity: 0.3;
-        }
-
-        .show-card {
-            background: var(--comic-white);
-            color: var(--comic-black);
-            padding: 1.2rem;
-            border: 4px solid var(--comic-black);
-            transform: rotate(1deg);
-            transition: all 0.3s ease;
-            position: relative;
+        /* SeatGeek-Style Event Cards */
+        .sg-event-card {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
             overflow: hidden;
-            box-shadow: 6px 6px 0px var(--comic-black);
-            margin: 0.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sg-event-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: #cbd5e1;
+        }
+
+        .sg-header {
+            padding: 16px 20px 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .sg-event-meta {
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             align-items: center;
-            text-align: center;
-            min-height: 200px;
+            justify-content: space-between;
+            margin-bottom: 8px;
         }
 
-        .show-card::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 25px;
-            height: 25px;
-            background-image: radial-gradient(circle, var(--comic-blue) 1.5px, transparent 1.5px);
-            background-size: 5px 5px;
-            opacity: 0.4;
+        .sg-badge {
+            background: #f1f5f9;
+            color: #334155;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .show-card::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 6px;
-            background: repeating-linear-gradient(
-                90deg,
-                var(--comic-red) 0px,
-                var(--comic-red) 8px,
-                var(--comic-yellow) 8px,
-                var(--comic-yellow) 16px
-            );
+        .sg-badge.stage {
+            background: #fef2f2;
+            color: #dc2626;
         }
 
-        .show-card:hover {
-            transform: rotate(0deg) translateY(-3px);
-            box-shadow: 10px 10px 0px var(--comic-black);
+        .sg-badge.screen {
+            background: #eff6ff;
+            color: #2563eb;
         }
 
-        .show-card:nth-child(even) {
-            background: var(--comic-yellow);
-            transform: rotate(-1deg);
+        .sg-price {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
         }
 
-        .show-card:nth-child(3n) {
-            background: var(--comic-green);
-            color: var(--comic-white);
-            transform: rotate(1.5deg);
-        }
-
-        .show-card:nth-child(4n) {
-            background: var(--comic-purple);
-            color: var(--comic-white);
-            transform: rotate(-0.5deg);
-        }
-
-        .show-day {
-            font-family: 'Bangers', cursive;
-            font-size: 2rem;
-            color: var(--comic-blue);
-            margin-bottom: 0.5rem;
-        }
-
-        .show-time {
-            font-size: 1.1rem;
+        .sg-event-title {
+            font-size: 18px;
             font-weight: 700;
-            color: var(--comic-red);
-            margin-bottom: 1rem;
+            color: #0f172a;
+            line-height: 1.3;
+            margin-bottom: 2px;
         }
 
-        .show-buttons {
+        .sg-event-subtitle {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 400;
+        }
+
+        /* Date and Time Section */
+        .sg-datetime {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .sg-datetime:hover {
+            background-color: #f8fafc;
+        }
+
+        .sg-date-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .sg-date-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sg-calendar-icon {
+            width: 16px;
+            height: 16px;
+            color: #94a3b8;
+        }
+
+        .sg-date-info {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            width: 100%;
-            margin-top: auto;
         }
 
-        .show-type {
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            padding: 0.6rem 1.2rem;
-            border-radius: 0;
-            display: block;
-            margin: 0;
-            text-decoration: none;
+        .sg-date-primary {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .sg-date-secondary {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 1px;
+        }
+
+        /* Venue Section (only for Stage Edition) */
+        .sg-venue {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 3px solid var(--comic-black);
-            box-shadow: 4px 4px 0px var(--comic-black);
-            transform: skew(-3deg);
+            transition: background-color 0.2s ease;
+        }
+
+        .sg-venue:hover {
+            background-color: #f8fafc;
+        }
+
+        .sg-location-icon {
+            width: 16px;
+            height: 16px;
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+
+        .sg-venue-info {
+            flex: 1;
+        }
+
+        .sg-venue-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 1px;
+        }
+
+        .sg-venue-address {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* Actions Section */
+        .sg-actions {
+            padding: 16px 20px;
+        }
+
+        .sg-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sg-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
             text-align: center;
-            min-height: 44px;
-            line-height: 1.2;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            line-height: 1;
         }
 
-        .show-type.online {
+        .sg-btn-primary {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+        }
+
+        .sg-btn-primary:hover {
+            background: #1e293b;
+            border-color: #1e293b;
+        }
+
+        .sg-btn-secondary {
+            background: #ffffff;
+            color: #334155;
+            border-color: #e2e8f0;
+        }
+
+        .sg-btn-secondary:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        /* Stage Edition Specific Styling */
+        .sg-event-card.stage .sg-btn-primary {
+            background: var(--comic-red);
+            border-color: var(--comic-red);
+        }
+
+        .sg-event-card.stage .sg-btn-primary:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .sg-event-card.stage .sg-btn-secondary {
+            color: var(--comic-blue);
+            border-color: var(--comic-blue);
+        }
+
+        .sg-event-card.stage .sg-btn-secondary:hover {
+            background: #eff6ff;
+            border-color: var(--comic-blue);
+        }
+
+        /* Screen Edition Specific Styling */
+        .sg-event-card.screen .sg-btn-primary {
             background: var(--comic-blue);
-            color: var(--comic-white);
-            border: 2px solid var(--comic-black);
+            border-color: var(--comic-blue);
         }
 
-        .show-type.online:hover {
-            background: var(--comic-purple);
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 0px var(--comic-black);
+        .sg-event-card.screen .sg-btn-primary:hover {
+            background: #3b82f6;
+            border-color: #3b82f6;
         }
 
-        .show-type.in-person {
-            background: var(--comic-green);
-            color: var(--comic-white);
-            border: 2px solid var(--comic-black);
-        }
-
-        .show-type.in-person:hover {
-            background: var(--comic-orange);
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 0px var(--comic-black);
+        .sg-event-card.screen .sg-venue {
+            display: none;
         }
 
         /* Reviews Section */
@@ -735,14 +840,14 @@
         .social-link:nth-child(4) {
             background: #FFF351;
             transform: rotate(-5deg);
-            color: #000 !important; /* Light gray override */
-}
+            color: #000 !important;
+        }
 
         .social-link:nth-child(4):hover {
             transform: rotate(0deg) scale(1.1);
             background: #F0F0F0;
-            color: #000 !important; /* Keep light gray on hover */
-}
+            color: #000 !important;
+        }
 
         .footer-text {
             font-size: 1.1rem;
@@ -819,6 +924,21 @@
             .content-card:nth-child(7) {
                 grid-column: span 1;
             }
+
+            /* Show grid mobile */
+            .show-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding: 1rem;
+            }
+            
+            .sg-buttons {
+                flex-direction: column;
+            }
+            
+            .sg-btn {
+                padding: 14px 16px;
+            }
         }
 
         /* Tablet responsive for varied card sizes */
@@ -834,7 +954,7 @@
             }
 
             .content-card:nth-child(4) {
-                grid-column: span 8; /* Full width on tablet */
+                grid-column: span 8;
             }
 
             .content-card:nth-child(5),
@@ -944,63 +1064,259 @@
 
         <section class="section show-times" id="shows">
             <h2 class="section-title">Show Schedule</h2>
+            
+            <!-- Show Type Descriptions -->
+            <div style="max-width: 900px; margin: 0 auto 4rem; padding: 2rem; background: linear-gradient(45deg, var(--comic-black), #1a1a1a); border-radius: 20px; position: relative; overflow: hidden;">
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle, var(--comic-yellow) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.1;"></div>
+                <div style="position: relative; z-index: 2;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
+                        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, var(--comic-blue), #2563eb); border-radius: 15px; transform: rotate(-2deg); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);">
+                            <h3 style="font-family: 'Bangers', cursive; font-size: 2.5rem; color: var(--comic-white); margin-bottom: 1rem; text-shadow: 3px 3px 0px var(--comic-black);">SCREEN EDITION</h3>
+                            <p style="font-size: 1.2rem; color: var(--comic-white); line-height: 1.6; font-weight: 600;">A comedy show for the online audience.</p>
+                        </div>
+                        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, var(--comic-red), #dc2626); border-radius: 15px; transform: rotate(2deg); box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);">
+                            <h3 style="font-family: 'Bangers', cursive; font-size: 2.5rem; color: var(--comic-white); margin-bottom: 1rem; text-shadow: 3px 3px 0px var(--comic-black);">STAGE EDITION</h3>
+                            <p style="font-size: 1.2rem; color: var(--comic-white); line-height: 1.6; font-weight: 600;">A comedy show for in-person and online audiences.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="show-grid">
-                <div class="show-card">
-                    <div>
-                        <div class="show-day">FRIDAY</div>
-                        <div class="show-time">Oct 3, 2025 7:45 PM CT</div>
+                <!-- Stage Edition Shows -->
+                <div class="sg-event-card stage">
+                    <div class="sg-header">
+                        <div class="sg-event-meta">
+                            <span class="sg-badge stage">Stage Edition</span>
+                            <span class="sg-price">$10 or Sellable Item</span>
+                        </div>
+                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
+                        <p class="sg-event-subtitle">A comedy show for in-person and online audiences</p>
                     </div>
-                    <div class="show-buttons">
-                        <a href="https://brownpapertickets.com/" class="show-type in-person" target="_blank">LIVE AUDIENCE</a>
-                        <a href="https://www.whatnot.com/live/e74f6f91-a1b9-4147-8222-511b3264b5de?app=web&invitedBy=soldoutcomedyshow&sender_id=24510767" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                    
+                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-10-03', '19:45', 'The Comedy Theater, 123 Main Street, Downtown')">
+                        <div class="sg-date-row">
+                            <div class="sg-date-block">
+                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <div class="sg-date-info">
+                                    <div class="sg-date-primary">Fri, Oct 3 • 7:45 PM</div>
+                                    <div class="sg-date-secondary">Central Time</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="show-card">
-                    <div>
-                        <div class="show-day">THURSDAY</div>
-                        <div class="show-time">Aug 21, 2025 8:00 PM CT</div>
+                    
+                    <div class="sg-venue" onclick="openDirections('The Comedy Theater, 123 Main Street, Downtown')">
+                        <svg class="sg-location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <div class="sg-venue-info">
+                            <div class="sg-venue-name">The Comedy Theater</div>
+                            <div class="sg-venue-address">123 Main Street, Downtown</div>
+                        </div>
                     </div>
-                    <div class="show-buttons">
-                        <a href="https://brownpapertickets.com/" class="show-type in-person" target="_blank">LIVE AUDIENCE</a>
-                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
-                    </div>
-                </div>
-                <div class="show-card">
-                    <div>
-                        <div class="show-day">FRIDAY</div>
-                        <div class="show-time">Aug 22, 2025 9:30 PM CT</div>
-                    </div>
-                    <div class="show-buttons">
-                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
-                    </div>
-                </div>
-                <div class="show-card">
-                    <div>
-                        <div class="show-day">SATURDAY</div>
-                        <div class="show-time">Aug 23, 2025 6:00 PM CT</div>
-                    </div>
-                    <div class="show-buttons">
-                        <a href="https://brownpapertickets.com/" class="show-type in-person" target="_blank">LIVE AUDIENCE</a>
-                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
-                    </div>
-                </div>
-                <div class="show-card">
-                    <div>
-                        <div class="show-day">SUNDAY</div>
-                        <div class="show-time">Aug 24, 2025 7:00 PM CT</div>
-                    </div>
-                    <div class="show-buttons">
-                        <a href="https://brownpapertickets.com/" class="show-type in-person" target="_blank">LIVE AUDIENCE</a>
-                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                    
+                    <div class="sg-actions">
+                        <div class="sg-buttons">
+                            <a href="https://brownpapertickets.com/" class="sg-btn sg-btn-primary" target="_blank">Get Tickets</a>
+                            <a href="https://www.whatnot.com/live/e74f6f91-a1b9-4147-8222-511b3264b5de?app=web&invitedBy=soldoutcomedyshow&sender_id=24510767" class="sg-btn sg-btn-secondary" target="_blank">Watch Online</a>
+                        </div>
                     </div>
                 </div>
-                <div class="show-card">
-                    <div>
-                        <div class="show-day">MONDAY</div>
-                        <div class="show-time">Aug 25, 2025 8:30 PM CT</div>
+                
+                <div class="sg-event-card stage">
+                    <div class="sg-header">
+                        <div class="sg-event-meta">
+                            <span class="sg-badge stage">Stage Edition</span>
+                            <span class="sg-price">$10 or Sellable Item</span>
+                        </div>
+                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
+                        <p class="sg-event-subtitle">A comedy show for in-person and online audiences</p>
                     </div>
-                    <div class="show-buttons">
-                        <a href="https://www.whatnot.com/" class="show-type online" target="_blank">ONLINE AUDIENCE</a>
+                    
+                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-21', '20:00', 'The Comedy Theater, 123 Main Street, Downtown')">
+                        <div class="sg-date-row">
+                            <div class="sg-date-block">
+                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <div class="sg-date-info">
+                                    <div class="sg-date-primary">Thu, Aug 21 • 8:00 PM</div>
+                                    <div class="sg-date-secondary">Central Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sg-venue" onclick="openDirections('The Comedy Theater, 123 Main Street, Downtown')">
+                        <svg class="sg-location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <div class="sg-venue-info">
+                            <div class="sg-venue-name">The Comedy Theater</div>
+                            <div class="sg-venue-address">123 Main Street, Downtown</div>
+                        </div>
+                    </div>
+                    
+                    <div class="sg-actions">
+                        <div class="sg-buttons">
+                            <a href="https://brownpapertickets.com/" class="sg-btn sg-btn-primary" target="_blank">Get Tickets</a>
+                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-secondary" target="_blank">Watch Online</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Screen Edition Show -->
+                <div class="sg-event-card screen">
+                    <div class="sg-header">
+                        <div class="sg-event-meta">
+                            <span class="sg-badge screen">Screen Edition</span>
+                            <span class="sg-price">Free</span>
+                        </div>
+                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
+                        <p class="sg-event-subtitle">A comedy show for the online audience</p>
+                    </div>
+                    
+                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-22', '21:30', 'Online Event')">
+                        <div class="sg-date-row">
+                            <div class="sg-date-block">
+                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <div class="sg-date-info">
+                                    <div class="sg-date-primary">Fri, Aug 22 • 9:30 PM</div>
+                                    <div class="sg-date-secondary">Central Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sg-actions">
+                        <div class="sg-buttons">
+                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-primary" style="width: 100%;" target="_blank">Watch Online</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sg-event-card stage">
+                    <div class="sg-header">
+                        <div class="sg-event-meta">
+                            <span class="sg-badge stage">Stage Edition</span>
+                            <span class="sg-price">$10 or Sellable Item</span>
+                        </div>
+                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
+                        <p class="sg-event-subtitle">A comedy show for in-person and online audiences</p>
+                    </div>
+                    
+                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-23', '18:00', 'The Comedy Theater, 123 Main Street, Downtown')">
+                        <div class="sg-date-row">
+                            <div class="sg-date-block">
+                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <div class="sg-date-info">
+                                    <div class="sg-date-primary">Sat, Aug 23 • 6:00 PM</div>
+                                    <div class="sg-date-secondary">Central Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sg-venue" onclick="openDirections('The Comedy Theater, 123 Main Street, Downtown')">
+                        <svg class="sg-location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <div class="sg-venue-info">
+                            <div class="sg-venue-name">The Comedy Theater</div>
+                            <div class="sg-venue-address">123 Main Street, Downtown</div>
+                        </div>
+                    </div>
+                    
+                    <div class="sg-actions">
+                        <div class="sg-buttons">
+                            <a href="https://brownpapertickets.com/" class="sg-btn sg-btn-primary" target="_blank">Get Tickets</a>
+                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-secondary" target="_blank">Watch Online</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sg-event-card stage">
+                    <div class="sg-header">
+                        <div class="sg-event-meta">
+                            <span class="sg-badge stage">Stage Edition</span>
+                            <span class="sg-price">$10 or Sellable Item</span>
+                        </div>
+                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
+                        <p class="sg-event-subtitle">A comedy show for in-person and online audiences</p>
+                    </div>
+                    
+                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-24', '19:00', 'The Comedy Theater, 123 Main Street, Downtown')">
+                        <div class="sg-date-row">
+                            <div class="sg-date-block">
+                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <div class="sg-date-info">
+                                    <div class="sg-date-primary">Sun, Aug 24 • 7:00 PM</div>
+                                    <div class="sg-date-secondary">Central Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sg-venue" onclick="openDirections('The Comedy Theater, 123 Main Street, Downtown')">
+                        <svg class="sg-location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <div class="sg-venue-info">
+                            <div class="sg-venue-name">The Comedy Theater</div>
+                            <div class="sg-venue-address">123 Main Street, Downtown</div>
+                        </div>
+                    </div>
+                    
+                    <div class="sg-actions">
+                        <div class="sg-buttons">
+                            <a href="https://brownpapertickets.com/" class="sg-btn sg-btn-primary" target="_blank">Get Tickets</a>
+                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-secondary" target="_blank">Watch Online</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Screen Edition Show -->
+                <div class="sg-event-card screen">
+                    <div class="sg-header">
+                        <div class="sg-event-meta">
+                            <span class="sg-badge screen">Screen Edition</span>
+                            <span class="sg-price">Free</span>
+                        </div>
+                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
+                        <p class="sg-event-subtitle">A comedy show for the online audience</p>
+                    </div>
+                    
+                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-25', '20:30', 'Online Event')">
+                        <div class="sg-date-row">
+                            <div class="sg-date-block">
+                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                <div class="sg-date-info">
+                                    <div class="sg-date-primary">Mon, Aug 25 • 8:30 PM</div>
+                                    <div class="sg-date-secondary">Central Time</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sg-actions">
+                        <div class="sg-buttons">
+                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-primary" style="width: 100%;" target="_blank">Watch Online</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1071,43 +1387,33 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Smooth scrolling for nav links
-            const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                    
-                    // Close mobile menu after clicking a link
-                    const hamburger = document.querySelector('.hamburger');
-                    const navLinksContainer = document.querySelector('.nav-links');
-                    hamburger.classList.remove('active');
-                    navLinksContainer.classList.remove('active');
-                });
-            });
-
-            // Hamburger menu toggle
-            const hamburger = document.querySelector('.hamburger');
-            const navLinksContainer = document.querySelector('.nav-links');
+        function addToCalendar(title, date, time, location) {
+            // Create calendar event data
+            const startDateTime = new Date(`${date}T${time}:00`);
+            const endDateTime = new Date(startDateTime.getTime() + (2 * 60 * 60 * 1000)); // 2 hours duration
             
-            hamburger.addEventListener('click', function() {
-                hamburger.classList.toggle('active');
-                navLinksContainer.classList.toggle('active');
-            });
+            // Format dates for calendar URL
+            const formatDate = (date) => {
+                return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+            };
+            
+            const startFormatted = formatDate(startDateTime);
+            const endFormatted = formatDate(endDateTime);
+            
+            // Create Google Calendar URL
+            const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startFormatted}/${endFormatted}&location=${encodeURIComponent(location)}&details=${encodeURIComponent('Live improv comedy meets live shopping!')}`;
+            
+            // Open calendar in new tab
+            window.open(googleCalendarUrl, '_blank');
+        }
+        
+        function openDirections(address) {
+            // Create Google Maps directions URL
+            const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(address)}`;
+            
+            // Open directions in new tab
+            window.open(mapsUrl, '_blank');
+        }
 
-            // Close menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!hamburger.contains(e.target) && !navLinksContainer.contains(e.target)) {
-                    hamburger.classList.remove('active');
-                    navLinksContainer.classList.remove('active');
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth
