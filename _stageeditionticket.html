@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A SOLD OUT! Comedy Show Stage Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=Courier+Prime:wght@400;700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            font-family: 'Comic Neue', cursive;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .stage-edition-ticket-container {
+            background: #fff;
+            border: 8px solid #000;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 0 4px #4a90e2,
+                0 0 0 8px #000,
+                20px 20px 0 0 rgba(0,0,0,0.3);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+        }
+        
+        .stage-edition-ticket-container:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+        
+        .stage-edition-ticket-header {
+            background: linear-gradient(135deg, #8e44ad, #9b59b6);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ticket-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.1) 10px,
+                rgba(255,255,255,0.1) 20px
+            );
+            animation: shine 3s linear infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            100% { transform: translateX(100%) translateY(100%); }
+        }
+        
+        .stage-edition {
+            font-family: 'Bangers', cursive;
+            font-size: 2.5rem;
+            text-shadow: 4px 4px 0 #000;
+            margin: 0;
+            letter-spacing: 6px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin: 10px 0 0 0;
+            text-shadow: 2px 2px 0 #000;
+            position: relative;
+            z-index: 2;
+            font-family: 'Courier Prime', monospace;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+        
+        .stage-edition-sold-out-banner {
+            background: #4a90e2;
+            color: #fff;
+            font-family: 'Bangers', cursive;
+            font-size: 1.8rem;
+            padding: 15px;
+            text-align: center;
+            border-top: 4px dashed #000;
+            border-bottom: 4px dashed #000;
+            position: relative;
+            overflow: hidden;
+            text-shadow: 2px 2px 0 #000;
+            line-height: 1.2;
+        }
+        
+        .stage-edition-sold-out-banner .stage-edition-smaller-text {
+            font-size: 1.2rem;
+        }
+        
+        .stage-edition-sold-out-banner::after {
+            content: '💥';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            animation: bounce 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes bounce {
+            0% { transform: translateY(-50%) scale(1); }
+            100% { transform: translateY(-50%) scale(1.2); }
+        }
+        
+        .stage-edition-ticket-body {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .stage-edition-show-details {
+            background: #fff;
+            border: 3px solid #000;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.1);
+        }
+        
+        .stage-edition-show-theme {
+            font-family: 'Bangers', cursive;
+            font-size: 2rem;
+            color: #ff4757;
+            text-align: center;
+            margin: 0 0 20px 0;
+            text-shadow: 2px 2px 0 #000;
+            letter-spacing: 2px;
+        }
+        
+        .stage-edition-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            font-family: 'Courier Prime', monospace;
+        }
+        
+        .stage-edition-detail-label {
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .stage-edition-detail-value {
+            color: #ff4757;
+            font-weight: 400;
+        }
+        
+        .stage-edition-buttons-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .stage-edition-ticket-button {
+            font-family: 'Bangers', cursive;
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border: 4px solid #000;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            min-width: 140px;
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        .stage-edition-live-button {
+            background: linear-gradient(135deg, #4a90e2, #357abd);
+            color: #fff;
+        }
+        
+        .stage-edition-live-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 8px 12px 0 rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #357abd, #4a90e2);
+        }
+        
+        .stage-edition-online-button {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: #fff;
+        }
+        
+        .stage-edition-online-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 8px 12px 0 rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .stage-edition-decorative-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .stage-edition-star {
+            position: absolute;
+            color: #ffd700;
+            font-size: 1.5rem;
+            animation: twinkle 2s ease-in-out infinite alternate;
+        }
+        
+        .stage-edition-star:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+        .stage-edition-star:nth-child(2) { top: 20%; right: 15%; animation-delay: 0.5s; }
+        .stage-edition-star:nth-child(3) { bottom: 15%; left: 20%; animation-delay: 1s; }
+        .stage-edition-star:nth-child(4) { bottom: 25%; right: 10%; animation-delay: 1.5s; }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .stage-edition-zigzag-border {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: linear-gradient(45deg, 
+                transparent 0%, transparent 40%, 
+                #000 40%, #000 60%, 
+                transparent 60%, transparent 100%);
+            background-size: 30px 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .stage-edition-buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stage-edition-ticket-button {
+                width: 100%;
+                max-width: 250px;
+            }
+            
+            .stage-edition {
+                font-size: 2rem;
+            }
+            
+            .stage-edition-show-theme {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stage-edition-ticket-container">
+        <div class="stage-edition-decorative-elements">
+            <div class="stage-edition-star">⭐</div>
+            <div class="stage-edition-star">✨</div>
+            <div class="stage-edition-star">⭐</div>
+            <div class="stage-edition-star">✨</div>
+        </div>
+        
+        <div class="stage-edition-ticket-header">
+            <h1 class="stage-edition">HOME GOODS GEMS</h1>
+        </div>
+        
+        <div class="stage-edition-sold-out-banner">
+            A <strong>SOLD OUT!</strong> Comedy Show<br>
+            <span class="stage-edition-smaller-text">Stage Edition (in-person and online audience)</span>
+        </div>
+        
+        <div class="stage-edition-ticket-body">
+            <div class="stage-edition-show-details">
+                <div class="stage-edition-detail-row">
+                    <span class="stage-edition-detail-label">Date:</span>
+                    <span class="stage-edition-detail-value">[DATE]</span>
+                </div>
+                
+                <div class="stage-edition-detail-row">
+                    <span class="stage-edition-detail-label">Merch Check-In:</span>
+                    <span class="stage-edition-detail-value">[START TIME] - [END TIME] CT</span>
+                </div>
+                
+                <div class="stage-edition-detail-row">
+                    <span class="stage-edition-detail-label">Show Time:</span>
+                    <span class="stage-edition-detail-value">[TIME] CT</span>
+                </div>
+                
+                <div class="stage-edition-detail-row">
+                    <span class="stage-edition-detail-label">Location:</span>
+                    <span class="stage-edition-detail-value">[LOCATION]</span>
+                </div>
+            </div>
+            
+            <div class="stage-edition-buttons-container">
+                <a href="#" class="stage-edition-ticket-button stage-edition-live-button">
+                    $10 LIVE TIX
+                </a>
+                <a href="#" class="stage-edition-ticket-button stage-edition-online-button">
+                    WATCH FREE ONLINE
+                </a>
+            </div>
+        </div>
+        
+        <div class="stage-edition-zigzag-border"></div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A SOLD OUT! Comedy ShowScreen Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@400;700&family=Courier+Prime:wght@400;700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+            font-family: 'Comic Neue', cursive;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .screen-edition-ticket-container {
+            background: #fff;
+            border: 8px solid #000;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 
+                0 0 0 4px #c0392b,
+                0 0 0 8px #000,
+                20px 20px 0 0 rgba(0,0,0,0.3);
+            transform: rotate(2deg);
+            transition: transform 0.3s ease;
+        }
+        
+        .screen-edition-ticket-container:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+        
+        .screen-edition-ticket-header {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .screen-edition-ticket-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.1) 10px,
+                rgba(255,255,255,0.1) 20px
+            );
+            animation: shine 3s linear infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            100% { transform: translateX(100%) translateY(100%); }
+        }
+        
+        .screen-edition {
+            font-family: 'Bangers', cursive;
+            font-size: 2.5rem;
+            text-shadow: 4px 4px 0 #000;
+            margin: 0;
+            letter-spacing: 6px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .screen-edition-subtitle {
+            font-size: 1.2rem;
+            margin: 10px 0 0 0;
+            text-shadow: 2px 2px 0 #000;
+            position: relative;
+            z-index: 2;
+            font-family: 'Courier Prime', monospace;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+        
+        .screen-edition-sold-out-banner {
+            background: #c0392b;
+            color: #fff;
+            font-family: 'Bangers', cursive;
+            font-size: 1.8rem;
+            padding: 15px;
+            text-align: center;
+            border-top: 4px dashed #000;
+            border-bottom: 4px dashed #000;
+            position: relative;
+            overflow: hidden;
+            text-shadow: 2px 2px 0 #000;
+            line-height: 1.2;
+        }
+        
+        .screen-edition-sold-out-banner .screen-edition-smaller-text {
+            font-size: 1.2rem;
+        }
+        
+        .screen-edition-sold-out-banner::after {
+            content: '💥';
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            animation: bounce 1s ease-in-out infinite alternate;
+        }
+        
+        @keyframes bounce {
+            0% { transform: translateY(-50%) scale(1); }
+            100% { transform: translateY(-50%) scale(1.2); }
+        }
+        
+        .screen-edition-ticket-body {
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        
+        .screen-edition-show-details {
+            background: #fff;
+            border: 3px solid #000;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.1);
+        }
+        
+        .screen-edition-show-theme {
+            font-family: 'Bangers', cursive;
+            font-size: 2rem;
+            color: #ff4757;
+            text-align: center;
+            margin: 0 0 20px 0;
+            text-shadow: 2px 2px 0 #000;
+            letter-spacing: 2px;
+        }
+        
+        .screen-edition-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-weight: 700;
+            font-size: 1.1rem;
+            font-family: 'Courier Prime', monospace;
+        }
+        
+        .screen-edition-detail-label {
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .screen-edition-detail-value {
+            color: #ff4757;
+            font-weight: 400;
+        }
+        
+        .screen-edition-buttons-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .screen-edition-ticket-button {
+            font-family: 'Bangers', cursive;
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border: 4px solid #000;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+        }
+        
+        .screen-edition-online-button {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: #fff;
+        }
+        
+        .screen-edition-online-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 8px 12px 0 rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+        
+        .screen-edition-decorative-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .screen-edition-star {
+            position: absolute;
+            color: #ffd700;
+            font-size: 1.5rem;
+            animation: twinkle 2s ease-in-out infinite alternate;
+        }
+        
+        .screen-edition-star:nth-child(1) { top: 15%; right: 12%; animation-delay: 0.2s; }
+        .screen-edition-star:nth-child(2) { top: 8%; left: 18%; animation-delay: 0.8s; }
+        .screen-edition-star:nth-child(3) { bottom: 20%; right: 25%; animation-delay: 1.3s; }
+        .screen-edition-star:nth-child(4) { bottom: 12%; left: 8%; animation-delay: 0.5s; }
+        .screen-edition-star:nth-child(5) { top: 35%; left: 5%; animation-delay: 1.8s; }
+        .screen-edition-star:nth-child(6) { bottom: 35%; right: 8%; animation-delay: 0.1s; }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .screen-edition-zigzag-border {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: linear-gradient(45deg, 
+                transparent 0%, transparent 40%, 
+                #000 40%, #000 60%, 
+                transparent 60%, transparent 100%);
+            background-size: 30px 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .screen-edition-buttons-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .screen-edition-ticket-button {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .screen-edition {
+                font-size: 2rem;
+            }
+            
+            .screen-edition-show-theme {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="screen-edition-ticket-container">
+        <div class="screen-edition-decorative-elements">
+            <div class="screen-edition-star">✨</div>
+            <div class="screen-edition-star">⭐</div>
+            <div class="screen-edition-star">✨</div>
+            <div class="screen-edition-star">⭐</div>
+            <div class="screen-edition-star">💫</div>
+            <div class="screen-edition-star">🌟</div>
+        </div>
+        
+        <div class="screen-edition-ticket-header">
+            <h1 class="screen-edition">ESPECIALLY HEINOUS</h1>
+        </div>
+        
+        <div class="screen-edition-sold-out-banner">
+            A <strong>SOLD OUT!</strong> Comedy Show<br>
+            <span class="screen-edition-smaller-text">Screen Edition (online audience only)</span>
+        </div>
+        
+        <div class="screen-edition-ticket-body">
+            <div class="screen-edition-show-details">
+                <div class="screen-edition-detail-row">
+                    <span class="screen-edition-detail-label">Date:</span>
+                    <span class="screen-edition-detail-value">[DATE]</span>
+                </div>
+                
+                <div class="screen-edition-detail-row">
+                    <span class="screen-edition-detail-label">Show Time:</span>
+                    <span class="screen-edition-detail-value">[TIME] CT</span>
+                </div>
+            </div>
+            
+            <div class="screen-edition-buttons-container">
+                <a href="#" class="screen-edition-ticket-button screen-edition-online-button">
+                    WATCH FREE ONLINE
+                </a>
+            </div>
+        </div>
+        
+        <div class="screen-edition-zigzag-border"></div>
+    </div>
+</body>
+</html>
