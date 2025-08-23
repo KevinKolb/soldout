@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SOLD OUT! Comedy Show — Event Cards</title>
+  <style>
+  @import url('https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap');
+
+  :root {
+    --comic-red: #FF3B3B;
+    --comic-blue: #4A90E2;
+    --comic-yellow: #FFD93D;
+    --comic-purple: #9013FE;
+    --comic-green: #4CAF50;
+    --comic-orange: #FF9500;
+    --comic-black: #2C2C2C;
+    --comic-white: #FFFFFF;
+    --bg: #0f1115;
+    --surface: #14171f;
+    --ink: #eef2f7;
+    --muted: #9aa4b2;
+    --brand: #fff351;
+    --ink-dark: #0f1115;
+    --shadow: 0 1px 2px rgba(0,0,0,.25), 0 24px 60px rgba(0,0,0,.40);
+  }
+
+  * {margin:0;padding:0;box-sizing:border-box;}
+  body {font-family:'Inter',sans-serif; background:linear-gradient(45deg,var(--comic-yellow),var(--comic-orange),var(--comic-red)); min-height:100vh; color:var(--comic-black);}
+  .wrap{max-width:1200px;margin:32px auto 80px;padding:0 20px;}
+  .page-title{font-family:'Bangers',cursive;font-size:clamp(28px,4vw,52px);color:#111;text-shadow:3px 3px 0 #fff351;margin-bottom:18px;}
+  .page-sub{color:#111;font-weight:600;margin-bottom:22px;}
+
+  /* Ticket Card */
+  .grid{display:grid;gap:20px;margin-top:18px;}
+  .event-card{background:var(--surface);color:var(--ink);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;}
+  .ticket{display:grid;grid-template-columns:150px 1fr;}
+  .ticket .left{background:linear-gradient(180deg,var(--brand),#ffd45a);color:#111;padding:18px;position:relative;}
+  .ticket .left::after{content:'';position:absolute;top:0;right:-12px;bottom:0;width:24px;background:radial-gradient(12px 12px at left center,transparent 11px,rgba(0,0,0,.15) 11px) left center/24px 24px repeat-y;}
+  .ticket .bigdate{font-size:42px;font-weight:900;line-height:.86;}
+  .ticket .right{padding:18px;}
+  .eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+  .title{font-size:24px;margin:6px 0;}
+  .sub{color:var(--muted);margin-bottom:10px;}
+  .meta{display:grid;gap:8px;}
+  .row{display:flex;gap:10px;align-items:center;}
+  .spacer{flex:1;}
+  .btn{padding:10px 14px;border-radius:12px;border:0;font-weight:800;cursor:pointer;}
+  .btn-primary{background:var(--brand);color:#111;}
+  .btn-ghost{background:transparent;border:1px dashed rgba(255,255,255,.25);color:var(--ink);}
+
+  /* Show-times (Stage Edition) */
+  .show-times{background:linear-gradient(135deg,var(--comic-purple),#6b21a8,var(--comic-black));color:var(--comic-white);border-radius:18px;box-shadow:var(--shadow);margin-top:24px;}
+  .show-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.25rem;max-width:1200px;margin:0 auto;padding:1.25rem;}
+  .sg-event-card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;overflow:hidden;transition:.2s;display:flex;flex-direction:column;min-height:280px;}
+  .sg-event-card:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.15);}
+  .sg-badge{position:absolute;top:0;left:0;right:0;font-size:11px;font-weight:600;padding:12px 16px;text-transform:uppercase;text-align:center;z-index:2;}
+  .sg-badge.stage{background:linear-gradient(135deg,var(--comic-red),#dc2626);color:#fff;}
+  .sg-header{padding:56px 20px 16px;border-bottom:1px solid #f1f5f9;flex-grow:1;}
+  .sg-event-title{font-size:18px;font-weight:700;color:#0f172a;margin-bottom:2px;}
+  .sg-event-subtitle{font-size:13px;color:#64748b;}
+  .sg-datetime{padding:16px 20px;border-bottom:1px solid #f1f5f9;}
+  .sg-date-primary{font-size:15px;font-weight:600;color:#0f172a;}
+  .sg-date-secondary{font-size:13px;color:#64748b;margin-top:1px;}
+  .sg-venue{padding:12px 20px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:12px;}
+  .sg-venue-name{font-size:14px;font-weight:600;color:#0f172a;}
+  .sg-venue-address{font-size:12px;color:#64748b;}
+  .sg-actions{padding:16px 20px;margin-top:auto;}
+  .sg-buttons{display:flex;gap:8px;}
+  .sg-btn{flex:1;padding:12px 16px;border-radius:8px;font-size:14px;font-weight:700;text-align:center;text-decoration:none;}
+  .sg-btn-primary{background:var(--comic-red);color:#fff;}
+  .sg-btn-secondary{background:#fff;color:var(--comic-blue);border:1px solid var(--comic-blue);}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="page-title">SOLD OUT! Comedy Show</h1>
+    <p class="page-sub">A comedy show for in-person and online audiences</p>
+
+    <!-- Ticket Stub Card -->
+    <section class="grid" aria-label="Compare styles">
+      <article class="event-card ticket" aria-labelledby="t-title">
+        <div class="left" aria-hidden="true">
+          <div style="text-transform:uppercase;font-size:12px;letter-spacing:.25em;">Sep</div>
+          <div class="bigdate">27</div>
+          <div style="margin-top:6px;font-weight:800;">Sat • 7:30 PM</div>
+        </div>
+        <div class="right">
+          <div class="eyebrow">STAGE EDITION</div>
+          <h2 class="title" id="t-title">SOLD OUT! Comedy Show</h2>
+          <p class="sub">A comedy show for in-person and online audiences</p>
+          <div class="meta">
+            <div>Doors 7:00 • Show 7:30–9:00 PM</div>
+            <div>Howlin' Wolf, Warehouse District</div>
+          </div>
+          <div class="row" style="margin-top:12px;">
+            <div style="font-weight:900;">$18 advance</div>
+            <div class="spacer"></div>
+            <button class="btn btn-ghost">Add to Calendar</button>
+            <button class="btn btn-primary">Buy Ticket</button>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Stage Edition Schedule Card -->
+    <section class="show-times">
+      <div class="show-grid" aria-label="Upcoming shows">
+        <article class="sg-event-card stage" role="article">
+          <div class="sg-badge stage">STAGE EDITION</div>
+          <div class="sg-header">
+            <div class="sg-event-meta"><div class="sg-price">From $25</div></div>
+            <h3 class="sg-event-title">SOLD OUT! Comedy Show</h3>
+            <p class="sg-event-subtitle">A comedy show for in-person and online audiences</p>
+          </div>
+          <div class="sg-datetime">
+            <div class="sg-date-info">
+              <div class="sg-date-primary">Fri, Sep 12 • 8:00 PM</div>
+              <div class="sg-date-secondary">Doors 7:00 • Ends 9:30 PM</div>
+            </div>
+          </div>
+          <div class="sg-venue">
+            <div class="sg-venue-info">
+              <div class="sg-venue-name">The Joy Theater</div>
+              <div class="sg-venue-address">1200 Canal St, New Orleans, LA</div>
+            </div>
+          </div>
+          <div class="sg-actions">
+            <div class="sg-buttons">
+              <a class="sg-btn sg-btn-secondary" href="#">Share</a>
+              <a class="sg-btn sg-btn-primary" href="#">Buy Tickets</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </div>
+</body>
+</html>
