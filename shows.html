@@ -1,565 +1,211 @@
-<!-- Show Section - Self-contained -->
-<section id="show-section">
-    <style>
-        /* Import fonts for shows */
-        @import url('https://fonts.googleapis.com/css2?family=Bangers&family=Courier+Prime:wght@400;700&display=swap');
-        
-        /* Show Section Styles - Scoped */
-        #show-section {
-            padding: 20px;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
-            background-size: 400% 400%;
-            animation: showGradientShift 8s ease infinite;
-            min-height: auto;
-        }
-        
-        @keyframes showGradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        #show-section .shows-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-        
-        #show-section .shows-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: masonry;
-            gap: 50px 40px;
-            width: 100%;
-            max-width: 1400px;
-            align-items: start;
-        }
-        
-        #show-section .ticket-container {
-            background: #fff;
-            border: 8px solid #000;
-            border-radius: 20px;
-            max-width: 100%;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 20px 20px 0 0 rgba(0,0,0,0.3);
-            transition: transform 0.3s ease;
-            align-self: start;
-        }
-        
-        #show-section .ticket-container.screen-edition {
-            box-shadow: 
-                0 0 0 4px #c0392b,
-                0 0 0 8px #000,
-                20px 20px 0 0 rgba(0,0,0,0.3);
-            transform: rotate(2deg);
-        }
-        
-        #show-section .ticket-container.stage-edition {
-            box-shadow: 
-                0 0 0 4px #4a90e2,
-                0 0 0 8px #000,
-                20px 20px 0 0 rgba(0,0,0,0.3);
-            transform: rotate(-2deg);
-        }
-        
-        #show-section .ticket-container:hover {
-            transform: rotate(0deg) scale(1.02);
-        }
-        
-        #show-section .ticket-header {
-            color: white;
-            padding: 20px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        #show-section .ticket-header.screen-edition {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-        }
-        
-        #show-section .ticket-header.stage-edition {
-            background: linear-gradient(135deg, #8e44ad, #9b59b6);
-        }
-        
-        #show-section .ticket-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(255,255,255,0.1) 10px,
-                rgba(255,255,255,0.1) 20px
-            );
-            animation: showShine 3s linear infinite;
-        }
-        
-        @keyframes showShine {
-            0% { transform: translateX(-100%) translateY(-100%); }
-            100% { transform: translateX(100%) translateY(100%); }
-        }
-        
-        #show-section .show-title {
-            font-family: 'Bangers', cursive;
-            font-size: 2.5rem;
-            text-shadow: 4px 4px 0 #000;
-            margin: 0;
-            letter-spacing: 6px;
-            position: relative;
-            z-index: 2;
-        }
-        
-        #show-section .subtitle {
-            font-size: 1.2rem;
-            margin: 10px 0 0 0;
-            text-shadow: 2px 2px 0 #000;
-            position: relative;
-            z-index: 2;
-            font-weight: 400;
-            letter-spacing: 1px;
-        }
-        
-        #show-section .sold-out-banner {
-            color: #fff;
-            font-family: 'Bangers', cursive;
-            font-size: 1.8rem;
-            padding: 15px;
-            text-align: center;
-            border-top: 4px dashed #000;
-            border-bottom: 4px dashed #000;
-            position: relative;
-            overflow: hidden;
-            text-shadow: 2px 2px 0 #000;
-            line-height: 1.2;
-        }
-        
-        #show-section .sold-out-banner.screen-edition {
-            background: #c0392b;
-        }
-        
-        #show-section .sold-out-banner.stage-edition {
-            background: #4a90e2;
-        }
-        
-        #show-section .sold-out-banner .smaller-text {
-            font-size: 1.2rem;
-        }
-        
-        #show-section .ticket-body {
-            padding: 30px;
-            background: #f8f9fa;
-        }
-        
-        #show-section .show-details {
-            background: #fff;
-            border: 3px solid #000;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 8px 8px 0 rgba(0,0,0,0.1);
-            font-family: 'Courier Prime', monospace;
-        }
-        
-        #show-section .detail-row {
-            display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
-            font-weight: 700;
-            font-size: 1.1rem;
-        }
-        
-        #show-section .detail-label {
-            color: #333;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 700;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        #show-section .detail-value {
-            color: #ff4757;
-            font-weight: 400;
-        }
-        
-        #show-section .location-link {
-            color: #ff4757;
-            text-decoration: none;
-            font-weight: 400;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-        
-        #show-section .location-link:hover {
-            color: #e84653;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
-        }
-        
-        #show-section .location-link::after {
-            content: '🗺️';
-            margin-left: 8px;
-            font-size: 0.9em;
-            opacity: 0.7;
-            transition: opacity 0.3s ease;
-        }
-        
-        #show-section .location-link:hover::after {
-            opacity: 1;
-        }
-        
-        #show-section .buttons-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-        
-        #show-section .ticket-button {
-            font-family: 'Bangers', cursive;
-            font-size: 1.5rem;
-            padding: 15px 30px;
-            border: 4px solid #000;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            box-shadow: 6px 6px 0 rgba(0,0,0,0.3);
-            text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-            letter-spacing: 1px;
-        }
-        
-        #show-section .live-button {
-            background: linear-gradient(135deg, #4a90e2, #357abd);
-            color: #fff;
-            min-width: 140px;
-        }
-        
-        #show-section .live-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 8px 12px 0 rgba(0,0,0,0.3);
-            background: linear-gradient(135deg, #357abd, #4a90e2);
-        }
-        
-        #show-section .online-button {
-            background: linear-gradient(135deg, #c0392b, #e74c3c);
-            color: #fff;
-        }
-        
-        #show-section .online-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 8px 12px 0 rgba(0,0,0,0.3);
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-        }
-        
-        #show-section .screen-edition .online-button {
-            width: 100%;
-        }
-        
-        #show-section .decorative-elements {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        
-        #show-section .star {
-            position: absolute;
-            color: #ffd700;
-            font-size: 1.5rem;
-            animation: showTwinkle 2s ease-in-out infinite alternate;
-        }
-        
-        #show-section .screen-edition .star:nth-child(1) { top: 15%; right: 12%; animation-delay: 0.2s; }
-        #show-section .screen-edition .star:nth-child(2) { top: 8%; left: 18%; animation-delay: 0.8s; }
-        #show-section .screen-edition .star:nth-child(3) { bottom: 20%; right: 25%; animation-delay: 1.3s; }
-        #show-section .screen-edition .star:nth-child(4) { bottom: 12%; left: 8%; animation-delay: 0.5s; }
-        #show-section .screen-edition .star:nth-child(5) { top: 35%; left: 5%; animation-delay: 1.8s; }
-        #show-section .screen-edition .star:nth-child(6) { bottom: 35%; right: 8%; animation-delay: 0.1s; }
-        
-        #show-section .stage-edition .star:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
-        #show-section .stage-edition .star:nth-child(2) { top: 20%; right: 15%; animation-delay: 0.5s; }
-        #show-section .stage-edition .star:nth-child(3) { bottom: 15%; left: 20%; animation-delay: 1s; }
-        #show-section .stage-edition .star:nth-child(4) { bottom: 25%; right: 10%; animation-delay: 1.5s; }
-        
-        @keyframes showTwinkle {
-            0% { opacity: 0.3; transform: scale(0.8); }
-            100% { opacity: 1; transform: scale(1.2); }
-        }
-        
-        #show-section .zigzag-border {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 15px;
-            background: linear-gradient(45deg, 
-                transparent 0%, transparent 40%, 
-                #000 40%, #000 60%, 
-                transparent 60%, transparent 100%);
-            background-size: 30px 15px;
-        }
-        
-        #show-section .no-shows-message {
-            background: #fff;
-            border: 8px solid #000;
-            border-radius: 20px;
-            padding: 40px;
-            text-align: center;
-            max-width: 600px;
-            margin: 0 auto;
-            box-shadow: 20px 20px 0 0 rgba(0,0,0,0.3);
-        }
-        
-        #show-section .no-shows-message h2 {
-            font-size: 2.5rem;
-            color: #ff4757;
-            margin: 0 0 20px 0;
-            text-shadow: 2px 2px 0 #000;
-        }
-        
-        #show-section .no-shows-message p {
-            font-size: 1.2rem;
-            color: #333;
-            margin: 0;
-        }
-        
-        @media (max-width: 768px) {
-            #show-section .shows-list {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-            
-            #show-section .buttons-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            #show-section .ticket-button {
-                width: 100%;
-                max-width: 250px;
-            }
-            
-            #show-section .screen-edition .ticket-button {
-                max-width: 100%;
-            }
-            
-            #show-section .show-title {
-                font-size: 2rem;
-            }
-        }
-    </style>
-
-    <div class="shows-container">
-        <div class="shows-list" id="shows-list"></div>
-        <div id="no-shows" class="no-shows-message" style="display: none;">
-            <h2>NO UPCOMING SHOWS</h2>
-            <p>Check back soon for new show announcements!</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shows</title>
+    <link rel="stylesheet" href="socs.css">
+</head>
+<body>
+    <!-- Show Section - Self-contained -->
+    <section id="show-section">
+        <div class="shows-container">
+            <div class="shows-list" id="shows-list"></div>
+            <div id="no-shows" class="no-shows-message" style="display: none;">
+                <h2>NO UPCOMING SHOWS</h2>
+                <p>Check back soon for new show announcements!</p>
+            </div>
         </div>
-    </div>
 
-    <script>
-        // Show JavaScript - Scoped to avoid conflicts
-        (function() {
-            function parseDate(dateStr) {
-                if (dateStr.includes('-')) {
-                    return new Date(dateStr);
-                } else {
-                    return new Date(dateStr);
+        <script>
+            // Show JavaScript - Scoped to avoid conflicts
+            (function() {
+                function parseDate(dateStr) {
+                    if (dateStr.includes('-')) {
+                        return new Date(dateStr);
+                    } else {
+                        return new Date(dateStr);
+                    }
                 }
-            }
-            
-            function formatDisplayDate(date) {
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
-                const tomorrow = new Date(today);
-                tomorrow.setDate(tomorrow.getDate() + 1);
                 
-                const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-                const compareToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                const compareYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
-                const compareTomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
-                
-                if (compareDate.getTime() === compareToday.getTime()) {
-                    return 'Today';
-                } else if (compareDate.getTime() === compareYesterday.getTime()) {
-                    return 'Yesterday';
-                } else if (compareDate.getTime() === compareTomorrow.getTime()) {
-                    return 'Tomorrow';
-                } else {
-                    return date.toLocaleDateString('en-US', { 
-                        weekday: 'long',
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                    });
+                function formatDisplayDate(date) {
+                    const today = new Date();
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    
+                    const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                    const compareToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    const compareYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
+                    const compareTomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
+                    
+                    if (compareDate.getTime() === compareToday.getTime()) {
+                        return 'Today';
+                    } else if (compareDate.getTime() === compareYesterday.getTime()) {
+                        return 'Yesterday';
+                    } else if (compareDate.getTime() === compareTomorrow.getTime()) {
+                        return 'Tomorrow';
+                    } else {
+                        return date.toLocaleDateString('en-US', { 
+                            weekday: 'long',
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        });
+                    }
                 }
-            }
-            
-            function shouldShowShow(showDate) {
-                const today = new Date();
-                const yesterday = new Date(today);
-                yesterday.setDate(yesterday.getDate() - 1);
                 
-                const compareDate = new Date(showDate.getFullYear(), showDate.getMonth(), showDate.getDate());
-                const compareYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
-                
-                return compareDate >= compareYesterday;
-            }
-            
-            function createShowElement(show, showType, colorIndex) {
-                const container = document.createElement('div');
-                container.className = `ticket-container ${showType}-edition`;
-                
-                // Define 7 different background colors for title headers (no red or blue shades)
-                const headerColors = [
-                    'linear-gradient(135deg, #2ed573, #27ae60)', // Green  
-                    'linear-gradient(135deg, #ffa502, #ff6348)', // Orange
-                    'linear-gradient(135deg, #9c88ff, #8c7ae6)', // Purple
-                    'linear-gradient(135deg, #ff6b9d, #e84393)', // Pink
-                    'linear-gradient(135deg, #f1c40f, #f39c12)', // Yellow
-                    'linear-gradient(135deg, #00d2d3, #01a3a4)', // Teal
-                    'linear-gradient(135deg, #a55eea, #8854d0)'  // Violet
-                ];
-                
-                const headerBg = headerColors[colorIndex % 7];
-                
-                const showDate = parseDate(show.querySelector('date').textContent);
-                const displayDate = formatDisplayDate(showDate);
-                
-                const location = show.querySelector('location');
-                const locationUrl = show.querySelector('locationUrl');
-                const locationHtml = location ? 
-                    (locationUrl ? 
-                        `<a href="${locationUrl.textContent}" target="_blank" class="location-link">${location.textContent}</a>` :
-                        `<span class="detail-value">${location.textContent}</span>`
-                    ) : '';
-                
-                container.innerHTML = `
-                    <div class="decorative-elements">
-                        ${showType === 'screen' ? 
-                            '<div class="star">✨</div><div class="star">⭐</div><div class="star">✨</div><div class="star">⭐</div><div class="star">💫</div><div class="star">🌟</div>' :
-                            '<div class="star">⭐</div><div class="star">✨</div><div class="star">⭐</div><div class="star">✨</div>'
-                        }
-                    </div>
+                function shouldShowShow(showDate) {
+                    const today = new Date();
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
                     
-                    <div class="ticket-header" style="background: ${headerBg};">
-                        <h1 class="show-title" style="color: white;">${show.querySelector('title').textContent}</h1>
-                    </div>
+                    const compareDate = new Date(showDate.getFullYear(), showDate.getMonth(), showDate.getDate());
+                    const compareYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
                     
-                    <div class="sold-out-banner ${showType}-edition">
-                        A <strong>SOLD OUT!</strong> Comedy Show<br>
-                        <span class="smaller-text">${showType === 'screen' ? 'Screen Edition (online audience only)' : 'Stage Edition (in-person and online audience)'}</span>
-                    </div>
+                    return compareDate >= compareYesterday;
+                }
+                
+                function createShowElement(show, showType, colorIndex) {
+                    const container = document.createElement('div');
+                    container.className = `ticket-container ${showType}-edition`;
                     
-                    <div class="ticket-body">
-                        <div class="show-details">
-                            <div class="detail-row">
-                                <span class="detail-label">Date:</span>
-                                <span class="detail-value">${displayDate}</span>
-                            </div>
-                            
-                            ${showType === 'stage' ? `
-                            <div class="detail-row">
-                                <span class="detail-label">Merch Check-In:</span>
-                                <span class="detail-value">${show.querySelector('merchStartTime').textContent} - ${show.querySelector('merchEndTime').textContent} CT</span>
-                            </div>
-                            ` : ''}
-                            
-                            <div class="detail-row">
-                                <span class="detail-label">Show Time:</span>
-                                <span class="detail-value">${show.querySelector('time').textContent} CT</span>
-                            </div>
-                            
-                            ${showType === 'stage' && locationHtml ? `
-                            <div class="detail-row">
-                                <span class="detail-label">Location:</span>
-                                <span class="detail-value">${locationHtml}</span>
-                            </div>
-                            ` : ''}
+                    // Define 7 different background colors for title headers (no red or blue shades)
+                    const headerColors = [
+                        'linear-gradient(135deg, #2ed573, #27ae60)', // Green  
+                        'linear-gradient(135deg, #ffa502, #ff6348)', // Orange
+                        'linear-gradient(135deg, #9c88ff, #8c7ae6)', // Purple
+                        'linear-gradient(135deg, #ff6b9d, #e84393)', // Pink
+                        'linear-gradient(135deg, #f1c40f, #f39c12)', // Yellow
+                        'linear-gradient(135deg, #00d2d3, #01a3a4)', // Teal
+                        'linear-gradient(135deg, #a55eea, #8854d0)'  // Violet
+                    ];
+                    
+                    const headerBg = headerColors[colorIndex % 7];
+                    
+                    const showDate = parseDate(show.querySelector('date').textContent);
+                    const displayDate = formatDisplayDate(showDate);
+                    
+                    const location = show.querySelector('location');
+                    const locationUrl = show.querySelector('locationUrl');
+                    const locationHtml = location ? 
+                        (locationUrl ? 
+                            `<a href="${locationUrl.textContent}" target="_blank" class="location-link">${location.textContent}</a>` :
+                            `<span class="detail-value">${location.textContent}</span>`
+                        ) : '';
+                    
+                    container.innerHTML = `
+                        <div class="decorative-elements">
+                            ${showType === 'screen' ? 
+                                '<div class="star">✨</div><div class="star">⭐</div><div class="star">✨</div><div class="star">⭐</div><div class="star">💫</div><div class="star">🌟</div>' :
+                                '<div class="star">⭐</div><div class="star">✨</div><div class="star">⭐</div><div class="star">✨</div>'
+                            }
                         </div>
                         
-                        <div class="buttons-container">
-                            ${showType === 'stage' ? `
-                            <a href="${show.querySelector('liveUrl') ? show.querySelector('liveUrl').textContent : '#'}" class="ticket-button live-button">
-                                $10 LIVE TIX
-                            </a>
-                            ` : ''}
-                            <a href="${show.querySelector('onlineUrl') ? show.querySelector('onlineUrl').textContent : '#'}" class="ticket-button online-button ${showType === 'screen' ? 'screen-edition' : ''}">
-                                WATCH FREE ONLINE
-                            </a>
+                        <div class="ticket-header" style="background: ${headerBg};">
+                            <h1 class="show-title" style="color: white;">${show.querySelector('title').textContent}</h1>
                         </div>
-                    </div>
-                    
-                    <div class="zigzag-border"></div>
-                `;
-                
-                return container;
-            }
-            
-            async function loadShows() {
-                try {
-                    const response = await fetch('show-data.xml');
-                    const xmlText = await response.text();
-                    const parser = new DOMParser();
-                    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-                    
-                    const shows = Array.from(xmlDoc.querySelectorAll('show'));
-                    const showsList = document.getElementById('shows-list');
-                    const noShowsMessage = document.getElementById('no-shows');
-                    
-                    const filteredShows = shows.filter(show => {
-                        const showDate = parseDate(show.querySelector('date').textContent);
-                        return shouldShowShow(showDate);
-                    });
-                    
-                    filteredShows.sort((a, b) => {
-                        const dateA = parseDate(a.querySelector('date').textContent);
-                        const dateB = parseDate(b.querySelector('date').textContent);
-                        return dateA - dateB;
-                    });
-                    
-                    if (filteredShows.length === 0) {
-                        noShowsMessage.style.display = 'block';
-                        return;
-                    }
-                    
-                    filteredShows.forEach((show, index) => {
-                        const showType = show.getAttribute('type');
-                        const showElement = createShowElement(show, showType, index);
-                        showsList.appendChild(showElement);
-                    });
-                    
-                } catch (error) {
-                    console.error('Error loading shows:', error);
-                    const showsList = document.getElementById('shows-list');
-                    showsList.innerHTML = `
-                        <div class="no-shows-message">
-                            <h2>ERROR LOADING SHOWS</h2>
-                            <p>Please check that show-data.xml is available.</p>
+                        
+                        <div class="sold-out-banner ${showType}-edition">
+                            A <strong>SOLD OUT!</strong> Comedy Show<br>
+                            <span class="smaller-text">${showType === 'screen' ? 'Screen Edition (online audience only)' : 'Stage Edition (in-person and online audience)'}</span>
                         </div>
+                        
+                        <div class="ticket-body">
+                            <div class="show-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Date:</span>
+                                    <span class="detail-value">${displayDate}</span>
+                                </div>
+                                
+                                ${showType === 'stage' ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Merch Check-In:</span>
+                                    <span class="detail-value">${show.querySelector('merchStartTime').textContent} - ${show.querySelector('merchEndTime').textContent} CT</span>
+                                </div>
+                                ` : ''}
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Show Time:</span>
+                                    <span class="detail-value">${show.querySelector('time').textContent} CT</span>
+                                </div>
+                                
+                                ${showType === 'stage' && locationHtml ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Location:</span>
+                                    <span class="detail-value">${locationHtml}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="buttons-container">
+                                ${showType === 'stage' ? `
+                                <a href="${show.querySelector('liveUrl') ? show.querySelector('liveUrl').textContent : '#'}" class="ticket-button live-button">
+                                    $10 LIVE TIX
+                                </a>
+                                ` : ''}
+                                <a href="${show.querySelector('onlineUrl') ? show.querySelector('onlineUrl').textContent : '#'}" class="ticket-button online-button ${showType === 'screen' ? 'screen-edition' : ''}">
+                                    WATCH FREE ONLINE
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="zigzag-border"></div>
                     `;
+                    
+                    return container;
                 }
-            }
-            
-            // Load shows when this script runs
-            loadShows();
-        })();
-    </script>
-</section>
+                
+                async function loadShows() {
+                    try {
+                        const response = await fetch('shows.xml');
+                        const xmlText = await response.text();
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                        
+                        const shows = Array.from(xmlDoc.querySelectorAll('show'));
+                        const showsList = document.getElementById('shows-list');
+                        const noShowsMessage = document.getElementById('no-shows');
+                        
+                        const filteredShows = shows.filter(show => {
+                            const showDate = parseDate(show.querySelector('date').textContent);
+                            return shouldShowShow(showDate);
+                        });
+                        
+                        filteredShows.sort((a, b) => {
+                            const dateA = parseDate(a.querySelector('date').textContent);
+                            const dateB = parseDate(b.querySelector('date').textContent);
+                            return dateA - dateB;
+                        });
+                        
+                        if (filteredShows.length === 0) {
+                            noShowsMessage.style.display = 'block';
+                            return;
+                        }
+                        
+                        filteredShows.forEach((show, index) => {
+                            const showType = show.getAttribute('type');
+                            const showElement = createShowElement(show, showType, index);
+                            showsList.appendChild(showElement);
+                        });
+                        
+                    } catch (error) {
+                        console.error('Error loading shows:', error);
+                        const showsList = document.getElementById('shows-list');
+                        showsList.innerHTML = `
+                            <div class="no-shows-message">
+                                <h2>ERROR LOADING SHOWS</h2>
+                                <p>Please check that shows.xml is available.</p>
+                            </div>
+                        `;
+                    }
+                }
+                
+                // Load shows when this script runs
+                loadShows();
+            })();
+        </script>
+    </section>
+</body>
+</html>

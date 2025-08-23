@@ -2,7 +2,7 @@
 <shows>
     <show type="stage">
         <title>VINTAGE VIBES</title>
-        <date>2025-08-25</date>
+        <date>2025-09-01</date>
         <time>7:30 PM</time>
         <location>Old Theater</location>
         <locationUrl>https://maps.google.com/maps?q=Old+Theater+downtown</locationUrl>
@@ -13,13 +13,13 @@
     </show>
     <show type="screen">
         <title>ESPECIALLY HEINOUS</title>
-        <date>2025-09-21</date>
+        <date>2025-09-01</date>
         <time>8:00 PM</time>
         <onlineUrl>https://example.com/watch-heinous</onlineUrl>
     </show>
     <show type="stage">
         <title>HOME GOODS GEMS</title>
-        <date>2025-08-27</date>
+        <date>2025-09-01</date>
         <time>8:00 PM</time>
         <location>Comedy Club Downtown</location>
         <locationUrl>https://www.comedyclubdowntown.com/directions</locationUrl>
@@ -30,13 +30,13 @@
     </show>
     <show type="screen">
         <title>DIGITAL DISASTERS</title>
-        <date>2025-08-23</date>
+        <date>2025-09-01</date>
         <time>9:00 PM</time>
         <onlineUrl>https://example.com/watch-disasters</onlineUrl>
     </show>
-    <show type="stage">
+    <show type="screen">
         <title>RETAIL THERAPY</title>
-        <date>2025-08-25</date>
+        <date>2025-09-01</date>
         <time>7:00 PM</time>
         <location>The Laugh Track</location>
         <locationUrl>https://maps.google.com/maps?q=The+Laugh+Track+comedy+venue</locationUrl>

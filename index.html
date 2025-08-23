@@ -14,8 +14,7 @@
                 <div class="logo">SOLD OUT! Comedy Show</div>
                 <div class="hamburger"></div>
                 <ul class="nav-links">
-                    <li><a href="#shows">Shows</a></li>
-                    <li><a href="#shop">Shop</a></li>
+                    <li><a href="#show-section">Shows</a></li>
                     <li><a href="#contact">Socials</a></li>
                 </ul>
             </nav>
@@ -102,279 +101,207 @@
                 </div>
             </div>
         </section>
+            <!-- Show Section - Self-contained -->
+    <section id="show-section">
+        <div class="shows-container">
+        <h2 class="section-title">SHow Schedule</h2>
+            <div class="shows-list" id="shows-list"></div>
+            <div id="no-shows" class="no-shows-message" style="display: none;">
+                <h2>NO UPCOMING SHOWS</h2>
+                <p>Check back soon for new show announcements!</p>
+            </div>
+        </div>
 
-        <section class="section show-times" id="shows">
-            <h2 class="section-title">Show Schedule</h2>
-            
-            <!-- Show Type Descriptions -->
-            <div style="max-width: 900px; margin: 0 auto 4rem; padding: 2rem; background: linear-gradient(45deg, var(--comic-black), #1a1a1a); border-radius: 20px; position: relative; overflow: hidden;">
-                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: radial-gradient(circle, var(--comic-yellow) 1px, transparent 1px); background-size: 20px 20px; opacity: 0.1;"></div>
-                <div style="position: relative; z-index: 2;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center;">
-                        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, var(--comic-blue), #2563eb); border-radius: 15px; transform: rotate(-2deg); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);">
-                            <h3 style="font-family: 'Bangers', cursive; font-size: 2.5rem; color: var(--comic-white); margin-bottom: 1rem; text-shadow: 3px 3px 0px var(--comic-black);">SCREEN EDITION</h3>
-                            <p style="font-size: 1.2rem; color: var(--comic-white); line-height: 1.6; font-weight: 600;">A comedy show for the online audience.</p>
-                        </div>
-                        <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, var(--comic-red), #dc2626); border-radius: 15px; transform: rotate(2deg); box-shadow: 0 10px 30px rgba(220, 38, 38, 0.3);">
-                            <h3 style="font-family: 'Bangers', cursive; font-size: 2.5rem; color: var(--comic-white); margin-bottom: 1rem; text-shadow: 3px 3px 0px var(--comic-black);">STAGE EDITION</h3>
-                            <p style="font-size: 1.2rem; color: var(--comic-white); line-height: 1.6; font-weight: 600;">A comedy show for in-person and online audiences.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="show-grid">
-                <!-- Stage Edition Shows -->
-                <div class="sg-event-card stage">
-                    <span class="sg-badge stage">
-                        Stage Edition
-                    </span>
-                    <div class="sg-header">
-                        <div class="sg-event-meta">
-                            <span class="sg-price">$10 or Sellable Item</span>
-                        </div>
-                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
-                        <p class="sg-event-subtitle">📱 + 🎭 A comedy show for in-person and online audiences</p>
-                    </div>
-                    
-                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-10-03', '19:45', 'The Comedy Theater, 123 Main Street, Downtown')">
-                        <div class="sg-date-row">
-                            <div class="sg-date-block">
-                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <div class="sg-date-info">
-                                    <div class="sg-date-primary">Fri, Oct 3 • 7:45 PM</div>
-                                    <div class="sg-date-secondary">Central Time</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="sg-venue" onclick="openDirections('The Comedy Theater, 123 Main Street, Downtown')">
-                        <svg class="sg-location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        <div class="sg-venue-info">
-                            <div class="sg-venue-name">The Comedy Theater</div>
-                            <div class="sg-venue-address">123 Main Street, Downtown</div>
-                        </div>
-                    </div>
-                    
-                    <div class="sg-actions">
-                        <div class="sg-buttons">
-                            <a href="https://brownpapertickets.com/" class="sg-btn sg-btn-primary" target="_blank">Get Tickets</a>
-                            <a href="https://www.whatnot.com/dashboard/lives" class="sg-btn sg-btn-secondary" target="_blank">Watch Online</a>
-                        </div>
-                    </div>
-                </div>
+        <script>
+            // Show JavaScript - Scoped to avoid conflicts
+            (function() {
+                function parseDate(dateStr) {
+                    if (dateStr.includes('-')) {
+                        return new Date(dateStr);
+                    } else {
+                        return new Date(dateStr);
+                    }
+                }
                 
-                <div class="sg-event-card stage">
-                    <span class="sg-badge stage">
-                        Stage Edition
-                    </span>
-                    <div class="sg-header">
-                        <div class="sg-event-meta">
-                            <span class="sg-price">$10 or Sellable Item</span>
-                        </div>
-                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
-                        <p class="sg-event-subtitle">📱 + 🎭 A comedy show for in-person and online audiences</p>
-                    </div>
+                function formatDisplayDate(date) {
+                    const today = new Date();
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
                     
-                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-21', '20:00', 'The Comedy Theater, 123 Main Street, Downtown')">
-                        <div class="sg-date-row">
-                            <div class="sg-date-block">
-                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <div class="sg-date-info">
-                                    <div class="sg-date-primary">Thu, Aug 21 • 8:00 PM</div>
-                                    <div class="sg-date-secondary">Central Time</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    const compareDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+                    const compareToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    const compareYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
+                    const compareTomorrow = new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate());
                     
-                    <div class="sg-venue" onclick="openDirections('The Comedy Theater, 123 Main Street, Downtown')">
-                        <svg class="sg-location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        <div class="sg-venue-info">
-                            <div class="sg-venue-name">The Comedy Theater</div>
-                            <div class="sg-venue-address">123 Main Street, Downtown</div>
-                        </div>
-                    </div>
-                    
-                    <div class="sg-actions">
-                        <div class="sg-buttons">
-                            <a href="https://brownpapertickets.com/" class="sg-btn sg-btn-primary" target="_blank">Get Tickets</a>
-                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-secondary" target="_blank">Watch Online</a>
-                        </div>
-                    </div>
-                </div>
+                    if (compareDate.getTime() === compareToday.getTime()) {
+                        return 'Today';
+                    } else if (compareDate.getTime() === compareYesterday.getTime()) {
+                        return 'Yesterday';
+                    } else if (compareDate.getTime() === compareTomorrow.getTime()) {
+                        return 'Tomorrow';
+                    } else {
+                        return date.toLocaleDateString('en-US', { 
+                            weekday: 'long',
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        });
+                    }
+                }
                 
-                <!-- Screen Edition Show -->
-                <div class="sg-event-card screen">
-                    <span class="sg-badge screen">
-                        Screen Edition
-                    </span>
-                    <div class="sg-header">
-                        <div class="sg-event-meta">
-                            <span class="sg-price">Free</span>
-                        </div>
-                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
-                        <p class="sg-event-subtitle">📱 A comedy show for the online audience</p>
-                    </div>
+                function shouldShowShow(showDate) {
+                    const today = new Date();
+                    const yesterday = new Date(today);
+                    yesterday.setDate(yesterday.getDate() - 1);
                     
-                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-22', '21:30', 'Online Event')">
-                        <div class="sg-date-row">
-                            <div class="sg-date-block">
-                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <div class="sg-date-info">
-                                    <div class="sg-date-primary">Fri, Aug 22 • 9:30 PM</div>
-                                    <div class="sg-date-secondary">Central Time</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    const compareDate = new Date(showDate.getFullYear(), showDate.getMonth(), showDate.getDate());
+                    const compareYesterday = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
                     
-                    <div class="sg-actions">
-                        <div class="sg-buttons">
-                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-primary" style="width: 100%;" target="_blank">Watch Online</a>
-                        </div>
-                    </div>
-                </div>
+                    return compareDate >= compareYesterday;
+                }
                 
-                <div class="sg-event-card stage">
-                    <span class="sg-badge stage">
-                        Stage Edition
-                    </span>
-                    <div class="sg-header">
-                        <div class="sg-event-meta">
-                            <span class="sg-price">$10 or Sellable Item</span>
-                        </div>
-                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
-                        <p class="sg-event-subtitle">📱 + 🎭 A comedy show for in-person and online audiences</p>
-                    </div>
+                function createShowElement(show, showType, colorIndex) {
+                    const container = document.createElement('div');
+                    container.className = `ticket-container ${showType}-edition`;
                     
-                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-23', '18:00', 'The Comedy Theater, 123 Main Street, Downtown')">
-                        <div class="sg-date-row">
-                            <div class="sg-date-block">
-                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <div class="sg-date-info">
-                                    <div class="sg-date-primary">Sat, Aug 23 • 6:00 PM</div>
-                                    <div class="sg-date-secondary">Central Time</div>
+                    // Define 7 different background colors for title headers (no red or blue shades)
+                    const headerColors = [
+                        'linear-gradient(135deg, #2ed573, #27ae60)', // Green  
+                        'linear-gradient(135deg, #ffa502, #ff6348)', // Orange
+                        'linear-gradient(135deg, #9c88ff, #8c7ae6)', // Purple
+                        'linear-gradient(135deg, #ff6b9d, #e84393)', // Pink
+                        'linear-gradient(135deg, #f1c40f, #f39c12)', // Yellow
+                        'linear-gradient(135deg, #00d2d3, #01a3a4)', // Teal
+                        'linear-gradient(135deg, #a55eea, #8854d0)'  // Violet
+                    ];
+                    
+                    const headerBg = headerColors[colorIndex % 7];
+                    
+                    const showDate = parseDate(show.querySelector('date').textContent);
+                    const displayDate = formatDisplayDate(showDate);
+                    
+                    const location = show.querySelector('location');
+                    const locationUrl = show.querySelector('locationUrl');
+                    const locationHtml = location ? 
+                        (locationUrl ? 
+                            `<a href="${locationUrl.textContent}" target="_blank" class="location-link">${location.textContent}</a>` :
+                            `<span class="detail-value">${location.textContent}</span>`
+                        ) : '';
+                    
+                    container.innerHTML = `
+                        <div class="decorative-elements">
+                            ${showType === 'screen' ? 
+                                '<div class="star">✨</div><div class="star">⭐</div><div class="star">✨</div><div class="star">⭐</div><div class="star">💫</div><div class="star">🌟</div>' :
+                                '<div class="star">⭐</div><div class="star">✨</div><div class="star">⭐</div><div class="star">✨</div>'
+                            }
+                        </div>
+                        
+                        <div class="ticket-header" style="background: ${headerBg};">
+                            <h1 class="show-title" style="color: white;">${show.querySelector('title').textContent}</h1>
+                        </div>
+                        
+                        <div class="sold-out-banner ${showType}-edition">
+                            A <strong>SOLD OUT!</strong> Comedy Show<br>
+                            <span class="smaller-text">${showType === 'screen' ? 'Screen Edition (online audience only)' : 'Stage Edition (in-person and online audience)'}</span>
+                        </div>
+                        
+                        <div class="ticket-body">
+                            <div class="show-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Date:</span>
+                                    <span class="detail-value">${displayDate}</span>
                                 </div>
+                                
+                                ${showType === 'stage' ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Merch Check-In:</span>
+                                    <span class="detail-value">${show.querySelector('merchStartTime').textContent} - ${show.querySelector('merchEndTime').textContent} CT</span>
+                                </div>
+                                ` : ''}
+                                
+                                <div class="detail-row">
+                                    <span class="detail-label">Show Time:</span>
+                                    <span class="detail-value">${show.querySelector('time').textContent} CT</span>
+                                </div>
+                                
+                                ${showType === 'stage' && locationHtml ? `
+                                <div class="detail-row">
+                                    <span class="detail-label">Location:</span>
+                                    <span class="detail-value">${locationHtml}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="buttons-container">
+                                ${showType === 'stage' ? `
+                                <a href="${show.querySelector('liveUrl') ? show.querySelector('liveUrl').textContent : '#'}" class="ticket-button live-button">
+                                    $10 LIVE TIX
+                                </a>
+                                ` : ''}
+                                <a href="${show.querySelector('onlineUrl') ? show.querySelector('onlineUrl').textContent : '#'}" class="ticket-button online-button ${showType === 'screen' ? 'screen-edition' : ''}">
+                                    WATCH FREE ONLINE
+                                </a>
                             </div>
                         </div>
-                    </div>
+                        
+                        <div class="zigzag-border"></div>
+                    `;
                     
-                    <div class="sg-venue" onclick="openDirections('The Comedy Theater, 123 Main Street, Downtown')">
-                        <svg class="sg-location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        <div class="sg-venue-info">
-                            <div class="sg-venue-name">The Comedy Theater</div>
-                            <div class="sg-venue-address">123 Main Street, Downtown</div>
-                        </div>
-                    </div>
-                    
-                    <div class="sg-actions">
-                        <div class="sg-buttons">
-                            <a href="https://brownpapertickets.com/" class="sg-btn sg-btn-primary" target="_blank">Get Tickets</a>
-                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-secondary" target="_blank">Watch Online</a>
-                        </div>
-                    </div>
-                </div>
+                    return container;
+                }
                 
-                <div class="sg-event-card stage">
-                    <span class="sg-badge stage">
-                        Stage Edition
-                    </span>
-                    <div class="sg-header">
-                        <div class="sg-event-meta">
-                            <span class="sg-price">$10 or Sellable Item</span>
-                        </div>
-                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
-                        <p class="sg-event-subtitle">📱 + 🎭 A comedy show for in-person and online audiences</p>
-                    </div>
-                    
-                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-24', '19:00', 'The Comedy Theater, 123 Main Street, Downtown')">
-                        <div class="sg-date-row">
-                            <div class="sg-date-block">
-                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <div class="sg-date-info">
-                                    <div class="sg-date-primary">Sun, Aug 24 • 7:00 PM</div>
-                                    <div class="sg-date-secondary">Central Time</div>
-                                </div>
+                async function loadShows() {
+                    try {
+                        const response = await fetch('shows.xml');
+                        const xmlText = await response.text();
+                        const parser = new DOMParser();
+                        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+                        
+                        const shows = Array.from(xmlDoc.querySelectorAll('show'));
+                        const showsList = document.getElementById('shows-list');
+                        const noShowsMessage = document.getElementById('no-shows');
+                        
+                        const filteredShows = shows.filter(show => {
+                            const showDate = parseDate(show.querySelector('date').textContent);
+                            return shouldShowShow(showDate);
+                        });
+                        
+                        filteredShows.sort((a, b) => {
+                            const dateA = parseDate(a.querySelector('date').textContent);
+                            const dateB = parseDate(b.querySelector('date').textContent);
+                            return dateA - dateB;
+                        });
+                        
+                        if (filteredShows.length === 0) {
+                            noShowsMessage.style.display = 'block';
+                            return;
+                        }
+                        
+                        filteredShows.forEach((show, index) => {
+                            const showType = show.getAttribute('type');
+                            const showElement = createShowElement(show, showType, index);
+                            showsList.appendChild(showElement);
+                        });
+                        
+                    } catch (error) {
+                        console.error('Error loading shows:', error);
+                        const showsList = document.getElementById('shows-list');
+                        showsList.innerHTML = `
+                            <div class="no-shows-message">
+                                <h2>ERROR LOADING SHOWS</h2>
+                                <p>Please check that shows.xml is available.</p>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <div class="sg-venue" onclick="openDirections('The Comedy Theater, 123 Main Street, Downtown')">
-                        <svg class="sg-location-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                        <div class="sg-venue-info">
-                            <div class="sg-venue-name">The Comedy Theater</div>
-                            <div class="sg-venue-address">123 Main Street, Downtown</div>
-                        </div>
-                    </div>
-                    
-                    <div class="sg-actions">
-                        <div class="sg-buttons">
-                            <a href="https://brownpapertickets.com/" class="sg-btn sg-btn-primary" target="_blank">Get Tickets</a>
-                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-secondary" target="_blank">Watch Online</a>
-                        </div>
-                    </div>
-                </div>
+                        `;
+                    }
+                }
                 
-                <!-- Screen Edition Show -->
-                <div class="sg-event-card screen">
-                    <span class="sg-badge screen">
-                        Screen Edition
-                    </span>
-                    <div class="sg-header">
-                        <div class="sg-event-meta">
-                            <span class="sg-price">Free</span>
-                        </div>
-                        <h2 class="sg-event-title">SOLD OUT! Comedy Show</h2>
-                        <p class="sg-event-subtitle">📱 A comedy show for the online audience</p>
-                    </div>
-                    
-                    <div class="sg-datetime" onclick="addToCalendar('SOLD OUT! Comedy Show', '2025-08-25', '20:30', 'Online Event')">
-                        <div class="sg-date-row">
-                            <div class="sg-date-block">
-                                <svg class="sg-calendar-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <div class="sg-date-info">
-                                    <div class="sg-date-primary">Mon, Aug 25 • 8:30 PM</div>
-                                    <div class="sg-date-secondary">Central Time</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="sg-actions">
-                        <div class="sg-buttons">
-                            <a href="https://www.whatnot.com/" class="sg-btn sg-btn-primary" style="width: 100%;" target="_blank">Watch Online</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        
+                // Load shows when this script runs
+                loadShows();
+            })();
+        </script>
+    </section>      
         <section class="section reviews-section" style="background: var(--comic-orange); color: var(--comic-white);">
             <h2 class="section-title">The Fake Reviews Are In</h2>
             <div class="reviews-grid">
