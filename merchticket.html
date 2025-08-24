@@ -2,191 +2,122 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>SOLD OUT! Comedy Show — Merch Tickets</title>
+<title>SOLD OUT! Comedy Show — Audience Ticket</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-  :root{
+  :root {
     --ink:#111; --rule:#000; --muted:#666;
-    --base:11pt; --lh:1.35;
-    --thin:0.6px;
+    --base:11pt; --lh:1.4;
+    --thin:0.5px;
   }
-  @page { size: Letter portrait; margin:0.5in; }
+  @page { size: Letter portrait; margin:0.75in; }
   body {
-    margin:0.5in;
+    margin:0.75in;
     color:var(--ink);
     font: var(--base)/var(--lh) system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     -webkit-font-smoothing: antialiased;
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
-    display:grid; gap:0.5in;
+    display:grid; gap:0.75in;
     background:#fff;
   }
 
-  .ticket-box {
+  .ticket {
     width:7.5in; height:5in;
-    border: var(--thin) solid var(--ink);
-    padding:0.4in;
-    box-sizing:border-box;
-    display:grid; grid-template-rows:auto 1fr;
-    gap:0.25in;
-  }
-
-  /* Divider between tickets */
-  .cut-line {
-    border-top: var(--thin) dashed var(--muted);
-    margin:0;
+    display:grid; gap:0.3in;
   }
 
   /* Header */
   .hdr {
     display:flex; justify-content:space-between; align-items:flex-end;
     border-bottom: var(--thin) solid var(--ink);
-    padding-bottom:0.1in;
+    padding-bottom:0.15in;
   }
   .title {
-    margin:0; font-weight:700; font-size:13pt;
-    letter-spacing:0.02em; text-transform:uppercase;
+    margin:0;
+    font-weight:700;
+    font-size:12pt;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
   }
-  .logo { width:1.2in; height:auto; }
-
-  /* Sections */
-  .section { display:grid; gap:0.12in; }
-  .section-title {
-    margin:0; font-weight:700; text-transform:uppercase;
-    letter-spacing:0.02em; font-size:10pt;
-  }
+  .logo { width:1in; height:auto; }
 
   /* Rows */
-  .row { display:flex; align-items:flex-end; gap:0.15in; margin:0.05in 0; }
-  .label { min-width:1.9in; font-weight:600; font-size:10pt; }
-  .line { flex:1 1 auto; border-bottom:1px solid var(--rule); height:0.16in; }
-  .w-compact { max-width:1.8in; }
+  .row { display:flex; align-items:flex-end; gap:0.2in; margin:0.1in 0; }
+  .label { min-width:2in; font-weight:600; font-size:10pt; }
+  .line { flex:1; border-bottom:1px solid var(--rule); height:0.18in; }
+  .w-compact { max-width:1.6in; }
   .w-wide { max-width:none; }
 
-  .fine { font-size:9.5pt; color:var(--ink); }
-  .divider { border:0; border-top:var(--thin) dotted var(--muted); margin:0.15in 0; }
-
-  .signs { display:flex; gap:0.5in; margin-top:0.12in; }
-  .signs .line { min-width:2in; }
+  .note { font-size:9pt; color:var(--muted); margin-left:2.2in; }
 
   /* ID Boxes */
-  .idwrap{ display:flex; align-items:center; gap:0.25in; }
-  .idboxes{ display:grid; grid-template-columns:repeat(4,0.34in); gap:0.06in; }
-  .idbox{
+  .idwrap { display:flex; align-items:center; gap:0.25in; }
+  .idboxes { display:grid; grid-template-columns:repeat(4,0.36in); gap:0.06in; }
+  .idbox {
     border:1px solid var(--rule);
-    width:0.34in; height:0.34in;
+    width:0.36in; height:0.36in;
     display:flex; align-items:center; justify-content:center;
     font-weight:700; font-size:11pt;
   }
+
+  /* Signatures */
+  .signs { display:flex; gap:0.75in; margin-top:auto; }
+  .sig { flex:1; }
+  .sig .line { width:100%; }
+  .sig-label { font-size:9pt; color:var(--muted); margin-top:0.05in; }
 </style>
 </head>
 <body>
 
-<!-- Ticket 1 -->
-<div class="ticket-box">
+<div class="ticket">
   <header class="hdr">
     <h1 class="title">SOLD OUT! Comedy Show — Merch Ticket</h1>
     <img class="logo" src="web/soldoutlogo.png" alt="SOLD OUT! Comedy Show logo">
   </header>
-  <section class="section">
-    <div class="row idwrap">
-      <div class="label">Unique ID #</div>
-      <div class="idboxes">
-        <div id="id1-0" class="idbox"></div>
-        <div id="id1-1" class="idbox"></div>
-        <div id="id1-2" class="idbox"></div>
-        <div id="id1-3" class="idbox"></div>
-      </div>
+
+  <div class="row idwrap">
+    <div class="label">Unique ID #</div>
+    <div class="idboxes">
+      <div id="id-0" class="idbox"></div>
+      <div id="id-1" class="idbox"></div>
+      <div id="id-2" class="idbox"></div>
+      <div id="id-3" class="idbox"></div>
     </div>
+  </div>
 
-    <h2 class="section-title">Audience Copy (keep this)</h2>
-    <div class="row"><div class="label">Name</div><div class="line"></div></div>
-    <div class="row"><div class="label">Box Provided?</div><div>☐ Yes ☐ No</div></div>
-    <div class="row"><div class="label">Item Description</div><div class="line w-wide"></div></div>
-    <div class="row"><div class="label">Minimum Price (Your Floor)</div><div>$</div><div class="line w-compact"></div></div>
+  <div class="row"><div class="label">Name</div><div class="line"></div></div>
+  <div class="row"><div class="label">Box Provided?</div><div>☐ Yes ☐ No</div></div>
+  <div class="row"><div class="label">Item Description</div><div class="line w-wide"></div></div>
+  <div class="row"><div class="label">Minimum Price (Your Floor)</div><div>$</div><div class="line w-compact"></div></div>
+  <div class="row"><div class="label">On-Stage Participant?</div><div>☐ Yes ☐ No</div></div>
 
-    <p class="fine">
-      If your item sells, you will receive <strong>exactly</strong> the minimum price you set—no more, no less.
-      Any amount above this minimum goes to <strong>SOLD OUT! Comedy</strong>. If the item does not sell, you receive nothing.
-    </p>
+  <div class="row"><div class="label">Rapid Sales?</div><div>☐ Yes ☐ No</div></div>
+  <p class="note">
+    If <strong>Yes</strong>, please hold on to your item until the end of the show.<br>
+    If <strong>No</strong>, please give your item to the appraiser for show prep.
+  </p>
 
-    <div class="row"><div class="label">On-Stage Participant?</div><div>☐ Yes ☐ No</div></div>
-    <div class="row"><div class="label">Appraiser Notes / Scene Assignment (internal)</div><div class="line w-wide"></div></div>
-
-    <hr class="divider">
-
-    <h2 class="section-title">Disclaimer (sign below)</h2>
-    <p class="fine">
-      I understand this process is subjective and part of a live performance. By participating, I agree my item may or may not sell.
-      If it sells, I will receive only the minimum price I set above. SOLD OUT! Comedy retains all amounts above that minimum.
-    </p>
-    <div class="signs">
-      <div>Participant Signature <div class="line"></div></div>
-      <div>Date <div class="line w-compact"></div></div>
+  <div class="signs">
+    <div class="sig">
+      <div class="line"></div>
+      <div class="sig-label">Participant Signature</div>
     </div>
-  </section>
-</div>
-
-<hr class="cut-line" aria-hidden="true">
-
-<!-- Ticket 2 -->
-<div class="ticket-box">
-  <header class="hdr">
-    <h1 class="title">SOLD OUT! Comedy Show — Merch Ticket</h1>
-    <img class="logo" src="web/soldoutlogo.png" alt="SOLD OUT! Comedy Show logo">
-  </header>
-  <section class="section">
-    <div class="row idwrap">
-      <div class="label">Unique ID #</div>
-      <div class="idboxes">
-        <div id="id2-0" class="idbox"></div>
-        <div id="id2-1" class="idbox"></div>
-        <div id="id2-2" class="idbox"></div>
-        <div id="id2-3" class="idbox"></div>
-      </div>
+    <div class="sig">
+      <div class="line"></div>
+      <div class="sig-label">Date</div>
     </div>
-
-    <h2 class="section-title">Audience Copy (keep this)</h2>
-    <div class="row"><div class="label">Name</div><div class="line"></div></div>
-    <div class="row"><div class="label">Box Provided?</div><div>☐ Yes ☐ No</div></div>
-    <div class="row"><div class="label">Item Description</div><div class="line w-wide"></div></div>
-    <div class="row"><div class="label">Minimum Price (Your Floor)</div><div>$</div><div class="line w-compact"></div></div>
-
-    <p class="fine">
-      If your item sells, you will receive <strong>exactly</strong> the minimum price you set—no more, no less.
-      Any amount above this minimum goes to <strong>SOLD OUT! Comedy</strong>. If the item does not sell, you receive nothing.
-    </p>
-
-    <div class="row"><div class="label">On-Stage Participant?</div><div>☐ Yes ☐ No</div></div>
-    <div class="row"><div class="label">Appraiser Notes / Scene Assignment (internal)</div><div class="line w-wide"></div></div>
-
-    <hr class="divider">
-
-    <h2 class="section-title">Disclaimer (sign below)</h2>
-    <p class="fine">
-      I understand this process is subjective and part of a live performance. By participating, I agree my item may or may not sell.
-      If it sells, I will receive only the minimum price I set above. SOLD OUT! Comedy retains all amounts above that minimum.
-    </p>
-    <div class="signs">
-      <div>Participant Signature <div class="line"></div></div>
-      <div>Date <div class="line w-compact"></div></div>
-    </div>
-  </section>
+  </div>
 </div>
 
 <script>
   function id4(){ return String(Math.floor(Math.random()*10000)).padStart(4,'0'); }
-  function fill(prefix, value){
+  function assignID(){
+    const id=id4();
     for(let i=0;i<4;i++){
-      const el=document.getElementById(prefix+i);
-      if(el) el.textContent=value[i];
+      document.getElementById('id-'+i).textContent=id[i];
     }
   }
-  function assignIDs(){
-    const id1=id4(), id2=id4();
-    fill('id1-',id1);
-    fill('id2-',id2);
-  }
-  window.addEventListener('DOMContentLoaded', assignIDs);
+  window.addEventListener('DOMContentLoaded', assignID);
 </script>
 
 </body>
