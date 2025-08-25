@@ -26,7 +26,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background: linear-gradient(45deg, var(--comic-yellow) 0%, var(--comic-orange) 50%, var(--comic-red) 100%);
+  background: white;
   color: var(--comic-black);
   overflow-x: hidden;
   min-height: 100vh;
@@ -34,7 +34,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ben Day Dots Background */
+/* Comic book dotted background on all pages */
 body::before {
   content: '';
   position: fixed;
@@ -43,19 +43,20 @@ body::before {
   width: 100%;
   height: 100%;
   background-image: radial-gradient(circle, var(--comic-black) 1px, transparent 1px);
-  background-size: 8px 8px;
-  opacity: 0.05;
+  background-size: 20px 20px;
+  opacity: 0.15;
   pointer-events: none;
   z-index: -1;
 }
 
 .container {
-  max-width: 800px;
+  max-width: 100vw;
   margin: 0 auto;
   position: relative;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding: 0 15px;
 }
 
 /* Progress bar */
@@ -84,7 +85,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px 20px;
+  padding: 60px 10px 20px;
   min-height: 100vh;
   opacity: 0;
   transform: translateY(30px);
@@ -149,7 +150,7 @@ body::before {
 
 /* Input styles */
 .input-group {
-  margin-bottom: 40px;
+  margin-bottom: 30px;
 }
 
 input[type="text"],
@@ -157,13 +158,12 @@ input[type="email"],
 input[type="number"],
 input[type="date"] {
   width: 100%;
-  max-width: 400px;
-  height: 60px;
+  height: 56px;
   background: var(--comic-white);
   border: 4px solid var(--comic-black);
   border-radius: 12px;
   color: var(--comic-black);
-  font-size: 18px;
+  font-size: 16px;
   font-family: 'Inter', sans-serif;
   font-weight: 600;
   padding: 0 20px;
@@ -306,15 +306,15 @@ input[type="number"]::placeholder {
 .nav-buttons {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-top: 40px;
-  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 30px;
+  flex-direction: column;
 }
 
 .btn {
   font-family: 'Bangers', cursive;
-  font-size: 18px;
-  padding: 16px 32px;
+  font-size: 16px;
+  padding: 18px 24px;
   border: 4px solid var(--comic-black);
   border-radius: 12px;
   cursor: pointer;
@@ -322,7 +322,9 @@ input[type="number"]::placeholder {
   text-decoration: none;
   text-transform: uppercase;
   letter-spacing: 1px;
-  min-width: 120px;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
   box-shadow: 6px 6px 0px var(--comic-black);
   text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
   font-weight: 400;
@@ -379,24 +381,18 @@ input[type="number"]::placeholder {
 
 /* Logo */
 .logo {
-  width: 100px;
-  height: 100px;
+  width: 150px;
+  height: 150px;
   margin: 0 auto 24px;
-  background: var(--comic-white);
-  border: 4px solid var(--comic-black);
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
-  font-size: 16px;
-  box-shadow: 8px 8px 0px var(--comic-black);
   overflow: hidden;
 }
 
 .logo img {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
   border-radius: 50%;
 }
@@ -688,10 +684,10 @@ input[type="number"]::placeholder {
       <div class="logo">
         <img src="web/soldoutlogo.png" alt="SOLD OUT! Logo" style="width: 80px; height: 80px; border-radius: 50%;">
       </div>
-      <h1 class="welcome-title">SOLD OUT!</h1>
-      <p class="welcome-subtitle">Comedy Show Merch Ticket<br>Let's get your item ready for auction!</p>
+      <h1 class="welcome-title">Merch Ticket</h1>
+      <p class="welcome-subtitle">**Note:** Please consult with an appraiser when filling out this form.</p>
       <div class="nav-buttons">
-        <button class="btn btn-primary" onclick="nextQuestion()">Get Started</button>
+        <button class="btn btn-primary" onclick="nextQuestion()">GO >>></button>
       </div>
     </div>
   </div>
@@ -797,6 +793,13 @@ input[type="number"]::placeholder {
     <div class="question-content">
       <div class="question-number">Question 6 of 7</div>
       <h2 class="question-title">Please sign below</h2>
+      
+      <div class="checkbox-container" style="margin-bottom: 32px;">
+        <label class="checkbox-label" style="margin-left: 0;">
+          By signing below, I acknowledge that my item will be auctioned during the SOLD OUT! Comedy Show. I understand that my item will only be sold if it reaches the listing price which will be higher than the sale price you chose. If sold, I will receive the exact sale amount I've specified—no more, no less. Any amount above sale price will be retained by SOLD OUT! Comedy. I agree to have the item sold in the show format as determined by the production team. The production team has final say regarding my participation in the show. All sales are final with no returns or refunds. I release SOLD OUT! Comedy from any liability related to my item or participation.
+        </label>
+      </div>
+      
       <div class="signature-container">
         <canvas id="signature-canvas" width="400" height="200"></canvas>
         <div class="signature-controls">
@@ -824,16 +827,9 @@ input[type="number"]::placeholder {
         <!-- Summary will be populated by JavaScript -->
       </div>
       
-      <div class="checkbox-container">
-        <input type="checkbox" id="agreement" onchange="validateCurrentStep()">
-        <label for="agreement" class="checkbox-label">
-          I agree that my item will be auctioned during the SOLD OUT! Comedy Show. I understand my item will only be sold if it reaches the listing price, and I'll receive my exact minimum take home amount. All sales are final. I release SOLD OUT! Comedy from any liability.
-        </label>
-      </div>
-      
       <div class="nav-buttons">
         <button class="btn btn-secondary" onclick="prevQuestion()">Back</button>
-        <button class="btn btn-primary" id="next-btn-7" onclick="submitForm()" disabled>Submit Ticket</button>
+        <button class="btn btn-primary" id="next-btn-7" onclick="submitForm()">Submit Ticket</button>
       </div>
     </div>
   </div>
@@ -1053,7 +1049,7 @@ function validateCurrentStep() {
       isValid = participantName !== '' && date !== '' && hasSignature;
       break;
     case 7:
-      isValid = document.getElementById('agreement').checked;
+      isValid = true; // Summary page doesn't need validation
       break;
   }
   
