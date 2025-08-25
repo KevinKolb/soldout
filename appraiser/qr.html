@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Merch Check-In QR Code</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            width: 7.5in; /* Adjusted for letter page margins */
+            height: 10in; /* Fits within 11in height with margins */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        h1 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin: 15px 0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        .qr-code {
+            width: 280px;
+            height: 280px;
+            border: 6px solid #2c3e50;
+            border-radius: 8px;
+            margin: 20px 0;
+            transition: box-shadow 0.3s ease;
+        }
+        .qr-code:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+                background: none;
+            }
+            .container {
+                box-shadow: none;
+                border: none;
+                width: 8.5in;
+                height: 11in;
+                padding: 0.5in;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                page-break-after: avoid;
+            }
+            .logo {
+                width: 150px;
+            }
+            .qr-code {
+                width: 280px;
+                height: 280px;
+                border: 6px solid #2c3e50;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .subtitle {
+                font-size: 16px;
+            }
+            @page {
+                size: letter;
+                margin: 0.5in;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="../web/soldoutlogo.png" alt="Sold Out! Comedy Logo" class="logo">
+        <div>
+            <h1>Do you have an item to sell?</h1>
+            <p class="subtitle">Scan here to join the fun!</p>
+        </div>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=https://kevinkolb.github.io/soldout/appraiser/index.html" alt="QR Code" class="qr-code">
+    </div>
+</body>
+</html>

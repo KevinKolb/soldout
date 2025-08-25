@@ -37,3 +37,5 @@ Merch ticket/disclaimer has a unique id on it. Have them sign both halves and gi
 Take the item if it's in a regular scene. Have them hold it if it's going in the rapid sales section.
 
 No item is rejected unless it breaks a rule of the selling service.
+
+Shipping? Weight? Taxes? Whatnot fee?
