@@ -16,11 +16,11 @@
         }
         .container {
             background-color: #ffffff;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-            padding: 30px;
-            width: 7.5in; /* Adjusted for letter page margins */
-            height: 10in; /* Fits within 11in height with margins */
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            padding: 20px;
+            width: 7.5in;
+            height: 9.5in; /* Reduced to fit within 11in with margins */
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
@@ -29,38 +29,38 @@
             text-align: center;
         }
         .logo {
-            width: 150px;
+            width: 140px;
             height: auto;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             transition: transform 0.3s ease;
         }
         .logo:hover {
             transform: scale(1.05);
         }
         h1 {
-            font-size: 24px;
+            font-size: 22px;
             color: #2c3e50;
-            margin: 15px 0;
+            margin: 10px 0;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
+            letter-spacing: 1px;
         }
         .subtitle {
-            font-size: 16px;
+            font-size: 14px;
             color: #7f8c8d;
-            margin-top: 10px;
+            margin-top: 8px;
             font-style: italic;
         }
         .qr-code {
-            width: 280px;
-            height: 280px;
-            border: 6px solid #2c3e50;
+            width: 260px;
+            height: 260px;
+            border: 5px solid #2c3e50;
             border-radius: 8px;
-            margin: 20px 0;
+            margin: 15px 0;
             transition: box-shadow 0.3s ease;
         }
         .qr-code:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
         @media print {
             body {
@@ -72,27 +72,28 @@
                 box-shadow: none;
                 border: none;
                 width: 8.5in;
-                height: 11in;
-                padding: 0.5in;
+                height: 10in; /* Tightened for single-page fit */
+                padding: 0.25in;
                 display: flex;
                 flex-direction: column;
                 justify-content: center;
                 align-items: center;
                 page-break-after: avoid;
+                page-break-inside: avoid;
             }
             .logo {
-                width: 150px;
+                width: 140px;
             }
             .qr-code {
-                width: 280px;
-                height: 280px;
-                border: 6px solid #2c3e50;
+                width: 260px;
+                height: 260px;
+                border: 5px solid #2c3e50;
             }
             h1 {
-                font-size: 24px;
+                font-size: 22px;
             }
             .subtitle {
-                font-size: 16px;
+                font-size: 14px;
             }
             @page {
                 size: letter;
@@ -108,7 +109,7 @@
             <h1>Do you have an item to sell?</h1>
             <p class="subtitle">Scan here to join the fun!</p>
         </div>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=280x280&data=https://kevinkolb.github.io/soldout/appraiser/index.html" alt="QR Code" class="qr-code">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://kevinkolb.github.io/soldout/appraiser/index.html" alt="QR Code" class="qr-code">
     </div>
 </body>
 </html>
