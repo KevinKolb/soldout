@@ -741,13 +741,14 @@ input[type="number"]::placeholder {
   <div class="question-container" data-step="4">
     <div class="question-content">
       <div class="question-number">Question 4 of 7</div>
-      <h2 class="question-title">Minimum you want to take home?</h2>
+      <h2 class="question-title">Sale Price</h2>
+      <p style="font-size: 14px; color: var(--comic-blue); margin-bottom: 20px; font-weight: 600;">This is the amount you will get if your item sells. This is the amount you're willing to take for your item.</p>
       <div class="input-group">
         <input type="number" id="min-price" placeholder="0.00" min="0" step="0.01" onkeypress="handleEnter(event)" oninput="updatePricing(); validateCurrentStep();">
       </div>
       <div class="price-display" id="price-display" style="display: none;">
         <div class="price-row">
-          <span>Your minimum take home:</span>
+          <span>Your sale amount:</span>
           <span id="min-display">$0.00</span>
         </div>
         <div class="price-row">
@@ -1081,7 +1082,7 @@ function generateSummary() {
   const sellerEmail = document.getElementById('seller-email').value;
   const itemDescription = document.getElementById('item-description').value;
   const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
-  const listingPrice = minPrice + 10;
+  const listingPrice = minPrice + (minPrice * 0.1);
   const sellerOption = document.querySelector('input[name="seller-option"]:checked')?.value;
   const signature = document.getElementById('participant-name').value;
   const date = document.getElementById('sig-date').value;
@@ -1139,12 +1140,12 @@ function submitForm() {
     sellerEmail: document.getElementById('seller-email').value,
     itemDescription: document.getElementById('item-description').value,
     minPrice: document.getElementById('min-price').value,
-    listingPrice: (parseFloat(document.getElementById('min-price').value) + 10).toFixed(2),
+    listingPrice: (parseFloat(document.getElementById('min-price').value) * 1.1).toFixed(2),
     sellerOption: document.querySelector('input[name="seller-option"]:checked')?.value,
     participantName: document.getElementById('participant-name').value,
     signatureImage: signatureDataURL,
     date: document.getElementById('sig-date').value,
-    agreementChecked: document.getElementById('agreement').checked,
+    agreementChecked: true,
     submissionTime: new Date().toISOString()
   };
   
