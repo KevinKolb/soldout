@@ -1,1186 +1,808 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>SOLD OUT! Comedy Show — Merch Ticket</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5">
-<link rel="icon" href="https://via.placeholder.com/32x32/000000/FFFFFF?text=SO" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-<style>
-:root {
-    --comic-red: #FF3B3B;
-    --comic-blue: #4A90E2;
-    --comic-yellow: #FFD93D;
-    --comic-purple: #9013FE;
-    --comic-green: #4CAF50;
-    --comic-orange: #FF9500;
-    --comic-black: #2C2C2C;
-    --comic-white: #FFFFFF;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Inter', sans-serif;
-  background: white;
-  color: var(--comic-black);
-  overflow-x: hidden;
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Comic book dotted background on all pages */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(circle, var(--comic-black) 1px, transparent 1px);
-  background-size: 20px 20px;
-  opacity: 0.15;
-  pointer-events: none;
-  z-index: -1;
-}
-
-.container {
-  max-width: 100vw;
-  margin: 0 auto;
-  position: relative;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 0 15px;
-}
-
-/* Progress bar */
-.progress-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  height: 8px;
-  background: var(--comic-black);
-  border-bottom: 4px solid var(--comic-yellow);
-}
-
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--comic-red), var(--comic-orange), var(--comic-yellow));
-  width: 0%;
-  transition: width 0.4s ease;
-  box-shadow: 0 0 20px rgba(255, 61, 59, 0.5);
-}
-
-/* Question container */
-.question-container {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 10px 20px;
-  min-height: 100vh;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.question-container.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.question-container.hidden {
-  display: none;
-}
-
-.question-content {
-  width: 100%;
-  max-width: 600px;
-  text-align: center;
-  background: var(--comic-white);
-  border: 6px solid var(--comic-black);
-  border-radius: 20px;
-  padding: 40px 30px;
-  box-shadow: 20px 20px 0 0 rgba(44, 44, 44, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Comic-style decorative dots */
-.question-content::before {
-  content: '';
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  width: 40px;
-  height: 40px;
-  background-image: radial-gradient(circle, var(--comic-red) 2px, transparent 2px);
-  background-size: 6px 6px;
-  opacity: 0.3;
-}
-
-.question-number {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--comic-blue);
-  margin-bottom: 16px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.question-title {
-  font-family: 'Bangers', cursive;
-  font-size: clamp(24px, 6vw, 40px);
-  font-weight: 400;
-  line-height: 1.1;
-  margin-bottom: 40px;
-  color: var(--comic-red);
-  text-shadow: 3px 3px 0px var(--comic-black);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-}
-
-/* Input styles */
-.input-group {
-  margin-bottom: 30px;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="number"],
-input[type="date"] {
-  width: 100%;
-  height: 56px;
-  background: var(--comic-white);
-  border: 4px solid var(--comic-black);
-  border-radius: 12px;
-  color: var(--comic-black);
-  font-size: 16px;
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  padding: 0 20px;
-  text-align: center;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 6px 6px 0px var(--comic-black);
-}
-
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="number"]:focus,
-input[type="date"]:focus {
-  outline: none;
-  background: var(--comic-yellow);
-  transform: translateY(-3px);
-  box-shadow: 8px 12px 0px var(--comic-black);
-}
-
-input[type="text"]::placeholder,
-input[type="email"]::placeholder,
-input[type="number"]::placeholder {
-  color: rgba(44, 44, 44, 0.6);
-  font-weight: 400;
-}
-
-@media (max-width: 480px) {
-  input[type="text"],
-  input[type="email"],
-  input[type="number"],
-  input[type="date"] {
-    font-size: 16px;
-    height: 56px;
-    max-width: 100%;
-  }
-}
-
-/* Radio button styles */
-.radio-options {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.radio-option {
-  position: relative;
-  background: var(--comic-white);
-  border: 4px solid var(--comic-black);
-  border-radius: 12px;
-  padding: 20px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 6px 6px 0px var(--comic-black);
-  transform: rotate(1deg);
-}
-
-.radio-option:nth-child(2) {
-  transform: rotate(-1deg);
-  background: var(--comic-yellow);
-}
-
-.radio-option:nth-child(3) {
-  transform: rotate(1deg);
-  background: var(--comic-blue);
-  color: var(--comic-white);
-}
-
-.radio-option:hover {
-  transform: rotate(0deg) translateY(-5px);
-  box-shadow: 10px 15px 0px var(--comic-black);
-}
-
-.radio-option.selected {
-  background: var(--comic-red);
-  color: var(--comic-white);
-  transform: rotate(0deg) scale(1.05);
-  box-shadow: 12px 12px 0px var(--comic-black);
-}
-
-.radio-option input[type="radio"] {
-  display: none;
-}
-
-.radio-label {
-  font-size: 18px;
-  font-weight: 700;
-  display: block;
-  text-align: center;
-  text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
-}
-
-@media (max-width: 480px) {
-  .radio-options {
-    max-width: 100%;
-  }
-  
-  .radio-option {
-    padding: 16px;
-  }
-  
-  .radio-label {
-    font-size: 16px;
-  }
-}
-
-/* Price display */
-.price-display {
-  background: var(--comic-green);
-  border: 4px solid var(--comic-black);
-  border-radius: 12px;
-  padding: 24px;
-  margin: 24px 0;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
-  box-shadow: 6px 6px 0px var(--comic-black);
-  color: var(--comic-white);
-}
-
-.price-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.price-row:last-child {
-  margin-bottom: 0;
-  padding-top: 12px;
-  border-top: 2px solid var(--comic-white);
-  font-weight: 700;
-  font-size: 20px;
-  text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
-}
-
-/* Navigation buttons */
-.nav-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 30px;
-  flex-direction: column;
-}
-
-.btn {
-  font-family: 'Bangers', cursive;
-  font-size: 16px;
-  padding: 18px 24px;
-  border: 4px solid var(--comic-black);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  text-decoration: none;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  width: 100%;
-  max-width: 300px;
-  margin: 0 auto;
-  box-shadow: 6px 6px 0px var(--comic-black);
-  text-shadow: 2px 2px 0px rgba(0,0,0,0.3);
-  font-weight: 400;
-}
-
-.btn-primary {
-  background: var(--comic-red);
-  color: var(--comic-white);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: #FF6B6B;
-  transform: translateY(-3px);
-  box-shadow: 8px 12px 0px var(--comic-black);
-}
-
-.btn-secondary {
-  background: var(--comic-white);
-  color: var(--comic-black);
-}
-
-.btn-secondary:hover {
-  background: var(--comic-yellow);
-  transform: translateY(-3px);
-  box-shadow: 8px 12px 0px var(--comic-black);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none !important;
-  filter: grayscale(0.5);
-}
-
-.btn:active {
-  transform: translateY(2px);
-  box-shadow: 2px 2px 0px var(--comic-black);
-}
-
-@media (max-width: 480px) {
-  .nav-buttons {
-    flex-direction: column;
-    gap: 16px;
-  }
-  
-  .btn {
-    width: 100%;
-    max-width: 300px;
-    margin: 0 auto;
-    padding: 18px 24px;
-    font-size: 16px;
-  }
-}
-
-/* Logo */
-.logo {
-  width: 150px;
-  height: 150px;
-  margin: 0 auto 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.logo img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-@media (max-width: 480px) {
-  .logo {
-    width: 80px;
-    height: 80px;
-  }
-  
-  .logo img {
-    width: 60px;
-    height: 60px;
-  }
-}
-
-/* Welcome screen */
-.welcome-screen {
-  text-align: center;
-}
-
-.welcome-title {
-  font-family: 'Bangers', cursive;
-  font-size: clamp(32px, 8vw, 48px);
-  font-weight: 400;
-  margin-bottom: 16px;
-  color: var(--comic-red);
-  text-shadow: 4px 4px 0px var(--comic-black);
-  text-transform: uppercase;
-  letter-spacing: 4px;
-}
-
-.welcome-subtitle {
-  font-size: clamp(16px, 4vw, 20px);
-  color: var(--comic-blue);
-  margin-bottom: 40px;
-  line-height: 1.4;
-  font-weight: 600;
-  text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
-}
-
-/* Signature canvas */
-.signature-container {
-  margin-bottom: 32px;
-}
-
-#signature-canvas {
-  border: 4px solid var(--comic-black);
-  border-radius: 12px;
-  background: var(--comic-white);
-  cursor: crosshair;
-  display: block;
-  margin: 0 auto;
-  max-width: 100%;
-  height: auto;
-  touch-action: none;
-  box-shadow: 6px 6px 0px var(--comic-black);
-  transition: all 0.3s ease;
-}
-
-#signature-canvas:focus {
-  transform: translateY(-2px);
-  box-shadow: 8px 10px 0px var(--comic-black);
-}
-
-.signature-controls {
-  margin-top: 16px;
-  text-align: center;
-}
-
-.signature-controls .btn {
-  padding: 8px 16px;
-  font-size: 14px;
-  min-width: auto;
-  text-transform: none;
-  letter-spacing: 0;
-}
-
-.signature-hint {
-  font-size: 14px;
-  color: var(--comic-blue);
-  margin-top: 8px;
-  text-align: center;
-  font-weight: 600;
-}
-
-@media (max-width: 480px) {
-  #signature-canvas {
-    width: 100%;
-    max-width: 350px;
-    height: 180px;
-  }
-  
-  .signature-hint {
-    font-size: 13px;
-  }
-}
-
-/* Summary screen */
-.summary-grid {
-  display: grid;
-  gap: 16px;
-  max-width: 500px;
-  margin: 0 auto 40px;
-  text-align: left;
-}
-
-.summary-item {
-  background: var(--comic-white);
-  border: 3px solid var(--comic-black);
-  border-radius: 8px;
-  padding: 16px;
-  box-shadow: 4px 4px 0px var(--comic-black);
-  transform: rotate(0.5deg);
-}
-
-.summary-item:nth-child(even) {
-  transform: rotate(-0.5deg);
-  background: var(--comic-yellow);
-}
-
-.summary-label {
-  font-size: 12px;
-  color: var(--comic-blue);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 4px;
-  font-weight: 700;
-}
-
-.summary-value {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--comic-black);
-}
-
-@media (max-width: 480px) {
-  .summary-grid {
-    max-width: 100%;
-  }
-  
-  .summary-item {
-    padding: 14px;
-  }
-  
-  .summary-value {
-    font-size: 15px;
-  }
-}
-
-/* Checkbox */
-.checkbox-container {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  max-width: 500px;
-  margin: 0 auto;
-  text-align: left;
-  background: var(--comic-purple);
-  border: 3px solid var(--comic-black);
-  border-radius: 8px;
-  padding: 16px;
-  color: var(--comic-white);
-  box-shadow: 4px 4px 0px var(--comic-black);
-}
-
-.checkbox-container input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
-  margin-top: 2px;
-  cursor: pointer;
-  accent-color: var(--comic-yellow);
-  flex-shrink: 0;
-}
-
-.checkbox-label {
-  font-size: 14px;
-  line-height: 1.4;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-@media (max-width: 480px) {
-  .checkbox-container {
-    max-width: 100%;
-    padding: 14px;
-  }
-  
-  .checkbox-label {
-    font-size: 13px;
-  }
-}
-
-/* Success animation */
-.success-icon {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 24px;
-  background: var(--comic-green);
-  border: 6px solid var(--comic-black);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 40px;
-  animation: successPulse 0.6s ease;
-  box-shadow: 12px 12px 0px var(--comic-black);
-  color: var(--comic-white);
-}
-
-@keyframes successPulse {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-/* Enter key hint */
-.enter-hint {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--comic-black);
-  color: var(--comic-white);
-  border: 3px solid var(--comic-yellow);
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  box-shadow: 4px 4px 0px var(--comic-yellow);
-}
-
-@media (max-width: 480px) {
-  .enter-hint {
-    display: none;
-  }
-  
-  .question-content {
-    padding: 30px 20px;
-    margin: 0 10px;
-  }
-  
-  .question-title {
-    margin-bottom: 30px;
-  }
-}
-
-/* Mobile responsive improvements */
-@media (max-width: 374px) {
-  .container {
-    padding: 0 12px;
-  }
-  
-  .question-content {
-    padding: 25px 16px;
-    margin: 0 5px;
-  }
-  
-  .question-title {
-    font-size: 20px;
-    margin-bottom: 25px;
-  }
-  
-  input[type="text"],
-  input[type="email"],
-  input[type="number"],
-  input[type="date"] {
-    font-size: 16px;
-    height: 52px;
-  }
-  
-  .btn {
-    font-size: 15px;
-    padding: 16px 20px;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sell Your Merch</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', 'Arial', sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            line-height: 1.4;
+            padding: 16px 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 420px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .header {
+            background: #f0f0f0;
+            color: #333333;
+            padding: 32px 24px;
+            border-bottom: 1px solid #d0d0d0;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-logo {
+            width: 72px;
+            height: 72px;
+            flex-shrink: 0;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 300;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+            color: #444444;
+        }
+
+        .header p {
+            font-size: 13px;
+            color: #777777;
+            margin-bottom: 0;
+            font-weight: 400;
+        }
+
+        .form-section {
+            display: none;
+            padding: 32px 24px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-section h2 {
+            font-size: 20px;
+            font-weight: 400;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+            letter-spacing: -0.01em;
+        }
+
+        .form-section p {
+            font-size: 13px;
+            color: #666666;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #444444;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #cccccc;
+            background: #fafafa;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.15s ease;
+            color: #1a1a1a;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #666666;
+            background: #ffffff;
+        }
+
+        input.error {
+            border-color: #999999;
+            background: #f8f8f8;
+        }
+
+        .error-message {
+            color: #777777;
+            font-size: 11px;
+            margin-top: 6px;
+            font-weight: 400;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border: 1px solid #e0e0e0;
+            background: #fafafa;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .radio-option:hover {
+            border-color: #cccccc;
+            background: #f5f5f5;
+        }
+
+        .radio-option.selected {
+            border-color: #666666;
+            background: #f0f0f0;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 14px;
+            accent-color: #666666;
+        }
+
+        .radio-option label {
+            margin: 0;
+            text-transform: none;
+            font-size: 14px;
+            font-weight: 400;
+            color: #1a1a1a;
+            cursor: pointer;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .back-btn {
+            background: #e0e0e0;
+            color: #666666;
+            border: 1px solid #cccccc;
+            padding: 18px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+            flex: 0 0 80px;
+        }
+
+        .back-btn:hover {
+            background: #d0d0d0;
+            border-color: #bbbbbb;
+        }
+
+        .next-btn {
+            background: #777777;
+            color: #ffffff;
+            border: 1px solid #999999;
+            padding: 18px;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-transform: uppercase;
+            flex: 1;
+        }
+
+        .next-btn:hover {
+            background: #666666;
+            border-color: #888888;
+        }
+
+        .next-btn:disabled {
+            background: #cccccc;
+            border-color: #dddddd;
+            cursor: not-allowed;
+        }
+
+        .price-display {
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .price-row:last-child {
+            margin-bottom: 0;
+            font-weight: 500;
+            border-top: 1px solid #d0d0d0;
+            padding-top: 12px;
+            color: #1a1a1a;
+        }
+
+        .price-row span:first-child {
+            color: #666666;
+        }
+
+        .terms {
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+            max-height: 220px;
+            overflow-y: auto;
+            color: #444444;
+        }
+
+        .terms p {
+            margin-bottom: 12px;
+        }
+
+        .signature-container {
+            border: 1px solid #cccccc;
+            background: #fafafa;
+            margin-bottom: 24px;
+        }
+
+        .signature-label {
+            padding: 12px 16px;
+            background: #eeeeee;
+            border-bottom: 1px solid #cccccc;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            color: #666666;
+            font-weight: 500;
+        }
+
+        #signatureCanvas {
+            display: block;
+            width: 100%;
+            height: 120px;
+            cursor: crosshair;
+            background: #ffffff;
+        }
+
+        .signature-controls {
+            padding: 12px 16px;
+            background: #f5f5f5;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clear-signature {
+            background: none;
+            border: 1px solid #cccccc;
+            color: #666666;
+            padding: 6px 12px;
+            font-size: 11px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            transition: all 0.15s ease;
+        }
+
+        .clear-signature:hover {
+            border-color: #999999;
+            color: #444444;
+        }
+
+        .signature-status {
+            font-size: 11px;
+            color: #666666;
+        }
+
+        .signature-status.signed {
+            color: #555555;
+        }
+
+        .final-screen {
+            text-align: left;
+            padding: 32px 24px;
+        }
+
+        .final-screen h2 {
+            color: #1a1a1a;
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+
+        .final-screen p {
+            color: #666666;
+            margin-bottom: 32px;
+        }
+
+        .results-section {
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .results-section h3 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            color: #666666;
+            font-weight: 400;
+        }
+
+        .result-value {
+            color: #1a1a1a;
+            font-weight: 500;
+        }
+
+        .progress {
+            height: 2px;
+            background: #e8e8e8;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #888888;
+            transition: width 0.3s ease;
+        }
+    </style>
 </head>
 <body>
-
-<!-- Progress bar -->
-<div class="progress-container">
-  <div class="progress-bar" id="progress-bar"></div>
-</div>
-
-<div class="container">
-  <!-- Question 1: Welcome -->
-  <div class="question-container active" data-step="0">
-    <div class="question-content welcome-screen">
-      <div class="logo">
-        <img src="web/soldoutlogo.png" alt="SOLD OUT! Logo" style="width: 80px; height: 80px; border-radius: 50%;">
-      </div>
-      <h1 class="welcome-title">Merch Ticket</h1>
-      <p class="welcome-subtitle">**Note:** Please consult with an appraiser when filling out this form.</p>
-      <div class="nav-buttons">
-        <button class="btn btn-primary" onclick="nextQuestion()">GO >>></button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Question 2: Seller name -->
-  <div class="question-container" data-step="1">
-    <div class="question-content">
-      <div class="question-number">Question 1 of 7</div>
-      <h2 class="question-title">What's your name?</h2>
-      <div class="input-group">
-        <input type="text" id="seller-name" placeholder="Enter your full name" onkeypress="handleEnter(event)" oninput="validateCurrentStep()">
-      </div>
-      <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="prevQuestion()">Back</button>
-        <button class="btn btn-primary" id="next-btn-1" onclick="nextQuestion()" disabled>Continue</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Question 3: Email -->
-  <div class="question-container" data-step="2">
-    <div class="question-content">
-      <div class="question-number">Question 2 of 7</div>
-      <h2 class="question-title">What's your email?</h2>
-      <div class="input-group">
-        <input type="email" id="seller-email" placeholder="your.email@example.com" onkeypress="handleEnter(event)" oninput="validateCurrentStep()">
-      </div>
-      <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="prevQuestion()">Back</button>
-        <button class="btn btn-primary" id="next-btn-2" onclick="nextQuestion()" disabled>Continue</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Question 4: Item description -->
-  <div class="question-container" data-step="3">
-    <div class="question-content">
-      <div class="question-number">Question 3 of 7</div>
-      <h2 class="question-title">Describe your item</h2>
-      <div class="input-group">
-        <input type="text" id="item-description" placeholder="e.g., Vintage leather jacket, handmade pottery..." onkeypress="handleEnter(event)" oninput="validateCurrentStep()">
-      </div>
-      <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="prevQuestion()">Back</button>
-        <button class="btn btn-primary" id="next-btn-3" onclick="nextQuestion()" disabled>Continue</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Question 5: Minimum price -->
-  <div class="question-container" data-step="4">
-    <div class="question-content">
-      <div class="question-number">Question 4 of 7</div>
-      <h2 class="question-title">Sale Price</h2>
-      <p style="font-size: 14px; color: var(--comic-blue); margin-bottom: 20px; font-weight: 600;">This is the amount you will get if your item sells. This is the amount you're willing to take for your item.</p>
-      <div class="input-group">
-        <input type="number" id="min-price" placeholder="0.00" min="0" step="0.01" onkeypress="handleEnter(event)" oninput="updatePricing(); validateCurrentStep();">
-      </div>
-      <div class="price-display" id="price-display" style="display: none;">
-        <div class="price-row">
-          <span>Your sale amount:</span>
-          <span id="min-display">$0.00</span>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="../web/soldoutlogo.png" alt="Sold Out Logo" class="header-logo">
+            <div class="header-content">
+                <h1>Sell Your Merch</h1>
+                <p>Note: Please consult with an appraiser when filling out this form.</p>
+            </div>
         </div>
-        <div class="price-row">
-          <span>Listing price:</span>
-          <span id="listing-display">$10.00</span>
+
+        <!-- Progress Bar -->
+        <div class="progress">
+            <div class="progress-bar" style="width: 16.67%"></div>
         </div>
-      </div>
-      <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="prevQuestion()">Back</button>
-        <button class="btn btn-primary" id="next-btn-4" onclick="nextQuestion()" disabled>Continue</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- Question 6: Performance option -->
-  <div class="question-container" data-step="5">
-    <div class="question-content">
-      <div class="question-number">Question 5 of 7</div>
-      <h2 class="question-title">Do you want to go on stage to sell your item?</h2>
-      <div class="radio-options">
-        <div class="radio-option" onclick="selectRadio('seller-option', 'insist', this)">
-          <input type="radio" name="seller-option" id="insist" value="insist">
-          <label class="radio-label" for="insist">Yes I Insist</label>
+        <!-- Step 1: Personal Info -->
+        <div class="form-section active" id="step1">
+            <h2>You</h2>
+            <p>Well, you don't need to consult with anyone for this part... hopefully.</p>
+            
+            <div class="form-group">
+                <label for="name">Name (required)</label>
+                <input type="text" id="name" required>
+                <div class="error-message" id="nameError"></div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email (required and validated)</label>
+                <input type="email" id="email" required>
+                <div class="error-message" id="emailError"></div>
+            </div>
+            
+            <div class="button-group">
+                <button class="next-btn" onclick="nextStep(1)">NEXT ≫</button>
+            </div>
         </div>
-        <div class="radio-option" onclick="selectRadio('seller-option', 'willing', this)">
-          <input type="radio" name="seller-option" id="willing" value="willing">
-          <label class="radio-label" for="willing">I'm Willing To</label>
+
+        <!-- Step 2: Item Description -->
+        <div class="form-section" id="step2">
+            <h2>Whatcha got there?</h2>
+            <p>Briefly describe your item.</p>
+            
+            <div class="form-group">
+                <textarea id="description" rows="4" placeholder="Family heirloom lava lamp"></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button class="back-btn" onclick="previousStep()">≪ BACK</button>
+                <button class="next-btn" onclick="nextStep(2)">NEXT ≫</button>
+            </div>
         </div>
-        <div class="radio-option" onclick="selectRadio('seller-option', 'no', this)">
-          <input type="radio" name="seller-option" id="no" value="no">
-          <label class="radio-label" for="no">Oh Hell No</label>
+
+        <!-- Step 3: Price -->
+        <div class="form-section" id="step3">
+            <h2>How much ya want for it?</h2>
+            <p>This is the amount you will get if your item sells. No more, no less.</p>
+            
+            <div class="form-group">
+                <label for="salePrice">Sale Price ($)</label>
+                <input type="number" id="salePrice" min="1" step="0.01" placeholder="1.00">
+            </div>
+            
+            <div class="button-group">
+                <button class="back-btn" onclick="previousStep()">≪ BACK</button>
+                <button class="next-btn" onclick="nextStep(3)">NEXT ≫</button>
+            </div>
         </div>
-      </div>
-      <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="prevQuestion()">Back</button>
-        <button class="btn btn-primary" id="next-btn-5" onclick="nextQuestion()" disabled>Continue</button>
-      </div>
-    </div>
-  </div>
 
-  <!-- Question 7: Signature -->
-  <div class="question-container" data-step="6">
-    <div class="question-content">
-      <div class="question-number">Question 6 of 7</div>
-      <h2 class="question-title">Please sign below</h2>
-      
-      <div class="checkbox-container" style="margin-bottom: 32px;">
-        <label class="checkbox-label" style="margin-left: 0;">
-          By signing below, I acknowledge that my item will be auctioned during the SOLD OUT! Comedy Show. I understand that my item will only be sold if it reaches the listing price which will be higher than the sale price you chose. If sold, I will receive the exact sale amount I've specified—no more, no less. Any amount above sale price will be retained by SOLD OUT! Comedy. I agree to have the item sold in the show format as determined by the production team. The production team has final say regarding my participation in the show. All sales are final with no returns or refunds. I release SOLD OUT! Comedy from any liability related to my item or participation.
-        </label>
-      </div>
-      
-      <div class="signature-container">
-        <canvas id="signature-canvas" width="400" height="200"></canvas>
-        <div class="signature-controls">
-          <button type="button" class="btn btn-secondary" onclick="clearSignature()">Clear</button>
+        <!-- Step 4: Price Confirmation -->
+        <div class="form-section" id="step4">
+            <h2>Price Breakdown</h2>
+            
+            <div class="price-display">
+                <div class="price-row">
+                    <span>Sale Price:</span>
+                    <span id="displaySalePrice">$0.00</span>
+                </div>
+                <div class="price-row">
+                    <span>Listing Price:</span>
+                    <span id="displayListingPrice">$0.00</span>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="back-btn" onclick="previousStep()">≪ BACK</button>
+                <button class="next-btn" onclick="nextStep(4)">NEXT ≫</button>
+            </div>
         </div>
-        <div class="signature-hint">Sign with your finger or mouse</div>
-      </div>
-      <div class="input-group">
-        <input type="text" id="participant-name" placeholder="Type your full name" onkeypress="handleEnter(event)" oninput="validateCurrentStep()">
-        <input type="date" id="sig-date" style="margin-top: 16px;" onchange="validateCurrentStep()">
-      </div>
-      <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="prevQuestion()">Back</button>
-        <button class="btn btn-primary" id="next-btn-6" onclick="nextQuestion()" disabled>Continue</button>
-      </div>
+
+        <!-- Step 5: Performance Question -->
+        <div class="form-section" id="step5">
+            <h2>Are you a Master Thespian?!</h2>
+            <p>If so, do you want to go on stage to sell your item?</p>
+            
+            <div class="radio-group">
+                <div class="radio-option" onclick="selectRadio('performance', 'insist')">
+                    <input type="radio" name="performance" value="insist" id="insist">
+                    <label for="insist">Yes, I insist</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('performance', 'willing')">
+                    <input type="radio" name="performance" value="willing" id="willing">
+                    <label for="willing">I'm willing to</label>
+                </div>
+                <div class="radio-option" onclick="selectRadio('performance', 'no')">
+                    <input type="radio" name="performance" value="no" id="no">
+                    <label for="no">Oh hell no!</label>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="back-btn" onclick="previousStep()">≪ BACK</button>
+                <button class="next-btn" onclick="nextStep(5)">NEXT ≫</button>
+            </div>
+        </div>
+
+        <!-- Step 6: Signature -->
+        <div class="form-section" id="step6">
+            <h2>Please sign below.</h2>
+            
+            <div class="terms">
+                <p><strong>By signing below, I acknowledge that my item will be auctioned during the SOLD OUT! Comedy Show.</strong></p>
+                <p>I understand that my item will only be sold if it reaches the listing price which will be higher than the sale price you chose. Site fees, transaction fees and taxes will be added to the sale price to create the listing price.</p>
+                <p>If sold, I will receive the exact sale amount I've specified—no more, no less.</p>
+                <p>Any amount above sale price will be retained by SOLD OUT! Comedy.</p>
+                <p>I agree to have the item sold in the show format as determined by the production team.</p>
+                <p>The production team has final say regarding my participation in the show.</p>
+                <p>All sales are final with no returns or refunds.</p>
+                <p>I release SOLD OUT! Comedy from any liability related to my item or participation.</p>
+            </div>
+            
+            <div class="signature-container">
+                <div class="signature-label">Digital Signature</div>
+                <canvas id="signatureCanvas" width="400" height="120"></canvas>
+                <div class="signature-controls">
+                    <span class="signature-status" id="signatureStatus">Please sign above</span>
+                    <button class="clear-signature" onclick="clearSignature()">Clear</button>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="back-btn" onclick="previousStep()">≪ BACK</button>
+                <button class="next-btn" id="finalSubmit" onclick="submitForm()" disabled>NEXT ≫</button>
+            </div>
+        </div>
+
+        <!-- Final Screen -->
+        <div class="form-section" id="final">
+            <div class="final-screen">
+                <h2>Sold! ... hopefully.</h2>
+                <p>Box up your item with an appraiser and they will let you know whether to give it to us or to hold onto it until later in the show.</p>
+                
+                <div class="results-section">
+                    <h3>Form Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Item ID:</span>
+                        <span class="result-value" id="resultItemId"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Name:</span>
+                        <span class="result-value" id="resultName"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Email:</span>
+                        <span class="result-value" id="resultEmail"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Item:</span>
+                        <span class="result-value" id="resultDescription"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Sale Price:</span>
+                        <span class="result-value" id="resultSalePrice"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Listing Price:</span>
+                        <span class="result-value" id="resultListingPrice"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Performance:</span>
+                        <span class="result-value" id="resultPerformance"></span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Signature:</span>
+                        <span class="result-value" id="resultSignature"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Question 8: Summary & Agreement -->
-  <div class="question-container" data-step="7">
-    <div class="question-content">
-      <div class="question-number">Final Step</div>
-      <h2 class="question-title">Review & Submit</h2>
-      <div class="summary-grid" id="summary-grid">
-        <!-- Summary will be populated by JavaScript -->
-      </div>
-      
-      <div class="nav-buttons">
-        <button class="btn btn-secondary" onclick="prevQuestion()">Back</button>
-        <button class="btn btn-primary" id="next-btn-7" onclick="submitForm()">Submit Ticket</button>
-      </div>
-    </div>
-  </div>
+    <script>
+        let currentStep = 1;
+        let formData = {
+            itemId: Math.floor(Math.random() * 9000) + 1000,
+            fees: 0.1
+        };
 
-  <!-- Success screen -->
-  <div class="question-container" data-step="8">
-    <div class="question-content">
-      <div class="success-icon">✓</div>
-      <h2 class="question-title">Ticket Submitted!</h2>
-      <p class="welcome-subtitle">
-        Your merch ticket <strong id="final-item-id"></strong> has been submitted successfully.<br><br>
-        A confirmation email will be sent to <strong id="final-email"></strong>
-      </p>
-    </div>
-  </div>
-</div>
+        // Signature functionality
+        let canvas, ctx, isDrawing = false, hasSigned = false;
 
-<!-- Enter key hint -->
-<div class="enter-hint">Press Enter ↵</div>
+        function initSignaturePad() {
+            canvas = document.getElementById('signatureCanvas');
+            ctx = canvas.getContext('2d');
+            
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            
+            ctx.strokeStyle = '#555555';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
 
-<script>
-// Signature canvas variables
-let canvas, ctx, isDrawing = false, hasSignature = false;
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
 
-// Initialize signature canvas
-function initSignatureCanvas() {
-  canvas = document.getElementById('signature-canvas');
-  ctx = canvas.getContext('2d');
-  
-  // Set canvas size for high DPI displays
-  const rect = canvas.getBoundingClientRect();
-  const dpr = window.devicePixelRatio || 1;
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  ctx.scale(dpr, dpr);
-  
-  // Set drawing styles
-  ctx.strokeStyle = '#2C2C2C';
-  ctx.lineWidth = 3;
-  ctx.lineCap = 'round';
-  ctx.lineJoin = 'round';
-  
-  // Mouse events
-  canvas.addEventListener('mousedown', startDrawing);
-  canvas.addEventListener('mousemove', draw);
-  canvas.addEventListener('mouseup', stopDrawing);
-  canvas.addEventListener('mouseout', stopDrawing);
-  
-  // Touch events
-  canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-  canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-  canvas.addEventListener('touchend', stopDrawing, { passive: false });
-}
+            canvas.addEventListener('touchstart', handleTouch);
+            canvas.addEventListener('touchmove', handleTouch);
+            canvas.addEventListener('touchend', stopDrawing);
+        }
 
-function startDrawing(e) {
-  isDrawing = true;
-  const rect = canvas.getBoundingClientRect();
-  ctx.beginPath();
-  ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-}
+        function handleTouch(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
 
-function draw(e) {
-  if (!isDrawing) return;
-  const rect = canvas.getBoundingClientRect();
-  ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-  ctx.stroke();
-  hasSignature = true;
-  validateCurrentStep();
-}
+            if (e.type === 'touchstart') {
+                startDrawing({offsetX: x, offsetY: y});
+            } else if (e.type === 'touchmove') {
+                draw({offsetX: x, offsetY: y});
+            }
+        }
 
-function stopDrawing() {
-  if (isDrawing) {
-    isDrawing = false;
-    ctx.beginPath();
-  }
-}
+        function startDrawing(e) {
+            isDrawing = true;
+            ctx.beginPath();
+            ctx.moveTo(e.offsetX, e.offsetY);
+        }
 
-function handleTouchStart(e) {
-  e.preventDefault();
-  const touch = e.touches[0];
-  const mouseEvent = new MouseEvent('mousedown', {
-    clientX: touch.clientX,
-    clientY: touch.clientY
-  });
-  canvas.dispatchEvent(mouseEvent);
-}
+        function draw(e) {
+            if (!isDrawing) return;
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.stroke();
+            
+            if (!hasSigned) {
+                hasSigned = true;
+                document.getElementById('signatureStatus').textContent = 'Signed';
+                document.getElementById('signatureStatus').classList.add('signed');
+                document.getElementById('finalSubmit').disabled = false;
+            }
+        }
 
-function handleTouchMove(e) {
-  e.preventDefault();
-  const touch = e.touches[0];
-  const mouseEvent = new MouseEvent('mousemove', {
-    clientX: touch.clientX,
-    clientY: touch.clientY
-  });
-  canvas.dispatchEvent(mouseEvent);
-}
+        function stopDrawing() {
+            isDrawing = false;
+        }
 
-function clearSignature() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  hasSignature = false;
-  validateCurrentStep();
-}
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hasSigned = false;
+            document.getElementById('signatureStatus').textContent = 'Please sign above';
+            document.getElementById('signatureStatus').classList.remove('signed');
+            document.getElementById('finalSubmit').disabled = true;
+        }
 
-let currentStep = 0;
-const totalSteps = 8;
-let itemId = '';
+        function showStep(step) {
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.getElementById('step' + step).classList.add('active');
+            
+            if (step === 6) {
+                setTimeout(initSignaturePad, 100);
+            }
+        }
 
-// Generate unique item ID
-function generateID() {
-  itemId = `${Math.floor(Math.random() * 9000) + 1000}`;
-  return itemId;
-}
+        function updateProgress() {
+            const progress = (currentStep / 6) * 100;
+            document.querySelector('.progress-bar').style.width = progress + '%';
+        }
 
-// Update progress bar
-function updateProgress() {
-  const progress = (currentStep / totalSteps) * 100;
-  document.getElementById('progress-bar').style.width = progress + '%';
-}
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
 
-// Show question
-function showQuestion(step) {
-  document.querySelectorAll('.question-container').forEach((container, index) => {
-    container.classList.remove('active');
-    if (index === step) {
-      container.classList.add('active');
-      container.classList.remove('hidden');
-      // Initialize signature canvas when showing signature step
-      if (step === 6) {
-        setTimeout(() => initSignatureCanvas(), 100);
-      }
-      // Small delay for smooth transition
-      setTimeout(() => {
-        container.style.opacity = '1';
-        container.style.transform = 'translateY(0)';
-      }, 50);
-    } else {
-      setTimeout(() => {
-        container.classList.add('hidden');
-      }, 300);
-    }
-  });
-  updateProgress();
-}
+        function validateStep1() {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            let isValid = true;
 
-// Next question
-function nextQuestion() {
-  if (currentStep < totalSteps) {
-    if (currentStep === 6) {
-      generateSummary();
-    }
-    currentStep++;
-    showQuestion(currentStep);
-  }
-}
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('name').classList.remove('error');
+            document.getElementById('email').classList.remove('error');
 
-// Previous question
-function prevQuestion() {
-  if (currentStep > 0) {
-    currentStep--;
-    showQuestion(currentStep);
-  }
-}
+            if (!name) {
+                document.getElementById('nameError').textContent = 'Name is required';
+                document.getElementById('name').classList.add('error');
+                isValid = false;
+            }
 
-// Handle Enter key
-function handleEnter(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-    validateCurrentStep();
-    if (!document.getElementById(`next-btn-${currentStep}`).disabled) {
-      nextQuestion();
-    }
-  }
-}
+            if (!email) {
+                document.getElementById('emailError').textContent = 'Email is required';
+                document.getElementById('email').classList.add('error');
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                document.getElementById('emailError').textContent = 'Please enter a valid email address';
+                document.getElementById('email').classList.add('error');
+                isValid = false;
+            }
 
-// Select radio option
-function selectRadio(name, value, element) {
-  // Remove selected class from all options
-  document.querySelectorAll('.radio-option').forEach(option => {
-    option.classList.remove('selected');
-  });
-  
-  // Add selected class to clicked option
-  element.classList.add('selected');
-  
-  // Set the radio button
-  document.getElementById(value).checked = true;
-  
-  validateCurrentStep();
-}
+            return isValid;
+        }
 
-// Validate current step
-function validateCurrentStep() {
-  let isValid = false;
-  let buttonId = `next-btn-${currentStep}`;
-  
-  switch (currentStep) {
-    case 1:
-      isValid = document.getElementById('seller-name').value.trim() !== '';
-      break;
-    case 2:
-      const email = document.getElementById('seller-email').value;
-      isValid = email.trim() !== '' && email.includes('@') && email.includes('.');
-      break;
-    case 3:
-      isValid = document.getElementById('item-description').value.trim() !== '';
-      break;
-    case 4:
-      const price = parseFloat(document.getElementById('min-price').value);
-      isValid = !isNaN(price) && price >= 0;
-      break;
-    case 5:
-      isValid = document.querySelector('input[name="seller-option"]:checked') !== null;
-      break;
-    case 6:
-      const participantName = document.getElementById('participant-name').value.trim();
-      const date = document.getElementById('sig-date').value;
-      isValid = participantName !== '' && date !== '' && hasSignature;
-      break;
-    case 7:
-      isValid = true; // Summary page doesn't need validation
-      break;
-  }
-  
-  const button = document.getElementById(buttonId);
-  if (button) {
-    button.disabled = !isValid;
-  }
-}
+        function validateStep3() {
+            const salePrice = parseFloat(document.getElementById('salePrice').value);
+            
+            if (!salePrice || salePrice < 1) {
+                return false;
+            }
+            
+            return true;
+        }
 
-// Update pricing display
-function updatePricing() {
-  const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
-  const listingPrice = minPrice + 10;
-  
-  document.getElementById('min-display').textContent = `${minPrice.toFixed(2)}`;
-  document.getElementById('listing-display').textContent = `${listingPrice.toFixed(2)}`;
-  
-  const display = document.getElementById('price-display');
-  if (minPrice > 0) {
-    display.style.display = 'block';
-  } else {
-    display.style.display = 'none';
-  }
-}
+        function nextStep(step) {
+            if (step === 1 && !validateStep1()) {
+                return;
+            }
+            
+            if (step === 3 && !validateStep3()) {
+                alert('Sale price must be at least $1.00');
+                return;
+            }
 
-// Generate summary
-function generateSummary() {
-  const sellerName = document.getElementById('seller-name').value;
-  const sellerEmail = document.getElementById('seller-email').value;
-  const itemDescription = document.getElementById('item-description').value;
-  const minPrice = parseFloat(document.getElementById('min-price').value) || 0;
-  const listingPrice = minPrice + (minPrice * 0.1);
-  const sellerOption = document.querySelector('input[name="seller-option"]:checked')?.value;
-  const signature = document.getElementById('participant-name').value;
-  const date = document.getElementById('sig-date').value;
-  
-  const optionText = {
-    'insist': 'Yes I Insist',
-    'willing': 'I\'m Willing To',
-    'no': 'Oh Hell No'
-  };
-  
-  const summaryGrid = document.getElementById('summary-grid');
-  summaryGrid.innerHTML = `
-    <div class="summary-item">
-      <div class="summary-label">Item ID</div>
-      <div class="summary-value">${generateID()}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Seller Name</div>
-      <div class="summary-value">${sellerName}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Email</div>
-      <div class="summary-value">${sellerEmail}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Item Description</div>
-      <div class="summary-value">${itemDescription}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Minimum Take Home</div>
-      <div class="summary-value">${minPrice.toFixed(2)}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Listing Price</div>
-      <div class="summary-value">${listingPrice.toFixed(2)}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Performance Option</div>
-      <div class="summary-value">${optionText[sellerOption] || 'Not selected'}</div>
-    </div>
-    <div class="summary-item">
-      <div class="summary-label">Signature & Date</div>
-      <div class="summary-value">${signature}, ${date}</div>
-    </div>
-  `;
-}
+            if (step === 3) {
+                const salePrice = parseFloat(document.getElementById('salePrice').value) || 0;
+                const listingPrice = salePrice + (salePrice * formData.fees);
+                
+                document.getElementById('displaySalePrice').textContent = '$' + salePrice.toFixed(2);
+                document.getElementById('displayListingPrice').textContent = '$' + listingPrice.toFixed(2);
+                
+                formData.salePrice = salePrice;
+                formData.listingPrice = listingPrice;
+            }
 
-// Submit form
-function submitForm() {
-  const signatureDataURL = canvas.toDataURL('image/png');
-  
-  const formData = {
-    itemId: itemId,
-    sellerName: document.getElementById('seller-name').value,
-    sellerEmail: document.getElementById('seller-email').value,
-    itemDescription: document.getElementById('item-description').value,
-    minPrice: document.getElementById('min-price').value,
-    listingPrice: (parseFloat(document.getElementById('min-price').value) * 1.1).toFixed(2),
-    sellerOption: document.querySelector('input[name="seller-option"]:checked')?.value,
-    participantName: document.getElementById('participant-name').value,
-    signatureImage: signatureDataURL,
-    date: document.getElementById('sig-date').value,
-    agreementChecked: true,
-    submissionTime: new Date().toISOString()
-  };
-  
-  console.log('Form submitted:', formData);
-  
-  // Update success screen
-  document.getElementById('final-item-id').textContent = itemId;
-  document.getElementById('final-email').textContent = formData.sellerEmail;
-  
-  nextQuestion();
-}
+            currentStep++;
+            showStep(currentStep);
+            updateProgress();
+        }
 
-// Initialize
-window.addEventListener('DOMContentLoaded', () => {
-  // Set today's date as default
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('sig-date').value = today;
-  
-  updateProgress();
-  
-  // Add keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === 'Enter') {
-      const nextBtn = document.getElementById(`next-btn-${currentStep}`);
-      if (nextBtn && !nextBtn.disabled) {
-        nextQuestion();
-      }
-    } else if (e.key === 'ArrowLeft') {
-      if (currentStep > 0) {
-        prevQuestion();
-      }
-    }
-  });
-});
-</script>
+        function previousStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+                updateProgress();
+            }
+        }
 
+        function selectRadio(name, value) {
+            document.querySelectorAll('input[name="' + name + '"]').forEach(radio => {
+                radio.checked = false;
+                radio.closest('.radio-option').classList.remove('selected');
+            });
+            
+            document.getElementById(value).checked = true;
+            document.getElementById(value).closest('.radio-option').classList.add('selected');
+            
+            formData.performance = value;
+        }
+
+        function submitForm() {
+            formData.name = document.getElementById('name').value;
+            formData.email = document.getElementById('email').value;
+            formData.description = document.getElementById('description').value;
+            formData.signatureData = canvas.toDataURL();
+            
+            document.getElementById('resultItemId').textContent = formData.itemId;
+            document.getElementById('resultName').textContent = formData.name;
+            document.getElementById('resultEmail').textContent = formData.email;
+            document.getElementById('resultDescription').textContent = formData.description || 'No description provided';
+            document.getElementById('resultSalePrice').textContent = '$' + formData.salePrice.toFixed(2);
+            document.getElementById('resultListingPrice').textContent = '$' + formData.listingPrice.toFixed(2);
+            
+            const performanceLabels = {
+                'insist': 'Yes, I insist',
+                'willing': "I'm willing to",
+                'no': 'Oh hell no!'
+            };
+            document.getElementById('resultPerformance').textContent = performanceLabels[formData.performance] || 'Not selected';
+            document.getElementById('resultSignature').textContent = hasSigned ? 'Signed' : 'Not signed';
+            
+            console.log('Form submitted:', formData);
+            
+            document.querySelectorAll('.form-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById('final').classList.add('active');
+            document.querySelector('.progress-bar').style.width = '100%';
+        }
+
+        // Initialize progress on load
+        window.addEventListener('load', function() {
+            updateProgress();
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,85 @@
+web form prompt:
+
+Let's make a mobile web form, super swiss styling. sharp and gray.
+
+Sell Your Merch
+Note: Please consult with an appraiser when filling out this form.
+SELL OUT >>> button
+
+Hidden Field: ITEMID {4 digit randomly generated ID >999}
+Hidden Field: FEES {.1}
+
+You
+Well, you don't need to consult with anyone for this part... hopefully.
+Name (required)
+field
+Email (required and validated)
+field
+NEXT >>> button
+
+Whatcha got there?
+Briefly describe your item.
+field
+NEXT >>> button
+
+How much ya want for it?
+This is the amount you will get if your item sells. No more, no less.
+field
+NEXT >>> button
+
+Sale Price: {from previous}
+Listing Price: {Sale Price} + {Sale Price}*{FEES}
+NEXT >>> button
+
+Are you a Master Thespian?!
+If so, do you want to go on stage to sell your item?
+radio buttons:
+Yes, I insist
+I'm willing to
+Oh hell no!
+NEXT >>> button
+
+Please sign below.
+
+By signing below, I acknowledge that my item will be auctioned during the SOLD OUT! Comedy Show.
+
+I understand that my item will only be sold if it reaches the listing price which will be higher than the sale price you chose. Site fees, transaction fees and taxes will be added to the sale price to create the listing price.
+
+If sold, I will receive the exact sale amount I've specified—no more, no less.
+
+Any amount above sale price will be retained by SOLD OUT! Comedy.
+
+I agree to have the item sold in the show format as determined by the production team.
+
+The production team has final say regarding my participation in the show.
+
+All sales are final with no returns or refunds.
+
+I release SOLD OUT! Comedy from any liability related to my item or participation.
+
+(Do that fancy drag your finger to sign pad thing)
+
+NEXT >>> button
+
+End:
+Sold! ... hopefully.
+Box up your item with an appraiser and they will let you know whether to give it to us or to hold onto it until later in the show.
+
+Show results for now on end page
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
