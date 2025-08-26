@@ -1,50 +1,250 @@
-## SOLD OUT! COMEDY SHOW (STAGE EDITION)
-# Appraisers
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOLD OUT! - The Appraiser</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-Item Check-in QR Code: appraiser\qr.html
-Item Check-in: Merch Ticket
+    body {
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+      line-height: 1.6;
+      font-weight: 300;
+      font-size: 18px;
+    }
 
-The appraiser plays a very crucial role in building the show. They are one part prop-designer, one part casting director, and one part show runner.
+    .grid-container {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 320px 1fr;
+    }
 
+    /* Sidebar */
+    .sidebar {
+      background: #555;
+      color: #fff;
+      padding: 40px 30px;
+      position: fixed;
+      top: 0; left: 0;
+      width: 320px; height: 100vh;
+      overflow-y: auto;
+      font-size: 18px;
+    }
+    .sidebar h1 {
+      font-size: 26px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 14px;
+      line-height: 1.2;
+    }
+    .subtitle {
+      font-size: 16px;
+      color: #eee;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
 
-# MERCH CHECK-IN
+    /* Sidebar buttons */
+    .nav-btn {
+      display: block;
+      width: 100%;
+      padding: 14px 0;
+      margin-bottom: 12px;
+      background: transparent;
+      color: #fff;
+      border: 1px solid #999;
+      text-align: center;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .nav-btn:hover {
+      background: #fff;
+      color: #333;
+    }
 
+    .tools-section {
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid #777;
+    }
+    .tools-section h3 {
+      font-size: 18px;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      color: #fff;
+    }
+    .tools-section ul { list-style: none; }
+    .tools-section > ul > li {
+      font-size: 17px;
+      margin-bottom: 10px;
+      position: relative;
+      padding-left: 20px;
+    }
+    .tools-section > ul > li:before {
+      content: "●";
+      position: absolute;
+      left: 0;
+      color: #ccc;
+      font-size: 12px;
+      top: 6px;
+    }
+    .tools-section ul ul {
+      margin-top: 6px;
+      margin-left: 20px;
+    }
+    .tools-section ul ul li {
+      font-size: 16px;
+      margin-bottom: 6px;
+      color: #ddd;
+      position: relative;
+      padding-left: 16px;
+    }
+    .tools-section ul ul li:before {
+      content: "○";
+      position: absolute;
+      left: 0;
+      font-size: 10px;
+      top: 2px;
+    }
 
-From one hour prior to the start of the show, until 15 minutes before the show starts, our panel of appraisers evaluates the items brought in by audience members.
+    /* Main content */
+    .main-content {
+      margin-left: 320px;
+      width: calc(100vw - 320px);
+      padding: 64px 96px;
+      font-size: 18px;
+    }
+    .section {
+      background: #f7f7f7;
+      border: 1px solid #e6e6e6;
+      padding: 32px 36px;
+      margin-bottom: 32px;
+    }
+    .section-title {
+      font-size: 28px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      color: #111;
+    }
+    .section p {
+      font-size: 18px;
+      margin-bottom: 14px;
+      color: #333;
+    }
+    .step {
+      background: #fff;
+      border: 1px solid #e6e6e6;
+      padding: 18px 20px;
+      margin: 14px 0;
+    }
+    .step h4 {
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      color: #111;
+    }
+    .info, .warning {
+      background: #fff;
+      border: 2px solid #e6e6e6;
+      padding: 18px 20px;
+      margin: 14px 0;
+      font-size: 18px;
+    }
+    .info   { border-left: 5px solid #666; }
+    .warning{ border-left: 5px solid #ffb300; background: #fff9e6; }
 
-These items will be auctioned off during the program.
-The appraisers are also sizing up the audience members to determine where they will best fit into our improv/selling show.
+    @media (max-width: 1024px) {
+      .sidebar { position: static; width: 100%; height: auto; }
+      .grid-container { grid-template-columns: 1fr; }
+      .main-content { margin-left: 0; width: 100%; padding: 40px 30px; }
+    }
+    @media (max-width: 768px) {
+      .main-content { padding: 28px 20px; font-size: 16px; }
+      .section-title { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h1>Sold Out!<br/>Comedy Show</h1>
+      <div class="subtitle">Stage Edition</div>
+      <div class="subtitle">Backstage Crew:<br/>The Appraiser</div>
 
-Obviously this is all very subjective and is a major factor in determining how fun and successful a show is.
-Each check-in should only take 2–3 minutes max. Keep it moving while still making them feel valued. Stay playful but authoritative. This process is part of the show.
+      <!-- Buttons -->
+      <a href="..\appraiser\qr.html" class="nav-btn">QR CODE</a>
+      <a href="..\appraiser\merch.html" class="nav-btn">SELL YOUR MERCH FORM</a>
 
-### CHECK-IN PROCESS
-Greet the person and fill out both halves of a merch ticket/disclaimer as you go.
-1. **NAME**
-Get their first name and last initial.
-2. **BOX**
-If they didn't bring a mail ready box with them, provide one.
-3. **PRICE**
-Work with the audience member to determine the value of the item and the minimum amount they will sell their item for.
+      <!-- Tools -->
+      <div class="tools-section">
+        <h3>Tools</h3>
+        <ul>
+          <li>Phone
+            <ul>
+              <li>Whatnot App</li>
+              <li>Item Database App</li>
+            </ul>
+          </li>
+          <li>Laminated QR Code</li>
+          <li>Boxes</li>
+          <li>Sharpie</li>
+          <li>Pen</li>
+          <li>Copy of the Script</li>
+        </ul>
+      </div>
+    </aside>
 
-They will receive nothing or that exact amount. Make sure they know that anything over the amount they set will be given to SOLD OUT! Comedy.
-They may want to set the price higher than they initially thought, but then it might not sell. The final price is their choice. It's a gamble for them. They are gamblers. We are the house.
+    <!-- Main -->
+    <main class="main-content">
+      <section class="section">
+        <h2 class="section-title">Overview</h2>
+        <p>The appraiser plays a very crucial role in building the show. They are one part propmaster, one part casting director, and one part show runner.</p>
+        <p>From one hour prior to the start of the show, until 15 minutes before the show starts, our appraiser evaluates the items brought in by audience members. The appraiser is also sizing up the audience members themselves to determine where they will best fit into our improv/selling show, if at all.</p>
+        <p>Obviously this is all very subjective and is a major factor in determining how fun and successful a show is. Each check-in should only take 2–3 minutes max. Keep it moving while still making them feel valued. Stay playful but authoritative. Think of this process as part of the show.</p>
+      </section>
 
-4. **PARTICIPANT**
-Ask the audience member if they would like to participate on stage, in a random scene, to sell their item.
-5. **SCENE**
-Consult the script to determine which scene the person and/or item should go into.
+      <section class="section">
+        <h2 class="section-title">Item Check-In</h2>
+        <div class="info">
+          <p><strong>Access Requirements:</strong> The appraiser table or room can only be reached by paying admission first. In other words, a seller must be a paying member of the audience to sell an item.</p>
+        </div>
+        <div class="step"><h4>Step 1: Form Setup</h4><p>The appraiser has the seller scan the "ITEM TO SELL" QR code and helps the seller/audience member fill out the form.</p></div>
+        <div class="step"><h4>Step 2: Personal Information</h4><p>The seller fills out the "You" section of the Seller Form. It's important to have this information for payment purposes.</p></div>
+        <div class="step"><h4>Step 3: Item Description</h4><p>The seller fills out the item description.</p></div>
+        <div class="step"><h4>Step 4: Sale Price</h4><p>The seller fills out the Sale Price. The appraiser emphasizes that if their item does not sell, the seller goes home with the item and no money. The sale price is what the seller will get if their item sells. No more, no less.</p></div>
+        <div class="warning"><p>They may want to set the price higher than they initially thought, but then it might not sell. The final price is their choice. It's a gamble for them. They are gamblers. We are the house.</p></div>
+        <div class="step"><h4>Step 5: Pricing Information</h4><p>The appraiser explains to the seller that the listing price is higher than the sale price because of site fees, credit card transaction fees and taxes. The buyer pays for shipping.</p></div>
+        <div class="step"><h4>Step 6: Participation Discussion</h4><p>Now the Appraiser and the Seller discuss the Seller's participation.</p></div>
+        <div class="step"><h4>Step 7: Form Completion</h4><p>The Seller signs and submits the form.</p></div>
+        <div class="step"><h4>Step 8: Item Transfer</h4><p>The appraiser takes the item, boxes it, and takes possession of it.</p></div>
+        <div class="info">
+          <p><strong>Policy:</strong> No item is rejected unless it breaks a rule of the selling service.</p>
+          <p><strong>Important:</strong> Do not promise when their item will be used in the show. Do not promise who will sell their item. If they insisted on performing: An item ending in 'Y' will always give the seller the ability to participate.</p>
+          <p><strong>Instructions to Seller:</strong> Simply tell them to listen for their item number to be called.</p>
+        </div>
+      </section>
 
-Do not let the person know what scene they are going into unless you feel the item doesn't fit in any of the scenes or the scenes are full. In that case, let them know that you think their item fits in the rapid sales section at the end of the show.
-They can have a cast member or a friend auction their item, but strongly encourage them to participate in the sale.
-They will get one minute to auction their item anyway they want.
-
-**NOTES**
-
-Merch ticket/disclaimer has a unique id on it. Have them sign both halves and give them their half for reference. Check off the item in the script. Place your half in the relevant scene section of the accordion file. Write ID number in box.
-
-Take the item if it's in a regular scene. Have them hold it if it's going in the rapid sales section.
-
-No item is rejected unless it breaks a rule of the selling service.
-
-Shipping? Weight? Taxes? Whatnot fee?
+      <section class="section">
+        <h2 class="section-title">Process the Item</h2>
+        <div class="step"><h4>Step 1: Database Consultation</h4><p>Consult the item database for information.</p></div>
+        <div class="step"><h4>Step 2: ID Code & Performance Status</h4><p>The item's four-digit ID code: Write it in large ink on the outside of the box.</p><p>Add a Y for YES will perform, N for NO will not perform, or M for Maybe will perform.</p></div>
+        <div class="step"><h4>Step 3: Physical Organization</h4><p>Stack the box so that the number and letter are visible.</p></div>
+        <div class="step"><h4>Step 4: Script Documentation</h4><p>Fill in the ID number and the letter in the printed script in the best scene you think it will work in.</p></div>
+        <div class="step"><h4>Step 5: Enter Items into Whatnot</h4><p>Enter the accepted items into the Whatnot system for tracking and sale.</p></div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
