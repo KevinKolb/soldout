@@ -414,7 +414,7 @@
             <p>Well, you don't need to consult with anyone for this part... hopefully.</p>
             
             <div class="form-group">
-                <label for="name">Name (required)</label>
+                <label for="name">Seller (required)</label>
                 <input type="text" id="name" required>
                 <div class="error-message" id="nameError"></div>
             </div>
@@ -452,7 +452,7 @@
             
             <div class="form-group">
                 <label for="salePrice">Sale Price ($)</label>
-                <input type="number" id="salePrice" min="1" step="0.01" placeholder="1.00">
+                <input type="number" id="salePrice" min="1" step="0.01" placeholder="10.00" value="10.00">
             </div>
             
             <div class="button-group">
@@ -468,11 +468,11 @@
             <div class="price-display">
                 <div class="price-row">
                     <span>Sale Price:</span>
-                    <span id="displaySalePrice">$0.00</span>
+                    <span id="displaySalePrice"><strong>$10.00</strong></span>
                 </div>
                 <div class="price-row">
                     <span>Listing Price:</span>
-                    <span id="displayListingPrice">$0.00</span>
+                    <span id="displayListingPrice"><strong>$11.00</strong></span>
                 </div>
             </div>
             
@@ -542,7 +542,7 @@
         <div class="form-section" id="final">
             <div class="final-screen">
                 <h2>Sold! ... hopefully.</h2>
-                <p>BGive the appraiser your boxed item. Check your email for your receipt and your item ID, which you'll need to listen for if you're performing. Make sure you received the receipt to confirm your email address is correct for payment.</p>
+                <p>Give the appraiser your boxed item. Check your email for your receipt and your item ID, which you'll need to listen for if you're performing. Make sure you received the receipt to confirm your email address is correct for payment.</p>
                 
                 <div class="results-section">
                     <h3>Form Results</h3>
@@ -551,7 +551,7 @@
                         <span class="result-value" id="resultItemId"></span>
                     </div>
                     <div class="result-item">
-                        <span class="result-label">Name:</span>
+                        <span class="result-label">Seller:</span>
                         <span class="result-value" id="resultName"></span>
                     </div>
                     <div class="result-item">
@@ -559,7 +559,7 @@
                         <span class="result-value" id="resultEmail"></span>
                     </div>
                     <div class="result-item">
-                        <span class="result-label">Item:</span>
+                        <span class="result-label">Description:</span>
                         <span class="result-value" id="resultDescription"></span>
                     </div>
                     <div class="result-item">
@@ -571,7 +571,7 @@
                         <span class="result-value" id="resultListingPrice"></span>
                     </div>
                     <div class="result-item">
-                        <span class="result-label">Performance:</span>
+                        <span class="result-label">Perform:</span>
                         <span class="result-value" id="resultPerformance"></span>
                     </div>
                     <div class="result-item">
@@ -672,6 +672,18 @@
             if (step === 6) {
                 setTimeout(initSignaturePad, 100);
             }
+
+            // Set default values when showing step 4
+            if (step === 4) {
+                const salePrice = 10.00;
+                const listingPrice = 11.00;
+                
+                document.getElementById('displaySalePrice').innerHTML = '<strong>$' + salePrice.toFixed(2) + '</strong>';
+                document.getElementById('displayListingPrice').innerHTML = '<strong>$' + listingPrice.toFixed(2) + '</strong>';
+                
+                formData.salePrice = salePrice;
+                formData.listingPrice = listingPrice;
+            }
         }
 
         function updateProgress() {
@@ -695,7 +707,7 @@
             document.getElementById('email').classList.remove('error');
 
             if (!name) {
-                document.getElementById('nameError').textContent = 'Name is required';
+                document.getElementById('nameError').textContent = 'Seller name is required';
                 document.getElementById('name').classList.add('error');
                 isValid = false;
             }
@@ -734,11 +746,11 @@
             }
 
             if (step === 3) {
-                const salePrice = parseFloat(document.getElementById('salePrice').value) || 0;
+                const salePrice = parseFloat(document.getElementById('salePrice').value) || 10.00;
                 const listingPrice = salePrice + (salePrice * formData.fees);
                 
-                document.getElementById('displaySalePrice').textContent = '$' + salePrice.toFixed(2);
-                document.getElementById('displayListingPrice').textContent = '$' + listingPrice.toFixed(2);
+                document.getElementById('displaySalePrice').innerHTML = '<strong>$' + salePrice.toFixed(2) + '</strong>';
+                document.getElementById('displayListingPrice').innerHTML = '<strong>$' + listingPrice.toFixed(2) + '</strong>';
                 
                 formData.salePrice = salePrice;
                 formData.listingPrice = listingPrice;
@@ -799,9 +811,11 @@
             document.querySelector('.progress-bar').style.width = '100%';
         }
 
-        // Initialize progress on load
+        // Initialize progress and default values on load
         window.addEventListener('load', function() {
             updateProgress();
+            // Set default sale price
+            document.getElementById('salePrice').value = '10.00';
         });
     </script>
 </body>
