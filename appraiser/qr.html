@@ -2,232 +2,120 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Merch Check-In QR Code</title>
     <link rel="icon" type="image/png" href="../web/soldoutlogo.png">
     <style>
-        html {
-            overscroll-behavior: none;
-            -webkit-overflow-scrolling: touch;
-        }
-        
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            font-family: Arial, Helvetica, sans-serif;
             margin: 0;
-            padding: 10px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            box-sizing: border-box;
-            overscroll-behavior: none;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .container {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
             padding: 20px;
-            width: 100%;
-            max-width: 500px;
-            height: 100%;
-            max-height: 90vh;
-            box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            background-color: #f8f8f8;
+            color: #333;
             text-align: center;
         }
-        
-        .header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-        
-        .logo {
-            width: 120px;
+
+        img.logo {
+            max-width: 150px;
             height: auto;
-            max-width: 100%;
-            margin-bottom: 10px;
-            transition: transform 0.3s ease;
+            margin-top: 20px;
         }
-        
-        .logo:hover {
-            transform: scale(1.05);
-        }
-        
+
         h1 {
-            font-size: 16px;
+            font-size: 1.5em;
+            margin: 10px 0;
             color: #2c3e50;
-            margin: 3px 0;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            line-height: 1.2;
         }
-        
-        .qr-section {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 20px 0;
+
+        a.qr-code {
+            display: block;
+            margin-bottom: 20px;
         }
-        
-        .qr-code {
-            width: 100%;
-            max-width: 350px;
+
+        img.qr {
+            max-width: 300px;
             height: auto;
-            border: 3px solid #2c3e50;
+            border: 2px solid #2c3e50;
             border-radius: 8px;
-            transition: box-shadow 0.3s ease;
-            aspect-ratio: 1;
-        }
-        
-        .qr-code:hover {
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Larger mobile screens */
-        @media screen and (min-width: 400px) {
-            .container {
-                padding: 30px;
-            }
-            .logo {
-                width: 140px;
-                margin-bottom: 15px;
-            }
-            h1 {
-                font-size: 18px;
-                margin: 5px 0;
-            }
-            .qr-code {
-                max-width: 400px;
-            }
-        }
-
-        /* Desktop - only show print styles here */
-        @media screen and (min-width: 768px) {
+        @media (max-width: 600px) {
             body {
-                position: static;
+                padding: 15px;
                 height: 100vh;
-                min-height: 100vh;
-                padding: 40px;
+                overflow: hidden;
             }
-            
-            .container {
-                width: 7.5in;
-                height: 9.5in;
-                max-height: none;
-                padding: 40px;
-                justify-content: flex-start;
-            }
-            
-            .header {
-                margin-bottom: 40px;
-                padding-bottom: 20px;
-                border-bottom: 2px solid #ecf0f1;
-            }
-            
-            .logo {
-                width: 200px;
-                margin-bottom: 15px;
-            }
-            
+
             h1 {
-                font-size: 20px;
-                margin: 5px 0;
-                letter-spacing: 1px;
+                font-size: 1.2em;
             }
-            
-            .qr-section {
-                flex: 1;
-                padding: 0;
+
+            img.logo {
+                max-width: 120px;
             }
-            
-            .qr-code {
-                max-width: 450px;
-                border: 4px solid #2c3e50;
+
+            img.qr {
+                max-width: 250px;
             }
         }
 
-        /* Print styles - desktop only */
         @media print {
-            body {
-                margin: 0;
-                padding: 0;
-                background: none;
-                position: static;
-                width: auto;
-                height: auto;
+            @page {
+                size: letter; /* US Letter size: 8.5x11 inches */
+                margin: 0.5in; /* Standard print margin */
             }
-            .container {
-                box-shadow: none;
-                border: none;
-                width: 8.5in;
-                height: 10.5in;
-                max-width: none;
-                max-height: none;
+
+            body {
+                background-color: white;
+                color: black;
+                margin: 0;
                 padding: 0.5in;
                 display: flex;
                 flex-direction: column;
-                justify-content: flex-start;
                 align-items: center;
-                page-break-after: avoid;
-                page-break-inside: avoid;
+                justify-content: flex-start; /* Start from top to fit on page */
+                height: auto;
+                overflow: hidden;
+                box-sizing: border-box;
+                width: 7.5in; /* Account for 0.5in margins on each side */
             }
-            .header {
-                margin-bottom: 30px;
-                padding-bottom: 15px;
-                border-bottom: 2px solid #2c3e50;
+
+            img.logo {
+                max-width: 2in; /* Reduced for print to save space */
+                margin-top: 0.5in;
             }
-            .logo {
-                width: 160px;
-                margin-bottom: 10px;
-            }
-            .qr-section {
-                flex: 1;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-            }
-            .qr-code {
-                width: 400px;
-                height: 400px;
-                max-width: none;
-                border: 4px solid #2c3e50;
-            }
+
             h1 {
-                font-size: 18px;
-                margin: 4px 0;
+                color: black;
+                font-size: 1.2em; /* Slightly smaller for print fit */
+                margin: 0.25in 0;
             }
-            @page {
-                size: letter;
-                margin: 0.25in;
+
+            a.qr-code {
+                margin-bottom: 0.5in;
+            }
+
+            img.qr {
+                width: 3in; /* Fixed size for scannability */
+                height: 3in;
+                border: 1px solid black;
+                border-radius: 0; /* Remove rounding for print clarity */
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img src="../web/soldoutlogo.png" alt="Sold Out! Comedy Logo" class="logo">
-            <h1>Do you have an item to sell?</h1>
-            <h1>Stare at this box until it's sold.</h1>
-        </div>
-        
-        <div class="qr-section">
-            <a href="https://kevinkolb.github.io/soldout/appraiser/merch.html" target="_blank">
-                <img src="https://api.qrserver.com/v1/create-qr-code/?size=450x450&data=https://kevinkolb.github.io/soldout/appraiser/merch.html" alt="QR Code" class="qr-code">
-            </a>
-        </div>
-    </div>
+    <a href="https://kevinkolb.github.io/soldout/appraiser/merch.html" target="_blank" class="qr-code">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://kevinkolb.github.io/soldout/appraiser/merch.html" alt="QR Code" class="qr">
+    </a>
+    <h1>Do you have an item to sell?</h1>
+    <h1>Stare at this box until it's sold.</h1>
+    <img src="../web/soldoutlogo.png" alt="Sold Out! Comedy Logo" class="logo">
 </body>
 </html>
