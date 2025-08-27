@@ -23,13 +23,19 @@ jobs:
     - name: Replace environment variables
       run: |
         # Replace placeholders with actual secrets
-        sed -i "s/{{AIRTABLE_API_KEY}}/${{ secrets.AIRTABLE_API_KEY }}/g" *.html
-        sed -i "s/{{AIRTABLE_BASE_ID}}/${{ secrets.AIRTABLE_BASE_ID }}/g" *.html
-        sed -i "s/{{AIRTABLE_TABLE_NAME}}/${{ secrets.AIRTABLE_TABLE_NAME }}/g" *.html
-        sed -i "s/{{EMAILJS_SERVICE_ID}}/${{ secrets.EMAILJS_SERVICE_ID }}/g" *.html
-        sed -i "s/{{EMAILJS_TEMPLATE_ID}}/${{ secrets.EMAILJS_TEMPLATE_ID }}/g" *.html
-        sed -i "s/{{EMAILJS_PUBLIC_KEY}}/${{ secrets.EMAILJS_PUBLIC_KEY }}/g" *.html
-        sed -i "s/{{FEES_PERCENTAGE}}/${{ secrets.FEES_PERCENTAGE }}/g" *.html
+        find . -name "*.html" -type f -exec sed -i "s/{{AIRTABLE_API_KEY}}/${{ secrets.AIRTABLE_API_KEY }}/g" {} \;
+        find . -name "*.html" -type f -exec sed -i "s/{{AIRTABLE_BASE_ID}}/${{ secrets.AIRTABLE_BASE_ID }}/g" {} \;
+        find . -name "*.html" -type f -exec sed -i "s/{{AIRTABLE_TABLE_NAME}}/${{ secrets.AIRTABLE_TABLE_NAME }}/g" {} \;
+        find . -name "*.html" -type f -exec sed -i "s/{{EMAILJS_SERVICE_ID}}/${{ secrets.EMAILJS_SERVICE_ID }}/g" {} \;
+        find . -name "*.html" -type f -exec sed -i "s/{{EMAILJS_TEMPLATE_ID}}/${{ secrets.EMAILJS_TEMPLATE_ID }}/g" {} \;
+        find . -name "*.html" -type f -exec sed -i "s/{{EMAILJS_PUBLIC_KEY}}/${{ secrets.EMAILJS_PUBLIC_KEY }}/g" {} \;
+        
+        # Debug: Show what files were processed
+        find . -name "*.html" -type f
+        
+        # Debug: Show a snippet of the processed file
+        echo "=== Sample of processed HTML ==="
+        head -20 ./merch.html || head -20 ./*.html
     
     - name: Setup Pages
       uses: actions/configure-pages@v4
