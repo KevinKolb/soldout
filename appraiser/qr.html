@@ -6,150 +6,167 @@
     <title>Merch Check-In QR Code</title>
     <link rel="icon" type="image/png" href="../web/soldoutlogo.png">
     <style>
+        html {
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
             margin: 0;
             padding: 10px;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             box-sizing: border-box;
+            overscroll-behavior: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
+        
         .container {
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-            padding: 40px;
+            padding: 20px;
             width: 100%;
-            max-width: 600px;
-            min-height: 80vh;
+            max-width: 500px;
+            height: 100%;
+            max-height: 90vh;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
             text-align: center;
         }
+        
         .header {
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #ecf0f1;
             width: 100%;
         }
+        
         .logo {
-            width: 200px;
+            width: 120px;
             height: auto;
             max-width: 100%;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             transition: transform 0.3s ease;
         }
+        
         .logo:hover {
             transform: scale(1.05);
         }
+        
         h1 {
-            font-size: 20px;
+            font-size: 16px;
             color: #2c3e50;
-            margin: 5px 0;
+            margin: 3px 0;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             line-height: 1.2;
         }
+        
         .qr-section {
             flex: 1;
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
+            padding: 20px 0;
         }
+        
         .qr-code {
             width: 100%;
-            max-width: 450px;
+            max-width: 350px;
             height: auto;
-            border: 4px solid #2c3e50;
+            border: 3px solid #2c3e50;
             border-radius: 8px;
             transition: box-shadow 0.3s ease;
             aspect-ratio: 1;
         }
+        
         .qr-code:hover {
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Tablet styles */
-        @media screen and (max-width: 768px) {
+        /* Larger mobile screens */
+        @media screen and (min-width: 400px) {
             .container {
-                padding: 30px 20px;
-                margin: 10px;
-                min-height: 70vh;
-            }
-            .header {
-                margin-bottom: 30px;
-                padding-bottom: 15px;
+                padding: 30px;
             }
             .logo {
-                width: 150px;
-                margin-bottom: 12px;
+                width: 140px;
+                margin-bottom: 15px;
             }
             h1 {
                 font-size: 18px;
-                margin: 4px 0;
-            }
-        }
-
-        /* Mobile styles */
-        @media screen and (max-width: 480px) {
-            body {
-                padding: 5px;
-            }
-            .container {
-                padding: 20px 15px;
-                margin: 5px;
-                min-height: 75vh;
-                border-radius: 8px;
-            }
-            .header {
-                margin-bottom: 25px;
-                padding-bottom: 12px;
-            }
-            .logo {
-                width: 120px;
-                margin-bottom: 10px;
-            }
-            h1 {
-                font-size: 16px;
-                margin: 3px 0;
-                letter-spacing: 0.5px;
+                margin: 5px 0;
             }
             .qr-code {
-                border: 3px solid #2c3e50;
-                border-radius: 6px;
+                max-width: 400px;
             }
         }
 
-        /* Extra small mobile styles */
-        @media screen and (max-width: 360px) {
+        /* Desktop - only show print styles here */
+        @media screen and (min-width: 768px) {
+            body {
+                position: static;
+                height: 100vh;
+                min-height: 100vh;
+                padding: 40px;
+            }
+            
             .container {
-                padding: 15px 10px;
+                width: 7.5in;
+                height: 9.5in;
+                max-height: none;
+                padding: 40px;
+                justify-content: flex-start;
             }
+            
+            .header {
+                margin-bottom: 40px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #ecf0f1;
+            }
+            
             .logo {
-                width: 100px;
+                width: 200px;
+                margin-bottom: 15px;
             }
+            
             h1 {
-                font-size: 14px;
+                font-size: 20px;
+                margin: 5px 0;
+                letter-spacing: 1px;
+            }
+            
+            .qr-section {
+                flex: 1;
+                padding: 0;
+            }
+            
+            .qr-code {
+                max-width: 450px;
+                border: 4px solid #2c3e50;
             }
         }
 
-        /* Print styles */
+        /* Print styles - desktop only */
         @media print {
             body {
                 margin: 0;
                 padding: 0;
                 background: none;
+                position: static;
+                width: auto;
+                height: auto;
             }
             .container {
                 box-shadow: none;
@@ -157,6 +174,7 @@
                 width: 8.5in;
                 height: 10.5in;
                 max-width: none;
+                max-height: none;
                 padding: 0.5in;
                 display: flex;
                 flex-direction: column;
