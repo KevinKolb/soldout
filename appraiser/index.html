@@ -92,6 +92,7 @@
       font-weight: 700;
       text-decoration: none;
       transition: transform .06s ease, background .2s ease, border-color .2s ease;
+      cursor: pointer;
     }
     .nav-btn:hover {
       background: rgba(255,255,255,0.14);
@@ -101,6 +102,62 @@
     .nav-btn:focus-visible{
       outline: 3px solid var(--focus);
       outline-offset: 2px;
+    }
+
+    /* Form popup styles */
+    .form-popup-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .form-popup {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: rgba(0,0,0,0.95);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 8px;
+      transform: translateY(-10px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .form-popup.active {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .form-popup-btn {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      text-align: center;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-popup-btn:hover {
+      background: rgba(255,255,255,0.2);
+      border-color: rgba(255,255,255,0.4);
+    }
+
+    .form-popup-btn:last-child {
+      margin-bottom: 0;
     }
 
     /* Tools block */
@@ -247,17 +304,29 @@
     <aside class="sidebar">
       <h1>Sold Out!<br/>Comedy Show</h1>
       <div class="subtitle">Stage Edition</br>The Appraiser</div>
-    </br>
 
       <!-- Buttons -->
-      <a href="..\appraiser\qr.html" class="nav-btn">QR CODE</a>
-      <a href="..\appraiser\merch.html" class="nav-btn">SELL YOUR MERCH FORM</a>
-      <a href="https://airtable.com/appryObcmJdPmk9ls/pagseYDP4XZ56CYG8" class="nav-btn">ITEM DATABASE</a>
-      <a href="https://www.whatnot.com/" class="nav-btn">WHATNOT</a>
+      <div class="tools-section" style="margin-top: 16px; padding-top: 12px;">
+        <h3>Merch Check-In</h3>
+      
+      <!-- Form button with popup -->
+      <div class="form-popup-container">
+        <button class="nav-btn" id="formBtn">CHECK-IN FORM</button>
+        <div class="form-popup" id="formPopup">
+          <a href="merch.html" class="form-popup-btn">FILL OUT FORM</a>
+          <a href="merch.html?text" class="form-popup-btn">TEXT FORM TO SELLER</a>
+          <a href="merch.html?email" class="form-popup-btn">EMAIL FORM TO SELLER</a>
+          <a href="qr.html" class="form-popup-btn">SHOW FORM QR CODE TO SELLER</a>
+          <a href="qr.html?print" class="form-popup-btn">PRINT FORM QR CODE FOR SELLER</a>
+        </div>
+      </div>
+      
+      <a href="https://airtable.com/appryObcmJdPmk9ls/pagseYDP4XZ56CYG8" class="nav-btn">CHECKED-IN ITEMS</a>
+      <a href="https://www.whatnot.com/" class="nav-btn">ADD ITEMS TO WHATNOT</a>
 
       <!-- Tools -->
       <div class="tools-section">
-        <h3>Tools</h3>
+        <h3>Real World Tools</h3>
         <ul>
           <li>Phone</li>
           <li>Laminated QR Code</li>
@@ -284,7 +353,7 @@
             <p><strong>Access Requirements:</strong> The appraiser table or room can only be reached by paying admission first. In other words, a seller must be a paying member of the audience to sell an item.</p>
           </div>
           <div class="step"><h4>Step 1: Form Setup</h4><p>The appraiser has the seller scan the QR code and helps the seller/audience member fill out the form.</p></div>
-          <div class="step"><h4>Step 2: Personal Information</h4><p>The seller fills out the "You" section of the Seller Form. It's important to have an email address for payment purposes.</p></div>
+          <div class="step"><h4>Step 2: Personal Information</h4><p>The seller fills out the "You" section of the Merch Form. It's important to have an email address for payment purposes.</p></div>
           <div class="step"><h4>Step 3: Item Description</h4><p>The seller fills out the item description.</p></div>
           <div class="step"><h4>Step 4: Sale Price</h4><p>The seller fills out the Sale Price. The appraiser emphasizes that if their item does not sell, the seller goes home with the item and no money. The sale price is what the seller will get if their item sells. No more, no less.</p></div>
           <div class="warning"><p>They may want to set the price higher than they initially thought, but then it might not sell. The final price is their choice. It's a gamble for them. They are gamblers. We are the house.</p></div>
@@ -310,5 +379,38 @@
       </div>
     </main>
   </div>
+
+  <script>
+    // Handle form button popup
+    const formBtn = document.getElementById('formBtn');
+    const formPopup = document.getElementById('formPopup');
+    let isPopupOpen = false;
+
+    formBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (isPopupOpen) {
+        formPopup.classList.remove('active');
+        isPopupOpen = false;
+      } else {
+        formPopup.classList.add('active');
+        isPopupOpen = true;
+      }
+    });
+
+    // Close popup when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!formBtn.contains(e.target) && !formPopup.contains(e.target)) {
+        formPopup.classList.remove('active');
+        isPopupOpen = false;
+      }
+    });
+
+    // Prevent popup from closing when clicking inside it
+    formPopup.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+  </script>
 </body>
 </html>

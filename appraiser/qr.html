@@ -117,5 +117,24 @@
     <h1>Do you have an item to sell?</h1>
     <h1>Stare at this box until it's sold.</h1>
     <img src="../web/soldoutlogo.png" alt="Sold Out! Comedy Logo" class="logo">
+
+    <script>
+        // Check if the URL contains the 'print' parameter
+        function checkForPrintParameter() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('print')) {
+                // Wait for images to load before printing
+                window.addEventListener('load', function() {
+                    // Small delay to ensure everything is fully rendered
+                    setTimeout(function() {
+                        window.print();
+                    }, 500);
+                });
+            }
+        }
+
+        // Run the check when the page loads
+        checkForPrintParameter();
+    </script>
 </body>
 </html>

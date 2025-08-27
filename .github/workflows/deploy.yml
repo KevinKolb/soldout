@@ -20,22 +20,36 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
+    - name: Debug - Check secrets availability
+      run: |
+        echo "Checking if secrets are available..."
+        echo "AIRTABLE_API_KEY length: ${#AIRTABLE_API_KEY}"
+        echo "AIRTABLE_BASE_ID length: ${#AIRTABLE_BASE_ID}"
+        if [ -z "${{ secrets.AIRTABLE_API_KEY }}" ]; then
+          echo "ERROR: AIRTABLE_API_KEY secret is empty!"
+        else
+          echo "AIRTABLE_API_KEY secret is set"
+        fi
+    
+    - name: Debug - Show file before replacement
+      run: |
+        echo "=== BEFORE replacement ==="
+        grep -A 8 "const CONFIG" ./appraiser/merch.html || echo "CONFIG not found"
+    
     - name: Replace environment variables
       run: |
-        # Replace placeholders with actual secrets
-        find . -name "*.html" -type f -exec sed -i "s/{{AIRTABLE_API_KEY}}/${{ secrets.AIRTABLE_API_KEY }}/g" {} \;
-        find . -name "*.html" -type f -exec sed -i "s/{{AIRTABLE_BASE_ID}}/${{ secrets.AIRTABLE_BASE_ID }}/g" {} \;
-        find . -name "*.html" -type f -exec sed -i "s/{{AIRTABLE_TABLE_NAME}}/${{ secrets.AIRTABLE_TABLE_NAME }}/g" {} \;
-        find . -name "*.html" -type f -exec sed -i "s/{{EMAILJS_SERVICE_ID}}/${{ secrets.EMAILJS_SERVICE_ID }}/g" {} \;
-        find . -name "*.html" -type f -exec sed -i "s/{{EMAILJS_TEMPLATE_ID}}/${{ secrets.EMAILJS_TEMPLATE_ID }}/g" {} \;
-        find . -name "*.html" -type f -exec sed -i "s/{{EMAILJS_PUBLIC_KEY}}/${{ secrets.EMAILJS_PUBLIC_KEY }}/g" {} \;
-        
-        # Debug: Show what files were processed
-        find . -name "*.html" -type f
-        
-        # Debug: Show a snippet of the processed file
-        echo "=== Sample of processed HTML ==="
-        head -20 ./merch.html || head -20 ./*.html
+        # Replace placeholders with actual secrets - using different approach
+        sed -i 's/{{AIRTABLE_API_KEY}}/${{ secrets.AIRTABLE_API_KEY }}/g' ./appraiser/merch.html
+        sed -i 's/{{AIRTABLE_BASE_ID}}/${{ secrets.AIRTABLE_BASE_ID }}/g' ./appraiser/merch.html
+        sed -i 's/{{AIRTABLE_TABLE_NAME}}/${{ secrets.AIRTABLE_TABLE_NAME }}/g' ./appraiser/merch.html
+        sed -i 's/{{EMAILJS_SERVICE_ID}}/${{ secrets.EMAILJS_SERVICE_ID }}/g' ./appraiser/merch.html
+        sed -i 's/{{EMAILJS_TEMPLATE_ID}}/${{ secrets.EMAILJS_TEMPLATE_ID }}/g' ./appraiser/merch.html
+        sed -i 's/{{EMAILJS_PUBLIC_KEY}}/${{ secrets.EMAILJS_PUBLIC_KEY }}/g' ./appraiser/merch.html
+    
+    - name: Debug - Show file after replacement
+      run: |
+        echo "=== AFTER replacement ==="
+        grep -A 8 "const CONFIG" ./appraiser/merch.html || echo "CONFIG not found"
     
     - name: Setup Pages
       uses: actions/configure-pages@v4
