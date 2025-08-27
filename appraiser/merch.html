@@ -435,37 +435,59 @@ function showSuccessScreen() {
     document.querySelector('.progress-bar').style.width = '100%';
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // SMS/Email deep links via query params
-    const urlParams = new URLSearchParams(window.location.search);
-    
-    if (urlParams.has('text') || urlParams.has('sms')) {
-        window.location.href = 'sms:?body=' + encodeURIComponent('SOLD OUT! Comedy - Submit your items for auction: https://kevinkolb.github.io/soldout/appraiser/merch.html');
-        return;
-    }
-    
-    if (urlParams.has('email')) {
-        window.location.href = 'mailto:?subject=' + encodeURIComponent('SOLD OUT! Comedy - Sell Your Merch') + '&body=' + encodeURIComponent('Submit your items for auction at the SOLD OUT! Comedy Show:\n\nhttps://kevinkolb.github.io/soldout/appraiser/merch.html');
-        return;
-    }
-    
-    // Regular form setup
-    updateProgress();
-    document.getElementById('step1Next').addEventListener('click', () => nextStep(1));
-    document.getElementById('step2Back').addEventListener('click', previousStep);
-    document.getElementById('step2Next').addEventListener('click', () => nextStep(2));
-    document.getElementById('step3Back').addEventListener('click', previousStep);
-    document.getElementById('step3Next').addEventListener('click', () => nextStep(3));
-    document.getElementById('step4Back').addEventListener('click', previousStep);
-    document.getElementById('step4Next').addEventListener('click', () => nextStep(4));
-    document.getElementById('step5Back').addEventListener('click', previousStep);
-    document.getElementById('step5Next').addEventListener('click', () => nextStep(5));
-    document.getElementById('step6Back').addEventListener('click', previousStep);
-    document.getElementById('finalSubmit').addEventListener('click', submitForm);
-    document.getElementById('clearSig').addEventListener('click', clearSignature);
-    document.querySelectorAll('.radio-option').forEach(option => {
-        option.addEventListener('click', () => selectRadio(option.dataset.value));
-    });
+document.addEventListener('DOMContentLoaded', function () {
+  // ---- Deep link handling (non-blocking) ----
+  (function handleDeepLinks() {
+    const params = new URLSearchParams(window.location.search);
+    const hasSMS = params.has('sms') || params.has('text');
+    const hasEmail = params.has('email');
+    if (!hasSMS && !hasEmail) return;
+
+    // Strip params immediately so coming back doesn't retrigger
+    const cleanURL = window.location.origin + window.location.pathname;
+    history.replaceState({}, '', cleanURL);
+
+    const smsBody = encodeURIComponent(
+      'SOLD OUT! Comedy - Submit your items for auction: https://kevinkolb.github.io/soldout/appraiser/merch.html'
+    );
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const smsHref = isIOS ? `sms:&body=${smsBody}` : `sms:?body=${smsBody}`;
+
+    const mailHref =
+      'mailto:?subject=' +
+      encodeURIComponent('SOLD OUT! Comedy - Sell Your Merch') +
+      '&body=' +
+      encodeURIComponent(
+        'Submit your items for auction at the SOLD OUT! Comedy Show:\n\nhttps://kevinkolb.github.io/soldout/appraiser/merch.html'
+      );
+
+    // Fire after a tick so it doesn't block the rest of setup
+    setTimeout(() => {
+      if (hasEmail) {
+        window.location.href = mailHref;
+      } else if (hasSMS) {
+        window.location.href = smsHref;
+      }
+    }, 0);
+  })();
+
+  // ---- Regular form setup ----
+  updateProgress();
+  document.getElementById('step1Next').addEventListener('click', () => nextStep(1));
+  document.getElementById('step2Back').addEventListener('click', previousStep);
+  document.getElementById('step2Next').addEventListener('click', () => nextStep(2));
+  document.getElementById('step3Back').addEventListener('click', previousStep);
+  document.getElementById('step3Next').addEventListener('click', () => nextStep(3));
+  document.getElementById('step4Back').addEventListener('click', previousStep);
+  document.getElementById('step4Next').addEventListener('click', () => nextStep(4));
+  document.getElementById('step5Back').addEventListener('click', previousStep);
+  document.getElementById('step5Next').addEventListener('click', () => nextStep(5));
+  document.getElementById('step6Back').addEventListener('click', previousStep);
+  document.getElementById('finalSubmit').addEventListener('click', submitForm);
+  document.getElementById('clearSig').addEventListener('click', clearSignature);
+  document.querySelectorAll('.radio-option').forEach(option => {
+    option.addEventListener('click', () => selectRadio(option.dataset.value));
+  });
 });
 </script>
 </body>
