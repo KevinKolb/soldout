@@ -19,18 +19,26 @@
             background-color: #ffffff;
             border-radius: 12px;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-            padding: 20px;
+            padding: 40px;
             width: 7.5in;
-            height: 9.5in; /* Reduced to fit within 11in with margins */
+            height: 9.5in;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             align-items: center;
             text-align: center;
         }
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+        }
         .logo {
-            width: 300px;
+            width: 200px;
             height: auto;
             margin-bottom: 15px;
             transition: transform 0.3s ease;
@@ -39,25 +47,25 @@
             transform: scale(1.05);
         }
         h1 {
-            font-size: 24px;
+            font-size: 20px;
             color: #2c3e50;
-            margin: 10px 0;
+            margin: 5px 0;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
+            line-height: 1.2;
         }
-        .subtitle {
-            font-size: 18px;
-            color: #7f8c8d;
-            margin-top: 8px;
-            font-style: italic;
+        .qr-section {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .qr-code {
-            width: 300px;
-            height: 300px;
-            border: 5px solid #2c3e50;
+            width: 450px;
+            height: 450px;
+            border: 4px solid #2c3e50;
             border-radius: 8px;
-            margin: 15px 0;
             transition: box-shadow 0.3s ease;
         }
         .qr-code:hover {
@@ -73,46 +81,59 @@
                 box-shadow: none;
                 border: none;
                 width: 8.5in;
-                height: 10in; /* Tightened for single-page fit */
-                padding: 0.25in;
+                height: 10.5in;
+                padding: 0.5in;
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
+                justify-content: flex-start;
                 align-items: center;
                 page-break-after: avoid;
                 page-break-inside: avoid;
             }
+            .header {
+                margin-bottom: 30px;
+                padding-bottom: 15px;
+                border-bottom: 2px solid #2c3e50;
+            }
             .logo {
-                width: 140px;
+                width: 160px;
+                margin-bottom: 10px;
+            }
+            .qr-section {
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
             .qr-code {
-                width: 260px;
-                height: 260px;
-                border: 5px solid #2c3e50;
+                width: 400px;
+                height: 400px;
+                border: 4px solid #2c3e50;
             }
             h1 {
-                font-size: 22px;
-            }
-            .subtitle {
-                font-size: 14px;
+                font-size: 18px;
+                margin: 4px 0;
             }
             @page {
                 size: letter;
-                margin: 0.5in;
+                margin: 0.25in;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="../web/soldoutlogo.png" alt="Sold Out! Comedy Logo" class="logo">
-        <div>
+        <div class="header">
+            <img src="../web/soldoutlogo.png" alt="Sold Out! Comedy Logo" class="logo">
             <h1>Do you have an item to sell?</h1>
-            <p class="subtitle">Scan here to join the fun!</p>
+            <h1>Stare at this box until it's sold.</h1>
         </div>
-        <a href="https://kevinkolb.github.io/soldout/appraiser/merch.html" target="_blank">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=https://kevinkolb.github.io/soldout/appraiser/merch.html" alt="QR Code" class="qr-code">
-        </a>    
-</div>
+        
+        <div class="qr-section">
+            <a href="https://kevinkolb.github.io/soldout/appraiser/merch.html" target="_blank">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=450x450&data=https://kevinkolb.github.io/soldout/appraiser/merch.html" alt="QR Code" class="qr-code">
+            </a>
+        </div>
+    </div>
 </body>
 </html>
