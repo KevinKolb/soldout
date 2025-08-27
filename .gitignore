@@ -1,2 +1,5 @@
 # Ignore everything in the 'show' folder
 show/
+
+# Environment variables
+secrets/.env
