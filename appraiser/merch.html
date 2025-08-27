@@ -220,7 +220,7 @@ async function loadConfig() {
         formData.fees = config.FEES_PERCENTAGE;
     } catch (error) {
         console.error('Failed to load config:', error);
-        // Use default fees if config fails to load
+        // Use the default fees if config fails to load
         formData.fees = 0.1;
     }
 }
