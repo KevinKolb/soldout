@@ -300,61 +300,103 @@ function initSignaturePad() {
     ctx.lineWidth = 2; 
     ctx.lineCap = 'round';
     
-    // Mouse events
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mousemove', draw);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mouseout', stopDrawing);
+    // Prevent all default touch behaviors on canvas and container
+    const container = canvas.closest('.signature-container');
     
-    // Touch events for mobile
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-    canvas.addEventListener('touchend', stopDrawing);
-    canvas.addEventListener('touchcancel', stopDrawing);
+    // Disable context menu
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    
+    // Mouse events
+    canvas.addEventListener('mousedown', handleStart);
+    canvas.addEventListener('mousemove', handleMove);
+    canvas.addEventListener('mouseup', handleEnd);
+    canvas.addEventListener('mouseout', handleEnd);
+    
+    // Touch events for mobile - very aggressive prevention
+    canvas.addEventListener('touchstart', handleStart, { passive: false });
+    canvas.addEventListener('touchmove', handleMove, { passive: false });
+    canvas.addEventListener('touchend', handleEnd, { passive: false });
+    canvas.addEventListener('touchcancel', handleEnd, { passive: false });
+    
+    // Prevent container from interfering
+    if (container) {
+        container.addEventListener('touchstart', (e) => {
+            if (e.target === canvas) e.preventDefault();
+        }, { passive: false });
+        container.addEventListener('touchmove', (e) => {
+            if (e.target === canvas) e.preventDefault();
+        }, { passive: false });
+    }
+    
+    // Prevent document scrolling when touching canvas
+    document.addEventListener('touchstart', (e) => {
+        if (e.target === canvas) e.preventDefault();
+    }, { passive: false });
+    document.addEventListener('touchmove', (e) => {
+        if (e.target === canvas) e.preventDefault();
+    }, { passive: false });
 }
 
 function getEventPos(e) {
     const rect = canvas.getBoundingClientRect();
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    let clientX, clientY;
+    
+    if (e.touches && e.touches.length > 0) {
+        clientX = e.touches[0].clientX;
+        clientY = e.touches[0].clientY;
+    } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+    }
+    
     return {
         x: clientX - rect.left,
         y: clientY - rect.top
     };
 }
 
-function handleTouchStart(e) {
-    e.preventDefault(); // Prevent scrolling
-    const pos = getEventPos(e);
+function handleStart(e) {
+    // Aggressive prevention of all default behaviors
+    e.preventDefault();
+    e.stopPropagation();
+    
     isDrawing = true;
+    const pos = getEventPos(e);
     ctx.beginPath();
     ctx.moveTo(pos.x, pos.y);
 }
 
-function handleTouchMove(e) {
-    e.preventDefault(); // Prevent scrolling
+function handleMove(e) {
+    // Aggressive prevention of all default behaviors
+    e.preventDefault();
+    e.stopPropagation();
+    
     if (!isDrawing) return;
+    
     const pos = getEventPos(e);
-    draw({ clientX: pos.x + canvas.getBoundingClientRect().left, clientY: pos.y + canvas.getBoundingClientRect().top });
-}
-
-function startDrawing(e) {
-    isDrawing = true; 
-    ctx.beginPath();
-    const pos = getEventPos(e);
-    ctx.moveTo(pos.x, pos.y);
-}
-
-function draw(e) {
-    if (!isDrawing) return;
-    const pos = getEventPos(e);
-    ctx.lineTo(pos.x, pos.y); 
+    ctx.lineTo(pos.x, pos.y);
     ctx.stroke();
+    
     if (!hasSigned) {
         hasSigned = true;
         document.getElementById('signatureStatus').textContent = 'Signed';
         document.getElementById('finalSubmit').disabled = false;
     }
+}
+
+function handleEnd(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    isDrawing = false;
+}
+
+// Legacy functions for compatibility
+function startDrawing(e) {
+    handleStart(e);
+}
+
+function draw(e) {
+    handleMove(e);
 }
 
 function stopDrawing() { 
