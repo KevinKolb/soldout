@@ -217,12 +217,12 @@
 
 <script>
 const CONFIG = {
-    AIRTABLE_API_KEY: '{{AIRTABLE_API_KEY}}',
-    AIRTABLE_BASE_ID: '{{AIRTABLE_BASE_ID}}',
-    AIRTABLE_TABLE_NAME: '{{AIRTABLE_TABLE_NAME}}',
-    EMAILJS_SERVICE_ID: '{{EMAILJS_SERVICE_ID}}',
-    EMAILJS_TEMPLATE_ID: '{{EMAILJS_TEMPLATE_ID}}',
-    EMAILJS_PUBLIC_KEY: '{{EMAILJS_PUBLIC_KEY}}',
+    AIRTABLE_API_KEY: 'patv1p4GwzZUH3Whd.4fb4bcc89097466a60a830b3f29dc85eb4296d8c0196b74e0374116421d7822a',
+    AIRTABLE_BASE_ID: 'appryObcmJdPmk9ls',
+    AIRTABLE_TABLE_NAME: 'Items',
+    EMAILJS_SERVICE_ID: 'service_151yelq',
+    EMAILJS_TEMPLATE_ID: 'template_nroyna9',
+    EMAILJS_PUBLIC_KEY: 'yi2bgGVokQizGNBWi',
     FEES_PERCENTAGE: 0.1
 };
 
@@ -436,7 +436,7 @@ function showSuccessScreen() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // SMS/Email functionality - check query params first
+    // SMS/Email deep links via query params
     const urlParams = new URLSearchParams(window.location.search);
     
     if (urlParams.has('text') || urlParams.has('sms')) {
