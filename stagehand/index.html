@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8"/>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ <title>SOLD OUT! Comedy - The Stagehand</title>
+ <link rel="icon" type="image/png" href="../web/soldoutlogo.png">
+ <style>
+   /* Reset */
+   * { margin: 0; padding: 0; box-sizing: border-box; }
+
+   /* Base */
+   :root{
+     --sidebar-bg:#333;      /* darker for contrast */
+     --sidebar-fg:#fff;
+     --sidebar-muted:#cfd3d8;
+     --border:#e6e6e6;
+     --ink:#111;
+     --text:#1a1a1a;
+     --muted:#555;
+     --panel:#f8f8f8;
+     --step:#fff;
+     --accent:#0a0a0a;
+     --focus: #005fcc;
+   }
+
+   html, body {
+     height: 100%;
+   }
+
+   body {
+     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+     background: #fff;
+     color: var(--text);
+     line-height: 1.7;
+     font-weight: 300;
+     font-size: 20px; /* bigger base */
+     -webkit-font-smoothing: antialiased;
+     -moz-osx-font-smoothing: grayscale;
+   }
+
+   /* Layout */
+   .grid-container {
+     min-height: 100vh;
+     display: grid;
+     grid-template-columns: 340px 1fr; /* a bit wider for clearer nav */
+   }
+
+   /* Sidebar */
+   .sidebar {
+     background: var(--sidebar-bg);
+     color: var(--sidebar-fg);
+     padding: 40px 28px;
+     position: fixed;
+     inset: 0 auto 0 0;
+     width: 340px;
+     overflow-y: auto;
+     border-right: 1px solid rgba(255,255,255,0.08);
+   }
+
+   .sidebar h1 {
+     font-size: 28px;
+     font-weight: 800;
+     text-transform: uppercase;
+     letter-spacing: 1.5px;
+     line-height: 1.15;
+     margin-bottom: 10px;
+   }
+
+   .subtitle {
+     font-size: 16px;
+     color: var(--sidebar-muted);
+     text-transform: uppercase;
+     margin-bottom: 18px;
+     letter-spacing: .8px;
+   }
+
+   /* Sidebar buttons */
+   .nav-btn {
+     display: block;
+     width: 100%;
+     padding: 14px 14px;
+     margin-bottom: 12px;
+     background: rgba(255,255,255,0.06);
+     color: #fff;
+     border: 1px solid rgba(255,255,255,0.18);
+     border-radius: 8px;
+     text-align: center;
+     font-size: 15px;
+     text-transform: uppercase;
+     letter-spacing: 1px;
+     font-weight: 700;
+     text-decoration: none;
+     transition: transform .06s ease, background .2s ease, border-color .2s ease;
+     cursor: pointer;
+   }
+   .nav-btn:hover {
+     background: rgba(255,255,255,0.14);
+     border-color: rgba(255,255,255,0.28);
+     transform: translateY(-1px);
+   }
+   .nav-btn:focus-visible{
+     outline: 3px solid var(--focus);
+     outline-offset: 2px;
+   }
+
+   /* Form popup styles */
+   .form-popup-container {
+     position: relative;
+     width: 100%;
+   }
+
+   .form-popup {
+     position: absolute;
+     top: 100%;
+     left: 0;
+     right: 0;
+     background: rgba(0,0,0,0.95);
+     border: 1px solid rgba(255,255,255,0.3);
+     border-radius: 8px;
+     padding: 16px;
+     margin-top: 8px;
+     transform: translateY(-10px);
+     opacity: 0;
+     visibility: hidden;
+     transition: all 0.3s ease;
+     z-index: 1000;
+   }
+
+   .form-popup.active {
+     transform: translateY(0);
+     opacity: 1;
+     visibility: visible;
+   }
+
+   .form-popup-btn {
+     display: block;
+     width: 100%;
+     padding: 12px;
+     margin-bottom: 8px;
+     background: rgba(255,255,255,0.1);
+     color: #fff;
+     border: 1px solid rgba(255,255,255,0.2);
+     border-radius: 6px;
+     text-align: center;
+     font-size: 13px;
+     text-transform: uppercase;
+     letter-spacing: 0.8px;
+     font-weight: 600;
+     text-decoration: none;
+     transition: all 0.2s ease;
+   }
+
+   .form-popup-btn:hover {
+     background: rgba(255,255,255,0.2);
+     border-color: rgba(255,255,255,0.4);
+   }
+
+   .form-popup-btn:last-child {
+     margin-bottom: 0;
+   }
+
+   /* Tools block */
+   .tools-section {
+     margin-top: 28px;
+     padding-top: 20px;
+     border-top: 1px solid rgba(255,255,255,0.16);
+   }
+   .tools-section h3 {
+     font-size: 16px;
+     font-weight: 800;
+     text-transform: uppercase;
+     margin-bottom: 12px;
+     color: #fff;
+     letter-spacing: 1px;
+   }
+   .tools-section ul { list-style: none; }
+   .tools-section > ul > li {
+     font-size: 17px;
+     margin-bottom: 10px;
+     position: relative;
+     padding-left: 18px;
+     color: #f5f5f5;
+   }
+   .tools-section > ul > li::before {
+     content: "•";
+     position: absolute;
+     left: 0;
+     color: var(--sidebar-muted);
+     font-size: 16px;
+     line-height: 1;
+     top: 2px;
+   }
+   .tools-section ul ul {
+     margin-top: 6px;
+     margin-left: 18px;
+   }
+   .tools-section ul ul li {
+     font-size: 15px;
+     margin-bottom: 6px;
+     color: #e8e8e8;
+     position: relative;
+     padding-left: 14px;
+   }
+   .tools-section ul ul li::before {
+     content: "○";
+     position: absolute;
+     left: 0;
+     font-size: 11px;
+     top: 3px;
+     color: var(--sidebar-muted);
+   }
+
+   /* Main content */
+   .main-content {
+     margin-left: 340px;
+     width: calc(100vw - 340px);
+     padding: 72px 56px;
+     display: flex;
+     justify-content: center;
+   }
+
+   /* Readable line length container */
+   .content-wrap{
+     width: 100%;
+     max-width: 880px; /* limit line length for readability */
+   }
+
+   .section {
+     background: var(--panel);
+     border: 1px solid var(--border);
+     padding: 28px 28px;
+     margin-bottom: 28px;
+     border-radius: 12px;
+   }
+
+   .section-title {
+     font-size: 30px;
+     font-weight: 800;
+     text-transform: uppercase;
+     margin-bottom: 14px;
+     color: var(--ink);
+     letter-spacing: .6px;
+   }
+
+   .section p {
+     font-size: 19px;
+     margin-bottom: 14px;
+     color: #2a2a2a;
+   }
+   
+   .section ul {
+     list-style: disc;
+     margin-left: 30px;
+     margin-bottom: 14px;
+   }
+   
+   .section ul li {
+     font-size: 19px;
+     margin-bottom: 8px;
+     color: #2a2a2a;
+   }
+
+   .step {
+     background: var(--step);
+     border: 1px solid var(--border);
+     padding: 18px 20px;
+     margin: 14px 0;
+     border-radius: 10px;
+   }
+   .step h4 {
+     font-size: 18px;
+     font-weight: 800;
+     text-transform: uppercase;
+     margin-bottom: 8px;
+     color: var(--ink);
+     letter-spacing: .5px;
+   }
+
+   .info, .warning {
+     background: #fff;
+     border: 2px solid var(--border);
+     padding: 18px 20px;
+     margin: 14px 0;
+     font-size: 18px;
+     border-radius: 10px;
+   }
+   .info   { border-left: 6px solid #777; }
+   .warning{ border-left: 6px solid #ffb300; background: #fffaf0; }
+
+   /* Media queries */
+   @media (max-width: 1200px){
+     .main-content{ padding: 64px 40px; }
+     .content-wrap{ max-width: 820px; }
+   }
+
+   @media (max-width: 1024px) {
+     .sidebar { position: static; width: 100%; height: auto; border-right: 0; }
+     .grid-container { grid-template-columns: 1fr; }
+     .main-content { margin-left: 0; width: 100%; padding: 40px 24px; }
+     .content-wrap{ max-width: 720px; }
+   }
+
+   @media (max-width: 768px) {
+     body{ font-size: 18px; line-height: 1.65; }
+     .main-content { padding: 28px 18px; }
+     .section { padding: 22px; border-radius: 10px; }
+     .section-title { font-size: 24px; }
+     .step h4{ font-size: 17px; }
+   }
+ </style>
+</head>
+<body>
+ <div class="grid-container">
+   <!-- Sidebar -->
+   <aside class="sidebar">
+     <h1>Sold Out!<br/>Comedy Show</h1>
+     <div class="subtitle">Stage Edition<br/>The Stagehand</div>
+
+     <!-- Buttons -->
+     <div class="tools-section" style="margin-top: 16px; padding-top: 12px;">
+       <h3>Merch Check-In</h3>
+     
+       <!-- Form button with popup -->
+       <div class="form-popup-container">
+         <button class="nav-btn" id="formBtn">CHECK-IN FORM</button>
+         <div class="form-popup" id="formPopup">
+           <a href="merch.html" class="form-popup-btn">FILL OUT FORM</a>
+           <a href="merch.html?text" class="form-popup-btn">TEXT FORM TO SELLER</a>
+           <a href="merch.html?email" class="form-popup-btn">EMAIL FORM TO SELLER</a>
+           <a href="qr.html" class="form-popup-btn">SHOW FORM QR CODE TO SELLER</a>
+           <a href="qr.html?print" class="form-popup-btn">PRINT FORM QR CODE FOR SELLER</a>
+         </div>
+       </div>
+     
+       <a href="https://airtable.com/appryObcmJdPmk9ls/pagseYDP4XZ56CYG8" class="nav-btn">CHECKED-IN ITEMS</a>
+       <a href="https://www.whatnot.com/user/soldoutcomedyshow" class="nav-btn">ADD ITEMS TO WHATNOT</a>
+     </div>
+
+     <!-- Tools -->
+     <div class="tools-section">
+       <h3>Real World Tools</h3>
+       <ul>
+         <li>Phone</li>
+         <li>Copy of the Script</li>
+         <li>FedEx Costume</li>
+       </ul>
+     </div>
+   </aside>
+
+   <!-- Main -->
+   <main class="main-content">
+     <div class="content-wrap">
+       <section class="section">
+         <h2 class="section-title">Overview</h2>
+         <p>Our Stagehand is so much more than a stagehand. This is an on-stage performer with evolving responsibilities that blur the line between crew and cast. Throughout the show, the Stagehand:</p>
+         <ul>
+           <li>Manages physical logistics during the show, including retrieving "sold" items, moving boxes, and prepping props</li>
+           <li>Delivers items to the stage before each scene begins</li>
+           <li>Works seamlessly to ensure smooth transitions between scenes</li>
+           <li>Acts as liaison between the Appraiser and cast/performers, signaling item readiness</li>
+         </ul>
+       </section>
+
+       <section class="section">
+         <h2 class="section-title">Character Arc</h2>
+         <p>The Stagehand's presence evolves throughout the show. In the first skit, they wander onstage like an actual FedEx employee who's stumbled into something unexpected, confused about what's happening. As the show progresses, they gradually become integrated into the performance itself, sometimes actively participating in skits, sometimes observing from the sidelines.</p>
+         
+         <div class="info">
+           <p>Between scenes, sound effects mark their comedic journey: the rumble of their delivery truck driving off with each "sold" item, followed by the screech of racing back, before they casually walk in carrying the next item. This running gag transforms a functional role into a beloved character who bridges the gap between backstage mechanics and onstage magic.</p>
+         </div>
+         
+         <p>By show's end, the Stagehand has transformed from confused outsider to essential ensemble member, a meta-theatrical element that celebrates both the visible and invisible work of live performance.</p>
+       </section>
+     </div>
+   </main>
+ </div>
+
+ <script>
+   // Handle form button popup
+   const formBtn = document.getElementById('formBtn');
+   const formPopup = document.getElementById('formPopup');
+   let isPopupOpen = false;
+
+   formBtn.addEventListener('click', function(e) {
+     e.preventDefault();
+     e.stopPropagation();
+     
+     if (isPopupOpen) {
+       formPopup.classList.remove('active');
+       isPopupOpen = false;
+     } else {
+       formPopup.classList.add('active');
+       isPopupOpen = true;
+     }
+   });
+
+   // Close popup when clicking outside
+   document.addEventListener('click', function(e) {
+     if (!formBtn.contains(e.target) && !formPopup.contains(e.target)) {
+       formPopup.classList.remove('active');
+       isPopupOpen = false;
+     }
+   });
+
+   // Prevent popup from closing when clicking inside it
+   formPopup.addEventListener('click', function(e) {
+     e.stopPropagation();
+   });
+ </script>
+</body>
+</html>
