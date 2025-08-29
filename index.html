@@ -1,189 +1,227 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLD OUT! Comedy Show</title>
-    <link rel="stylesheet" href="socs.css">
-    <link rel="icon" type="image/png" href="web/soldoutlogo.png">
-    <style>
-        .single-card {
-            width: 75% !important;
-            margin: 0 auto !important;
-            grid-column: 1 / -1 !important;
-        }
-        
-        .hero-card {
-            margin-top: 2rem !important;
-            max-width: 800px !important;
-        }
-        
-        .hero-card h3 {
-            font-size: 3rem !important;
-        }
-        
-        .hero-card h4 {
-            font-size: 2rem !important;
-        }
-        
-        .hero-card p {
-            font-size: 1.4rem !important;
-        }
-        
-        .hero-card li {
-            font-size: 1.4rem !important;
-        }
-        
-        @media (max-width: 768px) {
-            .single-card {
-                width: 100% !important;
-            }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SOLD OUT! Comedy Show</title>
+  <link rel="icon" type="image/png" href="web/soldoutlogo.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap">
+<style>
+  :root{
+    --comic-red:#FF3B3B;
+    --comic-blue:#4A90E2;
+    --comic-yellow:#FFD93D;
+    --comic-orange:#FF9500;
+    --comic-black:#2C2C2C;
+    --comic-white:#FFFFFF;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box}
+
+  body{
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    background:linear-gradient(45deg,var(--comic-yellow) 0%, var(--comic-orange) 50%, var(--comic-red) 100%);
+    min-height:100vh;overflow-x:hidden;
+  }
+
+  /* Ben Day dots */
+  .dots-bg{position:relative}
+  .dots-bg::before{
+    content:"";position:absolute;inset:0;
+    background-image:radial-gradient(circle,var(--comic-black) 1px,transparent 1px);
+    background-size:8px 8px;opacity:.1;pointer-events:none;
+  }
+  .dots-overlay{position:absolute;inset:0;pointer-events:none}
+
+  /* Hero */
+  .hero{
+    padding:4rem 2rem;text-align:center;position:relative;
+    background:#F0F0F0;border-bottom:8px solid var(--comic-yellow);
+    min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  }
+  .hero-logo{max-width:400px;width:100%;height:auto;margin-bottom:2rem}
+
+  /* XML tagline up top */
+  .hero-subtitle{
+    font-family:'Bangers',cursive;
+    font-size:clamp(2rem,4vw,3rem); /* larger */
+    color:var(--comic-blue);
+    text-shadow:2px 2px 0 var(--comic-black);
+    letter-spacing:2px;line-height:1.3;margin-bottom:2rem;text-transform:uppercase;
+  }
+
+  .hero-description{
+    font-size:1.3rem;color:var(--comic-black);max-width:800px;margin:0 auto 3rem;
+    line-height:1.6;background:rgba(255,255,255,.9);padding:2rem;border-radius:15px;
+    border:4px solid var(--comic-black);box-shadow:8px 8px 0 rgba(0,0,0,.2);
+  }
+
+  /* Cards */
+  .two-cards{display:grid;grid-template-columns:1fr 1fr;gap:2rem;max-width:1200px;margin:2rem auto;padding:0 1rem}
+  .edition-card{
+    background:rgba(255,255,255,.95);border-radius:20px;padding:2rem;
+    box-shadow:0 10px 30px rgba(0,0,0,.1);border:4px solid var(--comic-black);
+    transition:.3s;position:relative;
+  }
+  .edition-card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(0,0,0,.2)}
+  .edition-card h3{
+    font-family:'Bangers',cursive;font-size:2.4rem;color:var(--comic-red);
+    text-shadow:2px 2px 0 var(--comic-black);letter-spacing:1.5px;margin-bottom:1rem;
+  }
+  .edition-card .subtitle{
+    font-size:1.1rem;color:var(--comic-blue);font-weight:600;margin-bottom:1.2rem;letter-spacing:1px;text-transform:uppercase
+  }
+  .edition-card p{font-size:1.15rem;line-height:1.6;color:var(--comic-black)}
+
+  /* Upcoming Themes (left-aligned bullets) */
+  .themes-section{
+    background:rgba(231,76,60,.08);border:2px dashed var(--comic-red);border-radius:12px;
+    padding:1rem;margin-top:1rem;text-align:left; /* force left */
+  }
+  .themes-section h4{
+    font-family:'Bangers',cursive;font-size:1.4rem;color:var(--comic-red);
+    text-shadow:1px 1px 0 var(--comic-black);letter-spacing:1px;margin-bottom:.5rem;
+  }
+  .themes-list{list-style:none;padding:0;margin:0;text-align:left;} /* ensure left */
+  .themes-list li{font-size:1.05rem;margin:.5rem 0;position:relative;padding-left:1.3rem}
+  .themes-list li::before{content:"★";position:absolute;left:0;color:var(--comic-yellow);text-shadow:1px 1px 0 var(--comic-black)}
+
+  /* CTA with single SVG burst */
+  .cta-section{position:relative;display:flex;justify-content:center;margin:3rem 0}
+  .burst-wrap{position:relative;display:inline-block}
+  .burst-svg{
+    width:min(90vw,900px);height:auto;display:block;
+    filter:drop-shadow(10px 10px 0 rgba(0,0,0,.25));
+  }
+  .tagline{
+    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    font-family:'Bangers',cursive;
+    font-size:clamp(3rem,7vw,6.5rem);
+    color:var(--comic-red);
+    text-shadow:4px 4px 0 var(--comic-black);
+    letter-spacing:4px;line-height:1.1;transform:rotate(-2deg);pointer-events:none;
+  }
+
+  /* Footer */
+  footer{background:var(--comic-black);color:var(--comic-white);padding:3rem 2rem 1rem;border-top:8px solid var(--comic-yellow)}
+  .footer-content{max-width:1200px;margin:0 auto;text-align:center}
+  .social-links{display:flex;justify-content:center;gap:2rem;margin-bottom:2rem}
+  .social-link{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;background:var(--comic-red);border:4px solid #fff;text-decoration:none;font-weight:700;color:#fff;transform:rotate(5deg);transition:.2s}
+  .social-link:nth-child(2){background:var(--comic-blue);transform:rotate(-5deg)}
+  .social-link:nth-child(3){background:#000;transform:rotate(5deg)}
+  .social-link:nth-child(4){background:#FFF351;transform:rotate(-5deg);color:#000!important}
+  .social-link:hover{transform:rotate(0) scale(1.1);background:#F0F0F0;color:var(--comic-black)}
+  .copyright{font-size:.9rem;opacity:.7;border-top:2px solid var(--comic-yellow);padding-top:1rem;margin-top:1rem}
+
+  /* Mobile */
+  @media (max-width:768px){
+    .hero{padding:2rem 1rem;min-height:auto}
+    .hero-logo{max-width:300px}
+    .hero-subtitle{font-size:clamp(1.6rem,5vw,2.2rem)}
+    .hero-description{font-size:1.05rem;padding:1.25rem}
+    .two-cards{grid-template-columns:1fr;gap:1.25rem;margin:1rem auto}
+    .edition-card h3{font-size:2rem}
+    .edition-card p,.edition-card li{font-size:1rem}
+  }
+</style>
 </head>
 <body>
-    <div class="dots-bg">
-        <section class="hero">
-            <div class="dots-overlay"></div>
-            <img src="web/soldoutlogo.png" alt="SOLD OUT! Comedy Show" class="hero-logo">
-            <p class="hero-subtitle">What's the opposite of Antiques Road Show?</p>
-            
-            <div class="content-card single-card hero-card">
-               <h3>SOLD OUT! Comedy Show</h3>
-               
-               <div class="trash-section">
-                   <h4>LIVE COMMERCE REIMAGINED</h4>
-                   <ul class="options-list">
-                       <li><strong>$68 BILLION</strong> MARKET OPPORTUNITY</li>
-                   </ul>
-               </div>
-               
-               <div class="trash-section">
-                   <p>Live online selling is boring and painful to watch—like QVC meets the worst parts of influencer culture. We're revolutionizing the space by making it actually entertaining.</p>
-               </div>
-               
-               <div class="trash-section">
-                   <h4>How It Works:</h4>
-                   <p>People bring items in mail-ready boxes. Our improv comedians transform them into entertainment gold—a bread maker becomes a time machine, an exercise ball turns into a crystal ball for terrible life advice.</p>
-                   
-                   <p>Audiences can trade items for tickets, donate for laughs, or consign for cash. We encourage phone use so people can bid online, chat live, and even jump on stage to help sell their own stuff.</p>
-               </div>
-               
-               <div class="trash-section">
-                   <h4>The Proof:</h4>
-                   <p>We've sold out multiple shows with engaged audiences both in-person and online, creating a completely new category in live commerce. Entertainment sells better than aggressive pitching.</p>
-               </div>
-               
-               <div class="trash-section final-note">
-                   <p>We're capturing a piece of the $68 billion live commerce market by making shopping fun instead of excruciating.</p>
-                   <p class="tagline"><em>Finally—live selling that's actually worth watching.</em></p>
-               </div>
-            </div>
-        </section>
+  <div class="dots-bg">
+    <section class="hero">
+      <div class="dots-overlay"></div>
+      <img src="web/soldoutlogo.png" alt="SOLD OUT! Comedy Show" class="hero-logo">
 
+      <!-- XML tagline (bigger now) -->
+      <p class="hero-subtitle">Loading tagline…</p>
 
-        <footer id="contact">
-            <div class="footer-content">
-                <div class="social-links">
-                    <a href="https://www.instagram.com/soldoutcomedyshow" class="social-link" title="Follow us on Instagram">IG</a>
-                    <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Like us on Facebook">FB</a>
-                    <a href="https://x.com/soldoutcomedy" class="social-link" title="Follow us on X">X</a>
-                    <a href="https://www.whatnot.com/user/soldoutcomedyshow" class="social-link" title="Watch us on Whatnot">WN</a>
-                </div>
-                <div class="copyright">
-                    <p>&copy; 2025 SOLD OUT! Comedy Show</p>
-                </div>
-            </div>
-        </footer>
-    </div>
+      <div class="hero-description">
+        Live online selling is a $68 billion market that's painful to watch. We're fixing that by making shopping genuinely fun instead of excruciating. Your dusty juicer deserves a dramatic exit—and unlike your garage sale, people will actually show up.
+      </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Mobile hamburger menu (if elements exist)
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (hamburger && navLinks) {
-        hamburger.addEventListener('click', function() {
-            hamburger.classList.toggle('active');
-            navLinks.classList.toggle('active');
-        });
+      <div class="two-cards">
+        <div class="edition-card">
+          <h3>Screen Edition</h3>
+          <div class="subtitle">Online Audience Only</div>
+          <p>Live-streamed comedy meets live commerce—without the soul-crushing sales tactics. We transform everyday items into comedy gold (maybe). No aggressive pitching, no fake urgency, just genuine entertainment while real products find new homes.</p>
+          <div class="themes-section">
+            <h3>Upcoming Themes</h3>
+            <ul class="themes-list">
+              <li><strong>Vintage Vibes</strong></li>
+              <li><strong>Home Goods Gems</strong></li>
+              <li><strong>Trunk Show</strong></li>
+            </ul>
+          </div>
+        </div>
 
-        // Close menu when clicking on a link
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                hamburger.classList.remove('active');
-                navLinks.classList.remove('active');
-            });
-        });
+        <div class="edition-card">
+          <h3>Stage Edition</h3>
+          <div class="subtitle">In-Person and Online Audience</div>
+          <p>Full theatrical improv where YOUR items become the stars. Audience members bring items in mail-ready boxes, our comedians transform them through hilarious scenes, and both live and online audiences can bid. That bread maker? Now it's a time machine. Your exercise ball? A crystal ball for terrible life advice.</p>
+          <div class="themes-section">
+            <h3>Upcoming Themes</h3>
+            <ul class="themes-list">
+              <li><strong>Once Upon a Time There Was a Thing Called TV</strong></li>
+              <li><strong>Things Found in Your Mother's Nightstand</strong></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA with single SVG starburst -->
+      <div class="cta-section">
+        <div class="burst-wrap">
+          <svg class="burst-svg" viewBox="0 0 1200 600" role="img" aria-label="Comic burst">
+            <defs>
+              <filter id="comicShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="12" dy="12" stdDeviation="4" flood-color="#000" flood-opacity="0.4"/>
+              </filter>
+            </defs>
+            <path d="M600 40  690 120 820 60 770 170 1080 210 820 250 
+                     1140 340 780 330 910 520 640 400 600 560 560 400 
+                     290 520 420 330 60 340 380 250 120 210 430 170 
+                     380 60 510 120 Z"
+                  fill="#FFD93D" stroke="#2C2C2C" stroke-width="24" stroke-linejoin="round"
+                  filter="url(#comicShadow)"/>
+          </svg>
+
+          <!-- Comic burst tagline -->
+          <div class="tagline">SELL OUT WITH US.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer id="contact">
+      <div class="footer-content">
+        <div class="social-links">
+          <a href="https://www.instagram.com/soldoutcomedyshow" class="social-link" title="Instagram">IG</a>
+          <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Facebook">FB</a>
+          <a href="https://x.com/soldoutcomedy" class="social-link" title="X">X</a>
+          <a href="https://www.whatnot.com/user/soldoutcomedyshow" class="social-link" title="Whatnot">WN</a>
+        </div>
+        <div class="copyright">
+          <p>&copy; 2025 SOLD OUT! Comedy Show</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Random tagline loader for the XML tagline (hero-subtitle)
+    document.addEventListener('DOMContentLoaded', () => loadRandomTagline());
+    async function loadRandomTagline(){
+      const el = document.querySelector('.hero-subtitle');
+      if(!el) return;
+      try{
+        const res = await fetch('../web/taglines.xml', {cache:'no-cache'});
+        if(!res.ok) throw new Error('HTTP '+res.status);
+        const xml = await res.text();
+        const doc = new DOMParser().parseFromString(xml,'text/xml');
+        const items = [...doc.querySelectorAll('taglines > tagline')].map(n=>n.textContent?.trim()).filter(Boolean);
+        el.textContent = items.length ? items[Math.floor(Math.random()*items.length)] : 'Live Comedy Meets Live Shopping';
+      }catch{
+        el.textContent = 'Live Comedy Meets Live Shopping';
+      }
     }
-    
-    // Smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-
-    // Random tagline loader
-    loadRandomTagline();
-});
-
-// Random tagline loader
-async function loadRandomTagline() {
-    const subtitleEl = document.querySelector('.hero-subtitle');
-    if (!subtitleEl) return;
-
-    try {
-        const res = await fetch('../web/taglines.xml', { cache: 'no-cache' });
-        
-        if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-        }
-        
-        const xmlText = await res.text();
-        const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
-        
-        // Check for XML parsing errors
-        const parserError = doc.querySelector('parsererror');
-        if (parserError) {
-            throw new Error('XML parsing failed');
-        }
-
-        const nodes = Array.from(doc.querySelectorAll('taglines > tagline'))
-            .map(n => n.textContent?.trim())
-            .filter(Boolean);
-
-        if (nodes.length) {
-            // Filter out the last tagline if we have more than one option
-            const availableTaglines = nodes.length > 1 && window.lastTagline
-                ? nodes.filter(tagline => tagline !== window.lastTagline)
-                : nodes;
-            
-            // Pick a random tagline from available options
-            const pick = availableTaglines[Math.floor(Math.random() * availableTaglines.length)];
-            
-            // Update the display
-            subtitleEl.textContent = pick;
-            
-            // Store this tagline as the last one shown
-            window.lastTagline = pick;
-        } else {
-            subtitleEl.textContent = 'Live Comedy Meets Live Shopping';
-        }
-    } catch (e) {
-        console.error('Tagline load failed:', e);
-        // fallback
-        subtitleEl.textContent = 'Live Comedy Meets Live Shopping';
-    }
-}
-</script>
+  </script>
 </body>
 </html>
