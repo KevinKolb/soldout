@@ -391,7 +391,7 @@ async function loadRandomTagline() {
     if (!subtitleEl) return;
 
     try {
-        const res = await fetch('taglines.xml', { cache: 'no-cache' });
+        const res = await fetch('../web/taglines.xml', { cache: 'no-cache' });
         
         if (!res.ok) {
             throw new Error(`HTTP ${res.status}`);

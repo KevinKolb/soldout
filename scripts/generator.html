@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLD OUT! Comedy Show Script Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 300;
+            letter-spacing: -2px;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+        }
+
+        .forms-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .forms-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-section {
+            background: white;
+            padding: 30px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .form-section h2 {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            color: #888;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            background: #fff;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #000;
+            background: #fafafa;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 20px;
+            background: #000;
+            color: white;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #333;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: white;
+            color: #000;
+            border: 2px solid #000;
+        }
+
+        button.secondary:hover {
+            background: #f5f5f5;
+        }
+
+        .scenes-container {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .scenes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .scenes-header h2 {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+        }
+
+        #scenes-list {
+            min-height: 100px;
+        }
+
+        .scene-item {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: move;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .scene-item:hover {
+            background: #f5f5f5;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .scene-item.sortable-ghost {
+            opacity: 0.4;
+            background: #e0e0e0;
+        }
+
+        .scene-item h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scene-number {
+            display: inline-block;
+            background: #000;
+            color: white;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .scene-location {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .scene-action {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .delete-scene {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #ff3333;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .delete-scene:hover {
+            background: #ff0000;
+        }
+
+        .script-preview {
+            background: white;
+            border: 1px solid #e0e0e0;
+            padding: 40px;
+            margin-bottom: 30px;
+            min-height: 400px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .script-preview h2 {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-bottom: 30px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .script-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .script-author {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+
+        .script-scene {
+            margin-bottom: 30px;
+        }
+
+        .script-scene-heading {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .script-action {
+            margin-bottom: 10px;
+            max-width: 600px;
+        }
+
+        .drag-hint {
+            font-size: 12px;
+            color: #999;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Script Generator</h1>
+        
+        <div class="forms-grid">
+            <div class="form-section">
+                <h2>Show Information</h2>
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" placeholder="Enter show title">
+                </div>
+                <div class="form-group">
+                    <label for="author">Written By</label>
+                    <input type="text" id="author" placeholder="Enter writer name">
+                </div>
+                <div class="form-group">
+                    <label for="genre">Genre</label>
+                    <select id="genre">
+                        <option value="">Select genre</option>
+                        <option value="Drama">Drama</option>
+                        <option value="Comedy">Comedy</option>
+                        <option value="Action">Action</option>
+                        <option value="Thriller">Thriller</option>
+                        <option value="Sci-Fi">Sci-Fi</option>
+                        <option value="Horror">Horror</option>
+                        <option value="Documentary">Documentary</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="episode">Episode</label>
+                    <input type="text" id="episode" placeholder="e.g., S01E01">
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Add Scene</h2>
+                <div class="form-group">
+                    <label for="scene-location">Location</label>
+                    <input type="text" id="scene-location" placeholder="e.g., INT. COFFEE SHOP - DAY">
+                </div>
+                <div class="form-group">
+                    <label for="scene-action">Action/Description</label>
+                    <textarea id="scene-action" placeholder="Describe what happens in the scene..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="scene-dialogue">Dialogue (Optional)</label>
+                    <textarea id="scene-dialogue" placeholder="CHARACTER NAME&#10;Dialogue text..."></textarea>
+                </div>
+                <button onclick="addScene()">Add Scene</button>
+            </div>
+        </div>
+        
+        <div class="scenes-container">
+            <div class="scenes-header">
+                <h2>Scenes</h2>
+                <span class="drag-hint">Drag to reorder scenes</span>
+            </div>
+            <div id="scenes-list">
+                <div class="empty-state">No scenes added yet. Add your first scene above.</div>
+            </div>
+        </div>
+        
+        <div class="script-preview">
+            <h2>Script Preview</h2>
+            <div id="script-content">
+                <div class="empty-state">Your script will appear here once you add scenes.</div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button onclick="generatePDF()">Generate PDF</button>
+            <button class="secondary" onclick="clearAll()">Clear All</button>
+        </div>
+    </div>
+
+    <script>
+        let scenes = [];
+        let sortable;
+
+        // Initialize sortable
+        document.addEventListener('DOMContentLoaded', function() {
+            sortable = new Sortable(document.getElementById('scenes-list'), {
+                animation: 150,
+                ghostClass: 'sortable-ghost',
+                onEnd: function(evt) {
+                    const item = scenes.splice(evt.oldIndex, 0)[0];
+                    scenes.splice(evt.newIndex, 0, item);
+                    updateScriptPreview();
+                }
+            });
+        });
+
+        function addScene() {
+            const location = document.getElementById('scene-location').value;
+            const action = document.getElementById('scene-action').value;
+            const dialogue = document.getElementById('scene-dialogue').value;
+            
+            if (!location || !action) {
+                alert('Please enter at least a location and action for the scene.');
+                return;
+            }
+            
+            const scene = {
+                id: Date.now(),
+                location: location,
+                action: action,
+                dialogue: dialogue
+            };
+            
+            scenes.push(scene);
+            renderScenes();
+            updateScriptPreview();
+            
+            // Clear form
+            document.getElementById('scene-location').value = '';
+            document.getElementById('scene-action').value = '';
+            document.getElementById('scene-dialogue').value = '';
+        }
+
+        function renderScenes() {
+            const scenesList = document.getElementById('scenes-list');
+            
+            if (scenes.length === 0) {
+                scenesList.innerHTML = '<div class="empty-state">No scenes added yet. Add your first scene above.</div>';
+                return;
+            }
+            
+            scenesList.innerHTML = scenes.map((scene, index) => `
+                <div class="scene-item" data-id="${scene.id}">
+                    <button class="delete-scene" onclick="deleteScene(${scene.id})">Delete</button>
+                    <h3><span class="scene-number">SCENE ${index + 1}</span> ${scene.location}</h3>
+                    <div class="scene-action">${scene.action}</div>
+                    ${scene.dialogue ? `<div class="scene-dialogue" style="margin-top: 10px; font-style: italic;">${scene.dialogue}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function deleteScene(id) {
+            scenes = scenes.filter(scene => scene.id !== id);
+            renderScenes();
+            updateScriptPreview();
+        }
+
+        function updateScriptPreview() {
+            const title = document.getElementById('title').value || 'Untitled';
+            const author = document.getElementById('author').value || 'Anonymous';
+            const scriptContent = document.getElementById('script-content');
+            
+            if (scenes.length === 0) {
+                scriptContent.innerHTML = '<div class="empty-state">Your script will appear here once you add scenes.</div>';
+                return;
+            }
+            
+            let scriptHTML = `
+                <div class="script-title">${title}</div>
+                <div class="script-author">Written by ${author}</div>
+            `;
+            
+            scenes.forEach((scene, index) => {
+                scriptHTML += `
+                    <div class="script-scene">
+                        <div class="script-scene-heading">SCENE ${index + 1} - ${scene.location}</div>
+                        <div class="script-action">${scene.action}</div>
+                        ${scene.dialogue ? `<div class="script-dialogue" style="margin-top: 10px; margin-left: 100px; margin-right: 100px;">${scene.dialogue}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            scriptContent.innerHTML = scriptHTML;
+        }
+
+        function generatePDF() {
+            if (scenes.length === 0) {
+                alert('Please add at least one scene before generating a PDF.');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const title = document.getElementById('title').value || 'Untitled';
+            const author = document.getElementById('author').value || 'Anonymous';
+            const genre = document.getElementById('genre').value;
+            const episode = document.getElementById('episode').value;
+            
+            // Add title page
+            doc.setFontSize(24);
+            doc.text(title.toUpperCase(), 105, 50, { align: 'center' });
+            
+            doc.setFontSize(14);
+            if (episode) {
+                doc.text(episode, 105, 65, { align: 'center' });
+            }
+            if (genre) {
+                doc.text(genre, 105, 75, { align: 'center' });
+            }
+            
+            doc.setFontSize(12);
+            doc.text(`Written by ${author}`, 105, 100, { align: 'center' });
+            
+            // Add scenes
+            let yPosition = 140;
+            const lineHeight = 7;
+            const pageHeight = 280;
+            
+            scenes.forEach((scene, index) => {
+                if (yPosition > pageHeight - 40) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                doc.setFont(undefined, 'bold');
+                doc.setFontSize(12);
+                doc.text(`SCENE ${index + 1} - ${scene.location}`, 20, yPosition);
+                yPosition += lineHeight * 1.5;
+                
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(11);
+                
+                // Split action text into lines
+                const actionLines = doc.splitTextToSize(scene.action, 170);
+                actionLines.forEach(line => {
+                    if (yPosition > pageHeight - 20) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                    doc.text(line, 20, yPosition);
+                    yPosition += lineHeight;
+                });
+                
+                if (scene.dialogue) {
+                    yPosition += lineHeight;
+                    const dialogueLines = doc.splitTextToSize(scene.dialogue, 130);
+                    dialogueLines.forEach(line => {
+                        if (yPosition > pageHeight - 20) {
+                            doc.addPage();
+                            yPosition = 20;
+                        }
+                        doc.text(line, 40, yPosition);
+                        yPosition += lineHeight;
+                    });
+                }
+                
+                yPosition += lineHeight * 2;
+            });
+            
+            // Save the PDF
+            doc.save(`${title.replace(/\s+/g, '_')}_script.pdf`);
+        }
+
+        function clearAll() {
+            if (confirm('Are you sure you want to clear all content? This cannot be undone.')) {
+                scenes = [];
+                document.getElementById('title').value = '';
+                document.getElementById('author').value = '';
+                document.getElementById('genre').value = '';
+                document.getElementById('episode').value = '';
+                document.getElementById('scene-location').value = '';
+                document.getElementById('scene-action').value = '';
+                document.getElementById('scene-dialogue').value = '';
+                renderScenes();
+                updateScriptPreview();
+            }
+        }
+
+        // Update preview when show info changes
+        document.getElementById('title').addEventListener('input', updateScriptPreview);
+        document.getElementById('author').addEventListener('input', updateScriptPreview);
+    </script>
+</body>
+</html>

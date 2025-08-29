@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SOLD OUT! Comedy - The Appraiser</title>
+  <title>SOLD OUT! Comedy - The Referee</title>
   <link rel="icon" type="image/png" href="../web/soldoutlogo.png">
   <style>
     /* Reset */
@@ -276,6 +276,39 @@
     .info   { border-left: 6px solid #777; }
     .warning{ border-left: 6px solid #ffb300; background: #fffaf0; }
 
+    .penalty-list {
+      background: #fff;
+      border: 2px solid var(--border);
+      padding: 20px;
+      margin: 18px 0;
+      border-radius: 10px;
+    }
+    .penalty-list h4 {
+      font-size: 19px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--ink);
+    }
+    .penalty-list ul {
+      list-style: none;
+      margin-left: 0;
+    }
+    .penalty-list li {
+      font-size: 18px;
+      margin-bottom: 10px;
+      padding-left: 24px;
+      position: relative;
+      color: #2a2a2a;
+    }
+    .penalty-list li::before {
+      content: "•";
+      position: absolute;
+      left: 8px;
+      color: #ffb300;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
     /* Media queries */
     @media (max-width: 1200px){
       .main-content{ padding: 64px 40px; }
@@ -303,36 +336,16 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <h1>Sold Out!<br/>Comedy Show</h1>
-      <div class="subtitle">Stage Edition</br>The Appraiser</div>
-
-      <!-- Buttons -->
-      <div class="tools-section" style="margin-top: 16px; padding-top: 12px;">
-        <h3>Merch Check-In</h3>
-      
-      <!-- Form button with popup -->
-      <div class="form-popup-container">
-        <button class="nav-btn" id="formBtn">CHECK-IN FORM</button>
-        <div class="form-popup" id="formPopup">
-          <a href="merch.html" class="form-popup-btn">FILL OUT FORM</a>
-          <a href="merch.html?text" class="form-popup-btn">TEXT FORM TO SELLER</a>
-          <a href="merch.html?email" class="form-popup-btn">EMAIL FORM TO SELLER</a>
-          <a href="qr.html" class="form-popup-btn">SHOW FORM QR CODE TO SELLER</a>
-          <a href="qr.html?print" class="form-popup-btn">PRINT FORM QR CODE FOR SELLER</a>
-        </div>
-      </div>
-      
-      <a href="https://airtable.com/appryObcmJdPmk9ls/pagseYDP4XZ56CYG8" class="nav-btn">CHECKED-IN ITEMS</a>
-      <a href="https://www.whatnot.com/user/soldoutcomedyshow" class="nav-btn">ADD ITEMS TO WHATNOT</a>
+      <div class="subtitle">Stage Edition<br/>The Referee</div>
 
       <!-- Tools -->
       <div class="tools-section">
         <h3>Real World Tools</h3>
         <ul>
-          <li>Phone</li>
-          <li>Laminated QR Code</li>
-          <li>Boxes</li>
-          <li>Sharpie</li>
-          <li>Copy of the Script</li>
+          <li>Red Flag (or Yellow Card)</li>
+          <li>Buzzer or Bell</li>
+          <li>Gavel (for Judge variant)</li>
+          <li>Whistle</li>
         </ul>
       </div>
     </aside>
@@ -341,77 +354,110 @@
     <main class="main-content">
       <div class="content-wrap">
         <section class="section">
-<h2 class="section-title">Overview</h2>
-<p>The appraiser plays a very crucial role in building the show. They are one part propmaster, one part casting director, and one part show runner.</p>
-<p>From one hour prior to the start of the show, until 15 minutes before the show starts, they evaluate the items brought in by audience members. They are also sizing up the audience members themselves to determine where they will best fit into our improv/selling show, if at all.</p>
-<p>Obviously this is all very subjective and is a major factor in determining how fun and successful a show is. Each check-in should only take 2–3 minutes max. Keep it moving while still making them feel valued. Stay playful but authoritative. Think of this process as part of the show.</p>
-</section>
+          <h2 class="section-title">Overview</h2>
+          <p>The Referee is an interactive comedy bit that transforms an audience member into the show's rule enforcer. This role can take different forms depending on the show's theme: a sports referee with flags and whistles, a courtroom judge with a gavel, or even "Tiffany's Buzz Kill" character with a buzzer.</p>
+          <p>After the first scene establishes the tone, the role of the referee is explained to the audience. A volunteer is selected and given the power to stop the show whenever performers break the established "house rules." This creates an unpredictable, interactive element that keeps both performers and audience on their toes.</p>
+          <p>The referee becomes an active participant in shaping the show's direction, with the authority to call out violations and assign creative penalties that add to the comedy.</p>
+        </section>
 
         <section class="section">
-          <h2 class="section-title">Item Check-In</h2>
-          <div class="info">
-            <p><strong>Access Requirements:</strong> The appraiser table or room can only be reached by paying admission first. In other words, a seller must be a paying member of the audience to sell an item.</p>
+          <h2 class="section-title">How It Works</h2>
+          <div class="step">
+            <h4>Step 1: First Scene Setup</h4>
+            <p>Perform the opening scene normally to establish the show's baseline. This gives the audience a sense of what "normal" looks like before introducing the referee element.</p>
           </div>
-          <div class="step"><h4>Step 1: Form Setup</h4><p>The appraiser has the seller scan the QR code and helps the seller/audience member fill out the form.</p></div>
-          <div class="step"><h4>Step 2: Personal Information</h4><p>The seller fills out the "You" section of the Merch Form. It's important to have an email address for payment purposes.</p></div>
-          <div class="step"><h4>Step 3: Item Description</h4><p>The seller fills out the item description.</p></div>
-          <div class="step"><h4>Step 4: Sale Price</h4><p>The seller fills out the Sale Price. The appraiser emphasizes that if their item does not sell, the seller goes home with the item and no money. The sale price is what the seller will get if their item sells. No more, no less.</p></div>
-          <div class="warning"><p>They may want to set the price higher than they initially thought, but then it might not sell. The final price is their choice. It's a gamble for them. They are gamblers. We are the house.</p></div>
-          <div class="step"><h4>Step 5: Pricing Information</h4><p>The appraiser explains to the seller that the listing price is higher than the sale price because of site fees, credit card transaction fees and taxes. The buyer pays for shipping.</p></div>
-          <div class="step"><h4>Step 6: Participation Discussion</h4><p>Now the Appraiser and the Seller discuss the Seller's participation.</p></div>
-          <div class="step"><h4>Step 7: Form Completion</h4><p>The Seller signs and submits the form.</p></div>
-          <div class="step"><h4>Step 8: Item Transfer</h4><p>The appraiser takes the item, boxes it, and takes possession of it.</p></div>
-          <div class="info">
-            <p><strong>Policy:</strong> No item is rejected unless it breaks a rule of the selling service.</p>
-            <p><strong>Note:</strong> If the person and/or the item doesn't fit (again, subjective) then the item goes into the lightning round. No consideration should be given to the salability of the item, only its comedic potential. Do not promise when their item will be used in the show. Do not promise who will sell their item, unless it's them.</p>
-            <p><strong>Instructions to Seller:</strong> Simply tell them to listen for their item number to be called.</p>
+          <div class="step">
+            <h4>Step 2: Introduce the Concept</h4>
+            <p>After the first scene, explain the referee role to the audience. Build excitement around the idea that one of them will have the power to control the show.</p>
+          </div>
+          <div class="step">
+            <h4>Step 3: Select the Referee</h4>
+            <p>Choose a volunteer who seems engaged and confident. Give them their tools (flag, buzzer, or gavel) and briefly explain the rules they'll be enforcing.</p>
+          </div>
+          <div class="step">
+            <h4>Step 4: Enforce the Rules</h4>
+            <p>The referee watches for violations and stops the action when they occur. They can use their flag, buzzer, or gavel to signal a penalty.</p>
+          </div>
+          <div class="step">
+            <h4>Step 5: Assign Penalties</h4>
+            <p>The referee assigns creative penalties to rule-breakers, which become part of the comedy. Penalties should be playful and add to the entertainment value.</p>
           </div>
         </section>
 
         <section class="section">
-          <h2 class="section-title">Process the Item</h2>
-          <div class="step"><h4>Step 1: Database Consultation</h4><p>Consult the item database for information.</p></div>
-          <div class="step"><h4>Step 2: ID Code &amp; Performance Status</h4><p>The item's four-digit ID code: Write it in large ink on the outside of the box.</p><p>Add a Y for YES will perform, N for NO will not perform, or M for Maybe will perform.</p></div>
-          <div class="step"><h4>Step 3: Physical Organization</h4><p>Stack the box so that the number and letter are visible.</p></div>
-          <div class="step"><h4>Step 4: Script Documentation</h4><p>Fill in the ID number and the letter in the printed script in the best scene you think it will work in.</p></div>
-          <div class="step"><h4>Step 5: Enter Items into Whatnot</h4><p>Enter the accepted items into the Whatnot system for tracking and sale.</p></div>
+          <h2 class="section-title">Common Violations</h2>
+          <div class="penalty-list">
+            <h4>The referee can call penalties for:</h4>
+            <ul>
+              <li><strong>Breaking the Fourth Wall</strong> - When performers acknowledge the audience or step out of character</li>
+              <li><strong>Overtly Sexual References</strong> - Any inappropriate or overly suggestive content</li>
+              <li><strong>Illegal Use of Accent</strong> - Attempting a terrible accent mid-scene (especially bad British accents)</li>
+              <li><strong>Inappropriate Prop Use</strong> - Using props in suggestive or unintended ways</li>
+              <li><strong>Political Statements</strong> - Making overt political commentary or partisan statements</li>
+              <li><strong>Excessive Puns</strong> - Too many groan-worthy wordplays in succession</li>
+              <li><strong>Scene Hijacking</strong> - One performer dominating or derailing the scene</li>
+              <li><strong>Corpse Breaking</strong> - Performers breaking character to laugh</li>
+            </ul>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Creative Penalties</h2>
+          <div class="penalty-list">
+            <h4>Examples of penalties the referee can assign:</h4>
+            <ul>
+              <li><strong>Dance Break</strong> - Violator must dance for 30 seconds while the scene continues</li>
+              <li><strong>Eyes Closed</strong> - Perform the rest of the scene with eyes shut</li>
+              <li><strong>One-Armed Performance</strong> - Keep one hand behind their back for the remainder</li>
+              <li><strong>Speak in Rhyme</strong> - All dialogue must rhyme for the next minute</li>
+              <li><strong>Slow Motion</strong> - Move in slow motion for the rest of the scene</li>
+              <li><strong>Scene Ejection</strong> - Get thrown out and replaced by another performer</li>
+              <li><strong>Audience Apology</strong> - Formally apologize to the audience for the violation</li>
+              <li><strong>Sing It</strong> - Deliver all lines in song for the next exchange</li>
+              <li><strong>Statue Freeze</strong> - Freeze in place for 10 seconds while others continue</li>
+              <li><strong>Role Reversal</strong> - Switch characters with another performer</li>
+            </ul>
+          </div>
+          <div class="warning">
+            <p><strong>Important:</strong> Keep penalties playful and fun. The goal is to add to the comedy, not to humiliate. The referee should feel empowered but guided toward constructive choices that enhance the show.</p>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Tips for Success</h2>
+          <div class="info">
+            <p><strong>Choosing the Right Referee:</strong> Look for someone who's been laughing and engaged, appears confident but not disruptive, and seems like they'll enjoy the responsibility without going overboard.</p>
+          </div>
+          <div class="info">
+            <p><strong>Setting Boundaries:</strong> Give the referee clear guidelines about when to call penalties. Too many interruptions can kill momentum; too few makes the bit pointless. Aim for 3-5 penalties per show segment.</p>
+          </div>
+          <div class="info">
+            <p><strong>Performer Response:</strong> Performers should accept penalties gracefully and incorporate them into the scene. This models good sportsmanship and keeps the energy positive.</p>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">Variations</h2>
+          <div class="step">
+            <h4>The Judge</h4>
+            <p>Set up the show as a "courtroom" where scenes are "evidence" and the judge can hold performers in contempt. Use legal terminology for violations and penalties.</p>
+          </div>
+          <div class="step">
+            <h4>Tiffany's Buzz Kill</h4>
+            <p>A character-based version where "Tiffany" is a uptight audience member who buzzes anything she finds offensive or inappropriate. This adds a layer of character comedy to the referee role.</p>
+          </div>
+          <div class="step">
+            <h4>The Sports Referee</h4>
+            <p>Full sports theme with yellow cards, red cards, and a whistle. Penalties become "plays" and violations are "fouls." Perfect for sports-themed shows or athletic audiences.</p>
+          </div>
+          <div class="step">
+            <h4>The Director's Cut</h4>
+            <p>The referee becomes a "director" who can yell "CUT!" and demand retakes with specific adjustments. This works well with film/theater-savvy audiences.</p>
+          </div>
         </section>
       </div>
     </main>
   </div>
-
-  <script>
-    // Handle form button popup
-    const formBtn = document.getElementById('formBtn');
-    const formPopup = document.getElementById('formPopup');
-    let isPopupOpen = false;
-
-    formBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      if (isPopupOpen) {
-        formPopup.classList.remove('active');
-        isPopupOpen = false;
-      } else {
-        formPopup.classList.add('active');
-        isPopupOpen = true;
-      }
-    });
-
-    // Close popup when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!formBtn.contains(e.target) && !formPopup.contains(e.target)) {
-        formPopup.classList.remove('active');
-        isPopupOpen = false;
-      }
-    });
-
-    // Prevent popup from closing when clicking inside it
-    formPopup.addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
-  </script>
 <!-- Footer Navigation - Add this before the closing </body> tag -->
 <footer style="
   background: #222;
