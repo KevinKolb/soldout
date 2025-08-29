@@ -34,22 +34,22 @@ jobs:
     - name: Debug - Show file before replacement
       run: |
         echo "=== BEFORE replacement ==="
-        grep -A 8 "const CONFIG" ./appraiser/merch.html || echo "CONFIG not found"
+        grep -A 8 "const CONFIG" ../backstage/appraiser/merch.html || echo "CONFIG not found"
     
     - name: Replace environment variables
       run: |
         # Replace placeholders with actual secrets - using different approach
-        sed -i 's/{{AIRTABLE_API_KEY}}/${{ secrets.AIRTABLE_API_KEY }}/g' ./appraiser/merch.html
-        sed -i 's/{{AIRTABLE_BASE_ID}}/${{ secrets.AIRTABLE_BASE_ID }}/g' ./appraiser/merch.html
-        sed -i 's/{{AIRTABLE_TABLE_NAME}}/${{ secrets.AIRTABLE_TABLE_NAME }}/g' ./appraiser/merch.html
-        sed -i 's/{{EMAILJS_SERVICE_ID}}/${{ secrets.EMAILJS_SERVICE_ID }}/g' ./appraiser/merch.html
-        sed -i 's/{{EMAILJS_TEMPLATE_ID}}/${{ secrets.EMAILJS_TEMPLATE_ID }}/g' ./appraiser/merch.html
-        sed -i 's/{{EMAILJS_PUBLIC_KEY}}/${{ secrets.EMAILJS_PUBLIC_KEY }}/g' ./appraiser/merch.html
+        sed -i 's/{{AIRTABLE_API_KEY}}/${{ secrets.AIRTABLE_API_KEY }}/g' ../backstage/appraiser/merch.html
+        sed -i 's/{{AIRTABLE_BASE_ID}}/${{ secrets.AIRTABLE_BASE_ID }}/g' ../backstage/appraiser/merch.html
+        sed -i 's/{{AIRTABLE_TABLE_NAME}}/${{ secrets.AIRTABLE_TABLE_NAME }}/g' ../backstage/appraiser/merch.html
+        sed -i 's/{{EMAILJS_SERVICE_ID}}/${{ secrets.EMAILJS_SERVICE_ID }}/g' ../backstage/appraiser/merch.html
+        sed -i 's/{{EMAILJS_TEMPLATE_ID}}/${{ secrets.EMAILJS_TEMPLATE_ID }}/g' ../backstage/appraiser/merch.html
+        sed -i 's/{{EMAILJS_PUBLIC_KEY}}/${{ secrets.EMAILJS_PUBLIC_KEY }}/g' ../backstage/appraiser/merch.html
     
     - name: Debug - Show file after replacement
       run: |
         echo "=== AFTER replacement ==="
-        grep -A 8 "const CONFIG" ./appraiser/merch.html || echo "CONFIG not found"
+        grep -A 8 "const CONFIG" ../backstage/appraiser/merch.html || echo "CONFIG not found"
     
     - name: Setup Pages
       uses: actions/configure-pages@v4
