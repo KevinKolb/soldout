@@ -1,5 +1,5 @@
 # Ignore everything in the 'show' folder
-backstage/show/
+backstage/large_files/
 
 # Environment variables
 secrets/.env
