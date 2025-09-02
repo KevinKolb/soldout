@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SOLD OUT! Comedy Show</title>
+  <title>SOLD OUT! Comedy</title>
   <link rel="icon" type="image/png" href="web/soldoutlogo.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap">
 <style>
@@ -102,16 +102,16 @@
     letter-spacing:4px;line-height:1.1;transform:rotate(-2deg);pointer-events:none;
   }
 
-  /* Footer */
-  footer{background:var(--comic-black);color:var(--comic-white);padding:3rem 2rem 1rem;border-top:8px solid var(--comic-yellow)}
-  .footer-content{max-width:1200px;margin:0 auto;text-align:center}
-  .social-links{display:flex;justify-content:center;gap:2rem;margin-bottom:2rem}
-  .social-link{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;background:var(--comic-red);border:4px solid #fff;text-decoration:none;font-weight:700;color:#fff;transform:rotate(5deg);transition:.2s}
-  .social-link:nth-child(2){background:var(--comic-blue);transform:rotate(-5deg)}
-  .social-link:nth-child(3){background:#000;transform:rotate(5deg)}
-  .social-link:nth-child(4){background:#FFF351;transform:rotate(-5deg);color:#000!important}
-  .social-link:hover{transform:rotate(0) scale(1.1);background:#F0F0F0;color:var(--comic-black)}
-  .copyright{font-size:.9rem;opacity:.7;border-top:2px solid var(--comic-yellow);padding-top:1rem;margin-top:1rem}
+/* Footer */
+footer{background:var(--comic-black);color:var(--comic-white);padding:3rem 2rem 1rem;border-top:8px solid var(--comic-yellow)}
+.footer-content{max-width:1200px;margin:0 auto;text-align:center}
+.social-links{display:flex;justify-content:center;gap:2rem;margin-bottom:2rem}
+.social-link{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;text-decoration:none;font-weight:700;color:#fff;transform:rotate(5deg);transition:.2s}
+.social-link:nth-child(2){transform:rotate(-5deg)}
+.social-link:nth-child(3){transform:rotate(5deg)}
+.social-link:nth-child(4){transform:rotate(-5deg);color:#fff!important}
+.social-link:hover{transform:rotate(0) scale(1.1);color:#fff}
+.copyright{font-size:.9rem;opacity:.7;border-top:2px solid var(--comic-yellow);padding-top:1rem;margin-top:1rem}
 
   /* Mobile */
   @media (max-width:768px){
@@ -129,7 +129,7 @@
   <div class="dots-bg">
     <section class="hero">
       <div class="dots-overlay"></div>
-      <img src="web/soldoutlogo.png" alt="SOLD OUT! Comedy Show" class="hero-logo">
+      <img src="web/soldoutlogo.png" alt="SOLD OUT! Comedy" class="hero-logo">
 
       <!-- XML tagline (bigger now) -->
       <p class="hero-subtitle">Loading tagline…</p>
@@ -193,13 +193,21 @@
     <footer id="contact">
       <div class="footer-content">
         <div class="social-links">
-          <a href="https://www.instagram.com/soldoutcomedyshow" class="social-link" title="Instagram">IG</a>
-          <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Facebook">FB</a>
-          <a href="https://x.com/soldoutcomedy" class="social-link" title="X">X</a>
-          <a href="https://www.whatnot.com/user/soldoutcomedyshow" class="social-link" title="Whatnot">WN</a>
-        </div>
-        <div class="copyright">
-          <p>&copy; 2025 SOLD OUT! Comedy Show</p>
+        <a href="https://www.instagram.com/soldoutcomedyshow" class="social-link" title="Instagram">
+        <img src="web/instagram_logo.svg" alt="Instagram" style="width: 100%; height: 100%; object-fit: contain;">
+        </a>          
+        <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Facebook">
+        <img src="web/facebook_logo.png" alt="Facebook" style="width: 100%; height: 100%; object-fit: contain;">
+        </a>          
+        <a href="https://x.com/soldoutcomedy" class="social-link" title="X">
+          <img src="web/x_logo.png" alt="X" style="width: 100%; height: 100%; object-fit: contain;">
+          </a>          
+          <a href="https://www.whatnot.com/user/soldoutcomedyshow" class="social-link" title="Whatnot">
+          <img src="web/whatnot.jpg" alt="Whatnot" style="width: 100%; height: 100%; object-fit: contain;">
+          </a>
+        </div>        
+          <div class="copyright">
+          <p>&copy; 2025 SOLD OUT! Comedy</p>
         </div>
       </div>
     </footer>
