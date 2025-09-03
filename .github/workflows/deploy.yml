@@ -39,12 +39,12 @@ jobs:
     - name: Replace environment variables
       run: |
         # Replace placeholders with actual secrets - using different approach
-        sed -i 's/{{AIRTABLE_API_KEY}}/${{ secrets.AIRTABLE_API_KEY }}/g' ./backstage/appraiser/merch.html
-        sed -i 's/{{AIRTABLE_BASE_ID}}/${{ secrets.AIRTABLE_BASE_ID }}/g' ./backstage/appraiser/merch.html
-        sed -i 's/{{AIRTABLE_TABLE_NAME}}/${{ secrets.AIRTABLE_TABLE_NAME }}/g' ./backstage/appraiser/merch.html
-        sed -i 's/{{EMAILJS_SERVICE_ID}}/${{ secrets.EMAILJS_SERVICE_ID }}/g' ./backstage/appraiser/merch.html
-        sed -i 's/{{EMAILJS_TEMPLATE_ID}}/${{ secrets.EMAILJS_TEMPLATE_ID }}/g' ./backstage/appraiser/merch.html
-        sed -i 's/{{EMAILJS_PUBLIC_KEY}}/${{ secrets.EMAILJS_PUBLIC_KEY }}/g' ./backstage/appraiser/merch.html
+        sed -i 's/{{AIRTABLE_API_KEY}}/${{ secrets.AIRTABLE_API_KEY }}/g' ./backstage/merch.html
+        sed -i 's/{{AIRTABLE_BASE_ID}}/${{ secrets.AIRTABLE_BASE_ID }}/g' ./backstage/merch.html
+        sed -i 's/{{AIRTABLE_TABLE_NAME}}/${{ secrets.AIRTABLE_TABLE_NAME }}/g' ./backstage/merch.html
+        sed -i 's/{{EMAILJS_SERVICE_ID}}/${{ secrets.EMAILJS_SERVICE_ID }}/g' ./backstage/merch.html
+        sed -i 's/{{EMAILJS_TEMPLATE_ID}}/${{ secrets.EMAILJS_TEMPLATE_ID }}/g' ./backstage/merch.html
+        sed -i 's/{{EMAILJS_PUBLIC_KEY}}/${{ secrets.EMAILJS_PUBLIC_KEY }}/g' ./backstage/merch.html
     
     - name: Debug - Show file after replacement
       run: |
