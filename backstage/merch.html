@@ -9,7 +9,7 @@
     
     <!-- Open Graph meta tags for rich link previews -->
     <meta property="og:title" content="Sell Your Merch - SOLD OUT! Comedy">
-    <meta property="og:description" content="Submit your items for auction at the SOLD OUT! Comedy Show">
+    <meta property="og:description" content="Submit your props for auction at the SOLD OUT! Comedy Show">
     <meta property="og:image" content="https://kevinkolb.github.io/soldout/web/soldoutlogo.png">
     <meta property="og:url" content="https://kevinkolb.github.io/soldout/appraiser/merch.html">
     <meta property="og:type" content="website">
@@ -106,7 +106,7 @@
         
         <div class="form-section" id="step2">
             <h2>Whatcha got there?</h2>
-            <p>Briefly describe your item.</p>
+            <p>Briefly describe your prop.</p>
             <div class="form-group">
                 <textarea id="description" rows="4" placeholder="Family heirloom lava lamp"></textarea>
             </div>
@@ -118,7 +118,7 @@
         
         <div class="form-section" id="step3">
             <h2>How much ya want for it?</h2>
-            <p>This is the amount you will get if your item sells. No more, no less.</p>
+            <p>This is the amount you will get if your prop sells. No more, no less.</p>
             <div class="form-group">
                 <label for="salePrice">Sale Price ($)</label>
                 <input type="number" id="salePrice" min="1" step="0.01" placeholder="10.00" value="10.00">
@@ -149,7 +149,7 @@
         
         <div class="form-section" id="step5">
             <h2>Are you a Master Thespian?!</h2>
-            <p>If so, do you want to go on stage to sell your item?</p>
+            <p>If so, do you want to go on stage to sell your prop?</p>
             <div class="radio-group">
                 <div class="radio-option" data-value="insist">
                     <input type="radio" name="performance" value="insist" id="insist">
@@ -173,14 +173,14 @@
         <div class="form-section" id="step6">
             <h2>Please sign below.</h2>
             <div class="terms">
-                <p><strong>By signing below, I acknowledge that my item will be auctioned during the SOLD OUT! Comedy Show.</strong></p>
-                <p>I understand that my item will only be sold if it reaches the listing price which will be higher than the sale price you chose. Site fees, transaction fees and taxes will be added to the sale price to create the listing price.</p>
+                <p><strong>By signing below, I acknowledge that my prop will be auctioned during the SOLD OUT! Comedy Show.</strong></p>
+                <p>I understand that my prop will only be sold if it reaches the listing price which will be higher than the sale price you chose. Site fees, transaction fees and taxes will be added to the sale price to create the listing price.</p>
                 <p>If sold, I will receive the exact sale amount I've specified—no more, no less.</p>
                 <p>Any amount above sale price will be retained by SOLD OUT! Comedy.</p>
-                <p>I agree to have the item sold in the show format as determined by the production team.</p>
+                <p>I agree to have the prop sold in the show format as determined by the production team.</p>
                 <p>The production team has final say regarding my participation in the show.</p>
                 <p>All sales are final with no returns or refunds.</p>
-                <p>I release SOLD OUT! Comedy from any liability related to my item or participation.</p>
+                <p>I release SOLD OUT! Comedy from any liability related to my prop or participation.</p>
             </div>
             <div class="signature-container">
                 <div class="signature-label">Digital Signature</div>
@@ -199,10 +199,10 @@
         <div class="form-section" id="final">
             <div class="final-screen">
                 <h2>Sold! ... hopefully.</h2>
-                <p>Give the appraiser your boxed item. Check your email for your receipt and your item ID, which you'll need to listen for if you're performing. Make sure you received the receipt to confirm your email address is correct for payment.</p>
+                <p>Give the appraiser your boxed prop. Check your email for your receipt and your prop ID, which you'll need to listen for if you're performing. Make sure you received the receipt to confirm your email address is correct for payment.</p>
                 <div class="results-section">
                     <h3>Form Results</h3>
-                    <div class="result-item"><span class="result-label">Item ID:</span><span class="result-value" id="resultItemId"></span></div>
+                    <div class="result-item"><span class="result-label">Prop ID:</span><span class="result-value" id="resultItemId"></span></div>
                     <div class="result-item"><span class="result-label">Seller:</span><span class="result-value" id="resultName"></span></div>
                     <div class="result-item"><span class="result-label">Email:</span><span class="result-value" id="resultEmail"></span></div>
                     <div class="result-item"><span class="result-label">Description:</span><span class="result-value" id="resultDescription"></span></div>
@@ -219,7 +219,7 @@
 const CONFIG = {
     AIRTABLE_API_KEY: 'patv1p4GwzZUH3Whd.4fb4bcc89097466a60a830b3f29dc85eb4296d8c0196b74e0374116421d7822a',
     AIRTABLE_BASE_ID: 'appryObcmJdPmk9ls',
-    AIRTABLE_TABLE_NAME: 'Items',
+    AIRTABLE_TABLE_NAME: 'Props',
     EMAILJS_SERVICE_ID: 'service_151yelq',
     EMAILJS_TEMPLATE_ID: 'template_nroyna9',
     EMAILJS_PUBLIC_KEY: 'yi2bgGVokQizGNBWi',
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function () {
     history.replaceState({}, '', cleanURL);
 
     const smsBody = encodeURIComponent(
-      'SOLD OUT! Comedy - Submit your items for auction: https://kevinkolb.github.io/soldout/appraiser/merch.html'
+      'SOLD OUT! Comedy - Submit your props for auction: https://kevinkolb.github.io/soldout/appraiser/merch.html'
     );
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const smsHref = isIOS ? `sms:&body=${smsBody}` : `sms:?body=${smsBody}`;
@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function () {
       encodeURIComponent('SOLD OUT! Comedy - Sell Your Merch') +
       '&body=' +
       encodeURIComponent(
-        'Submit your items for auction at the SOLD OUT! Comedy Show:\n\nhttps://kevinkolb.github.io/soldout/appraiser/merch.html'
+        'Submit your props for auction at the SOLD OUT! Comedy Show:\n\nhttps://kevinkolb.github.io/soldout/appraiser/merch.html'
       );
 
     // Fire after a tick so it doesn't block the rest of setup

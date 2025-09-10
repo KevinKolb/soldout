@@ -19,10 +19,169 @@
             font-size: 16px;
         }
 
+        /* Layout */
+        .grid-container {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: #333;
+            color: #fff;
+            padding: 40px 28px;
+            position: fixed;
+            inset: 0 auto 0 0;
+            width: 340px;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .sidebar h1 {
+            font-size: 28px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            line-height: 1.15;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #cfd3d8;
+            text-transform: uppercase;
+            margin-bottom: 18px;
+            letter-spacing: .8px;
+        }
+
+        /* Sidebar buttons */
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 14px 14px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.06);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform .06s ease, background .2s ease, border-color .2s ease;
+            cursor: pointer;
+        }
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.14);
+            border-color: rgba(255,255,255,0.28);
+            transform: translateY(-1px);
+        }
+        .nav-btn:focus-visible{
+            outline: 3px solid #005fcc;
+            outline-offset: 2px;
+        }
+
+        /* Form popup styles */
+        .form-popup-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .form-popup {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.95);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 8px;
+            transform: translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .form-popup.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .form-popup-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            text-align: center;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-popup-btn:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .form-popup-btn:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Tools section */
+        .tools-section {
+            margin-top: 28px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.16);
+        }
+        .tools-section h3 {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        .tools-section ul { list-style: none; }
+        .tools-section > ul > li {
+            font-size: 17px;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 18px;
+            color: #f5f5f5;
+        }
+        .tools-section > ul > li::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #cfd3d8;
+            font-size: 16px;
+            line-height: 1;
+            top: 2px;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-left: 340px;
+            width: calc(100vw - 340px);
+            padding: 40px 40px;
+        }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 20px;
         }
 
         /* Header */
@@ -204,6 +363,12 @@
         }
 
         /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { position: static; width: 100%; height: auto; border-right: 0; }
+            .grid-container { grid-template-columns: 1fr; }
+            .main-content { margin-left: 0; width: 100%; padding: 40px 24px; }
+        }
+
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -219,216 +384,597 @@
                 text-align: center;
                 gap: 10px;
             }
+
+            .main-content { padding: 28px 18px; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <div>
-                    <div class="logo">BACKSTAGE</div>
-                    <div class="tagline">The SOLD OUT! Comedy Intranet</div>
-                </div>
-                <a href="https://soldoutcomedy.com" style="text-decoration: underline; color: #000; font-size: 14px;">Public Site</a>
-            </div>
-        </header>
+    <div class="grid-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h1>Sold Out!<br/>Comedy Show</h1>
+            <div class="subtitle">Backstage Hub</div>
 
-        <!-- Announcement -->
-        <div class="announcement">
-            <div class="announcement-title">Announcement</div>
-            <div>Super important announcement</div>
-        </div>
-
-        <!-- Team Roles Section -->
-        <section style="margin-bottom: 40px;">
-            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">The Team</h2>
-            <div class="grid">
-                <div class="col-6">
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;"><a href="https://soldoutcomedy.com/backstage/appraiser/" style="text-decoration: underline; color: #000;">The Appraiser</a></h3>
-                        <p style="color: #666; font-size: 14px; line-height: 1.5;">Evaluates audience props, manages check-in process, assigns items to scenes</p>
-                    </div>
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;"><a href="https://soldoutcomedy.com/backstage/referee/" style="text-decoration: underline; color: #000;">The Referee</a></h3>
-                        <p style="color: #666; font-size: 14px; line-height: 1.5;">Monitors show flow, enforces house rules, manages audience participation</p>
-                    </div>
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">The DJ</h3>
-                        <p style="color: #666; font-size: 14px; line-height: 1.5;">Controls all technical elements, sound, lighting, and video cues</p>
-                    </div>
-                    <div>
-                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">The Sell Outs</h3>
-                        <p style="color: #666; font-size: 14px; line-height: 1.5;">Core improv performers who transform props into comedy gold</p>
+            <!-- Merch Check-In Section -->
+            <div class="tools-section" style="margin-top: 16px; padding-top: 12px;">
+                <h3>Props</h3>
+            
+                <!-- Form button with popup -->
+                <div class="form-popup-container">
+                    <button class="nav-btn" id="formBtn">PROP CHECK-IN FORM</button>
+                    <div class="form-popup" id="formPopup">
+                        <a href="merch.html" class="form-popup-btn">FILL OUT FORM</a>
+                        <a href="merch.html?text" class="form-popup-btn">TEXT FORM TO SELLER</a>
+                        <a href="merch.html?email" class="form-popup-btn">EMAIL FORM TO SELLER</a>
+                        <a href="qr.html" class="form-popup-btn">SHOW FORM QR CODE TO SELLER</a>
+                        <a href="qr.html?print" class="form-popup-btn">PRINT FORM QR CODE FOR SELLER</a>
                     </div>
                 </div>
-                <div class="col-6">
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;"><a href="https://soldoutcomedy.com/backstage/stagehand/" style="text-decoration: underline; color: #000;">The Stagehand</a></h3>
-                        <p style="color: #666; font-size: 14px; line-height: 1.5;">Manages prop logistics, stage setup, and scene transitions</p>
-                    </div>
-                    <div style="margin-bottom: 30px;">
-                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">The Host</h3>
-                        <p style="color: #666; font-size: 14px; line-height: 1.5;">Front-facing show leader, audience interaction, energy management</p>
-                    </div>
-                    <div>
-                        <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 8px;">The Audience</h3>
-                        <p style="color: #666; font-size: 14px; line-height: 1.5;">Active participants who bring props, bid online, and join scenes on stage</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Main Grid -->
-
-            <!-- Quick Access -->
-            <div class="col-4">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Quick Access</div>
-                        <div class="card-subtitle">Frequently Used</div>
-                    </div>
-                    <div class="card-content">
-                        <ul class="quick-links">
-                            <li><a href="#">Show Schedule <span class="arrow">→</span></a></li>
-                            <li><a href="#">Artist Database <span class="arrow">→</span></a></li>
-                            <li><a href="#">Venue Management <span class="arrow">→</span></a></li>
-                            <li><a href="#">Ticket Sales <span class="arrow">→</span></a></li>
-                            <li><a href="#">Marketing Assets <span class="arrow">→</span></a></li>
-                            <li><a href="#">Staff Directory <span class="arrow">→</span></a></li>
-                        </ul>
-                    </div>
-                </div>
+                
+                <a href="https://airtable.com/appryObcmJdPmk9ls/pagseYDP4XZ56CYG8" class="nav-btn">CHECKED-IN PROPS</a>
+                <a href="https://www.whatnot.com/user/soldoutcomedyshow" class="nav-btn">ADD PROPS TO WHATNOT</a>
             </div>
 
-            <!-- Today's Shows -->
-            <div class="col-4">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Today's Shows</div>
-                        <div class="card-subtitle">Friday, August 29</div>
-                    </div>
-                    <div class="card-content">
-                        <div style="margin-bottom: 15px;">
-                            <strong>8:00 PM - Main Stage</strong><br>
-                            <span class="status status-live">LIVE</span><br>
-                            <small>Sarah Chen - Stand Up Special</small>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <strong>10:30 PM - Studio B</strong><br>
-                            <span class="status status-upcoming">UPCOMING</span><br>
-                            <small>Open Mic Night</small>
-                        </div>
+            <!-- Quick Access Section -->
+            <div class="tools-section">
+                <h3>Quick Access</h3>
+                <a href="#" class="nav-btn">SHOW SCHEDULE</a>
+                <a href="#" class="nav-btn">ARTIST DATABASE</a>
+                <a href="#" class="nav-btn">VENUE MANAGEMENT</a>
+                <a href="#" class="nav-btn">TICKET SALES</a>
+                <a href="#" class="nav-btn">MARKETING ASSETS</a>
+                <a href="#" class="nav-btn">STAFF DIRECTORY</a>
+            </div>
+
+            <!-- Real World Tools -->
+            <div class="tools-section">
+                <h3>Appraiser Tools</h3>
+                <ul>
+                    <li>Phone</li>
+                    <li>Laminated QR Code</li>
+                    <li>Boxes</li>
+                    <li>Sharpie</li>
+                    <li>Copy of the Script</li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Header -->
+                <header class="header">
+                    <div class="header-content">
                         <div>
-                            <strong>7:00 PM - Lounge</strong><br>
-                            <span class="status status-complete">COMPLETE</span><br>
-                            <small>Comedy Writing Workshop</small>
+                            <div class="logo">BACKSTAGE</div>
+                            <div class="tagline">The SOLD OUT! Comedy Intranet</div>
                         </div>
+                        <a href="https://soldoutcomedy.com" style="text-decoration: underline; color: #000; font-size: 14px;">Public Site</a>
                     </div>
-                </div>
-            </div>
+                </header>
 
-            <!-- Statistics -->
-            <div class="col-4">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">This Week</div>
-                        <div class="card-subtitle">Key Metrics</div>
-                    </div>
-                    <div class="card-content">
-                        <div class="grid" style="margin-bottom: 0;">
-                            <div class="col-6">
-                                <div class="stat">
-                                    <div class="stat-number">847</div>
-                                    <div class="stat-label">Tickets Sold</div>
+                <!-- Announcement -->
+                <div class="announcement">
+                    <div class="announcement-title">Announcement</div>
+                    <div>Super important announcement</div>
+                </div>
+
+                <!-- Role Guides Section -->
+                <section style="margin-bottom: 40px;">
+                    <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px;">SOLD OUT! Krewe</h2>
+                    
+                    <!-- Core Roles Row -->
+                    <div class="grid">
+                        <!-- Appraiser Guide -->
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title">The Appraiser</div>
+                                </div>
+                                <div class="card-content">
+                                    <div style="background: #f0f8ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">The appraiser plays a very crucial role in building the show. They are one part propmaster, one part casting director, and one part show runner.</p>
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">From one hour prior to the start of the show, until 15 minutes before the show starts, they evaluate the props brought in by audience members. They are also sizing up the audience members themselves to determine where they will best fit into our improv/selling show, if at all.</p>
+                                        <p style="font-size: 13px; line-height: 1.4;">Obviously this is all very subjective and is a major factor in determining how fun and successful a show is. Each check-in should only take 2–3 minutes max. Keep it moving while still making them feel valued. Stay playful but authoritative. Think of this process as part of the show.</p>
+                                    </div>
+
+                                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Prop Check-In Process</h4>
+                                        <div style="background: #ffeaa7; padding: 10px; border-radius: 4px; margin-bottom: 12px; font-size: 12px;">
+                                            <strong>Access Requirements:</strong> The appraiser table or room can only be reached by paying admission first. In other words, a seller must be a paying member of the audience to sell a prop.
+                                        </div>
+                                        
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>Step 1: Form Setup</strong> - The appraiser has the seller scan the QR code and helps the seller/audience member fill out the form.<br><br>
+                                            <strong>Step 2: Personal Information</strong> - The seller fills out the "You" section of the Merch Form. It's important to have an email address for payment purposes.<br><br>
+                                            <strong>Step 3: Prop Description</strong> - The seller fills out the prop description.<br><br>
+                                            <strong>Step 4: Sale Price</strong> - The seller fills out the Sale Price. The appraiser emphasizes that if their prop does not sell, the seller goes home with the prop and no money. The sale price is what the seller will get if their prop sells. No more, no less.<br><br>
+                                            <strong>Step 5: Pricing Information</strong> - The appraiser explains to the seller that the listing price is higher than the sale price because of site fees, credit card transaction fees and taxes. The buyer pays for shipping.<br><br>
+                                            <strong>Step 6: Participation Discussion</strong> - Now the Appraiser and the Seller discuss the Seller's participation.<br><br>
+                                            <strong>Step 7: Form Completion</strong> - The Seller signs and submits the form.<br><br>
+                                            <strong>Step 8: Prop Transfer</strong> - The appraiser takes the prop, boxes it, and takes possession of it.
+                                        </div>
+                                        
+                                        <div style="background: #ffeb3b; padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px;">
+                                            <strong>Warning:</strong> They may want to set the price higher than they initially thought, but then it might not sell. The final price is their choice. It's a gamble for them. They are gamblers. We are the house.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #f0fff0; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Process the Prop</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>Step 1: Database Consultation</strong> - Consult the prop database for information.<br><br>
+                                            <strong>Step 2: ID Code & Performance Status</strong> - The prop's four-digit ID code: Write it in large ink on the outside of the box. Add a Y for YES will perform, N for NO will not perform, or M for Maybe will perform.<br><br>
+                                            <strong>Step 3: Physical Organization</strong> - Stack the box so that the number and letter are visible.<br><br>
+                                            <strong>Step 4: Script Documentation</strong> - Fill in the ID number and the letter in the printed script in the best scene you think it will work in.<br><br>
+                                            <strong>Step 5: Enter Props into Whatnot</strong> - Enter the accepted props into the Whatnot system for tracking and sale.
+                                        </div>
+                                        
+                                        <div style="background: #e8f5e8; padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px;">
+                                            <strong>Policy:</strong> No prop is rejected unless it breaks a rule of the selling service. If the person and/or the prop doesn't fit (again, subjective) then the prop goes into the lightning round. No consideration should be given to the salability of the prop, only its comedic potential. Do not promise when their prop will be used in the show. Do not promise who will sell their prop, unless it's them. Simply tell them to listen for their prop number to be called.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #e8f5e8; padding: 12px; border-radius: 4px;">
+                                        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #000;">Real World Tools</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            • Phone<br>
+                                            • Laminated QR Code<br>
+                                            • Boxes<br>
+                                            • Sharpie<br>
+                                            • Copy of the Script
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="stat">
-                                    <div class="stat-number">12</div>
-                                    <div class="stat-label">Shows</div>
+                        </div>
+
+                        <!-- SELL OUTS! Guide -->
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title">The Sell Outs!</div>
+                                </div>
+                                <div class="card-content">
+                                    <div style="background: #f0f8ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">The Sell Outs are our house comedy improv troupe who specialize in the art of making it up as they go along. Armed with nothing but their wits, audience suggestions, and an alarming willingness to embarrass themselves for laughs, these fearless performers dive headfirst into scenes they've never seen before.</p>
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">What makes The Sell Outs unique is that they will riff off of not only predetermined scenes but an item they're trying to sell—without knowing what either will be until showtime. This authentic, in-the-moment comedy creates an unpredictable energy that makes every show completely one-of-a-kind.</p>
+                                    </div>
+
+                                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">The Challenge</h4>
+                                        <p style="font-size: 12px; line-height: 1.3; margin-bottom: 10px;">Picture this: moments before they step on stage, The Sell Outs discover they need to improvise a sales pitch for a vintage toaster while performing in a scene set at a medieval knight's tournament. Or maybe they'll find themselves hawking a rubber chicken during what turns out to be a serious corporate board meeting.</p>
+                                        <p style="font-size: 12px; line-height: 1.3;">The magic happens in real-time as they seamlessly weave product placement into whatever scenario unfolds, creating comedy gold from the collision of commerce and creativity.</p>
+                                    </div>
+
+                                    <div style="background: #f0fff0; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">The High-Wire Act</h4>
+                                        <p style="font-size: 12px; line-height: 1.3; margin-bottom: 10px;">Every performance is a high-wire act without a net. The performers must think on their feet, stay in character, advance the scene, and somehow make that random household item seem like the most desirable thing on earth—all while the audience watches them figure it out together.</p>
+                                        <p style="font-size: 12px; line-height: 1.3;">It's this genuine uncertainty and collaborative problem-solving that generates the most authentic laughter and creates moments that simply can't be replicated.</p>
+                                    </div>
+
+                                    <div style="background: #ffe6e6; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Personal Stakes</h4>
+                                        <p style="font-size: 12px; line-height: 1.3; margin-bottom: 10px;">What drives The Sell Outs? Pure love for the art of improvisation and the thrill of the unknown. But there's also a personal stake in the game—these performers can bring their own items to sell during shows.</p>
+                                        <p style="font-size: 12px; line-height: 1.3;">Nothing motivates a comedian quite like trying to move their own vintage collectible or quirky household item while staying committed to whatever absurd character they've been thrown into. It's the perfect blend of artistic passion and entrepreneurial hustle.</p>
+                                    </div>
+
+                                    <div style="background: #f5f5f5; padding: 15px; border-radius: 6px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">The Result</h4>
+                                        <p style="font-size: 12px; line-height: 1.3; margin-bottom: 10px;">The result is comedy that feels alive, unpredictable, and uniquely yours. No two shows are ever the same because no two nights bring the same combination of scenes, items, and spontaneous inspiration.</p>
+                                        <p style="font-size: 12px; line-height: 1.3;">When you watch The Sell Outs, you're not just seeing a performance—you're witnessing the birth of comedy that has never existed before and will never exist again.</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="stat">
-                                    <div class="stat-number">98%</div>
-                                    <div class="stat-label">Capacity</div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Roles Row -->
+                    <div class="grid">
+                        <!-- Referee Guide -->
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title">The Referee</div>
+                                </div>
+                                <div class="card-content">
+                                    <div style="background: #f0f8ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">The Referee is an interactive comedy bit that transforms an audience member into the show's rule enforcer. This role can take different forms depending on the show's theme: a sports referee with flags and whistles, a courtroom judge with a gavel, or even "Tiffany's Buzz Kill" character with a buzzer.</p>
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">After the first scene establishes the tone, the role of the referee is explained to the audience. A volunteer is selected and given the power to stop the show whenever performers break the established "house rules." This creates an unpredictable, interactive element that keeps both performers and audience on their toes.</p>
+                                        <p style="font-size: 13px; line-height: 1.4;">The referee becomes an active participant in shaping the show's direction, with the authority to call out violations and assign creative penalties that add to the comedy.</p>
+                                    </div>
+
+                                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">How It Works</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>Step 1: First Scene Setup</strong> - Perform the opening scene normally to establish the show's baseline. This gives the audience a sense of what "normal" looks like before introducing the referee element.<br><br>
+                                            <strong>Step 2: Introduce the Concept</strong> - After the first scene, explain the referee role to the audience. Build excitement around the idea that one of them will have the power to control the show.<br><br>
+                                            <strong>Step 3: Select the Referee</strong> - Choose a volunteer who seems engaged and confident. Give them their tools (flag, buzzer, or gavel) and briefly explain the rules they'll be enforcing.<br><br>
+                                            <strong>Step 4: Enforce the Rules</strong> - The referee watches for violations and stops the action when they occur. They can use their flag, buzzer, or gavel to signal a penalty.<br><br>
+                                            <strong>Step 5: Assign Penalties</strong> - The referee assigns creative penalties to rule-breakers, which become part of the comedy. Penalties should be playful and add to the entertainment value.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #ffe6e6; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Common Violations</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Breaking the Fourth Wall</strong> - When performers acknowledge the audience or step out of character<br>
+                                            <strong>Overtly Sexual References</strong> - Any inappropriate or overly suggestive content<br>
+                                            <strong>Illegal Use of Accent</strong> - Attempting a terrible accent mid-scene (especially bad British accents)<br>
+                                            <strong>Inappropriate Prop Use</strong> - Using props in suggestive or unintended ways<br>
+                                            <strong>Political Statements</strong> - Making overt political commentary or partisan statements<br>
+                                            <strong>Excessive Puns</strong> - Too many groan-worthy wordplays in succession<br>
+                                            <strong>Scene Hijacking</strong> - One performer dominating or derailing the scene<br>
+                                            <strong>Corpse Breaking</strong> - Performers breaking character to laugh
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #f0fff0; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Creative Penalties</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Dance Break</strong> - Violator must dance for 30 seconds while the scene continues<br>
+                                            <strong>Eyes Closed</strong> - Perform the rest of the scene with eyes shut<br>
+                                            <strong>One-Armed Performance</strong> - Keep one hand behind their back for the remainder<br>
+                                            <strong>Speak in Rhyme</strong> - All dialogue must rhyme for the next minute<br>
+                                            <strong>Slow Motion</strong> - Move in slow motion for the rest of the scene<br>
+                                            <strong>Scene Ejection</strong> - Get thrown out and replaced by another performer<br>
+                                            <strong>Audience Apology</strong> - Formally apologize to the audience for the violation<br>
+                                            <strong>Sing It</strong> - Deliver all lines in song for the next exchange<br>
+                                            <strong>Statue Freeze</strong> - Freeze in place for 10 seconds while others continue<br>
+                                            <strong>Role Reversal</strong> - Switch characters with another performer
+                                        </div>
+                                        
+                                        <div style="background: #ffb3b3; padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px;">
+                                            <strong>Important:</strong> Keep penalties playful and fun. The goal is to add to the comedy, not to humiliate. The referee should feel empowered but guided toward constructive choices that enhance the show.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Tips for Success</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Choosing the Right Referee:</strong> Look for someone who's been laughing and engaged, appears confident but not disruptive, and seems like they'll enjoy the responsibility without going overboard.<br><br>
+                                            <strong>Setting Boundaries:</strong> Give the referee clear guidelines about when to call penalties. Too many interruptions can kill momentum; too few makes the bit pointless. Aim for 3-5 penalties per show segment.<br><br>
+                                            <strong>Performer Response:</strong> Performers should accept penalties gracefully and incorporate them into the scene. This models good sportsmanship and keeps the energy positive.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #e8f5e8; padding: 15px; border-radius: 6px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Variations & Tools</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>The Judge:</strong> Set up as "courtroom" where scenes are "evidence" and judge holds performers in contempt. Use legal terminology.<br>
+                                            <strong>Tiffany's Buzz Kill:</strong> Character-based version where "Tiffany" buzzes anything offensive. Adds character comedy layer.<br>
+                                            <strong>The Sports Referee:</strong> Full sports theme with cards and whistle. Perfect for athletic audiences.<br>
+                                            <strong>The Director's Cut:</strong> Referee becomes "director" who yells "CUT!" and demands retakes.<br><br>
+                                            <strong>Required Tools:</strong> Red Flag/Yellow Card, Buzzer/Bell, Gavel (Judge variant), Whistle
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="col-6">
-                                <div class="stat">
-                                    <div class="stat-number">24</div>
-                                    <div class="stat-label">Artists</div>
+                        </div>
+                    </div>
+
+                    <!-- Technical Roles Row -->
+                    <div class="grid">
+                        <!-- Stagehand Guide -->
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title">The Stagehand</div>
+                                    <div class="card-subtitle">AKA: Karl the Mailman</div>
+                                </div>
+                                <div class="card-content">
+                                    <div style="background: #f0f8ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">The Stagehand transcends traditional backstage work to become an integral performer who bridges the gap between logistics and entertainment. This unique hybrid role combines practical stage management with comedic timing, creating one of the show's most beloved characters.</p>
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;"><strong>Core Mission:</strong> Seamlessly blend functional necessity with comedic opportunity, transforming mundane logistics into laugh-out-loud moments that enhance rather than interrupt the show's flow.</p>
+                                        <p style="font-size: 13px; line-height: 1.4;">You serve as the audience's "way in" to the show's universe. They see themselves in your confusion and delight in your gradual integration from confused delivery person to beloved ensemble member.</p>
+                                    </div>
+
+                                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Recurring Comedy Bits</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>BIT 1: Signature Collection</strong> - Always ask for signature confirmation. Attempt to read it aloud with increasing confusion - "Is that... Johnson? Jimbo?" Evolves from simple confusion to elaborate pronunciation attempts involving the Appraiser and audience.<br><br>
+                                            <strong>BIT 2: Truck Sound Effects</strong> - Coordinate exits with sound team. Escalating "peeling out" sounds from modest puttering to dramatic tire screeches. Match your walking pace to sound urgency.<br><br>
+                                            <strong>BIT 3: Oblivious to Flirtation</strong> - Remain completely oblivious when recipients make passes. Respond with professional confusion - "Ma'am, I just need the signature." Earnest, helpful delivery person energy.
+                                        </div>
+                                        
+                                        <div style="background: #ffeb3b; padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px;">
+                                            <strong>Evolution:</strong> All three bits should escalate in complexity and audience involvement as the performance progresses, building to peak absurdity by show's end.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #f0fff0; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Technical Execution</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>Script Consultation Protocol</strong> - At each scene start, quickly reference your script copy to determine item reveal status. This should appear as natural "delivery manifest checking" to maintain FedEx character illusion.<br><br>
+                                            <strong>Item Retrieval Protocol</strong> - When an item "sells," you have 45-60 seconds to retrieve it and position the next item. Your truck "departure" sound covers retrieval; "arrival" sound announces next delivery.<br><br>
+                                            <strong>Delivery Timing</strong> - Enter during Appraiser setup for each new item. Arrival should feel natural and coincidental, not like waiting in wings. Clipboard consultation takes 15-20 seconds maximum.
+                                        </div>
+                                        
+                                        <div style="background: #e8f5e8; padding: 10px; border-radius: 4px; margin-top: 12px; font-size: 11px;">
+                                            <strong>Critical:</strong> Your entrances and exits are precisely choreographed with the Appraiser's pacing. Prioritize scripted delivery cues over improvisational beats - show flow takes precedence.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #ffe6e6; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Show Timeline & Character Arc</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Pre-Show (T-30 min):</strong> Final costume check, prop positioning, coordinate with sound team<br>
+                                            <strong>Show Open (0-5 min):</strong> Establish confusion and "accidental" presence. First truck departure should be basic puttering<br>
+                                            <strong>Mid-Show (25-35 min):</strong> Character awareness shift. Begin showing signs of understanding while maintaining FedEx persona<br>
+                                            <strong>Climax (60-70 min):</strong> Peak performance integration. Audience fully accepts you as show character. Signature reading reaches peak absurdity<br>
+                                            <strong>Show Close (80-90 min):</strong> Final bow integration. Complete journey from confused delivery person to beloved ensemble member
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Emergency Protocols</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Item Malfunction/Missing:</strong> Improvise with clipboard confusion, "check delivery manifest," buy time while backup solutions are implemented. Your confusion covers technical difficulties.<br><br>
+                                            <strong>Timing Issues:</strong> If running long, compress delivery beats. If running short, expand physical comedy and clipboard consultation. Your role is highly flexible for show timing adjustment.<br><br>
+                                            <strong>Physical Comedy Opportunities:</strong> Clipboard confusion, package handling struggles, mock radio calls to dispatch, gradual realization of show's nature.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #e8f5e8; padding: 12px; border-radius: 4px;">
+                                        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #000;">Essential Tools</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            • All-black clothing for stage invisibility<br>
+                                            • Clipboard with "delivery manifest" (script copy)<br>
+                                            • Flashlight or small headlamp<br>
+                                            • Cleaning supplies and towels<br>
+                                            • Basic repair kit (tape, glue, etc.)<br>
+                                            • Water bottles for performers
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DJ Guide -->
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title">The DJ</div>
+                                </div>
+                                <div class="card-content">
+                                    <div style="background: #f0f8ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">The DJ is the technical mastermind behind every SOLD OUT! show, controlling all sound, lighting, and video elements that bring the performance to life. They're not just playing music—they're orchestrating an entire technical production that supports and enhances every moment of improvised comedy.</p>
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">Working from a control booth or designated tech station, the DJ must stay constantly alert to the flow of the show, ready to provide audio cues, lighting changes, and visual effects that complement the unpredictable nature of live improv. They're part technician, part artist, and part mind reader.</p>
+                                        <p style="font-size: 13px; line-height: 1.4;">The DJ's role requires both technical expertise and creative instincts, as they must anticipate the performers' needs while being ready to pivot instantly when scenes take unexpected turns.</p>
+                                    </div>
+
+                                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Technical Responsibilities</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>Pre-Show Setup</strong> - Test all audio equipment, lighting systems, and video displays. Ensure wireless mics are charged and functioning properly.<br><br>
+                                            <strong>Sound Management</strong> - Monitor performer microphones, adjust levels in real-time, and ensure audience can clearly hear all dialogue and sales pitches.<br><br>
+                                            <strong>Music Cues</strong> - Provide entrance music, scene transitions, and comedic stings that enhance timing and energy. Build a library of versatile audio clips.<br><br>
+                                            <strong>Lighting Control</strong> - Manage stage lighting for different scenes, spotlight featured performers or props, and create atmosphere that supports the improvised scenarios.<br><br>
+                                            <strong>Video Support</strong> - Control any video screens showing prop images, bidding information, or visual aids that support the sales elements of the show.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #f0fff0; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Creative Support</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>Scene Enhancement</strong> - Use sound effects and music to support improvised scenarios. A medieval scene might need appropriate background music; a spaceship scene needs sci-fi sounds.<br><br>
+                                            <strong>Comedic Timing</strong> - Provide "rimshots," awkward silence emphasis, or dramatic stings that enhance comedic moments and punchlines.<br><br>
+                                            <strong>Energy Management</strong> - Use music and lighting to help control the pace and energy of the show, building excitement during prop reveals or sales climaxes.<br><br>
+                                            <strong>Emergency Support</strong> - Be ready with "save" music or effects if a scene needs rescue, or provide audio distractions during technical difficulties.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #ffe6e6; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Communication & Coordination</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Signal System</strong> - Establish clear hand signals or cues with performers for common needs: louder/softer, music on/off, lighting changes<br>
+                                            <strong>Host Coordination</strong> - Work closely with the Host to understand show flow and anticipate technical needs during audience interaction<br>
+                                            <strong>Stagehand Communication</strong> - Coordinate with Stagehand for prop reveals that need audio-visual support<br>
+                                            <strong>Real-time Adaptation</strong> - Stay flexible and ready to adjust all technical elements based on how scenes develop organically
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #e8f5e8; padding: 12px; border-radius: 4px;">
+                                        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #000;">Essential Equipment</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            • Audio mixing board and speakers<br>
+                                            • Wireless microphone systems<br>
+                                            • Lighting control panel<br>
+                                            • Computer with audio/music library<br>
+                                            • Video display controls<br>
+                                            • Backup equipment and cables
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Recent Activity -->
-            <div class="col-8">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Recent Activity</div>
-                        <div class="card-subtitle">Last 24 Hours</div>
-                    </div>
-                    <div class="card-content">
-                        <div style="border-left: 2px solid #000; padding-left: 15px;">
-                            <div style="margin-bottom: 15px;">
-                                <strong>2:30 PM</strong> - Marketing team uploaded new promotional materials for weekend shows<br>
-                                <small style="color: #666;">by Jessica Wong</small>
-                            </div>
-                            <div style="margin-bottom: 15px;">
-                                <strong>1:15 PM</strong> - Sound check completed for tonight's main stage performance<br>
-                                <small style="color: #666;">by Tech Team</small>
-                            </div>
-                            <div style="margin-bottom: 15px;">
-                                <strong>11:00 AM</strong> - New artist contracts signed: Mike Torres, Lisa Park<br>
-                                <small style="color: #666;">by Talent Management</small>
-                            </div>
-                            <div>
-                                <strong>9:30 AM</strong> - Weekend show tickets released - 89% sold in first hour<br>
-                                <small style="color: #666;">by Box Office</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    <!-- Leadership & Audience Row -->
+                    <div class="grid">
+                        <!-- Host Guide -->
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title">The Host</div>
+                                </div>
+                                <div class="card-content">
+                                    <div style="background: #f0f8ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">The Host is the face and driving force of every SOLD OUT! show, serving as the bridge between the audience and performers while maintaining the energy and flow that makes each night unforgettable. They're part ringmaster, part auctioneer, and part comedy performer all rolled into one dynamic presence.</p>
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">More than just an announcer, the Host actively shapes the show's direction through audience interaction, manages the sales process that funds the entire operation, and ensures that every audience member feels like an essential part of the experience.</p>
+                                        <p style="font-size: 13px; line-height: 1.4;">The Host must possess the rare combination of improv skills, sales acumen, crowd management abilities, and the charisma to keep hundreds of people engaged through an unpredictable live show.</p>
+                                    </div>
 
-            <!-- Upcoming Events -->
-            <div class="col-4">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Upcoming</div>
-                        <div class="card-subtitle">Next 7 Days</div>
-                    </div>
-                    <div class="card-content">
-                        <div style="margin-bottom: 15px;">
-                            <strong>Sep 2</strong><br>
-                            Labor Day Weekend Special<br>
-                            <small style="color: #666;">3 shows, 2 venues</small>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <strong>Sep 4</strong><br>
-                            New Talent Auditions<br>
-                            <small style="color: #666;">10 AM - 4 PM</small>
-                        </div>
-                        <div>
-                            <strong>Sep 6</strong><br>
-                            Staff Training Session<br>
-                            <small style="color: #666;">Customer service focus</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Audience Engagement</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>Opening Energy</strong> - Set the tone from the moment doors open. Create excitement and anticipation that builds throughout the pre-show period.<br><br>
+                                            <strong>Crowd Reading</strong> - Constantly assess the audience's energy level, comfort zone, and engagement. Adjust interaction style and content accordingly.<br><br>
+                                            <strong>Participation Management</strong> - Encourage shy audience members while gently managing overly enthusiastic ones. Create an inclusive environment where everyone feels welcome to participate.<br><br>
+                                            <strong>Story Building</strong> - Help audience members who bring props tell their stories effectively, drawing out interesting details that enhance the comedy potential.<br><br>
+                                            <strong>Energy Recovery</strong> - When energy dips or scenes don't land, quickly pivot to re-energize the room through direct audience interaction or high-energy activities.
+                                        </div>
+                                    </div>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <div>SOLD OUT Comedy | Internal Use Only</div>
-        </footer>
+                                    <div style="background: #f0fff0; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Show Leadership</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>Scene Direction</strong> - Guide performers through scene selections, prop assignments, and timing without breaking the improvisational flow.<br><br>
+                                            <strong>Pacing Control</strong> - Manage the rhythm of the entire show, knowing when to speed up, slow down, or insert audience interaction breaks.<br><br>
+                                            <strong>Crisis Management</strong> - Handle unexpected situations gracefully: technical failures, audience disruptions, performer mistakes, or props that don't work as planned.<br><br>
+                                            <strong>Team Coordination</strong> - Communicate seamlessly with DJ, Stagehand, and performers through signals and verbal cues that maintain show flow.<br><br>
+                                            <strong>Improvisation Leadership</strong> - Jump into scenes when needed, provide support to struggling performers, and maintain comedic momentum.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #ffe6e6; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Sales & Business Management</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Auction Facilitation</strong> - Drive bidding energy without being pushy. Create excitement around props while respecting audience comfort levels<br>
+                                            <strong>Value Creation</strong> - Help audience see the entertainment value they're purchasing, not just the physical props<br>
+                                            <strong>Platform Management</strong> - Seamlessly integrate online bidding platforms with live audience interaction<br>
+                                            <strong>Sales Psychology</strong> - Understand when to push for higher bids and when to close sales quickly to maintain show momentum<br>
+                                            <strong>Revenue Optimization</strong> - Balance entertainment value with business needs, ensuring the show remains financially sustainable
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Essential Skills</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Improvisation:</strong> Must be able to think quickly and create comedy on the spot when scenes need saving or energy needs boosting.<br><br>
+                                            <strong>Public Speaking:</strong> Command attention and maintain audience engagement through clear, confident communication.<br><br>
+                                            <strong>Emotional Intelligence:</strong> Read individual audience members and group dynamics to create positive experiences for everyone.<br><br>
+                                            <strong>Multi-tasking:</strong> Simultaneously manage multiple conversations, keep track of bidding activity, and coordinate with technical team.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #e8f5e8; padding: 12px; border-radius: 4px;">
+                                        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #000;">Host Toolkit</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            • Wireless microphone and backup<br>
+                                            • Tablet/phone for bidding platform<br>
+                                            • Show notes and prop tracking sheet<br>
+                                            • Emergency comedy material<br>
+                                            • Contact info for tech team<br>
+                                            • Water and throat care supplies
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Audience Guide -->
+                        <div class="col-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="card-title">The Audience</div>
+                                </div>
+                                <div class="card-content">
+                                    <div style="background: #f0f8ff; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">The Audience at a SOLD OUT! show is far from passive—they're active co-creators of the evening's entertainment. Unlike traditional comedy shows where audiences simply watch and laugh, SOLD OUT! audiences bring items to sell, participate in scenes, make real purchasing decisions, and help shape the direction of the improvised comedy.</p>
+                                        <p style="font-size: 13px; line-height: 1.4; margin-bottom: 10px;">Every audience member becomes a potential character in the show's narrative, whether they're selling a vintage lamp, bidding on someone else's collectible, or volunteering to join performers on stage. This creates a unique dynamic where the distinction between performer and audience continuously blurs.</p>
+                                        <p style="font-size: 13px; line-height: 1.4;">The result is an experience where audience members often leave feeling like they weren't just watching a show—they were part of creating something unique that could never be replicated.</p>
+                                    </div>
+
+                                    <div style="background: #fff3cd; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Bringing Props to Sell</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>Item Selection</strong> - Audience members bring personal items they're willing to part with: vintage goods, collections, handmade crafts, or inherited objects with interesting stories.<br><br>
+                                            <strong>Check-in Process</strong> - Work with the Appraiser to complete forms, set sale prices, and determine how they'd like to participate in the selling process.<br><br>
+                                            <strong>Storytelling Opportunity</strong> - Share the story behind their item with the Host and potentially the entire audience, adding personal narrative to the comedy.<br><br>
+                                            <strong>Performance Choice</strong> - Decide whether they want to actively participate in selling their item on stage or let the performers handle the sales pitch.<br><br>
+                                            <strong>Pricing Strategy</strong> - Balance their desire for profit with realistic market expectations, understanding that entertainment value affects selling potential.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #f0fff0; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Active Participation</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            <strong>On-Stage Involvement</strong> - Volunteer to join improvisational scenes, help sell their own items, or assist with other audience members' props when invited.<br><br>
+                                            <strong>Bidding Activity</strong> - Participate in live auctions using online platforms, creating real-time excitement as bids increase throughout performances.<br><br>
+                                            <strong>Suggestion Giving</strong> - Provide scene suggestions, character ideas, or improvisation prompts that performers incorporate into their comedy.<br><br>
+                                            <strong>Referee Participation</strong> - Potentially be selected as the show's Referee, gaining authority to call penalties and influence the performance's direction.<br><br>
+                                            <strong>Energy Contribution</strong> - Actively engage through laughter, applause, and vocal participation that fuels the performers' creative energy.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #ffe6e6; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Understanding the Experience</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Unpredictability</strong> - Embrace the fact that no one, including performers, knows exactly what will happen. Part of the fun is the genuine surprise<br>
+                                            <strong>Community Building</strong> - Connect with other audience members over shared items, bidding wars, or collaborative scene participation<br>
+                                            <strong>Risk & Reward</strong> - Understand that bringing items to sell involves real financial risk, but also potential profit and guaranteed entertainment<br>
+                                            <strong>Comfort Zones</strong> - Feel free to participate at their own comfort level, from quiet observation to full stage involvement<br>
+                                            <strong>Unique Memories</strong> - Recognize they're creating irreplaceable memories and stories they'll tell for years to come
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #f5f5f5; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                                        <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px; color: #000;">Tips for New Audience Members</h4>
+                                        <div style="font-size: 11px; line-height: 1.3;">
+                                            <strong>Come Prepared:</strong> Bring items you're genuinely ready to sell. Have backup items in case your first choice doesn't work for the show format.<br><br>
+                                            <strong>Stay Open:</strong> Be willing to laugh at yourself and participate in unexpected ways. The best audience experiences come from embracing spontaneity.<br><br>
+                                            <strong>Support Others:</strong> Bid on items that interest you, cheer for other sellers, and help create the supportive community atmosphere that makes the show work.
+                                        </div>
+                                    </div>
+
+                                    <div style="background: #e8f5e8; padding: 12px; border-radius: 4px;">
+                                        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #000;">What Audiences Bring</h4>
+                                        <div style="font-size: 12px; line-height: 1.3;">
+                                            • Personal items to sell<br>
+                                            • Phone/device for online bidding<br>
+                                            • Willingness to participate<br>
+                                            • Stories about their items<br>
+                                            • Sense of humor and adventure<br>
+                                            • Support for fellow audience members
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer class="footer">
+                    <div>SOLD OUT Comedy | Internal Use Only</div>
+                </footer>
+            </div>
+        </main>
     </div>
+
+    <script>
+        // Handle form button popup
+        const formBtn = document.getElementById('formBtn');
+        const formPopup = document.getElementById('formPopup');
+        let isPopupOpen = false;
+
+        formBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (isPopupOpen) {
+                formPopup.classList.remove('active');
+                isPopupOpen = false;
+            } else {
+                formPopup.classList.add('active');
+                isPopupOpen = true;
+            }
+        });
+
+        // Close popup when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!formBtn.contains(e.target) && !formPopup.contains(e.target)) {
+                formPopup.classList.remove('active');
+                isPopupOpen = false;
+            }
+        });
+
+        // Prevent popup from closing when clicking inside it
+        formPopup.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    </script>
 </body>
 </html>
