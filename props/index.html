@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Props - SOLD OUT! Comedy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.4;
+            color: #000;
+            background: #fff;
+            font-size: 16px;
+        }
+
+        /* Main container */
+        .container {
+            min-height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 28px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            line-height: 1.15;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+        /* Props section */
+        .props-section {
+            background: #333;
+            color: #fff;
+            padding: 40px 35px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .props-section h2 {
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 25px;
+            color: #fff;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* Buttons */
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 16px 18px;
+            margin-bottom: 15px;
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform .06s ease, background .2s ease, border-color .2s ease;
+            cursor: pointer;
+        }
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.16);
+            border-color: rgba(255,255,255,0.35);
+            transform: translateY(-1px);
+        }
+        .nav-btn:focus-visible{
+            outline: 3px solid #005fcc;
+            outline-offset: 2px;
+        }
+
+        /* Form popup styles */
+        .form-popup-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .form-popup {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.95);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            padding: 18px;
+            margin-top: 8px;
+            transform: translateY(-10px);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .form-popup.active {
+            transform: translateY(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .form-popup-btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.12);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.25);
+            border-radius: 6px;
+            text-align: center;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-popup-btn:hover {
+            background: rgba(255,255,255,0.22);
+            border-color: rgba(255,255,255,0.45);
+        }
+
+        .form-popup-btn:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid #ddd;
+            margin-top: 40px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .footer a {
+            color: #000;
+            text-decoration: underline;
+            margin-left: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 28px 20px;
+            }
+            
+            .header h1 {
+                font-size: 28px;
+            }
+            
+            .props-section {
+                padding: 30px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>Props Management</h1>
+            <div class="subtitle">SOLD OUT! Comedy</div>
+        </header>
+
+        <!-- Props Section -->
+        <div class="props-section">        
+            <!-- Form button with popup -->
+            <div class="form-popup-container">
+                <button class="nav-btn" id="formBtn">PROP CHECK-IN FORM</button>
+                <div class="form-popup" id="formPopup">
+                    <a href="input.html" class="form-popup-btn">FILL OUT FORM</a>
+                    <a href="input.html?text" class="form-popup-btn">TEXT FORM TO SELLER</a>
+                    <a href="input.html?email" class="form-popup-btn">EMAIL FORM TO SELLER</a>
+                    <a href="qr.html" class="form-popup-btn">SHOW FORM QR CODE TO SELLER</a>
+                    <a href="qr.html?print" class="form-popup-btn">PRINT FORM QR CODE FOR SELLER</a>
+                </div>
+            </div>
+            
+            <a href="https://airtable.com/appryObcmJdPmk9ls/pagseYDP4XZ56CYG8" class="nav-btn">CHECKED-IN PROPS</a>
+            <a href="https://www.whatnot.com/user/soldoutcomedy" class="nav-btn">ADD PROPS TO WHATNOT</a>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div>SOLD OUT Comedy | Props Management
+                <a href="../index.html">← Back to Home</a>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Handle form button popup
+        const formBtn = document.getElementById('formBtn');
+        const formPopup = document.getElementById('formPopup');
+        let isPopupOpen = false;
+
+        formBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (isPopupOpen) {
+                formPopup.classList.remove('active');
+                isPopupOpen = false;
+            } else {
+                formPopup.classList.add('active');
+                isPopupOpen = true;
+            }
+        });
+
+        // Close popup when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!formBtn.contains(e.target) && !formPopup.contains(e.target)) {
+                formPopup.classList.remove('active');
+                isPopupOpen = false;
+            }
+        });
+
+        // Prevent popup from closing when clicking inside it
+        formPopup.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    </script>
+</body>
+</html>
