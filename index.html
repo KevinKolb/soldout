@@ -64,6 +64,38 @@
     transition:.3s;position:relative;
   }
   .edition-card:hover{transform:translateY(-8px);box-shadow:0 20px 40px rgba(0,0,0,.2)}
+  
+  /* Blue styling for Screen Edition */
+  .edition-card.screen-edition{
+    background:linear-gradient(135deg, var(--comic-blue), #6FA8E8);
+    color:var(--comic-white);
+    border-color:var(--comic-black);
+    box-shadow:0 10px 30px rgba(74,144,226,.3);
+  }
+  .edition-card.screen-edition:hover{
+    box-shadow:0 20px 40px rgba(74,144,226,.4);
+  }
+  .edition-card.screen-edition h3{
+    color:var(--comic-white);
+    text-shadow:2px 2px 0 var(--comic-black);
+  }
+  .edition-card.screen-edition .subtitle{
+    color:var(--comic-yellow);
+  }
+  .edition-card.screen-edition p{
+    color:var(--comic-white);
+  }
+  .edition-card.screen-edition .themes-section{
+    background:rgba(255,255,255,.15);
+    border-color:var(--comic-yellow);
+  }
+  .edition-card.screen-edition .themes-section h4{
+    color:var(--comic-yellow);
+  }
+  .edition-card.screen-edition .themes-list li{
+    color:var(--comic-white);
+  }
+  
   .edition-card h3{
     font-family:'Bangers',cursive;font-size:2.4rem;color:var(--comic-red);
     text-shadow:2px 2px 0 var(--comic-black);letter-spacing:1.5px;margin-bottom:1rem;
@@ -85,6 +117,33 @@
   .themes-list{list-style:none;padding:0;margin:0;text-align:left;} /* ensure left */
   .themes-list li{font-size:1.05rem;margin:.5rem 0;position:relative;padding-left:1.3rem}
   .themes-list li::before{content:"★";position:absolute;left:0;color:var(--comic-yellow);text-shadow:1px 1px 0 var(--comic-black)}
+
+  /* Reviews Section */
+  .reviews-section{
+    background:var(--comic-orange);color:var(--comic-white);
+    padding:4rem 2rem;margin:3rem 0;border-radius:20px;
+    border:4px solid var(--comic-black);position:relative;
+  }
+  .reviews-section .section-title{
+    font-family:'Bangers',cursive;font-size:clamp(2.5rem,5vw,4rem);
+    text-align:center;margin-bottom:3rem;color:var(--comic-white);
+    text-shadow:3px 3px 0 var(--comic-black);letter-spacing:2px;
+  }
+  .reviews-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:2rem;max-width:1200px;margin:0 auto;
+  }
+  .review-card{
+    background:rgba(255,255,255,.95);color:var(--comic-black);
+    padding:1.5rem;border-radius:15px;border:3px solid var(--comic-black);
+    box-shadow:6px 6px 0 rgba(0,0,0,.3);transition:.3s;
+  }
+  .review-card:hover{transform:translateY(-5px);box-shadow:8px 8px 0 rgba(0,0,0,.4)}
+  .stars{font-size:1.5rem;margin-bottom:1rem}
+  .filled-star{color:var(--comic-yellow);text-shadow:1px 1px 0 var(--comic-black)}
+  .empty-star{color:#ddd}
+  .review-text{font-size:1.1rem;line-height:1.5;margin-bottom:1rem;font-style:italic}
+  .reviewer{font-weight:600;color:var(--comic-blue);text-align:right}
 
   /* CTA with single SVG burst */
   .cta-section{position:relative;display:flex;justify-content:center;margin:3rem 0}
@@ -122,6 +181,8 @@ footer{background:var(--comic-black);color:var(--comic-white);padding:3rem 2rem 
     .two-cards{grid-template-columns:1fr;gap:1.25rem;margin:1rem auto}
     .edition-card h3{font-size:2rem}
     .edition-card p,.edition-card li{font-size:1rem}
+    .reviews-grid{grid-template-columns:1fr;gap:1.5rem}
+    .reviews-section{padding:2rem 1rem}
   }
 </style>
 </head>
@@ -135,37 +196,84 @@ footer{background:var(--comic-black);color:var(--comic-white);padding:3rem 2rem 
       <p class="hero-subtitle">Loading tagline…</p>
 
       <div class="hero-description">
-        Live online selling is a $68 billion market that's painful to watch. We're fixing that by making shopping genuinely fun instead of excruciating. Your dusty juicer deserves a dramatic exit—and unlike your garage sale, people will actually show up.
-      </div>
+Live selling is a $68 billion market, but let's be real, it's painful to watch. We're changing that. Give us that dusty juicer to sell and it becomes a prop in an improv sketch while the live and online audiences both bid on it. We'll sell out our dignity to sell out your stuff.</div>
 
       <div class="two-cards">
         <div class="edition-card">
-          <h3>Screen Edition</h3>
-          <div class="subtitle">Online Audience Only</div>
-          <p>Live-streamed comedy meets live commerce—without the soul-crushing sales tactics. We transform everyday items into comedy gold (maybe). No aggressive pitching, no fake urgency, just genuine entertainment while real products find new homes.</p>
+          <h3>Stage Edition</h3>
+          <div class="subtitle">Live In-Person and Online Audiences</div>
+          <p>Full theatrical improv where YOUR items become props. Audience members bring items in mail-ready boxes and our comedians transform them through (hopefully) hilarious sketches, and both live in-person and online audiences can bid. That bread maker? Now it's a flux capacitor.</p>
           <div class="themes-section">
-            <h3>Upcoming Themes</h3>
+            <h4>Upcoming Themes</h4>
             <ul class="themes-list">
-              <li><strong>Vintage Vibes</strong></li>
-              <li><strong>Home Goods Gems</strong></li>
-              <li><strong>Trunk Show</strong></li>
+              <li><strong>Worst Bridal Shower Ever</strong></li>
+              <li><strong>Things Found in Your Mother's Nightstand</strong></li>
+              <li><strong>As Seen on TV</strong></li>
             </ul>
           </div>
         </div>
 
-        <div class="edition-card">
-          <h3>Stage Edition</h3>
-          <div class="subtitle">In-Person and Online Audience</div>
-          <p>Full theatrical improv where YOUR items become the stars. Audience members bring items in mail-ready boxes, our comedians transform them through hilarious scenes, and both live and online audiences can bid. That bread maker? Now it's a time machine. Your exercise ball? A crystal ball for terrible life advice.</p>
+        <div class="edition-card screen-edition">
+          <h3>Screen Edition</h3>
+          <div class="subtitle">Online Audience Only</div>
+          <p>Join us online/live for skits where we try and sell you a random pile of socks we impulse-bought from Temu at 2 AM. Baby needs a new pair of shoes! -Baby already has plenty of socks.</p>
           <div class="themes-section">
-            <h3>Upcoming Themes</h3>
+            <h4>Upcoming Themes</h4>
             <ul class="themes-list">
-              <li><strong>Once Upon a Time There Was a Thing Called TV</strong></li>
-              <li><strong>Things Found in Your Mother's Nightstand</strong></li>
+              <li><strong>Socks (Yes, we're serious about the socks.)</strong></li>
+              <li><strong>Home Goods Gems</strong></li>
+              <li><strong>The Junk in the Trunk Show</strong></li>
             </ul>
           </div>
         </div>
       </div>
+
+      <!-- Reviews Section -->
+      <section class="reviews-section">
+        <h2 class="section-title">The Fake Reviews Are In</h2>
+        <div class="reviews-grid">
+          <div class="review-card">
+            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <p class="review-text">"I can't believe they didn't use comic sans on their website"</p>
+            <div class="reviewer">- Karen M.</div>
+          </div>
+          <div class="review-card">
+            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <p class="review-text">"I thought I was going to Trader Joe's"</p>
+            <div class="reviewer">- Confused Customer</div>
+          </div>
+          <div class="review-card">
+            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <p class="review-text">"They sold me a banana for $47. It wasn't even ripe."</p>
+            <div class="reviewer">- Fruit Enthusiast</div>
+          </div>
+          <div class="review-card">
+            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <p class="review-text">"I came for the improv but left with 12 kitchen knives. Still confused."</p>
+            <div class="reviewer">- Sharp Shopper</div>
+          </div>
+          <div class="review-card">
+            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <p class="review-text">"My grandmother called during the show and bought a treadmill. She's 94."</p>
+            <div class="reviewer">- Concerned Grandchild</div>
+          </div>
+          <div class="review-card">
+            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <p class="review-text">"It makes QVC look like Masterpiece Theater"</p>
+            <div class="reviewer">- TV Critic</div>
+          </div>
+          <div class="review-card">
+            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <p class="review-text">"Charlie Babbitt squeezed and pulled and hurt my neck in 1988"</p>
+            <div class="reviewer">- Raymond Babbitt</div>
+          </div>
+          <div class="review-card">
+            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <p class="review-text">"If tickets are still available, you can't be sold out! How can you be sold out if tickets are still available?!"</p>
+            <div class="reviewer">- Floyd</div>
+          </div>
+        </div>
+      </section>
 
       <!-- CTA with single SVG starburst -->
       <div class="cta-section">
