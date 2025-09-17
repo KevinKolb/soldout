@@ -10,8 +10,8 @@
     <!-- Open Graph meta tags for rich link previews -->
     <meta property="og:title" content="Prop Check-In - SOLD OUT! Comedy">
     <meta property="og:description" content="Consign your prop with SOLD OUT! Comedy">
-    <meta property="og:image" content="https://kevinkolb.github.io/soldout/web/images/soldoutlogo.png">
-    <meta property="og:url" content="https://kevinkolb.github.io/soldout/props/input.html">
+    <meta property="og:image" content="https://soldoutcomedy.com/web/images/soldoutlogo.png">
+    <meta property="og:url" content="https://soldoutcomedy.com/props/input.html">
     <meta property="og:type" content="website">
     
     <style>
@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function () {
     history.replaceState({}, '', cleanURL);
 
     const smsBody = encodeURIComponent(
-      'SOLD OUT! Comedy - Submit your prop for consignment: https://kevinkolb.github.io/soldout/props/input.html'
+      'SOLD OUT! Comedy - Submit your prop for consignment: https://soldoutcomedy.com/props/input.html'
     );
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     const smsHref = isIOS ? `sms:&body=${smsBody}` : `sms:?body=${smsBody}`;
@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', function () {
       encodeURIComponent('SOLD OUT! Comedy - Prop Check-In') +
       '&body=' +
       encodeURIComponent(
-        'Submit your prop for consignment with SOLD OUT! Comedy:\n\nhttps://kevinkolb.github.io/soldout/props/input.html'
+        'Submit your prop for consignment with SOLD OUT! Comedy:\n\nhttps://soldoutcomedy.com/props/input.html'
       );
 
     // Fire after a tick so it doesn't block the rest of setup
