@@ -165,11 +165,8 @@
 footer{background:var(--comic-black);color:var(--comic-white);padding:3rem 2rem 1rem;border-top:8px solid var(--comic-yellow)}
 .footer-content{max-width:1200px;margin:0 auto;text-align:center}
 .social-links{display:flex;justify-content:center;gap:2rem;margin-bottom:2rem}
-.social-link{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;text-decoration:none;font-weight:700;color:#fff;transform:rotate(5deg);transition:.2s}
-.social-link:nth-child(2){transform:rotate(-5deg)}
-.social-link:nth-child(3){transform:rotate(5deg)}
-.social-link:nth-child(4){transform:rotate(-5deg);color:#fff!important}
-.social-link:hover{transform:rotate(0) scale(1.1);color:#fff}
+.social-link{display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;text-decoration:none;font-weight:700;color:#fff;transition:.2s}
+.social-link:hover{transform:rotate(0deg) scale(1.1) !important;color:#fff}
 .copyright{font-size:.9rem;opacity:.7;border-top:2px solid var(--comic-yellow);padding-top:1rem;margin-top:1rem}
 
   /* Mobile */
@@ -318,9 +315,18 @@ Live selling is a $68 billion market, but let's be real, it's painful to watch. 
           </a>
           <a href="https://poshmark.com/closet/soldoutcomedy" class="social-link" title="Poshmark">
           <img src="web/images/poshmark_logo.png" alt="Poshmark" style="width: 100%; height: 100%; object-fit: contain;">
-          </a>          
+          </a>
           <a href="https://www.whatnot.com/user/soldoutcomedy" class="social-link" title="Whatnot">
           <img src="web/images/whatnot.jpg" alt="Whatnot" style="width: 100%; height: 100%; object-fit: contain;">
+          </a>
+          <a href="https://www.pretzels.com/collections/all" class="social-link" title="Pretzels">
+          <img src="web/images/pretzel.jpg" alt="Pretzels" style="width: 100%; height: 100%; object-fit: contain;">
+          </a>
+          <a href="https://soldoutcomedy.bsky.social" class="social-link" title="Blue Sky">
+          <img src="web/images/Bluesky_Logo.svg" alt="Blue Sky" style="width: 100%; height: 100%; object-fit: contain;">
+          </a>
+          <a href="https://www.threads.com/@soldout.comedy?hl=en" class="social-link" title="Threads">
+          <img src="web/images/threads_logo.png" alt="Threads" style="width: 100%; height: 100%; object-fit: contain;">
           </a>
         </div>        
         <div class="copyright">
@@ -333,7 +339,11 @@ Live selling is a $68 billion market, but let's be real, it's painful to watch. 
 
   <script>
     // Random tagline loader for the XML tagline (hero-subtitle)
-    document.addEventListener('DOMContentLoaded', () => loadRandomTagline());
+    document.addEventListener('DOMContentLoaded', () => {
+      loadRandomTagline();
+      randomizeSocialIconTilts(); // Add random tilts to social icons
+    });
+
     async function loadRandomTagline(){
       const el = document.querySelector('.hero-subtitle');
       if(!el) return;
@@ -347,6 +357,16 @@ Live selling is a $68 billion market, but let's be real, it's painful to watch. 
       }catch{
         el.textContent = 'Live Comedy Meets Live Shopping';
       }
+    }
+
+    // Randomize social icon tilts
+    function randomizeSocialIconTilts() {
+      const socialLinks = document.querySelectorAll('.social-link');
+      socialLinks.forEach(link => {
+        // Random tilt between -15 and +15 degrees
+        const randomTilt = (Math.random() - 0.5) * 30;
+        link.style.transform = `rotate(${randomTilt}deg)`;
+      });
     }
   </script>
 </body>
