@@ -384,6 +384,38 @@
     font-weight:600;letter-spacing:1px;
   }
 
+  /* Schedule section */
+  .schedule-section{
+    background:linear-gradient(135deg, var(--comic-green) 0%, #58D68D 100%);
+    color:var(--comic-white);
+    padding:3rem 2rem;
+    margin:3rem auto;
+    max-width:1200px;
+    border:6px solid var(--comic-black);
+    box-shadow:inset -4px -4px 0 rgba(0,0,0,.2),10px 10px 0 rgba(0,0,0,.3);
+    position:relative;
+    box-sizing:border-box;
+  }
+
+  /* Schedule grid */
+  #schedule-container{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1.5rem;
+    max-width:100%;
+    box-sizing:border-box;
+  }
+
+  #schedule-container > div{
+    min-width:0;
+    box-sizing:border-box;
+  }
+
+  /* Tablet */
+  @media (max-width:900px){
+    #schedule-container{grid-template-columns:repeat(2,1fr);}
+  }
+
   /* Mobile */
   @media (max-width:768px){
     .hero{padding:2rem 1rem;min-height:auto}
@@ -401,6 +433,7 @@
     .consignment-section p{font-size:1.05rem}
     .social-links{gap:1rem}
     .social-link{width:70px;height:70px}
+    #schedule-container{grid-template-columns:1fr;}
   }
 </style>
 </head>
@@ -445,11 +478,11 @@ Live selling is a $68 billion market, but let's be real, <a href="https://www.re
       </div>
     </div>
 
-    <div class="schedule-section" style="background:linear-gradient(135deg, var(--comic-green) 0%, #58D68D 100%);color:var(--comic-white);padding:3rem 2.5rem;margin:3rem auto;max-width:1200px;border:6px solid var(--comic-black);box-shadow:inset -4px -4px 0 rgba(0,0,0,.2),10px 10px 0 rgba(0,0,0,.3);position:relative;">
+    <div class="schedule-section">
       <div style="content:'';position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;border:3px solid var(--comic-black);pointer-events:none;"></div>
       <h2 style="font-family:'Bangers',cursive;font-size:2.8rem;color:var(--comic-yellow);text-shadow:4px 4px 0 var(--comic-black);margin-bottom:.5rem;text-align:center;font-weight:400;letter-spacing:2px;">SOLD OUT! Shows</h2>
       <p style="text-align:center;font-size:1.2rem;font-weight:600;margin-bottom:1.5rem;color:var(--comic-white);text-shadow:2px 2px 0 var(--comic-black);">Tickets Still Available</p>
-      <div id="schedule-container" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;"></div>
+      <div id="schedule-container"></div>
     </div>
 
     <div class="consignment-section">
@@ -564,7 +597,6 @@ Live selling is a $68 billion market, but let's be real, <a href="https://www.re
         </a>
       </div>
       <div class="copyright">
-        <p>SHOW SCHEDULE COMING SOON</p>
         <p>&copy; 2025 SOLD OUT! Comedy</p>
       </div>
     </div>
@@ -581,15 +613,7 @@ document.addEventListener('DOMContentLoaded', () => {
    Small UI debug helper
 ------------------------ */
 function makeStatusLine(targetEl, id, above=true){
-  let host = document.getElementById(id);
-  if (!host && targetEl) {
-    host = document.createElement('div');
-    host.id = id;
-    host.style.cssText = 'grid-column:1/-1;margin:0 0 .5rem 0;font:600 12px/1.3 Inter,system-ui,sans-serif;color:#2C2C2C;opacity:.8';
-    if (above && targetEl.parentElement) targetEl.parentElement.insertBefore(host, targetEl);
-    else targetEl.appendChild(host);
-  }
-  return (msg) => { if (host) host.textContent = msg; console.log(`[SOLD OUT][${id}]`, msg); };
+  return (msg) => { console.log(`[SOLD OUT][${id}]`, msg); };
 }
 
 /* -----------------------
@@ -689,7 +713,7 @@ async function loadSchedule(){
 
   if (location.protocol === 'file:'){
     status('Cannot load shows.xml over file:// — run a local server (e.g., “npx serve”).');
-    container.innerHTML = '<p style="text-align:center;font-weight:600">Schedule coming soon!</p>';
+    container.innerHTML = '<p style="text-align:center;font-weight:600">More Shows Coming Soon</p>';
     return;
   }
 
@@ -741,26 +765,31 @@ async function loadSchedule(){
       return;
     }
 
-    const shows = nodes.map(show => {
-      const o = {
-        type:     show.getAttribute('type')?.trim() || '',
-        date:     show.querySelector('date')?.textContent?.trim() || '',
-        time:     show.querySelector('time')?.textContent?.trim() || '',
-        theme:    show.querySelector('theme')?.textContent?.trim() || '',
-        venue:    show.querySelector('venue')?.textContent?.trim() || '',
-        location: show.querySelector('location')?.textContent?.trim() || '',
-        address:  show.querySelector('address')?.textContent?.trim() || ''
-      };
-      o.start = parseDateTimeStrict(o.date, o.time);
-      if (!o.start) o._parseError = `Bad date/time: "${o.date}" "${o.time}"`;
-      return o;
-    });
+    const shows = nodes
+      .filter(show => show.querySelector('verified')?.textContent?.trim().toLowerCase() === 'yes')
+      .map(show => {
+        const o = {
+          type:          show.getAttribute('type')?.trim() || '',
+          date:          show.querySelector('date')?.textContent?.trim() || '',
+          time:          show.querySelector('time')?.textContent?.trim() || '',
+          theme:         show.querySelector('theme')?.textContent?.trim() || '',
+          venue:         show.querySelector('venue')?.textContent?.trim() || '',
+          location:      show.querySelector('location')?.textContent?.trim() || '',
+          address:       show.querySelector('address')?.textContent?.trim() || '',
+          watch:         show.querySelector('watch')?.textContent?.trim() || '',
+          addtocalendar: show.querySelector('addtocalendar')?.textContent?.trim() || '',
+          appraisal:     show.querySelector('appraisal')?.textContent?.trim() || ''
+        };
+        o.start = parseDateTimeStrict(o.date, o.time);
+        if (!o.start) o._parseError = `Bad date/time: "${o.date}" "${o.time}"`;
+        return o;
+      });
 
     // If everything failed to parse, tell why
     if (shows.every(s => !s.start)){
       status('All shows failed date/time parsing — see console');
       console.table(shows.map(s => ({date:s.date, time:s.time, error:s._parseError||null})));
-      container.innerHTML = '<p style="text-align:center;font-weight:600">Could not parse any show dates/times. Check console.</p>';
+      container.innerHTML = '<p style="text-align:center;font-weight:600;grid-column:1/-1;font-size:1.2rem;">More Shows Coming Soon</p>';
       return;
     }
 
@@ -769,50 +798,92 @@ async function loadSchedule(){
     const past     = shows.filter(s => s.start && s.start <  now).sort((a,b)=>b.start - a.start);
     const sorted   = [...upcoming, ...past];
 
+    // Helper to generate Google Calendar link
+    function makeGoogleCalendarLink(show) {
+      if (!show.start) return ADD_TO_CAL;
+
+      // Calculate end time (2 hours after start)
+      const endTime = new Date(show.start.getTime() + (2 * 60 * 60 * 1000));
+
+      // Format dates for Google Calendar (YYYYMMDDTHHmmss)
+      const formatGCal = (d) => {
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+      };
+
+      const title = `SOLD OUT! Comedy - ${show.type === 'stage' ? 'Stage Edition' : 'Screen Edition'}`;
+      const location = show.address || (show.type === 'screen' ? 'Online' : show.location || '');
+
+      let description = '';
+      if (show.venue) description += `${show.venue}\n`;
+      if (show.location && show.type === 'stage') description += `${show.location}\n`;
+      if (show.type === 'stage' && show.appraisal) description += `\nAppraisals: ${show.appraisal}\n`;
+      if (show.watch) description += `\nWatch Live: ${show.watch}`;
+
+      if (show.type === 'stage') {
+        description += '\n\nLive comedy meets live shopping! Your items become props in improv scenes.';
+      } else {
+        description += '\n\nWatch and bid from the Whatnot app.';
+      }
+
+      description += '\n\nhttps://soldoutcomedy.com';
+
+      const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: title,
+        dates: `${formatGCal(show.start)}/${formatGCal(endTime)}`,
+        details: description,
+        location: location
+      });
+
+      return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    }
+
     container.innerHTML = sorted.map(s => {
       const isPast = s.start < now;
       const burstFill = s.type === 'stage' ? '#FF3B3B' : '#4A90E2';
       const ribbon    = s.type === 'stage' ? 'STAGE EDITION' : 'SCREEN EDITION';
       const mapsLink  = s.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address)}` : '';
+      const watchUrl  = s.watch || WATCH_URL;
+      const calUrl    = makeGoogleCalendarLink(s);
 
       return `
-        <div style="border:5px solid var(--comic-black);box-shadow:6px 6px 0 rgba(0,0,0,.4);position:relative;display:flex;flex-direction:column;height:100%;${isPast ? 'opacity:.5;' : ''}">
+        <div style="border:5px solid var(--comic-black);border-top:12px solid ${burstFill};box-shadow:6px 6px 0 rgba(0,0,0,.3);position:relative;display:flex;flex-direction:column;min-height:450px;background:var(--comic-white);box-sizing:border-box;${isPast ? 'opacity:.5;pointer-events:none;' : ''}">
           <div style="position:absolute;top:-35px;left:-30px;z-index:10;">
-            <svg width="220" height="80" viewBox="0 0 220 80" style="filter:drop-shadow(6px 6px 0 rgba(0,0,0,.4));">
+            <svg width="180" height="70" viewBox="0 0 220 80" style="filter:drop-shadow(4px 4px 0 rgba(0,0,0,.3));">
               <path d="M110 5 130 25 170 15 155 35 200 45 160 50 180 70 130 55 110 75 90 55 40 70 60 50 20 45 65 35 50 15 90 25 Z"
                     fill="${burstFill}" stroke="#2C2C2C" stroke-width="3" stroke-linejoin="round"/>
             </svg>
             <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(${s.type==='stage' ? '-8' : '8'}deg);
-                        font-family:'Bangers',cursive;font-size:1rem;color:#FFD93D;letter-spacing:1px;white-space:nowrap;
+                        font-family:'Bangers',cursive;font-size:.9rem;color:#FFD93D;letter-spacing:1px;white-space:nowrap;
                         text-shadow:2px 2px 0 #2C2C2C;">${ribbon}</div>
           </div>
 
-          <div style="background:var(--comic-white);color:var(--comic-black);padding:1.5rem 1.5rem;">
-            <div style="text-align:center;padding:.5rem 0 1rem 0;">
-              <div style="font-family:'Bangers',cursive;font-size:2.5rem;color:var(--comic-green);text-shadow:3px 3px 0 var(--comic-black);letter-spacing:2px;margin-bottom:.5rem;line-height:1;">
-                ${fmtTime(s.start)}
-              </div>
-              <div style="font-family:Inter,sans-serif;font-size:1.1rem;font-weight:700;color:var(--comic-black);margin-bottom:.75rem;">
-                ${fmtDate(s.start)}
-              </div>
-              ${s.theme ? `<div style="font-family:'Bangers',cursive;font-size:1.5rem;color:var(--comic-yellow);text-shadow:2px 2px 0 var(--comic-black);letter-spacing:1px;margin-bottom:1rem;">${s.theme}</div>` : ''}
-              ${
-                s.venue
-                  ? (s.address && mapsLink
-                      ? `<a href="${mapsLink}" target="_blank" style="color:var(--comic-black);text-decoration:none;font-family:Inter,sans-serif;font-size:1.1rem;font-weight:700;display:block;margin-bottom:.25rem;">${s.venue}</a>`
-                      : `<div style="color:var(--comic-black);text-decoration:none;font-family:Inter,sans-serif;font-size:1.1rem;font-weight:700;display:block;margin-bottom:.25rem;">${s.venue}</div>`
-                    )
-                  : ''
-              }
-              ${s.location ? `<div style="font-family:Inter,sans-serif;font-size:1rem;font-weight:600;color:var(--comic-black);">${s.location}</div>` : ''}
+          <div style="padding:2.5rem 2rem 2rem 2rem;text-align:center;flex-grow:1;display:flex;flex-direction:column;">
+            ${
+              s.venue
+                ? (s.address && mapsLink
+                    ? `<a href="${mapsLink}" target="_blank" style="color:var(--comic-black);text-decoration:none;font-family:'Bangers',cursive;font-size:2.2rem;font-weight:400;display:block;margin-bottom:.25rem;letter-spacing:1px;text-shadow:2px 2px 0 rgba(0,0,0,.1);line-height:1.2;">${s.venue}</a>`
+                    : `<div style="color:var(--comic-black);font-family:'Bangers',cursive;font-size:2.2rem;font-weight:400;display:block;margin-bottom:.25rem;letter-spacing:1px;text-shadow:2px 2px 0 rgba(0,0,0,.1);line-height:1.2;">${s.venue}</div>`
+                  )
+                : ''
+            }
+            ${s.location ? `<div style="font-family:Inter,sans-serif;font-size:.9rem;font-weight:600;color:rgba(44,44,44,.6);margin-bottom:1.5rem;">${s.location}</div>` : ''}
+
+            <div style="font-family:Inter,sans-serif;font-size:1.3rem;font-weight:600;color:rgba(44,44,44,.85);margin-bottom:.75rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:100%;font-size:clamp(0.9rem,3vw,1.3rem);">
+              ${fmtDate(s.start)}
             </div>
+
+            <div style="font-family:'Bangers',cursive;font-size:4rem;color:var(--comic-green);text-shadow:4px 4px 0 var(--comic-black);letter-spacing:2px;margin-bottom:.75rem;line-height:.9;">
+              ${fmtTime(s.start)}
+            </div>
+
+            ${s.type === 'stage' && s.appraisal ? `<div style="font-family:Inter,sans-serif;font-size:.85rem;font-weight:600;color:${burstFill};margin-bottom:auto;letter-spacing:.5px;">Appraisals: ${s.appraisal}</div>` : `<div style="margin-bottom:auto;"></div>`}
           </div>
 
-          <div style="background:var(--comic-white);padding:1rem 1.5rem 1.5rem 1.5rem;flex-grow:1;display:flex;flex-direction:column;">
-            <div style="display:flex;gap:.5rem;flex-wrap:wrap;justify-content:center;margin-top:auto;">
-              <a href="${ADD_TO_CAL}" target="_blank" style="width:calc(50% - .25rem);box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--comic-yellow);color:var(--comic-black);padding:.75rem .5rem;border:3px solid var(--comic-black);text-decoration:none;font-weight:700;box-shadow:4px 4px 0 rgba(0,0,0,.3);font-family:'Bangers',cursive;font-size:1rem;letter-spacing:1px;text-shadow:2px 2px 0 var(--comic-white);">Add to Calendar</a>
-              <a href="${WATCH_URL}" target="_blank" style="width:calc(50% - .25rem);box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--comic-green);color:var(--comic-white);padding:.75rem .5rem;border:3px solid var(--comic-black);text-decoration:none;font-weight:700;box-shadow:4px 4px 0 rgba(0,0,0,.3);font-family:'Bangers',cursive;font-size:1rem;letter-spacing:1px;text-shadow:2px 2px 0 var(--comic-black);">Watch</a>
-            </div>
+          <div style="padding:0 2rem 2rem 2rem;display:flex;flex-direction:column;gap:.75rem;">
+            <a href="${calUrl}" target="_blank" style="width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--comic-yellow);color:var(--comic-black);padding:1rem;border:4px solid var(--comic-black);text-decoration:none;font-weight:700;box-shadow:5px 5px 0 rgba(0,0,0,.3);font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--comic-white);transition:transform .2s,box-shadow .2s;">ADD TO CALENDAR</a>
+            <a href="${watchUrl}" target="_blank" style="width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--comic-green);color:var(--comic-white);padding:1rem;border:4px solid var(--comic-black);text-decoration:none;font-weight:700;box-shadow:5px 5px 0 rgba(0,0,0,.3);font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--comic-black);transition:transform .2s,box-shadow .2s;">WATCH LIVE</a>
           </div>
         </div>
       `;
@@ -829,7 +900,7 @@ async function loadSchedule(){
   }catch(err){
     status('Failed to load schedule (see console)');
     console.error('[schedule] load failed:', err);
-    container.innerHTML = '<p style="text-align:center;font-weight:600">Schedule coming soon!</p>';
+    container.innerHTML = '<p style="text-align:center;font-weight:600">More Shows Coming Soon</p>';
   }
 }
 </script>

@@ -2,101 +2,107 @@
 <shows>
   <show type="stage">
     <date>2025-10-15</date>
-    <time>7:30 PM</time>
-    <theme>Worst Bridal Shower Ever</theme>
-    <venue>The Hideout Theatre</venue>
+    <time>8:00 PM</time>
+    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <theme>Live Studio Audience</theme>
+    <venue>TBD</venue>
     <location>New Orleans, LA</location>
     <address>123 Main St, New Orleans, LA 70116</address>
     <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>yes</verified>
+    <verified>no</verified>
   </show>
   <show type="screen">
     <date>2025-10-22</date>
     <time>8:00 PM</time>
+    <appraisal>7:00 PM - 7:45 PM</appraisal>
     <platform>Whatnot</platform>
     <theme>The One About Socks</theme>
-    <venue>Whatnot Only</venue>
+    <venue>Whatnot App</venue>
     <location>Online</location>
     <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>yes</verified>
+    <verified>no</verified>
   </show>
   <show type="stage">
     <date>2023-11-05</date>
-    <time>7:30 PM</time>
+    <time>8:00 PM</time>
+    <appraisal>7:00 PM - 7:45 PM</appraisal>
     <theme>Things Found in Your Mother's Nightstand</theme>
-    <venue>The Hideout Theatre</venue>
+    <venue>TBD</venue>
     <location>New Orleans, LA</location>
     <address>123 Main St, New Orleans, LA 70116</address>
     <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>yes</verified>
+    <verified>no</verified>
   </show>
   <show type="screen">
     <date>2025-11-19</date>
     <time>8:00 PM</time>
+    <appraisal>7:00 PM - 7:45 PM</appraisal>
     <platform>Whatnot</platform>
     <theme>Home Goods Gems</theme>
-    <venue>Whatnot Only</venue>
+    <venue>Whatnot App</venue>
     <location>Online</location>
     <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
-    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>yes</verified>
+    <watch>https://www.whatnot.com</watch>
+    <verified>no</verified>
   </show>
   <show type="stage">
     <date>2025-12-03</date>
-    <time>7:30 PM</time>
+    <time>8:00 PM</time>
+    <appraisal>7:00 PM - 7:45 PM</appraisal>
     <theme>As Seen on TV</theme>
-    <venue>The Hideout Theatre</venue>
+    <venue>TBD</venue>
     <location>New Orleans, LA</location>
     <address>123 Main St, New Orleans, LA 70116</address>
     <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>yes</verified>
+    <verified>no</verified>
   </show>
   <show type="screen">
     <date>2025-12-10</date>
     <time>8:00 PM</time>
+    <appraisal>7:00 PM - 7:45 PM</appraisal>
     <platform>Whatnot</platform>
     <theme>The Junk in the Trunk Show</theme>
-    <venue>Whatnot Only</venue>
+    <venue>Whatnot App</venue>
     <location>Online</location>
     <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>yes</verified>
+    <verified>no</verified>
   </show>
   <show type="stage">
     <date>2025-12-17</date>
-    <time>7:30 PM</time>
-    <theme>Kitchen Gadgets Gone Wild</theme>
-    <venue>The Hideout Theatre</venue>
+    <time>8:00 PM</time>
+    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <venue>TBD</venue>
     <location>New Orleans, LA</location>
     <address>123 Main St, New Orleans, LA 70116</address>
     <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>yes</verified>
+    <verified>no</verified>
   </show>
   <show type="screen">
     <date>2026-01-07</date>
     <time>8:00 PM</time>
+    <appraisal>7:00 PM - 7:45 PM</appraisal>
     <platform>Whatnot</platform>
-    <theme>Another One About Socks</theme>
-    <venue>Whatnot Only</venue>
+    <venue>Whatnot App</venue>
     <location>Online</location>
     <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>yes</verified>
+    <verified>no</verified>
   </show>
   <show type="screen">
-    <date>2026-02-04</date>
+    <date>2024-02-04</date>
     <time>8:00 PM</time>
-    <theme>Home Goods Gems</theme>
-    <venue>Whatnot Only</venue>
+    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <venue>Whatnot App</venue>
     <location>Online</location>
     <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>yes</verified>
+    <verified>no</verified>
 
   </show>
 </shows>
