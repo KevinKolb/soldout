@@ -3,11 +3,11 @@
   <show type="stage">
     <datetime>2025-10-16T01:00:00Z</datetime>
     <datetimeend>2025-10-16T03:00:00Z</datetimeend>
-    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <appraisal>2025-10-16T00:00:00Z - 2025-10-16T00:45:00Z</appraisal>
     <theme>Live Studio Audience</theme>
-    <venue>TBD</venue>
+    <venue>Location TBD</venue>
     <location>New Orleans, LA</location>
-    <address>123 Main St, New Orleans, LA 70116</address>
+    <address>Location TBD</address>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
@@ -17,47 +17,46 @@
     <platform>Whatnot</platform>
     <theme>The One with Socks</theme>
     <venue>Whatnot App</venue>
-    <location>Online</location>
-    <watch>https://www.whatnot.com/live/51957f20-73cb-48ea-90f5-03fcc8e9d769</watch>
+    <location>Online Only</location>
+    <watch>https://www.whatnot.com/live/922fcb2d-a32e-4bb7-96a0-dbcd9382c380?app=web&amp;sharing_channel=copyLink&amp;invitedBy=soldoutcomedy&amp;sender_id=24510767</watch>
     <verified>yes</verified>
   </show>
   <show type="stage">
     <datetime>2023-11-06T01:00:00Z</datetime>
     <datetimeend>2023-11-06T03:00:00Z</datetimeend>
-    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <appraisal>2023-11-06T00:00:00Z - 2023-11-06T00:45:00Z</appraisal>
     <theme>Things Found in Your Mother's Nightstand</theme>
-    <venue>TBD</venue>
+    <venue>Location TBD</venue>
     <location>New Orleans, LA</location>
-    <address>123 Main St, New Orleans, LA 70116</address>
+    <address>Location TBD</address>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
   <show type="screen">
-    <datetime>2025-11-20T01:00:00Z</datetime>
-    <datetimeend>2025-11-20T02:00:00Z</datetimeend>
-    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <datetime>2025-08-19T21:30:00Z</datetime>
+    <datetimeend>2025-08-19T22:30:00Z</datetimeend>
     <platform>Whatnot</platform>
-    <theme>Home Goods Gems</theme>
+    <theme>Tech Rehearsal</theme>
     <venue>Whatnot App</venue>
-    <location>Online</location>
-    <watch>https://www.whatnot.com</watch>
-    <verified>no</verified>
+    <location>Online Only</location>
+    <watch>https://www.whatnot.com/live/2122efaa-87ec-402e-afb5-b2cf1588d847</watch>
+    <verified>yes</verified>
   </show>
   <show type="stage">
-    <datetime>2025-12-04T01:00:00Z</datetime>
-    <datetimeend>2025-12-04T03:00:00Z</datetimeend>
-    <appraisal>7:00 PM - 7:45 PM</appraisal>
-    <theme>As Seen on TV</theme>
-    <venue>TBD</venue>
+    <datetime>2025-12-05T01:00:00Z</datetime>
+    <datetimeend>2025-12-05T03:00:00Z</datetimeend>
+    <appraisal>2025-12-05T00:00:00Z - 2025-12-05T00:45:00Z</appraisal>
+    <theme>Proof of CON-cept</theme>
+    <venue>Location TBD</venue>
     <location>New Orleans, LA</location>
-    <address>123 Main St, New Orleans, LA 70116</address>
-    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>no</verified>
+    <address>Location TBD</address>
+    <watch>https://www.whatnot.com/live/57150856-a002-4665-880c-18ca1382dd80</watch>
+    <verified>yes</verified>
   </show>
   <show type="screen">
     <datetime>2025-12-11T01:00:00Z</datetime>
     <datetimeend>2025-12-11T02:00:00Z</datetimeend>
-    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <appraisal>2025-12-11T00:00:00Z - 2025-12-11T00:45:00Z</appraisal>
     <platform>Whatnot</platform>
     <theme>The Junk in the Trunk Show</theme>
     <venue>Whatnot App</venue>
@@ -68,27 +67,27 @@
   <show type="stage">
     <datetime>2025-12-18T01:00:00Z</datetime>
     <datetimeend>2025-12-18T03:00:00Z</datetimeend>
-    <appraisal>7:00 PM - 7:45 PM</appraisal>
-    <venue>TBD</venue>
+    <appraisal>2025-12-18T00:00:00Z - 2025-12-18T00:45:00Z</appraisal>
+    <venue>Location TBD</venue>
     <location>New Orleans, LA</location>
-    <address>123 Main St, New Orleans, LA 70116</address>
+    <address>Location TBD</address>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
   <show type="screen">
     <datetime>2026-01-08T01:00:00Z</datetime>
     <datetimeend>2026-01-08T02:00:00Z</datetimeend>
-    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <appraisal>2026-01-08T00:00:00Z - 2026-01-08T00:45:00Z</appraisal>
     <platform>Whatnot</platform>
     <venue>Whatnot App</venue>
-    <location>Online</location>
+    <location>Online Only</location>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
   <show type="screen">
     <datetime>2024-02-05T01:00:00Z</datetime>
     <datetimeend>2024-02-05T02:00:00Z</datetimeend>
-    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <appraisal>2024-02-05T00:00:00Z - 2024-02-05T00:45:00Z</appraisal>
     <venue>Whatnot App</venue>
     <location>Online</location>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>

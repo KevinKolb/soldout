@@ -441,7 +441,7 @@
   <div class="halftone-overlay"></div>
 
   <section class="hero">
-    <p class="hero-subtitle">Loading tagline…</p>
+    <p class="hero-subtitle">Live Comedy Meets Live Shopping</p>
 
     <img src="web/images/soldoutlogo.png" alt="SOLD OUT! Comedy" class="hero-logo">
 
@@ -452,7 +452,7 @@ Live selling is a $68 billion market, but let's be real, <a href="https://www.re
       <div class="edition-card stage-edition">
         <h3>Stage Edition</h3>
         <div class="subtitle">Live In-Person and Online Audiences</div>
-        <p>Full theatrical improv where YOUR items become props. Audience members bring items in mail-ready boxes and our comedians transform them through (hopefully) hilarious sketches, and both live in-person and online audiences can bid. That bread maker? Now it's a flux capacitor.</p>
+        <p>Full theatrical improv where YOUR items become props in hilarious sketches. Bring something to sell, watch comedians transform it on stage, and let both live and online audiences battle it out in the bidding war. That bread maker? It's about to become a flux capacitor.</p>
         <div class="themes-section">
           <h4>Stage Edition Features</h4>
           <ul class="themes-list">
@@ -495,8 +495,8 @@ Live selling is a $68 billion market, but let's be real, <a href="https://www.re
       <div class="reviews-grid">
         <div class="review-card">
           <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
-          <p class="review-text">"I can't believe they didn't use comic sans on their website"</p>
-          <div class="reviewer">- Karen M.</div>
+          <p class="review-text">"I can't believe they didn't use Comic Sans on their website. It seems like a website that would have Comic Sans on it."</p>
+          <div class="reviewer">- Jorge B.</div>
         </div>
         <div class="review-card">
           <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
@@ -509,7 +509,7 @@ Live selling is a $68 billion market, but let's be real, <a href="https://www.re
           <div class="reviewer">- Fruit Enthusiast</div>
         </div>
         <div class="review-card">
-          <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+          <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
           <p class="review-text">"I came for the improv but left with 12 kitchen knives. Still confused."</p>
           <div class="reviewer">- Sharp Shopper</div>
         </div>
@@ -517,11 +517,6 @@ Live selling is a $68 billion market, but let's be real, <a href="https://www.re
           <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
           <p class="review-text">"My grandmother called during the show and bought a treadmill. She's 94."</p>
           <div class="reviewer">- Concerned Grandchild</div>
-        </div>
-        <div class="review-card">
-          <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
-          <p class="review-text">"It makes QVC look like Masterpiece Theater"</p>
-          <div class="reviewer">- TV Critic</div>
         </div>
         <div class="review-card">
           <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
@@ -737,10 +732,11 @@ async function loadSchedule(){
     return match ? match[1] : '';
   }
 
-  const fmtDate = (d)=> d?.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) || '';
-  const fmtTime = (d)=> {
+  const fmtDate = (d)=> d?.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'}) || '';
+  const fmtTime = (d, includeTZ = true)=> {
     if (!d) return '';
     const time = d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}).toLowerCase();
+    if (!includeTZ) return time;
     const tz = getTimezoneAbbr(d);
     return `${time} ${tz}`;
   };
@@ -763,11 +759,24 @@ async function loadSchedule(){
       return;
     }
 
+    // Parse appraisal time range (e.g., "2025-10-16T00:00:00Z - 2025-10-16T00:45:00Z")
+    function parseAppraisalTimes(appraisalStr) {
+      if (!appraisalStr) return null;
+      // Split on " - " (space-dash-space) to avoid splitting on date dashes
+      const parts = appraisalStr.split(' - ').map(s => s.trim());
+      if (parts.length !== 2) return null;
+      const start = parseUTCDateTime(parts[0]);
+      const end = parseUTCDateTime(parts[1]);
+      if (!start || !end) return null;
+      return { start, end };
+    }
+
     const shows = nodes
       .filter(show => show.querySelector('verified')?.textContent?.trim().toLowerCase() === 'yes')
       .map(show => {
         const datetimeStr = show.querySelector('datetime')?.textContent?.trim() || '';
         const datetimeendStr = show.querySelector('datetimeend')?.textContent?.trim() || '';
+        const appraisalStr = show.querySelector('appraisal')?.textContent?.trim() || '';
         const o = {
           type:          show.getAttribute('type')?.trim() || '',
           datetime:      datetimeStr,
@@ -778,7 +787,8 @@ async function loadSchedule(){
           address:       show.querySelector('address')?.textContent?.trim() || '',
           watch:         show.querySelector('watch')?.textContent?.trim() || '',
           addtocalendar: show.querySelector('addtocalendar')?.textContent?.trim() || '',
-          appraisal:     show.querySelector('appraisal')?.textContent?.trim() || ''
+          appraisal:     appraisalStr,
+          appraisalTimes: parseAppraisalTimes(appraisalStr)
         };
         o.start = parseUTCDateTime(o.datetime);
         o.end = parseUTCDateTime(o.datetimeend);
@@ -825,7 +835,11 @@ async function loadSchedule(){
       let description = '';
       if (show.venue) description += `${show.venue}\n`;
       if (show.location && show.type === 'stage') description += `${show.location}\n`;
-      if (show.type === 'stage' && show.appraisal) description += `\nAppraisals: ${show.appraisal}\n`;
+      if (show.type === 'stage' && show.appraisalTimes) {
+        const apprStart = fmtTime(show.appraisalTimes.start, false);
+        const apprEnd = fmtTime(show.appraisalTimes.end, false);
+        description += `\nAppraisals: ${apprStart} - ${apprEnd}\n`;
+      }
       if (show.watch) description += `\nWatch Live: ${show.watch}`;
 
       if (show.type === 'stage') {
@@ -856,7 +870,7 @@ async function loadSchedule(){
       const calUrl    = makeGoogleCalendarLink(s);
 
       return `
-        <div style="border:5px solid var(--comic-black);border-top:12px solid ${burstFill};box-shadow:6px 6px 0 rgba(0,0,0,.3);position:relative;display:flex;flex-direction:column;min-height:450px;background:var(--comic-white);box-sizing:border-box;${isPast ? 'opacity:.5;pointer-events:none;' : ''}">
+        <div style="border:5px solid var(--comic-black);border-top:12px solid ${burstFill};box-shadow:6px 6px 0 rgba(0,0,0,.3);position:relative;display:flex;flex-direction:column;min-height:450px;background:var(--comic-white);box-sizing:border-box;">
           <div style="position:absolute;top:-35px;left:-30px;z-index:10;">
             <svg width="180" height="70" viewBox="0 0 220 80" style="filter:drop-shadow(4px 4px 0 rgba(0,0,0,.3));">
               <path d="M110 5 130 25 170 15 155 35 200 45 160 50 180 70 130 55 110 75 90 55 40 70 60 50 20 45 65 35 50 15 90 25 Z"
@@ -867,31 +881,34 @@ async function loadSchedule(){
                         text-shadow:2px 2px 0 #2C2C2C;">${ribbon}</div>
           </div>
 
-          <div style="padding:2.5rem 2rem 2rem 2rem;text-align:center;flex-grow:1;display:flex;flex-direction:column;">
+          <div style="padding:2.5rem 2rem 2rem 2rem;display:flex;flex-direction:column;align-items:center;flex-grow:1;${isPast ? 'opacity:.5;' : ''}">
+            ${s.theme ? `<div style="font-family:'Bangers',cursive;font-size:2rem;color:${burstFill};letter-spacing:1px;margin-bottom:.25rem;line-height:1.2;text-align:center;width:100%;">${s.theme}</div>` : ''}
+            <div style="font-family:Inter,sans-serif;font-size:.75rem;font-weight:400;color:rgba(44,44,44,.6);margin-bottom:.75rem;text-align:center;width:100%;">A SOLD OUT! Comedy Show</div>
+
             ${
               s.venue
                 ? (s.address && mapsLink
-                    ? `<a href="${mapsLink}" target="_blank" style="color:var(--comic-black);text-decoration:none;font-family:'Bangers',cursive;font-size:2.2rem;font-weight:400;display:block;margin-bottom:.25rem;letter-spacing:1px;text-shadow:2px 2px 0 rgba(0,0,0,.1);line-height:1.2;">${s.venue}</a>`
-                    : `<div style="color:var(--comic-black);font-family:'Bangers',cursive;font-size:2.2rem;font-weight:400;display:block;margin-bottom:.25rem;letter-spacing:1px;text-shadow:2px 2px 0 rgba(0,0,0,.1);line-height:1.2;">${s.venue}</div>`
+                    ? `<a href="${mapsLink}" target="_blank" style="color:var(--comic-black);text-decoration:none;font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;display:block;">${s.venue}</a>`
+                    : `<div style="color:var(--comic-black);font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;">${s.venue}</div>`
                   )
                 : ''
             }
-            ${s.location ? `<div style="font-family:Inter,sans-serif;font-size:.9rem;font-weight:600;color:rgba(44,44,44,.6);margin-bottom:1.5rem;">${s.location}</div>` : ''}
+            ${s.location ? `<div style="font-family:'Bangers',cursive;font-size:1rem;font-weight:400;color:${burstFill};margin-bottom:.75rem;letter-spacing:1px;text-align:center;width:100%;">${s.location}</div>` : ''}
 
-            <div style="font-family:Inter,sans-serif;font-size:1.3rem;font-weight:600;color:rgba(44,44,44,.85);margin-bottom:.75rem;line-height:1.3;white-space:normal;overflow-wrap:break-word;max-width:100%;font-size:clamp(0.85rem,2.5vw,1.2rem);padding:0 0.5rem;">
+            <div style="font-family:'Bangers',cursive;font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:400;color:var(--comic-black);margin-bottom:.25rem;line-height:1.2;letter-spacing:1px;text-align:center;width:100%;">
               ${fmtDate(s.start)}
             </div>
 
-            <div style="font-family:'Bangers',cursive;font-size:3rem;color:var(--comic-green);text-shadow:4px 4px 0 var(--comic-black);letter-spacing:2px;margin-bottom:.75rem;line-height:.9;white-space:nowrap;">
+            <div style="font-family:'Bangers',cursive;font-size:1rem;color:${burstFill};letter-spacing:2px;margin-bottom:.25rem;line-height:1.2;text-align:center;width:100%;">
               ${fmtTime(s.start)}
             </div>
 
-            ${s.type === 'stage' && s.appraisal ? `<div style="font-family:Inter,sans-serif;font-size:.85rem;font-weight:600;color:${burstFill};margin-bottom:auto;letter-spacing:.5px;">Appraisals: ${s.appraisal}</div>` : `<div style="margin-bottom:auto;"></div>`}
+            ${s.type === 'stage' && s.appraisalTimes ? `<div style="font-family:'Bangers',cursive;font-size:1rem;font-weight:400;color:${burstFill};margin-top:auto;letter-spacing:1px;text-align:center;width:100%;">Appraisals: ${fmtTime(s.appraisalTimes.start, false)} - ${fmtTime(s.appraisalTimes.end, false)}</div>` : `<div style="margin-top:auto;"></div>`}
           </div>
 
           <div style="padding:0 2rem 2rem 2rem;display:flex;flex-direction:column;gap:.75rem;">
-            <a href="${calUrl}" target="_blank" style="width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--comic-yellow);color:var(--comic-black);padding:1rem;border:4px solid var(--comic-black);text-decoration:none;font-weight:700;box-shadow:5px 5px 0 rgba(0,0,0,.3);font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--comic-white);transition:transform .2s,box-shadow .2s;">ADD TO CALENDAR</a>
-            <a href="${watchUrl}" target="_blank" style="width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--comic-green);color:var(--comic-white);padding:1rem;border:4px solid var(--comic-black);text-decoration:none;font-weight:700;box-shadow:5px 5px 0 rgba(0,0,0,.3);font-family:'Bangers',cursive;font-size:1.2rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--comic-black);transition:transform .2s,box-shadow .2s;">WATCH LIVE</a>
+            <a href="${calUrl}" target="_blank" style="width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--comic-yellow);color:var(--comic-black);padding:1rem;border:4px solid var(--comic-black);text-decoration:none;font-weight:700;box-shadow:5px 5px 0 rgba(0,0,0,.3);font-family:'Bangers',cursive;font-size:1.3rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--comic-white);transition:transform .2s,box-shadow .2s;${isPast ? 'opacity:.5;pointer-events:none;' : ''}">ADD TO CALENDAR</a>
+            <a href="${watchUrl}" target="_blank" style="width:100%;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:var(--comic-green);color:var(--comic-white);padding:1rem;border:4px solid var(--comic-black);text-decoration:none;font-weight:700;box-shadow:5px 5px 0 rgba(0,0,0,.3);font-family:'Bangers',cursive;font-size:1.3rem;letter-spacing:1.5px;text-shadow:2px 2px 0 var(--comic-black);transition:transform .2s,box-shadow .2s;">${isPast ? 'WATCH RERUN' : 'WATCH LIVE'}</a>
           </div>
         </div>
       `;
