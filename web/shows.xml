@@ -1,54 +1,102 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <shows>
-    <show type="stage">
-        <title>VINTAGE VIBES</title>
-        <date>2025-09-01</date>
-        <time>7:30 PM</time>
-        <location>Old Theater</location>
-        <locationUrl>https://maps.google.com/maps?q=Old+Theater+downtown</locationUrl>
-        <merchStartTime>6:30 PM</merchStartTime>
-        <merchEndTime>7:15 PM</merchEndTime>
-        <liveUrl>https://example.com/buy-vintage-tickets</liveUrl>
-        <onlineUrl>https://example.com/watch-vintage</onlineUrl>
-    </show>
-    <show type="screen">
-        <title>ESPECIALLY HEINOUS</title>
-        <date>2025-09-01</date>
-        <time>8:00 PM</time>
-        <onlineUrl>https://example.com/watch-heinous</onlineUrl>
-    </show>
-    <show type="stage">
-        <title>HOME GOODS GEMS</title>
-        <date>2025-09-01</date>
-        <time>8:00 PM</time>
-        <location>Comedy Club Downtown</location>
-        <locationUrl>https://www.comedyclubdowntown.com/directions</locationUrl>
-        <merchStartTime>7:00 PM</merchStartTime>
-        <merchEndTime>7:45 PM</merchEndTime>
-        <liveUrl>https://example.com/buy-tickets</liveUrl>
-        <onlineUrl>https://example.com/watch-online</onlineUrl>
-    </show>
-    <show type="screen">
-        <title>DIGITAL DISASTERS</title>
-        <date>2025-09-01</date>
-        <time>9:00 PM</time>
-        <onlineUrl>https://example.com/watch-disasters</onlineUrl>
-    </show>
-    <show type="screen">
-        <title>RETAIL THERAPY</title>
-        <date>2025-09-01</date>
-        <time>7:00 PM</time>
-        <location>The Laugh Track</location>
-        <locationUrl>https://maps.google.com/maps?q=The+Laugh+Track+comedy+venue</locationUrl>
-        <merchStartTime>6:00 PM</merchStartTime>
-        <merchEndTime>6:45 PM</merchEndTime>
-        <liveUrl>https://example.com/buy-retail-tickets</liveUrl>
-        <onlineUrl>https://example.com/watch-retail</onlineUrl>
-    </show>
-    <show type="screen">
-        <title>SOCIAL MEDIA MAYHEM</title>
-        <date>2025-09-01</date>
-        <time>8:30 PM</time>
-        <onlineUrl>https://example.com/watch-social</onlineUrl>
-    </show>
+  <show type="stage">
+    <date>2025-10-15</date>
+    <time>7:30 PM</time>
+    <theme>Worst Bridal Shower Ever</theme>
+    <venue>The Hideout Theatre</venue>
+    <location>New Orleans, LA</location>
+    <address>123 Main St, New Orleans, LA 70116</address>
+    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
+    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
+    <verified>yes</verified>
+  </show>
+  <show type="screen">
+    <date>2025-10-22</date>
+    <time>8:00 PM</time>
+    <platform>Whatnot</platform>
+    <theme>The One About Socks</theme>
+    <venue>Whatnot Only</venue>
+    <location>Online</location>
+    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
+    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
+    <verified>yes</verified>
+  </show>
+  <show type="stage">
+    <date>2023-11-05</date>
+    <time>7:30 PM</time>
+    <theme>Things Found in Your Mother's Nightstand</theme>
+    <venue>The Hideout Theatre</venue>
+    <location>New Orleans, LA</location>
+    <address>123 Main St, New Orleans, LA 70116</address>
+    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
+    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
+    <verified>yes</verified>
+  </show>
+  <show type="screen">
+    <date>2025-11-19</date>
+    <time>8:00 PM</time>
+    <platform>Whatnot</platform>
+    <theme>Home Goods Gems</theme>
+    <venue>Whatnot Only</venue>
+    <location>Online</location>
+    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
+    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
+    <verified>yes</verified>
+  </show>
+  <show type="stage">
+    <date>2025-12-03</date>
+    <time>7:30 PM</time>
+    <theme>As Seen on TV</theme>
+    <venue>The Hideout Theatre</venue>
+    <location>New Orleans, LA</location>
+    <address>123 Main St, New Orleans, LA 70116</address>
+    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
+    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
+    <verified>yes</verified>
+  </show>
+  <show type="screen">
+    <date>2025-12-10</date>
+    <time>8:00 PM</time>
+    <platform>Whatnot</platform>
+    <theme>The Junk in the Trunk Show</theme>
+    <venue>Whatnot Only</venue>
+    <location>Online</location>
+    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
+    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
+    <verified>yes</verified>
+  </show>
+  <show type="stage">
+    <date>2025-12-17</date>
+    <time>7:30 PM</time>
+    <theme>Kitchen Gadgets Gone Wild</theme>
+    <venue>The Hideout Theatre</venue>
+    <location>New Orleans, LA</location>
+    <address>123 Main St, New Orleans, LA 70116</address>
+    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
+    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
+    <verified>yes</verified>
+  </show>
+  <show type="screen">
+    <date>2026-01-07</date>
+    <time>8:00 PM</time>
+    <platform>Whatnot</platform>
+    <theme>Another One About Socks</theme>
+    <venue>Whatnot Only</venue>
+    <location>Online</location>
+    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
+    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
+    <verified>yes</verified>
+  </show>
+  <show type="screen">
+    <date>2026-02-04</date>
+    <time>8:00 PM</time>
+    <theme>Home Goods Gems</theme>
+    <venue>Whatnot Only</venue>
+    <location>Online</location>
+    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
+    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
+    <verified>yes</verified>
+
+  </show>
 </shows>
