@@ -1,108 +1,97 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <shows>
   <show type="stage">
-    <date>2025-10-15</date>
-    <time>8:00 PM</time>
+    <datetime>2025-10-16T01:00:00Z</datetime>
+    <datetimeend>2025-10-16T03:00:00Z</datetimeend>
     <appraisal>7:00 PM - 7:45 PM</appraisal>
     <theme>Live Studio Audience</theme>
     <venue>TBD</venue>
     <location>New Orleans, LA</location>
     <address>123 Main St, New Orleans, LA 70116</address>
-    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
   <show type="screen">
-    <date>2025-10-22</date>
-    <time>8:00 PM</time>
-    <appraisal>7:00 PM - 7:45 PM</appraisal>
+    <datetime>2025-11-09T04:30:00Z</datetime>
+    <datetimeend>2025-11-09T05:30:00Z</datetimeend>
     <platform>Whatnot</platform>
-    <theme>The One About Socks</theme>
+    <theme>The One with Socks</theme>
     <venue>Whatnot App</venue>
     <location>Online</location>
-    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
-    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <verified>no</verified>
+    <watch>https://www.whatnot.com/live/51957f20-73cb-48ea-90f5-03fcc8e9d769</watch>
+    <verified>yes</verified>
   </show>
   <show type="stage">
-    <date>2023-11-05</date>
-    <time>8:00 PM</time>
+    <datetime>2023-11-06T01:00:00Z</datetime>
+    <datetimeend>2023-11-06T03:00:00Z</datetimeend>
     <appraisal>7:00 PM - 7:45 PM</appraisal>
     <theme>Things Found in Your Mother's Nightstand</theme>
     <venue>TBD</venue>
     <location>New Orleans, LA</location>
     <address>123 Main St, New Orleans, LA 70116</address>
-    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
   <show type="screen">
-    <date>2025-11-19</date>
-    <time>8:00 PM</time>
+    <datetime>2025-11-20T01:00:00Z</datetime>
+    <datetimeend>2025-11-20T02:00:00Z</datetimeend>
     <appraisal>7:00 PM - 7:45 PM</appraisal>
     <platform>Whatnot</platform>
     <theme>Home Goods Gems</theme>
     <venue>Whatnot App</venue>
     <location>Online</location>
-    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com</watch>
     <verified>no</verified>
   </show>
   <show type="stage">
-    <date>2025-12-03</date>
-    <time>8:00 PM</time>
+    <datetime>2025-12-04T01:00:00Z</datetime>
+    <datetimeend>2025-12-04T03:00:00Z</datetimeend>
     <appraisal>7:00 PM - 7:45 PM</appraisal>
     <theme>As Seen on TV</theme>
     <venue>TBD</venue>
     <location>New Orleans, LA</location>
     <address>123 Main St, New Orleans, LA 70116</address>
-    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
   <show type="screen">
-    <date>2025-12-10</date>
-    <time>8:00 PM</time>
+    <datetime>2025-12-11T01:00:00Z</datetime>
+    <datetimeend>2025-12-11T02:00:00Z</datetimeend>
     <appraisal>7:00 PM - 7:45 PM</appraisal>
     <platform>Whatnot</platform>
     <theme>The Junk in the Trunk Show</theme>
     <venue>Whatnot App</venue>
     <location>Online</location>
-    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
   <show type="stage">
-    <date>2025-12-17</date>
-    <time>8:00 PM</time>
+    <datetime>2025-12-18T01:00:00Z</datetime>
+    <datetimeend>2025-12-18T03:00:00Z</datetimeend>
     <appraisal>7:00 PM - 7:45 PM</appraisal>
     <venue>TBD</venue>
     <location>New Orleans, LA</location>
     <address>123 Main St, New Orleans, LA 70116</address>
-    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
   <show type="screen">
-    <date>2026-01-07</date>
-    <time>8:00 PM</time>
+    <datetime>2026-01-08T01:00:00Z</datetime>
+    <datetimeend>2026-01-08T02:00:00Z</datetimeend>
     <appraisal>7:00 PM - 7:45 PM</appraisal>
     <platform>Whatnot</platform>
     <venue>Whatnot App</venue>
     <location>Online</location>
-    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
   </show>
   <show type="screen">
-    <date>2024-02-04</date>
-    <time>8:00 PM</time>
+    <datetime>2024-02-05T01:00:00Z</datetime>
+    <datetimeend>2024-02-05T02:00:00Z</datetimeend>
     <appraisal>7:00 PM - 7:45 PM</appraisal>
     <venue>Whatnot App</venue>
     <location>Online</location>
-    <addtocalendar>https://comingsoon.com/addtocalendar</addtocalendar>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
     <verified>no</verified>
-
   </show>
 </shows>

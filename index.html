@@ -723,29 +723,27 @@ async function loadSchedule(){
     '../web/shows.xml'
   ];
 
-  // Strict, locale-safe parsing: YYYY-MM-DD + "7:30 PM" / "19:30"
-  function parseDateTimeStrict(dateStr, timeStr){
-    if (!dateStr || !timeStr) return null;
-    const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    if (!m) return null;
-    const [ , y, mo, d ] = m.map(Number);
-
-    let h=0, mi=0;
-    const ampmMatch = timeStr.match(/^\s*(\d{1,2})(?::(\d{2}))?\s*(am|pm)?\s*$/i);
-    if (!ampmMatch) return null;
-    h  = Number(ampmMatch[1]);
-    mi = Number(ampmMatch[2] || 0);
-    const ap = ampmMatch[3]?.toLowerCase();
-    if (ap){
-      const isPM = ap === 'pm';
-      if (h === 12) h = isPM ? 12 : 0; else if (isPM) h += 12;
-    }
-    const dt = new Date(y, mo-1, d, h, mi, 0, 0);
+  // Parse ISO 8601 UTC datetime: YYYY-MM-DDTHH:MM:SSZ
+  function parseUTCDateTime(datetimeStr){
+    if (!datetimeStr) return null;
+    const dt = new Date(datetimeStr);
     return isNaN(dt.getTime()) ? null : dt;
   }
 
+  // Get timezone abbreviation (e.g., "EST", "PST", "CST")
+  function getTimezoneAbbr(date) {
+    const str = date.toLocaleTimeString('en-US', {timeZoneName: 'short'});
+    const match = str.match(/\b([A-Z]{3,5})\b/);
+    return match ? match[1] : '';
+  }
+
   const fmtDate = (d)=> d?.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric', year:'numeric'}) || '';
-  const fmtTime = (d)=> d?.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}).replace(' ','').toLowerCase() || '';
+  const fmtTime = (d)=> {
+    if (!d) return '';
+    const time = d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}).toLowerCase();
+    const tz = getTimezoneAbbr(d);
+    return `${time} ${tz}`;
+  };
 
   try{
     const xmlText = await fetchFirstWorking(candidates, 'schedule');
@@ -768,10 +766,12 @@ async function loadSchedule(){
     const shows = nodes
       .filter(show => show.querySelector('verified')?.textContent?.trim().toLowerCase() === 'yes')
       .map(show => {
+        const datetimeStr = show.querySelector('datetime')?.textContent?.trim() || '';
+        const datetimeendStr = show.querySelector('datetimeend')?.textContent?.trim() || '';
         const o = {
           type:          show.getAttribute('type')?.trim() || '',
-          date:          show.querySelector('date')?.textContent?.trim() || '',
-          time:          show.querySelector('time')?.textContent?.trim() || '',
+          datetime:      datetimeStr,
+          datetimeend:   datetimeendStr,
           theme:         show.querySelector('theme')?.textContent?.trim() || '',
           venue:         show.querySelector('venue')?.textContent?.trim() || '',
           location:      show.querySelector('location')?.textContent?.trim() || '',
@@ -780,15 +780,16 @@ async function loadSchedule(){
           addtocalendar: show.querySelector('addtocalendar')?.textContent?.trim() || '',
           appraisal:     show.querySelector('appraisal')?.textContent?.trim() || ''
         };
-        o.start = parseDateTimeStrict(o.date, o.time);
-        if (!o.start) o._parseError = `Bad date/time: "${o.date}" "${o.time}"`;
+        o.start = parseUTCDateTime(o.datetime);
+        o.end = parseUTCDateTime(o.datetimeend);
+        if (!o.start) o._parseError = `Bad datetime: "${o.datetime}"`;
         return o;
       });
 
     // If everything failed to parse, tell why
     if (shows.every(s => !s.start)){
-      status('All shows failed date/time parsing — see console');
-      console.table(shows.map(s => ({date:s.date, time:s.time, error:s._parseError||null})));
+      status('All shows failed datetime parsing — see console');
+      console.table(shows.map(s => ({datetime:s.datetime, error:s._parseError||null})));
       container.innerHTML = '<p style="text-align:center;font-weight:600;grid-column:1/-1;font-size:1.2rem;">More Shows Coming Soon</p>';
       return;
     }
@@ -802,13 +803,20 @@ async function loadSchedule(){
     function makeGoogleCalendarLink(show) {
       if (!show.start) return ADD_TO_CAL;
 
-      // Calculate end time (2 hours after start)
-      const endTime = new Date(show.start.getTime() + (2 * 60 * 60 * 1000));
+      // Use datetimeend from XML, or fallback to calculated end time
+      let endTime;
+      if (show.end) {
+        endTime = show.end;
+      } else {
+        // Fallback: screen=1hr, stage=2hrs
+        const durationHours = show.type === 'screen' ? 1 : 2;
+        endTime = new Date(show.start.getTime() + (durationHours * 60 * 60 * 1000));
+      }
 
-      // Format dates for Google Calendar (YYYYMMDDTHHmmss)
+      // Format dates for Google Calendar in local time (YYYYMMDDTHHmmss)
       const formatGCal = (d) => {
         const pad = (n) => String(n).padStart(2, '0');
-        return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
+        return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
       };
 
       const title = `SOLD OUT! Comedy - ${show.type === 'stage' ? 'Stage Edition' : 'Screen Edition'}`;
@@ -870,11 +878,11 @@ async function loadSchedule(){
             }
             ${s.location ? `<div style="font-family:Inter,sans-serif;font-size:.9rem;font-weight:600;color:rgba(44,44,44,.6);margin-bottom:1.5rem;">${s.location}</div>` : ''}
 
-            <div style="font-family:Inter,sans-serif;font-size:1.3rem;font-weight:600;color:rgba(44,44,44,.85);margin-bottom:.75rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:clip;max-width:100%;font-size:clamp(0.9rem,3vw,1.3rem);">
+            <div style="font-family:Inter,sans-serif;font-size:1.3rem;font-weight:600;color:rgba(44,44,44,.85);margin-bottom:.75rem;line-height:1.3;white-space:normal;overflow-wrap:break-word;max-width:100%;font-size:clamp(0.85rem,2.5vw,1.2rem);padding:0 0.5rem;">
               ${fmtDate(s.start)}
             </div>
 
-            <div style="font-family:'Bangers',cursive;font-size:4rem;color:var(--comic-green);text-shadow:4px 4px 0 var(--comic-black);letter-spacing:2px;margin-bottom:.75rem;line-height:.9;">
+            <div style="font-family:'Bangers',cursive;font-size:3rem;color:var(--comic-green);text-shadow:4px 4px 0 var(--comic-black);letter-spacing:2px;margin-bottom:.75rem;line-height:.9;white-space:nowrap;">
               ${fmtTime(s.start)}
             </div>
 
@@ -891,8 +899,8 @@ async function loadSchedule(){
 
     const bad = shows.filter(s => s._parseError);
     if (bad.length){
-      status(`Rendered ${sorted.length} shows • ${bad.length} had date/time issues (see console)`);
-      console.table(bad.map(s => ({date:s.date, time:s.time, error:s._parseError})));
+      status(`Rendered ${sorted.length} shows • ${bad.length} had datetime issues (see console)`);
+      console.table(bad.map(s => ({datetime:s.datetime, error:s._parseError})));
     } else {
       status(`Rendered ${sorted.length} shows`);
     }
