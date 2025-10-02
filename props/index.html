@@ -19,6 +19,79 @@
             font-size: 16px;
         }
 
+        /* Password protection overlay */
+        #passwordOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        #passwordOverlay.hidden {
+            display: none;
+        }
+
+        .password-box {
+            text-align: center;
+            padding: 40px;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .password-box h2 {
+            font-size: 28px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 20px;
+        }
+
+        .password-box input {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 16px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .password-box button {
+            width: 100%;
+            padding: 14px 18px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .password-box button:hover {
+            background: #555;
+        }
+
+        .password-error {
+            color: #d00;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .password-error.show {
+            display: block;
+        }
+
         /* Main container */
         .container {
             min-height: 100vh;
@@ -188,10 +261,20 @@
     </style>
 </head>
 <body>
+    <!-- Password Protection Overlay -->
+    <div id="passwordOverlay">
+        <div class="password-box">
+            <h2>Enter Password</h2>
+            <input type="password" id="passwordInput" placeholder="Password" autocomplete="off">
+            <button onclick="checkPassword()">Submit</button>
+            <div class="password-error" id="passwordError">Incorrect password</div>
+        </div>
+    </div>
+
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1>Props Management</h1>
+            <h1>Prop Management</h1>
             <div class="subtitle">SOLD OUT! Comedy</div>
         </header>
 
@@ -215,13 +298,41 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <div>SOLD OUT Comedy | Props Management
+            <div>SOLD OUT Comedy | Prop Management
                 <a href="../index.html">← Back to Home</a>
             </div>
         </footer>
     </div>
 
     <script>
+        // Password protection
+        function checkPassword() {
+            const input = document.getElementById('passwordInput');
+            const error = document.getElementById('passwordError');
+            const overlay = document.getElementById('passwordOverlay');
+
+            if (input.value.toLowerCase() === 'yucks') {
+                sessionStorage.setItem('propsAuthenticated', 'true');
+                overlay.classList.add('hidden');
+            } else {
+                error.classList.add('show');
+                input.value = '';
+                setTimeout(() => error.classList.remove('show'), 3000);
+            }
+        }
+
+        // Check if already authenticated
+        if (sessionStorage.getItem('propsAuthenticated') === 'true') {
+            document.getElementById('passwordOverlay').classList.add('hidden');
+        }
+
+        // Allow Enter key to submit password
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
         // Handle form button popup
         const formBtn = document.getElementById('formBtn');
         const formPopup = document.getElementById('formPopup');
@@ -230,7 +341,7 @@
         formBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
+
             if (isPopupOpen) {
                 formPopup.classList.remove('active');
                 isPopupOpen = false;
