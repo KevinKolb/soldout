@@ -99,6 +99,10 @@
                 <input type="email" id="email" required>
                 <div class="error-message" id="emailError"></div>
             </div>
+            <div class="form-group">
+                <label for="venmo">Venmo</label>
+                <input type="text" id="venmo" placeholder="@username">
+            </div>
             <div class="button-group">
                 <button class="next-btn" id="step1Next">NEXT ≫</button>
             </div>
@@ -133,12 +137,16 @@
             <h2>Price Breakdown</h2>
             <div class="price-display">
                 <div class="price-row">
-                    <span>Sale Price:</span>
+                    <span>Sale Price (what you get):</span>
                     <span id="displaySalePrice"><strong>$10.00</strong></span>
                 </div>
                 <div class="price-row">
+                    <span>Whatnot Fee (8%):</span>
+                    <span id="displayWhatnotFee"><strong>$0.80</strong></span>
+                </div>
+                <div class="price-row">
                     <span>Listing Price:</span>
-                    <span id="displayListingPrice"><strong>$11.00</strong></span>
+                    <span id="displayListingPrice"><strong>$10.80</strong></span>
                 </div>
             </div>
             <div class="button-group">
@@ -205,14 +213,16 @@
         <div class="form-section" id="final">
             <div class="final-screen">
                 <h2>Sold! ... hopefully.</h2>
-                <p>Give the appraiser your boxed prop. Check your email for your receipt and your prop ID, which you'll need to listen for if you're performing. Make sure you received the receipt to confirm your email address is correct for payment.</p>
+                <p>Give the appraiser your boxed prop. Check your email for your receipt and your prop ID, which you'll need to listen for if you're performing. Make sure you received the receipt to confirm your email address and Venmo are correct for payment.</p>
                 <div class="results-section">
                     <h3>Form Results</h3>
                     <div class="result-item"><span class="result-label">Prop ID:</span><span class="result-value" id="resultItemId"></span></div>
                     <div class="result-item"><span class="result-label">Seller:</span><span class="result-value" id="resultName"></span></div>
                     <div class="result-item"><span class="result-label">Email:</span><span class="result-value" id="resultEmail"></span></div>
+                    <div class="result-item"><span class="result-label">Venmo:</span><span class="result-value" id="resultVenmo"></span></div>
                     <div class="result-item"><span class="result-label">Description:</span><span class="result-value" id="resultDescription"></span></div>
                     <div class="result-item"><span class="result-label">Sale Price:</span><span class="result-value" id="resultSalePrice"></span></div>
+                    <div class="result-item"><span class="result-label">Whatnot Fee (8%):</span><span class="result-value" id="resultWhatnotFee"></span></div>
                     <div class="result-item"><span class="result-label">Listing Price:</span><span class="result-value" id="resultListingPrice"></span></div>
                     <div class="result-item"><span class="result-label">Perform:</span><span class="result-value" id="resultPerformance"></span></div>
                     <div class="result-item"><span class="result-label">Signature:</span><span class="result-value" id="resultSignature"></span></div>
@@ -229,11 +239,11 @@ const CONFIG = {
     EMAILJS_SERVICE_ID: 'service_151yelq',
     EMAILJS_TEMPLATE_ID: 'template_nroyna9',
     EMAILJS_PUBLIC_KEY: 'yi2bgGVokQizGNBWi',
-    FEES_PERCENTAGE: 0.1
+    WHATNOT_FEE: 0.08
 };
 
 let currentStep = 1;
-let formData = { itemId: Math.floor(Math.random() * 9000) + 1000, fees: CONFIG.FEES_PERCENTAGE };
+let formData = { itemId: Math.floor(Math.random() * 9000) + 1000, fees: CONFIG.WHATNOT_FEE };
 let canvas, ctx, isDrawing = false, hasSigned = false;
 
 function validateEmail(email) {
@@ -270,10 +280,12 @@ function nextStep(step) {
     if (step === 3) {
         const salePrice = parseFloat(document.getElementById('salePrice').value);
         if (!salePrice || salePrice < 1) { alert('Sale price must be at least $1.00'); return; }
-        const listingPrice = salePrice + (salePrice * formData.fees);
+        const whatnotFee = salePrice * formData.fees;
+        const listingPrice = salePrice + whatnotFee;
         document.getElementById('displaySalePrice').innerHTML = '<strong>$' + salePrice.toFixed(2) + '</strong>';
+        document.getElementById('displayWhatnotFee').innerHTML = '<strong>$' + whatnotFee.toFixed(2) + '</strong>';
         document.getElementById('displayListingPrice').innerHTML = '<strong>$' + listingPrice.toFixed(2) + '</strong>';
-        formData.salePrice = salePrice; formData.listingPrice = listingPrice;
+        formData.salePrice = salePrice; formData.whatnotFee = whatnotFee; formData.listingPrice = listingPrice;
     }
     currentStep++; showStep(currentStep); updateProgress();
 }
@@ -375,6 +387,7 @@ function clearSignature() {
 async function submitForm() {
     formData.name = document.getElementById('name').value;
     formData.email = document.getElementById('email').value;
+    formData.venmo = document.getElementById('venmo').value;
     formData.description = document.getElementById('description').value;
     formData.signatureData = canvas.toDataURL();
     const btn = document.getElementById('finalSubmit');
@@ -393,21 +406,22 @@ async function submitToAirtable(data) {
     const labels = { 'insist': 'Yes, I insist', 'willing': "I'm willing to", 'no': 'Oh hell no!' };
     const response = await fetch(`https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${CONFIG.AIRTABLE_TABLE_NAME}`, {
         method: 'POST',
-        headers: { 
-            'Authorization': `Bearer ${CONFIG.AIRTABLE_API_KEY}`, 
-            'Content-Type': 'application/json' 
+        headers: {
+            'Authorization': `Bearer ${CONFIG.AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-            fields: { 
-                'Item ID': data.itemId, 
-                'Seller': data.name, 
-                'Email': data.email, 
-                'Description': data.description || 'No description provided', 
-                'Sale Price': data.salePrice, 
-                'Listing Price': data.listingPrice, 
-                'Perform': labels[data.performance] || 'Not selected', 
-                'Signature Data': data.signatureData 
-            } 
+        body: JSON.stringify({
+            fields: {
+                'Item ID': data.itemId,
+                'Seller': data.name,
+                'Email': data.email,
+                'venmo': data.venmo || '',
+                'Description': data.description || 'No description provided',
+                'Sale Price': data.salePrice,
+                'Listing Price': data.listingPrice,
+                'Perform': labels[data.performance] || 'Not selected',
+                'Signature Data': data.signatureData
+            }
         })
     });
     if (!response.ok) throw new Error('Airtable failed');
@@ -416,11 +430,12 @@ async function submitToAirtable(data) {
 async function sendEmailConfirmation(data) {
     const labels = { 'insist': 'Yes, I insist', 'willing': "I'm willing to", 'no': 'Oh hell no!' };
     await emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
-        seller_name: data.name, 
-        seller_email: data.email, 
+        seller_name: data.name,
+        seller_email: data.email,
+        venmo: data.venmo || 'Not provided',
         item_id: data.itemId,
         description: data.description || 'No description provided',
-        sale_price: '$' + data.salePrice.toFixed(2), 
+        sale_price: '$' + data.salePrice.toFixed(2),
         listing_price: '$' + data.listingPrice.toFixed(2),
         performance: labels[data.performance] || 'Not selected'
     }, CONFIG.EMAILJS_PUBLIC_KEY);
@@ -431,8 +446,10 @@ function showSuccessScreen() {
     document.getElementById('resultItemId').textContent = formData.itemId;
     document.getElementById('resultName').textContent = formData.name;
     document.getElementById('resultEmail').textContent = formData.email;
+    document.getElementById('resultVenmo').textContent = formData.venmo || 'Not provided';
     document.getElementById('resultDescription').textContent = formData.description || 'No description provided';
     document.getElementById('resultSalePrice').textContent = '$' + formData.salePrice.toFixed(2);
+    document.getElementById('resultWhatnotFee').textContent = '$' + formData.whatnotFee.toFixed(2);
     document.getElementById('resultListingPrice').textContent = '$' + formData.listingPrice.toFixed(2);
     document.getElementById('resultPerformance').textContent = labels[formData.performance] || 'Not selected';
     document.getElementById('resultSignature').textContent = hasSigned ? 'Signed' : 'Not signed';

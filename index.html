@@ -7,351 +7,557 @@
   <link rel="icon" type="image/png" href="web/images/soldoutlogo.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap">
 <style>
-  :root{
-    --comic-red:#FF3B3B;
-    --comic-blue:#4A90E2;
-    --comic-yellow:#FFD93D;
-    --comic-orange:#FF9500;
-    --comic-purple:#9B59B6;
-    --comic-green:#2ECC71;
-    --comic-black:#2C2C2C;
-    --comic-white:#FFFFFF;
+  /* === CSS VARIABLES === */
+  :root {
+    --comic-red: #FF3B3B;
+    --comic-blue: #4A90E2;
+    --comic-yellow: #FFD93D;
+    --comic-orange: #FF9500;
+    --comic-purple: #9B59B6;
+    --comic-green: #2ECC71;
+    --comic-black: #2C2C2C;
+    --comic-white: #FFFFFF;
   }
 
-  *{margin:0;padding:0;box-sizing:border-box}
+  /* === BASE STYLES === */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-  body{
-    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-    background:#FFE66D;
+  body {
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: #FFE66D;
     background-image:
       repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px),
       repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
-    min-height:100vh;overflow-x:hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
   }
 
-  /* Comic halftone dots pattern */
-  .halftone-overlay{
-    position:fixed;inset:0;pointer-events:none;z-index:1;
-    background-image:radial-gradient(circle, rgba(44,44,44,.08) 1px, transparent 1px);
-    background-size:6px 6px;
+  /* === OVERLAYS === */
+  .halftone-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image: radial-gradient(circle, rgba(44,44,44,.08) 1px, transparent 1px);
+    background-size: 6px 6px;
   }
 
-  /* Comic panel borders */
-  .comic-panel{
-    background:var(--comic-white);
-    border:5px solid var(--comic-black);
-    box-shadow:
-      inset -3px -3px 0 rgba(0,0,0,.2),
-      8px 8px 0 rgba(0,0,0,.3);
-    position:relative;
+  /* === COMIC PANEL COMPONENT === */
+  .comic-panel {
+    background: var(--comic-white);
+    border: 5px solid var(--comic-black);
+    box-shadow: inset -3px -3px 0 rgba(0,0,0,.2), 8px 8px 0 rgba(0,0,0,.3);
+    position: relative;
   }
 
-  .comic-panel::before{
-    content:'';position:absolute;top:-5px;left:-5px;right:-5px;bottom:-5px;
-    border:2px solid var(--comic-black);pointer-events:none;
+  .comic-panel::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid var(--comic-black);
+    pointer-events: none;
   }
 
-  /* Hero */
-  .hero{
-    padding:4rem 2rem;text-align:center;position:relative;z-index:2;
-    min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  /* === HERO SECTION === */
+  .hero {
+    padding: 4rem 2rem;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
-  .hero-logo{
-    max-width:400px;width:100%;height:auto;margin-bottom:2rem;
-    filter:drop-shadow(6px 6px 0 rgba(0,0,0,.3));
+  .hero-logo {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 2rem;
+    filter: drop-shadow(6px 6px 0 rgba(0,0,0,.3));
   }
 
-  /* Speech bubble for tagline */
-  .hero-subtitle{
-    font-family:'Bangers',cursive;
-    font-size:clamp(2rem,4vw,3rem);
-    color:var(--comic-red);
-    text-shadow:3px 3px 0 var(--comic-black);
-    letter-spacing:2px;line-height:1.3;margin-bottom:2rem;text-transform:uppercase;
-    background:var(--comic-white);
-    padding:1.5rem 2rem;
-    border:5px solid var(--comic-black);
-    border-radius:30px;
-    position:relative;
-    display:inline-block;
-    box-shadow:6px 6px 0 rgba(0,0,0,.3);
+  .hero-subtitle {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2rem, 4vw, 3rem);
+    color: var(--comic-red);
+    text-shadow: 3px 3px 0 var(--comic-black);
+    letter-spacing: 2px;
+    line-height: 1.3;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    background: var(--comic-white);
+    padding: 1.5rem 2rem;
+    border: 5px solid var(--comic-black);
+    border-radius: 30px;
+    position: relative;
+    display: inline-block;
+    box-shadow: 6px 6px 0 rgba(0,0,0,.3);
   }
 
-  .hero-subtitle::after{
-    content:'';position:absolute;bottom:-25px;left:50%;
-    width:0;height:0;
-    border-left:20px solid transparent;
-    border-right:20px solid transparent;
-    border-top:25px solid var(--comic-black);
-    transform:translateX(-50%);
+  .hero-subtitle::after {
+    content: '';
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 25px solid var(--comic-black);
+    transform: translateX(-50%);
   }
 
-  .hero-subtitle::before{
-    content:'';position:absolute;bottom:-18px;left:50%;
-    width:0;height:0;
-    border-left:15px solid transparent;
-    border-right:15px solid transparent;
-    border-top:20px solid var(--comic-white);
-    transform:translateX(-50%);
-    z-index:1;
+  .hero-subtitle::before {
+    content: '';
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 20px solid var(--comic-white);
+    transform: translateX(-50%);
+    z-index: 1;
   }
 
-  .hero-description{
-    font-size:1.3rem;color:var(--comic-black);max-width:900px;margin:0 auto 3rem;
-    line-height:1.6;background:var(--comic-white);padding:2.5rem;
-    border:6px solid var(--comic-black);
-    box-shadow:
-      inset -3px -3px 0 rgba(0,0,0,.15),
-      10px 10px 0 rgba(0,0,0,.3);
-    position:relative;
+  .hero-description {
+    font-size: 1.3rem;
+    color: var(--comic-black);
+    max-width: 900px;
+    margin: 0 auto 3rem;
+    line-height: 1.6;
+    background: var(--comic-white);
+    padding: 2.5rem;
+    border: 6px solid var(--comic-black);
+    box-shadow: inset -3px -3px 0 rgba(0,0,0,.15), 10px 10px 0 rgba(0,0,0,.3);
+    position: relative;
   }
 
-  .hero-description::before{
-    content:'';position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;
-    border:3px solid var(--comic-black);pointer-events:none;
+  .hero-description::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--comic-black);
+    pointer-events: none;
   }
 
-  /* Comic book panels for cards */
-  .two-cards{
-    display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;
-    max-width:1200px;margin:2rem auto;padding:0 1rem;
+  /* === EDITION CARDS === */
+  .two-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
   }
 
-  .edition-card{
-    background:var(--comic-white);
-    border:6px solid var(--comic-black);
-    padding:2.5rem;transition:.3s;position:relative;
-    box-shadow:
-      inset -4px -4px 0 rgba(0,0,0,.15),
-      10px 10px 0 rgba(0,0,0,.3);
+  .edition-card {
+    background: var(--comic-white);
+    border: 6px solid var(--comic-black);
+    padding: 2.5rem;
+    transition: .3s;
+    position: relative;
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,.15), 10px 10px 0 rgba(0,0,0,.3);
   }
 
-  .edition-card::before{
-    content:'';position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;
-    border:3px solid var(--comic-black);pointer-events:none;
+  .edition-card::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--comic-black);
+    pointer-events: none;
   }
 
-  .edition-card::after{
-    content:'';position:absolute;top:15px;right:15px;
-    width:60px;height:60px;
-    background:radial-gradient(circle, var(--comic-yellow) 30%, transparent 31%);
-    background-size:8px 8px;
-    opacity:.3;
-    pointer-events:none;
+  .edition-card::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, var(--comic-yellow) 30%, transparent 31%);
+    background-size: 8px 8px;
+    opacity: .3;
+    pointer-events: none;
   }
 
-  .edition-card:hover{
-    transform:translateY(-8px) rotate(-1deg);
-    box-shadow:
-      inset -4px -4px 0 rgba(0,0,0,.15),
-      12px 12px 0 rgba(0,0,0,.4);
+  .edition-card:hover {
+    transform: translateY(-8px) rotate(-1deg);
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,.15), 12px 12px 0 rgba(0,0,0,.4);
   }
 
-  /* Stage Edition - Red theme */
-  .edition-card.stage-edition{
-    background:linear-gradient(135deg, #FFE5E5 0%, #FFB3B3 100%);
+  .edition-card.stage-edition {
+    background: linear-gradient(135deg, #FFE5E5 0%, #FFB3B3 100%);
   }
 
-  .edition-card.stage-edition::after{
-    background:radial-gradient(circle, var(--comic-red) 30%, transparent 31%);
+  .edition-card.stage-edition::after {
+    background: radial-gradient(circle, var(--comic-red) 30%, transparent 31%);
   }
 
-  /* Screen Edition - Blue theme */
-  .edition-card.screen-edition{
-    background:linear-gradient(135deg, #E3F2FF 0%, #B3D9FF 100%);
+  .edition-card.screen-edition {
+    background: linear-gradient(135deg, #E3F2FF 0%, #B3D9FF 100%);
   }
 
-  .edition-card.screen-edition h3{
-    color:var(--comic-blue);
+  .edition-card.screen-edition h3 {
+    color: var(--comic-blue);
   }
 
-  .edition-card.screen-edition .subtitle{
-    color:#2C5AA0;
+  .edition-card.screen-edition .subtitle {
+    color: #2C5AA0;
   }
 
-  .edition-card.screen-edition::after{
-    background:radial-gradient(circle, var(--comic-blue) 30%, transparent 31%);
+  .edition-card.screen-edition::after {
+    background: radial-gradient(circle, var(--comic-blue) 30%, transparent 31%);
   }
 
-  .edition-card h3{
-    font-family:'Bangers',cursive;font-size:2.8rem;color:var(--comic-red);
-    text-shadow:4px 4px 0 var(--comic-black), 2px 2px 0 var(--comic-yellow);
-    letter-spacing:2px;margin-bottom:1rem;transform:rotate(-2deg);
+  .edition-card h3 {
+    font-family: 'Bangers', cursive;
+    font-size: 2.8rem;
+    color: var(--comic-red);
+    text-shadow: 4px 4px 0 var(--comic-black), 2px 2px 0 var(--comic-yellow);
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    transform: rotate(-2deg);
   }
 
-  .edition-card .subtitle{
-    font-size:1.1rem;color:#C0392B;font-weight:700;
-    margin-bottom:1.5rem;letter-spacing:1.5px;text-transform:uppercase;
-    background:var(--comic-yellow);
-    display:inline-block;padding:.5rem 1rem;
-    border:3px solid var(--comic-black);
-    box-shadow:4px 4px 0 rgba(0,0,0,.3);
-    transform:rotate(1deg);
+  .edition-card .subtitle {
+    font-size: 1.1rem;
+    color: #C0392B;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    background: var(--comic-yellow);
+    display: inline-block;
+    padding: .5rem 1rem;
+    border: 3px solid var(--comic-black);
+    box-shadow: 4px 4px 0 rgba(0,0,0,.3);
+    transform: rotate(1deg);
   }
 
-  .edition-card p{
-    font-size:1.15rem;line-height:1.7;color:var(--comic-black);
-    font-weight:500;
+  .edition-card p {
+    font-size: 1.15rem;
+    line-height: 1.7;
+    color: var(--comic-black);
+    font-weight: 500;
   }
 
-  /* Upcoming Themes - Comic caption box style */
-  .themes-section{
-    background:var(--comic-yellow);
-    border:4px solid var(--comic-black);
-    padding:1.5rem;margin-top:1.5rem;text-align:left;
-    box-shadow:5px 5px 0 rgba(0,0,0,.3);
-    position:relative;
+  /* === THEMES SECTION === */
+  .themes-section {
+    background: var(--comic-yellow);
+    border: 4px solid var(--comic-black);
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    text-align: left;
+    box-shadow: 5px 5px 0 rgba(0,0,0,.3);
+    position: relative;
   }
 
-  .themes-section::before{
-    content:'';position:absolute;top:-4px;left:-4px;right:-4px;bottom:-4px;
-    border:2px solid var(--comic-black);pointer-events:none;
+  .themes-section::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 2px solid var(--comic-black);
+    pointer-events: none;
   }
 
-  .themes-section h4{
-    font-family:'Bangers',cursive;font-size:1.6rem;color:var(--comic-black);
-    text-shadow:2px 2px 0 var(--comic-white);
-    letter-spacing:1.5px;margin-bottom:1rem;
+  .themes-section h4 {
+    font-family: 'Bangers', cursive;
+    font-size: 1.6rem;
+    color: var(--comic-black);
+    text-shadow: 2px 2px 0 var(--comic-white);
+    letter-spacing: 1.5px;
+    margin-bottom: 1rem;
   }
 
-  .themes-list{list-style:none;padding:0;margin:0;text-align:left;}
-  .themes-list li{
-    font-size:1.1rem;margin:.7rem 0;position:relative;padding-left:2rem;
-    font-weight:600;color:var(--comic-black);
-  }
-  .themes-list li::before{
-    content:"★";position:absolute;left:0;top:0;
-    font-size:1.5rem;line-height:1.1rem;
-    color:var(--comic-red);
-    text-shadow:2px 2px 0 var(--comic-black);
+  .themes-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
   }
 
-  /* Consignment Section - Comic panel style */
-  .consignment-section{
-    background:linear-gradient(135deg, var(--comic-purple) 0%, #C39BD3 100%);
-    color:var(--comic-white);
-    padding:3rem 2.5rem;margin:3rem auto;
-    max-width:1200px;
-    border:6px solid var(--comic-black);
-    box-shadow:
-      inset -4px -4px 0 rgba(0,0,0,.2),
-      10px 10px 0 rgba(0,0,0,.3);
-    position:relative;
+  .themes-list li {
+    font-size: 1.1rem;
+    margin: .7rem 0;
+    position: relative;
+    padding-left: 2rem;
+    font-weight: 600;
+    color: var(--comic-black);
   }
 
-  .consignment-section::before{
-    content:'';position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;
-    border:3px solid var(--comic-black);pointer-events:none;
+  .themes-list li::before {
+    content: "★";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.5rem;
+    line-height: 1.1rem;
+    color: var(--comic-red);
+    text-shadow: 2px 2px 0 var(--comic-black);
   }
 
-  .consignment-section h2{
-    font-family:'Bangers',cursive;font-size:2.8rem;
-    color:var(--comic-yellow);
-    text-shadow:4px 4px 0 var(--comic-black);
-    margin-bottom:1.5rem;text-align:center;font-weight:400;
-    letter-spacing:2px;
+  /* === SCHEDULE SECTION === */
+  .schedule-section {
+    background: linear-gradient(135deg, var(--comic-green) 0%, #58D68D 100%);
+    color: var(--comic-white);
+    padding: 3rem 2rem;
+    margin: 3rem auto;
+    max-width: 1200px;
+    border: 6px solid var(--comic-black);
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,.2), 10px 10px 0 rgba(0,0,0,.3);
+    position: relative;
   }
 
-  .consignment-section p{
-    font-size:1.2rem;line-height:1.8;margin:0;text-align:center;
-    font-weight:500;text-shadow:2px 2px 0 rgba(0,0,0,.3);
+  .schedule-section::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--comic-black);
+    pointer-events: none;
   }
 
-  /* Reviews Section - Comic page style */
-  .reviews-section{
-    background:var(--comic-orange);color:var(--comic-white);
-    padding:4rem 2rem;margin:3rem 0;
-    border:8px solid var(--comic-black);position:relative;
-    box-shadow:
-      inset -5px -5px 0 rgba(0,0,0,.2),
-      12px 12px 0 rgba(0,0,0,.3);
+  .schedule-section h2 {
+    font-family: 'Bangers', cursive;
+    font-size: 2.8rem;
+    color: var(--comic-yellow);
+    text-shadow: 4px 4px 0 var(--comic-black);
+    margin-bottom: .5rem;
+    text-align: center;
+    font-weight: 400;
+    letter-spacing: 2px;
   }
 
-  .reviews-section::before{
-    content:'';position:absolute;top:-8px;left:-8px;right:-8px;bottom:-8px;
-    border:4px solid var(--comic-black);pointer-events:none;
+  .schedule-section > p {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--comic-white);
+    text-shadow: 2px 2px 0 var(--comic-black);
   }
 
-  .reviews-section .section-title{
-    font-family:'Bangers',cursive;font-size:clamp(2.5rem,5vw,4.5rem);
-    text-align:center;margin-bottom:3rem;color:var(--comic-white);
-    text-shadow:5px 5px 0 var(--comic-black), 3px 3px 0 var(--comic-red);
-    letter-spacing:3px;
+  #schedule-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
   }
 
-  .reviews-grid{
-    display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-    gap:2rem;max-width:1200px;margin:0 auto;
+  /* === CONSIGNMENT SECTION === */
+  .consignment-section {
+    background: linear-gradient(135deg, var(--comic-purple) 0%, #C39BD3 100%);
+    color: var(--comic-white);
+    padding: 3rem 2.5rem;
+    margin: 3rem auto;
+    max-width: 1200px;
+    border: 6px solid var(--comic-black);
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,.2), 10px 10px 0 rgba(0,0,0,.3);
+    position: relative;
   }
 
-  .review-card{
-    background:var(--comic-white);color:var(--comic-black);
-    padding:1.5rem;
-    border:5px solid var(--comic-black);
-    box-shadow:
-      inset -3px -3px 0 rgba(0,0,0,.15),
-      6px 6px 0 rgba(0,0,0,.4);
-    transition:.3s;
-    position:relative;
+  .consignment-section::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--comic-black);
+    pointer-events: none;
   }
 
-  .review-card::before{
-    content:'';position:absolute;top:-5px;left:-5px;right:-5px;bottom:-5px;
-    border:2px solid var(--comic-black);pointer-events:none;
+  .consignment-section h2 {
+    font-family: 'Bangers', cursive;
+    font-size: 2.8rem;
+    color: var(--comic-yellow);
+    text-shadow: 4px 4px 0 var(--comic-black);
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-weight: 400;
+    letter-spacing: 2px;
   }
 
-  .review-card:hover{
-    transform:translateY(-5px) rotate(1deg);
-    box-shadow:
-      inset -3px -3px 0 rgba(0,0,0,.15),
-      8px 8px 0 rgba(0,0,0,.5);
+  .consignment-section p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin: 0;
+    text-align: center;
+    font-weight: 500;
+    text-shadow: 2px 2px 0 rgba(0,0,0,.3);
   }
 
-  .stars{font-size:1.8rem;margin-bottom:1rem}
-  .filled-star{
-    color:var(--comic-yellow);
-    text-shadow:2px 2px 0 var(--comic-black);
-  }
-  .empty-star{color:#ddd;text-shadow:1px 1px 0 rgba(0,0,0,.2)}
-  .review-text{
-    font-size:1.1rem;line-height:1.5;margin-bottom:1rem;
-    font-style:italic;font-weight:500;
-  }
-  .reviewer{
-    font-weight:700;color:var(--comic-blue);text-align:right;
-    text-shadow:1px 1px 0 rgba(0,0,0,.1);
+  /* === REVIEWS SECTION === */
+  .reviews-section {
+    background: var(--comic-orange);
+    color: var(--comic-white);
+    padding: 4rem 2rem;
+    margin: 3rem 0;
+    border: 8px solid var(--comic-black);
+    position: relative;
+    box-shadow: inset -5px -5px 0 rgba(0,0,0,.2), 12px 12px 0 rgba(0,0,0,.3);
   }
 
-  /* CTA - POW! style burst */
-  .cta-section{position:relative;display:flex;justify-content:center;margin:3rem 0}
-  .burst-wrap{position:relative;display:inline-block}
-  .burst-svg{
-    width:min(90vw,900px);height:auto;display:block;
-    filter:drop-shadow(12px 12px 0 rgba(0,0,0,.4));
-  }
-  .tagline{
-    position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    font-family:'Bangers',cursive;
-    font-size:clamp(3rem,7vw,7rem);
-    color:var(--comic-red);
-    text-shadow:
-      5px 5px 0 var(--comic-black),
-      3px 3px 0 var(--comic-yellow);
-    letter-spacing:5px;line-height:1.1;transform:rotate(-2deg);pointer-events:none;
+  .reviews-section::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    border: 4px solid var(--comic-black);
+    pointer-events: none;
   }
 
-  /* Footer - Comic strip style */
-  footer{
-    background:var(--comic-black);color:var(--comic-white);
-    padding:3rem 2rem 1rem;
-    border-top:8px solid var(--comic-yellow);
-    position:relative;
+  .reviews-section .section-title {
+    font-family: 'Bangers', cursive;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--comic-white);
+    text-shadow: 5px 5px 0 var(--comic-black), 3px 3px 0 var(--comic-red);
+    letter-spacing: 3px;
   }
 
-  footer::before{
-    content:'';position:absolute;top:0;left:0;right:0;height:8px;
-    background:repeating-linear-gradient(
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .review-card {
+    background: var(--comic-white);
+    color: var(--comic-black);
+    padding: 1.5rem;
+    border: 5px solid var(--comic-black);
+    box-shadow: inset -3px -3px 0 rgba(0,0,0,.15), 6px 6px 0 rgba(0,0,0,.4);
+    transition: .3s;
+    position: relative;
+  }
+
+  .review-card::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid var(--comic-black);
+    pointer-events: none;
+  }
+
+  .review-card:hover {
+    transform: translateY(-5px) rotate(1deg);
+    box-shadow: inset -3px -3px 0 rgba(0,0,0,.15), 8px 8px 0 rgba(0,0,0,.5);
+  }
+
+  .stars {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .filled-star {
+    color: var(--comic-yellow);
+    text-shadow: 2px 2px 0 var(--comic-black);
+  }
+
+  .empty-star {
+    color: #ddd;
+    text-shadow: 1px 1px 0 rgba(0,0,0,.2);
+  }
+
+  .review-text {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .reviewer {
+    font-weight: 700;
+    color: var(--comic-blue);
+    text-align: right;
+    text-shadow: 1px 1px 0 rgba(0,0,0,.1);
+  }
+
+  /* === CTA SECTION === */
+  .cta-section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    margin: 3rem 0;
+  }
+
+  .burst-wrap {
+    position: relative;
+    display: inline-block;
+  }
+
+  .burst-svg {
+    width: min(90vw, 900px);
+    height: auto;
+    display: block;
+    filter: drop-shadow(12px 12px 0 rgba(0,0,0,.4));
+  }
+
+  .tagline {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bangers', cursive;
+    font-size: clamp(3rem, 7vw, 7rem);
+    color: var(--comic-red);
+    text-shadow: 5px 5px 0 var(--comic-black), 3px 3px 0 var(--comic-yellow);
+    letter-spacing: 5px;
+    line-height: 1.1;
+    transform: rotate(-2deg);
+    pointer-events: none;
+  }
+
+  /* === FOOTER === */
+  footer {
+    background: var(--comic-black);
+    color: var(--comic-white);
+    padding: 3rem 2rem 1rem;
+    border-top: 8px solid var(--comic-yellow);
+    position: relative;
+  }
+
+  footer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: repeating-linear-gradient(
       90deg,
       var(--comic-yellow) 0px,
       var(--comic-yellow) 20px,
@@ -362,78 +568,163 @@
     );
   }
 
-  .footer-content{max-width:1200px;margin:0 auto;text-align:center}
-  .social-links{display:flex;justify-content:center;gap:2rem;margin-bottom:2rem;flex-wrap:wrap}
-  .social-link{
-    display:inline-flex;align-items:center;justify-content:center;
-    width:60px;height:60px;text-decoration:none;
-    background:var(--comic-white);
-    border:4px solid var(--comic-yellow);
-    transition:.2s;
-    box-shadow:4px 4px 0 rgba(0,0,0,.3);
-  }
-  .social-link:hover{
-    transform:rotate(0deg) scale(1.15) !important;
-    box-shadow:6px 6px 0 rgba(0,0,0,.4);
-    border-color:var(--comic-red);
-  }
-  .copyright{
-    font-size:.9rem;opacity:.8;
-    border-top:3px solid var(--comic-yellow);
-    padding-top:1rem;margin-top:1rem;
-    font-weight:600;letter-spacing:1px;
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
   }
 
-  /* Schedule section */
-  .schedule-section{
-    background:linear-gradient(135deg, var(--comic-green) 0%, #58D68D 100%);
-    color:var(--comic-white);
-    padding:3rem 2rem;
-    margin:3rem auto;
-    max-width:1200px;
-    border:6px solid var(--comic-black);
-    box-shadow:inset -4px -4px 0 rgba(0,0,0,.2),10px 10px 0 rgba(0,0,0,.3);
-    position:relative;
-    box-sizing:border-box;
+  .social-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
   }
 
-  /* Schedule grid */
-  #schedule-container{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:1.5rem;
-    max-width:100%;
-    box-sizing:border-box;
+  .social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    text-decoration: none;
+    background: var(--comic-white);
+    border: 4px solid var(--comic-yellow);
+    transition: .2s;
+    box-shadow: 4px 4px 0 rgba(0,0,0,.3);
   }
 
-  #schedule-container > div{
-    min-width:0;
-    box-sizing:border-box;
+  .social-link:hover {
+    transform: rotate(0deg) scale(1.15) !important;
+    box-shadow: 6px 6px 0 rgba(0,0,0,.4);
+    border-color: var(--comic-red);
   }
 
-  /* Tablet */
-  @media (max-width:900px){
-    #schedule-container{grid-template-columns:repeat(2,1fr);}
+  .copyright {
+    font-size: .9rem;
+    opacity: .8;
+    border-top: 3px solid var(--comic-yellow);
+    padding-top: 1rem;
+    margin-top: 1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
   }
 
-  /* Mobile */
-  @media (max-width:768px){
-    .hero{padding:2rem 1rem;min-height:auto}
-    .hero-logo{max-width:300px}
-    .hero-subtitle{font-size:clamp(1.6rem,5vw,2.2rem);padding:1rem 1.5rem}
-    .hero-description{font-size:1.05rem;padding:1.5rem}
-    .two-cards{grid-template-columns:1fr;gap:1.5rem;margin:1rem auto}
-    .edition-card{padding:2rem}
-    .edition-card h3{font-size:2.2rem}
-    .edition-card p,.edition-card li{font-size:1rem}
-    .reviews-grid{grid-template-columns:1fr;gap:1.5rem}
-    .reviews-section{padding:2rem 1rem}
-    .consignment-section{padding:2rem 1.5rem}
-    .consignment-section h2{font-size:2rem}
-    .consignment-section p{font-size:1.05rem}
-    .social-links{gap:1rem}
-    .social-link{width:70px;height:70px}
-    #schedule-container{grid-template-columns:1fr;}
+  /* === BORING LINKS FOOTER === */
+  .boring-footer {
+    background: #f8f9fa;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #dee2e6;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  }
+
+  .boring-footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .boring-footer a {
+    color: #495057;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    transition: color 0.2s;
+  }
+
+  .boring-footer a:hover {
+    color: #212529;
+  }
+
+  .boring-footer .separator {
+    color: #dee2e6;
+  }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 900px) {
+    #schedule-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: 2rem 1rem;
+      min-height: auto;
+    }
+
+    .hero-logo {
+      max-width: 300px;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      padding: 1rem 1.5rem;
+    }
+
+    .hero-description {
+      font-size: 1.05rem;
+      padding: 1.5rem;
+    }
+
+    .two-cards {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      margin: 1rem auto;
+    }
+
+    .edition-card {
+      padding: 2rem;
+    }
+
+    .edition-card h3 {
+      font-size: 2.2rem;
+    }
+
+    .edition-card p,
+    .edition-card li {
+      font-size: 1rem;
+    }
+
+    .reviews-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .reviews-section {
+      padding: 2rem 1rem;
+    }
+
+    .consignment-section {
+      padding: 2rem 1.5rem;
+    }
+
+    .consignment-section h2 {
+      font-size: 2rem;
+    }
+
+    .consignment-section p {
+      font-size: 1.05rem;
+    }
+
+    .social-links {
+      gap: 1rem;
+    }
+
+    .social-link {
+      width: 70px;
+      height: 70px;
+    }
+
+    #schedule-container {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
 </head>
@@ -446,7 +737,8 @@
     <img src="web/images/soldoutlogo.png" alt="SOLD OUT! Comedy" class="hero-logo">
 
     <div class="hero-description">
-Live selling is a $68 billion market, but let's be real, <a href="https://www.reddit.com/r/whatnotapp/comments/1ntac3q/once_again_crashout_on_whatnot_pt1/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button" target="_blank" rel="noopener noreferrer" style="color: var(--comic-red); font-weight: 700; text-decoration: underline;">it's painful to watch</a>. We're changing that. Give us that dusty juicer to sell and it becomes a prop in an improv sketch while the live and online audiences both bid on it. We'll sell out our dignity to sell out your stuff.</div>
+      Live selling is a $68 billion market, but let's be real, <a href="https://www.reddit.com/r/whatnotapp/comments/1ntac3q/once_again_crashout_on_whatnot_pt1/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button" target="_blank" rel="noopener noreferrer" style="color: var(--comic-red); font-weight: 700; text-decoration: underline;">it's painful to watch</a>. We're changing that. Give us that dusty juicer to sell and it becomes a prop in an improv sketch while the live and online audiences both bid on it. We'll sell out our dignity to sell out your stuff.
+    </div>
 
     <div class="two-cards">
       <div class="edition-card stage-edition">
@@ -479,9 +771,8 @@ Live selling is a $68 billion market, but let's be real, <a href="https://www.re
     </div>
 
     <div class="schedule-section">
-      <div style="content:'';position:absolute;top:-6px;left:-6px;right:-6px;bottom:-6px;border:3px solid var(--comic-black);pointer-events:none;"></div>
-      <h2 style="font-family:'Bangers',cursive;font-size:2.8rem;color:var(--comic-yellow);text-shadow:4px 4px 0 var(--comic-black);margin-bottom:.5rem;text-align:center;font-weight:400;letter-spacing:2px;">SOLD OUT! Shows</h2>
-      <p style="text-align:center;font-size:1.2rem;font-weight:600;margin-bottom:1.5rem;color:var(--comic-white);text-shadow:2px 2px 0 var(--comic-black);">Tickets Still Available</p>
+      <h2>SOLD OUT! Shows</h2>
+      <p>Tickets Still Available</p>
       <div id="schedule-container"></div>
     </div>
 
@@ -546,7 +837,6 @@ Live selling is a $68 billion market, but let's be real, <a href="https://www.re
                 fill="#FFD93D" stroke="#2C2C2C" stroke-width="24" stroke-linejoin="round"
                 filter="url(#comicShadow)"/>
         </svg>
-
         <div class="tagline">SELL OUT WITH US.</div>
       </div>
     </div>
@@ -597,29 +887,30 @@ Live selling is a $68 billion market, but let's be real, <a href="https://www.re
     </div>
   </footer>
 
-  <footer style="background: #f8f9fa; padding: 1.5rem 2rem; border-top: 1px solid #dee2e6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 2rem; flex-wrap: wrap;">
-      <a href="https://www.notion.so/SOLD-OUT-Comedy-BACKSTAGE-26360a0626ed80d2babee637915de291" style="color: #495057; text-decoration: none; font-size: 0.875rem; font-weight: 500; letter-spacing: 0.5px; transition: color 0.2s;">BACKSTAGE</a>
+  <!-- BORING LINKS -->
+  <footer class="boring-footer">
+    <div class="boring-footer-content">
+      <a href="https://www.notion.so/SOLD-OUT-Comedy-BACKSTAGE-26360a0626ed80d2babee637915de291">BACKSTAGE</a>
+      <span class="separator">|</span>
+      <a href="https://help.whatnot.com/hc/en-us/articles/360061224972-Prohibited-or-Restricted-Items-on-Whatnot" target="_blank" rel="noopener noreferrer">PROHIBITED ITEMS</a>
+      <span class="separator">|</span>
+      <a href="https://news.uchicago.edu/explainer/improv-explained" target="_blank" rel="noopener noreferrer">IMPROV EXPLAINED</a>
     </div>
   </footer>
 
 <script>
+// === INITIALIZATION ===
 document.addEventListener('DOMContentLoaded', () => {
   loadRandomTagline();
   randomizeSocialIconTilts();
   loadSchedule();
 });
 
-/* -----------------------
-   Small UI debug helper
------------------------- */
-function makeStatusLine(targetEl, id, above=true){
+// === HELPER FUNCTIONS ===
+function makeStatusLine(targetEl, id, above = true) {
   return (msg) => { console.log(`[SOLD OUT][${id}]`, msg); };
 }
 
-/* -----------------------
-   Social tilt (unchanged)
------------------------- */
 function randomizeSocialIconTilts() {
   const socialLinks = document.querySelectorAll('.social-link');
   socialLinks.forEach(link => {
@@ -628,19 +919,19 @@ function randomizeSocialIconTilts() {
   });
 }
 
-/* -----------------------
-   Robust XML fetcher
------------------------- */
-async function fetchFirstWorking(candidates, idForLogs){
+async function fetchFirstWorking(candidates, idForLogs) {
   let lastErr;
-  for (const url of candidates){
-    try{
-      const res = await fetch(url, {cache:'no-cache'});
-      if (!res.ok) { console.warn(`[${idForLogs}] ${url} -> HTTP ${res.status}`); continue; }
+  for (const url of candidates) {
+    try {
+      const res = await fetch(url, { cache: 'no-cache' });
+      if (!res.ok) {
+        console.warn(`[${idForLogs}] ${url} -> HTTP ${res.status}`);
+        continue;
+      }
       const text = await res.text();
       console.info(`[${idForLogs}] loaded from ${url}`);
       return text;
-    }catch(e){
+    } catch (e) {
       console.warn(`[${idForLogs}] ${url} failed`, e);
       lastErr = e;
     }
@@ -648,72 +939,69 @@ async function fetchFirstWorking(candidates, idForLogs){
   throw lastErr || new Error('No candidate URL worked.');
 }
 
-/* -----------------------
-   TAGLINE LOADER
------------------------- */
-async function loadRandomTagline(){
+// === TAGLINE LOADER ===
+async function loadRandomTagline() {
   const el = document.querySelector('.hero-subtitle');
-  if(!el) return;
+  if (!el) return;
 
   const status = makeStatusLine(el, 'taglines-debug');
 
-  if (location.protocol === 'file:'){
-    status('Cannot load taglines.xml over file:// — run a local server (e.g., “npx serve”).');
+  if (location.protocol === 'file:') {
+    status('Cannot load taglines.xml over file:// — run a local server (e.g., "npx serve").');
     el.textContent = 'Live Comedy Meets Live Shopping';
     return;
   }
 
   const candidates = [
-    'web/taglines.xml',   // same folder convention as your images
+    'web/taglines.xml',
     './taglines.xml',
     '../web/taglines.xml'
   ];
 
-  try{
+  try {
     const xmlText = await fetchFirstWorking(candidates, 'taglines');
     const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
     const parseErr = doc.querySelector('parsererror');
-    if (parseErr){
+
+    if (parseErr) {
       status('taglines.xml parser error — check console');
       console.error('[taglines] parsererror:', parseErr.textContent);
       el.textContent = 'Live Comedy Meets Live Shopping';
       return;
     }
+
     const items = [...doc.querySelectorAll('taglines > tagline')]
       .map(n => n.textContent?.trim())
       .filter(Boolean);
 
-    if (!items.length){
+    if (!items.length) {
       status('taglines.xml loaded, but no <tagline> items found');
       el.textContent = 'Live Comedy Meets Live Shopping';
       return;
     }
 
-    const choice = items[Math.floor(Math.random()*items.length)];
+    const choice = items[Math.floor(Math.random() * items.length)];
     el.textContent = choice;
     status(`Loaded ${items.length} taglines`);
-  }catch(err){
+  } catch (err) {
     status('Failed to load taglines (see console)');
     console.error('[taglines] load failed:', err);
     el.textContent = 'Live Comedy Meets Live Shopping';
   }
 }
 
-/* -----------------------
-   SCHEDULE LOADER
------------------------- */
-async function loadSchedule(){
+// === SCHEDULE LOADER ===
+async function loadSchedule() {
   const container = document.getElementById('schedule-container');
-  if(!container) return;
+  if (!container) return;
 
   const status = makeStatusLine(container, 'schedule-debug');
 
-  // Per your request: always show these static links
   const ADD_TO_CAL = 'https://cnn.com';
-  const WATCH_URL  = 'https://www.whatnot.com/user/soldoutcomedy';
+  const WATCH_URL = 'https://www.whatnot.com/user/soldoutcomedy';
 
-  if (location.protocol === 'file:'){
-    status('Cannot load shows.xml over file:// — run a local server (e.g., “npx serve”).');
+  if (location.protocol === 'file:') {
+    status('Cannot load shows.xml over file:// — run a local server (e.g., "npx serve").');
     container.innerHTML = '<p style="text-align:center;font-weight:600">More Shows Coming Soon</p>';
     return;
   }
@@ -724,34 +1012,92 @@ async function loadSchedule(){
     '../web/shows.xml'
   ];
 
-  // Parse ISO 8601 UTC datetime: YYYY-MM-DDTHH:MM:SSZ
-  function parseUTCDateTime(datetimeStr){
+  function parseUTCDateTime(datetimeStr) {
     if (!datetimeStr) return null;
     const dt = new Date(datetimeStr);
     return isNaN(dt.getTime()) ? null : dt;
   }
 
-  // Get timezone abbreviation (e.g., "EST", "PST", "CST")
   function getTimezoneAbbr(date) {
-    const str = date.toLocaleTimeString('en-US', {timeZoneName: 'short'});
+    const str = date.toLocaleTimeString('en-US', { timeZoneName: 'short' });
     const match = str.match(/\b([A-Z]{3,5})\b/);
     return match ? match[1] : '';
   }
 
-  const fmtDate = (d)=> d?.toLocaleDateString('en-US', {weekday:'long', month:'long', day:'numeric'}) || '';
-  const fmtTime = (d, includeTZ = true)=> {
+  const fmtDate = (d) => d?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) || '';
+
+  const fmtTime = (d, includeTZ = true) => {
     if (!d) return '';
-    const time = d.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'}).toLowerCase();
+    const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
     if (!includeTZ) return time;
     const tz = getTimezoneAbbr(d);
     return `${time} ${tz}`;
   };
 
-  try{
+  function parseAppraisalTimes(appraisalStr) {
+    if (!appraisalStr) return null;
+    const parts = appraisalStr.split(' - ').map(s => s.trim());
+    if (parts.length !== 2) return null;
+    const start = parseUTCDateTime(parts[0]);
+    const end = parseUTCDateTime(parts[1]);
+    if (!start || !end) return null;
+    return { start, end };
+  }
+
+  function makeGoogleCalendarLink(show) {
+    if (!show.start) return ADD_TO_CAL;
+
+    let endTime;
+    if (show.end) {
+      endTime = show.end;
+    } else {
+      const durationHours = show.type === 'screen' ? 1 : 2;
+      endTime = new Date(show.start.getTime() + (durationHours * 60 * 60 * 1000));
+    }
+
+    const formatGCal = (d) => {
+      const pad = (n) => String(n).padStart(2, '0');
+      return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+    };
+
+    const title = `SOLD OUT! Comedy - ${show.type === 'stage' ? 'Stage Edition' : 'Screen Edition'}`;
+    const location = show.address || (show.type === 'screen' ? 'Online' : show.location || '');
+
+    let description = '';
+    if (show.venue) description += `${show.venue}\n`;
+    if (show.location && show.type === 'stage') description += `${show.location}\n`;
+    if (show.type === 'stage' && show.appraisalTimes) {
+      const apprStart = fmtTime(show.appraisalTimes.start, false);
+      const apprEnd = fmtTime(show.appraisalTimes.end, false);
+      description += `\nAppraisals: ${apprStart} - ${apprEnd}\n`;
+    }
+    if (show.watch) description += `\nWatch Live: ${show.watch}`;
+
+    if (show.type === 'stage') {
+      description += '\n\nLive comedy meets live shopping! Your items become props in improv scenes.';
+    } else {
+      description += '\n\nWatch and bid from the Whatnot app.';
+    }
+
+    description += '\n\nhttps://soldoutcomedy.com';
+
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: title,
+      dates: `${formatGCal(show.start)}/${formatGCal(endTime)}`,
+      details: description,
+      location: location
+    });
+
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  }
+
+  try {
     const xmlText = await fetchFirstWorking(candidates, 'schedule');
     const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
     const parseErr = doc.querySelector('parsererror');
-    if (parseErr){
+
+    if (parseErr) {
       status('shows.xml parser error — check console');
       console.error('[schedule] parsererror:', parseErr.textContent);
       container.innerHTML = '<p style="text-align:center;font-weight:600">Problem parsing <code>shows.xml</code>.</p>';
@@ -759,22 +1105,10 @@ async function loadSchedule(){
     }
 
     const nodes = [...doc.querySelectorAll('shows > show')];
-    if (!nodes.length){
+    if (!nodes.length) {
       status('shows.xml loaded but contained 0 <show> nodes');
       container.innerHTML = '<p style="text-align:center;font-weight:600">No shows found in <code>shows.xml</code>.</p>';
       return;
-    }
-
-    // Parse appraisal time range (e.g., "2025-10-16T00:00:00Z - 2025-10-16T00:45:00Z")
-    function parseAppraisalTimes(appraisalStr) {
-      if (!appraisalStr) return null;
-      // Split on " - " (space-dash-space) to avoid splitting on date dashes
-      const parts = appraisalStr.split(' - ').map(s => s.trim());
-      if (parts.length !== 2) return null;
-      const start = parseUTCDateTime(parts[0]);
-      const end = parseUTCDateTime(parts[1]);
-      if (!start || !end) return null;
-      return { start, end };
     }
 
     const shows = nodes
@@ -784,16 +1118,16 @@ async function loadSchedule(){
         const datetimeendStr = show.querySelector('datetimeend')?.textContent?.trim() || '';
         const appraisalStr = show.querySelector('appraisal')?.textContent?.trim() || '';
         const o = {
-          type:          show.getAttribute('type')?.trim() || '',
-          datetime:      datetimeStr,
-          datetimeend:   datetimeendStr,
-          theme:         show.querySelector('theme')?.textContent?.trim() || '',
-          venue:         show.querySelector('venue')?.textContent?.trim() || '',
-          location:      show.querySelector('location')?.textContent?.trim() || '',
-          address:       show.querySelector('address')?.textContent?.trim() || '',
-          watch:         show.querySelector('watch')?.textContent?.trim() || '',
+          type: show.getAttribute('type')?.trim() || '',
+          datetime: datetimeStr,
+          datetimeend: datetimeendStr,
+          theme: show.querySelector('theme')?.textContent?.trim() || '',
+          venue: show.querySelector('venue')?.textContent?.trim() || '',
+          location: show.querySelector('location')?.textContent?.trim() || '',
+          address: show.querySelector('address')?.textContent?.trim() || '',
+          watch: show.querySelector('watch')?.textContent?.trim() || '',
           addtocalendar: show.querySelector('addtocalendar')?.textContent?.trim() || '',
-          appraisal:     appraisalStr,
+          appraisal: appraisalStr,
           appraisalTimes: parseAppraisalTimes(appraisalStr)
         };
         o.start = parseUTCDateTime(o.datetime);
@@ -802,78 +1136,25 @@ async function loadSchedule(){
         return o;
       });
 
-    // If everything failed to parse, tell why
-    if (shows.every(s => !s.start)){
+    if (shows.every(s => !s.start)) {
       status('All shows failed datetime parsing — see console');
-      console.table(shows.map(s => ({datetime:s.datetime, error:s._parseError||null})));
+      console.table(shows.map(s => ({ datetime: s.datetime, error: s._parseError || null })));
       container.innerHTML = '<p style="text-align:center;font-weight:600;grid-column:1/-1;font-size:1.2rem;">More Shows Coming Soon</p>';
       return;
     }
 
     const now = new Date();
-    const upcoming = shows.filter(s => s.start && s.start >= now).sort((a,b)=>a.start - b.start);
-    const past     = shows.filter(s => s.start && s.start <  now).sort((a,b)=>b.start - a.start);
-    const sorted   = [...upcoming, ...past];
-
-    // Helper to generate Google Calendar link
-    function makeGoogleCalendarLink(show) {
-      if (!show.start) return ADD_TO_CAL;
-
-      // Use datetimeend from XML, or fallback to calculated end time
-      let endTime;
-      if (show.end) {
-        endTime = show.end;
-      } else {
-        // Fallback: screen=1hr, stage=2hrs
-        const durationHours = show.type === 'screen' ? 1 : 2;
-        endTime = new Date(show.start.getTime() + (durationHours * 60 * 60 * 1000));
-      }
-
-      // Format dates for Google Calendar in local time (YYYYMMDDTHHmmss)
-      const formatGCal = (d) => {
-        const pad = (n) => String(n).padStart(2, '0');
-        return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
-      };
-
-      const title = `SOLD OUT! Comedy - ${show.type === 'stage' ? 'Stage Edition' : 'Screen Edition'}`;
-      const location = show.address || (show.type === 'screen' ? 'Online' : show.location || '');
-
-      let description = '';
-      if (show.venue) description += `${show.venue}\n`;
-      if (show.location && show.type === 'stage') description += `${show.location}\n`;
-      if (show.type === 'stage' && show.appraisalTimes) {
-        const apprStart = fmtTime(show.appraisalTimes.start, false);
-        const apprEnd = fmtTime(show.appraisalTimes.end, false);
-        description += `\nAppraisals: ${apprStart} - ${apprEnd}\n`;
-      }
-      if (show.watch) description += `\nWatch Live: ${show.watch}`;
-
-      if (show.type === 'stage') {
-        description += '\n\nLive comedy meets live shopping! Your items become props in improv scenes.';
-      } else {
-        description += '\n\nWatch and bid from the Whatnot app.';
-      }
-
-      description += '\n\nhttps://soldoutcomedy.com';
-
-      const params = new URLSearchParams({
-        action: 'TEMPLATE',
-        text: title,
-        dates: `${formatGCal(show.start)}/${formatGCal(endTime)}`,
-        details: description,
-        location: location
-      });
-
-      return `https://calendar.google.com/calendar/render?${params.toString()}`;
-    }
+    const upcoming = shows.filter(s => s.start && s.start >= now).sort((a, b) => a.start - b.start);
+    const past = shows.filter(s => s.start && s.start < now).sort((a, b) => b.start - a.start);
+    const sorted = [...upcoming, ...past];
 
     container.innerHTML = sorted.map(s => {
       const isPast = s.start < now;
       const burstFill = s.type === 'stage' ? '#FF3B3B' : '#4A90E2';
-      const ribbon    = s.type === 'stage' ? 'STAGE EDITION' : 'SCREEN EDITION';
-      const mapsLink  = s.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address)}` : '';
-      const watchUrl  = s.watch || WATCH_URL;
-      const calUrl    = makeGoogleCalendarLink(s);
+      const ribbon = s.type === 'stage' ? 'STAGE EDITION' : 'SCREEN EDITION';
+      const mapsLink = s.address ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.address)}` : '';
+      const watchUrl = s.watch || WATCH_URL;
+      const calUrl = makeGoogleCalendarLink(s);
 
       return `
         <div style="border:5px solid var(--comic-black);border-top:12px solid ${burstFill};box-shadow:6px 6px 0 rgba(0,0,0,.3);position:relative;display:flex;flex-direction:column;min-height:450px;background:var(--comic-white);box-sizing:border-box;">
@@ -882,7 +1163,7 @@ async function loadSchedule(){
               <path d="M110 5 130 25 170 15 155 35 200 45 160 50 180 70 130 55 110 75 90 55 40 70 60 50 20 45 65 35 50 15 90 25 Z"
                     fill="${burstFill}" stroke="#2C2C2C" stroke-width="3" stroke-linejoin="round"/>
             </svg>
-            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(${s.type==='stage' ? '-8' : '8'}deg);
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(${s.type === 'stage' ? '-8' : '8'}deg);
                         font-family:'Bangers',cursive;font-size:.9rem;color:#FFD93D;letter-spacing:1px;white-space:nowrap;
                         text-shadow:2px 2px 0 #2C2C2C;">${ribbon}</div>
           </div>
@@ -891,14 +1172,10 @@ async function loadSchedule(){
             ${s.theme ? `<div style="font-family:'Bangers',cursive;font-size:2rem;color:${burstFill};letter-spacing:1px;margin-bottom:.25rem;line-height:1.2;text-align:center;width:100%;">${s.theme}</div>` : ''}
             <div style="font-family:Inter,sans-serif;font-size:.75rem;font-weight:400;color:rgba(44,44,44,.6);margin-bottom:.75rem;text-align:center;width:100%;">A SOLD OUT! Comedy Show</div>
 
-            ${
-              s.venue
-                ? (s.address && mapsLink
-                    ? `<a href="${mapsLink}" target="_blank" style="color:var(--comic-black);text-decoration:none;font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;display:block;">${s.venue}</a>`
-                    : `<div style="color:var(--comic-black);font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;">${s.venue}</div>`
-                  )
-                : ''
-            }
+            ${s.venue ? (s.address && mapsLink
+                ? `<a href="${mapsLink}" target="_blank" style="color:var(--comic-black);text-decoration:none;font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;display:block;">${s.venue}</a>`
+                : `<div style="color:var(--comic-black);font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;">${s.venue}</div>`)
+              : ''}
             ${s.location ? `<div style="font-family:'Bangers',cursive;font-size:1rem;font-weight:400;color:${burstFill};margin-bottom:.75rem;letter-spacing:1px;text-align:center;width:100%;">${s.location}</div>` : ''}
 
             <div style="font-family:'Bangers',cursive;font-size:clamp(1.1rem,3.5vw,1.6rem);font-weight:400;color:var(--comic-black);margin-bottom:.25rem;line-height:1.2;letter-spacing:1px;text-align:center;width:100%;">
@@ -921,14 +1198,14 @@ async function loadSchedule(){
     }).join('');
 
     const bad = shows.filter(s => s._parseError);
-    if (bad.length){
+    if (bad.length) {
       status(`Rendered ${sorted.length} shows • ${bad.length} had datetime issues (see console)`);
-      console.table(bad.map(s => ({datetime:s.datetime, error:s._parseError})));
+      console.table(bad.map(s => ({ datetime: s.datetime, error: s._parseError })));
     } else {
       status(`Rendered ${sorted.length} shows`);
     }
 
-  }catch(err){
+  } catch (err) {
     status('Failed to load schedule (see console)');
     console.error('[schedule] load failed:', err);
     container.innerHTML = '<p style="text-align:center;font-weight:600">More Shows Coming Soon</p>';
