@@ -1128,7 +1128,8 @@ async function loadSchedule() {
           watch: show.querySelector('watch')?.textContent?.trim() || '',
           addtocalendar: show.querySelector('addtocalendar')?.textContent?.trim() || '',
           appraisal: appraisalStr,
-          appraisalTimes: parseAppraisalTimes(appraisalStr)
+          appraisalTimes: parseAppraisalTimes(appraisalStr),
+          icon: show.querySelector('icon')?.textContent?.trim() || ''
         };
         o.start = parseUTCDateTime(o.datetime);
         o.end = parseUTCDateTime(o.datetimeend);
@@ -1169,6 +1170,7 @@ async function loadSchedule() {
           </div>
 
           <div style="padding:2.5rem 2rem 2rem 2rem;display:flex;flex-direction:column;align-items:center;flex-grow:1;${isPast ? 'opacity:.5;' : ''}">
+            ${s.icon ? `<img src="${s.icon}" alt="${s.theme || 'Show'}" style="width:120px;height:120px;object-fit:contain;margin-bottom:1rem;border-radius:10px;border:3px solid var(--comic-black);box-shadow:4px 4px 0 rgba(0,0,0,.3);" onerror="this.style.display='none'">` : ''}
             ${s.theme ? `<div style="font-family:'Bangers',cursive;font-size:2rem;color:${burstFill};letter-spacing:1px;margin-bottom:.25rem;line-height:1.2;text-align:center;width:100%;">${s.theme}</div>` : ''}
             <div style="font-family:Inter,sans-serif;font-size:.75rem;font-weight:400;color:rgba(44,44,44,.6);margin-bottom:.75rem;text-align:center;width:100%;">A SOLD OUT! Comedy Show</div>
 

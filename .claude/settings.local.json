@@ -3,7 +3,11 @@
     "allow": [
       "Bash(dir:*)",
       "Bash(npx serve:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(if [ -d \"web/images/shows\" ])",
+      "Bash(then ls -la web/images/shows/)",
+      "Bash(else echo \"Directory does not exist\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []
