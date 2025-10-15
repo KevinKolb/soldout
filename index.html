@@ -1556,7 +1556,9 @@ async function loadSchedule() {
 
           <div style="padding:2.5rem 2rem 2rem 2rem;display:flex;flex-direction:column;align-items:center;flex-grow:1;${isPast ? 'opacity:.5;' : ''}">
             ${s.icon ? `<img src="${s.icon}" alt="${s.theme || 'Show'}" style="width:120px;height:120px;object-fit:contain;margin-bottom:1rem;border-radius:10px;border:3px solid var(--comic-black);box-shadow:4px 4px 0 rgba(0,0,0,.3);" onerror="this.style.display='none'">` : ''}
-            ${s.theme ? `<div style="font-family:'Bangers',cursive;font-size:2rem;color:${burstFill};letter-spacing:1px;margin-bottom:1rem;line-height:1.2;text-align:center;width:100%;">${s.theme}</div>` : ''}
+            ${s.theme ? `<div style="font-family:'Bangers',cursive;font-size:2rem;color:${burstFill};letter-spacing:1px;margin-bottom:.25rem;line-height:1.2;text-align:center;width:100%;">${s.theme}</div>` : ''}
+            <div style="font-family:Inter,sans-serif;font-size:.75rem;font-weight:400;color:rgba(44,44,44,.6);margin-bottom:.75rem;text-align:center;width:100%;">A SOLD OUT! Comedy Show</div>
+
             ${s.venue ? (s.address && mapsLink
                 ? `<a href="${mapsLink}" target="_blank" style="color:var(--comic-black);text-decoration:none;font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;display:block;">${s.venue}</a>`
                 : `<div style="color:var(--comic-black);font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;">${s.venue}</div>`)
@@ -1571,7 +1573,7 @@ async function loadSchedule() {
               ${fmtTime(s.start)}
             </div>
 
-            ${s.type === 'stage' && s.appraisalTimes ? `<div style="font-family:'Bangers',cursive;font-size:1rem;font-weight:400;color:${burstFill};margin-top:auto;letter-spacing:1px;text-align:center;width:100%;">Appraisals: ${fmtTime(s.appraisalTimes.start, false)} - ${fmtTime(s.appraisalTimes.end, false)}</div>` : `<div style="margin-top:auto;"></div>`}
+            ${s.type === 'stage' && s.appraisalTimes ? `<div style="font-family:'Bangers',cursive;font-size:1rem;font-weight:400;color:${burstFill};margin-top:auto;letter-spacing:1px;text-align:center;width:100%;">Appraisals: ${fmtTime(s.appraisalTimes.start, false)} - ${fmtTime(s.appraisalTimes.end, false)}</div>` : ''}
           </div>
 
           <div style="padding:0 2rem 2rem 2rem;display:flex;flex-direction:column;gap:.75rem;">
