@@ -10,7 +10,9 @@
       "Bash(fi)",
       "Bash(git log:*)",
       "Bash(git fsck:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ],
     "deny": [],
     "ask": []
