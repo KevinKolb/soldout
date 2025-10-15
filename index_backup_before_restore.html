@@ -28,10 +28,10 @@
 
   body {
     font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    background: #FFD93D;
+    background: #FFE66D;
     background-image:
-      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,.05) 2px, rgba(255,255,255,.05) 4px),
-      repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,.05) 2px, rgba(255,255,255,.05) 4px);
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px),
+      repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px);
     min-height: 100vh;
     overflow-x: hidden;
   }
@@ -41,10 +41,9 @@
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 9998;
-    background-image: radial-gradient(circle, rgba(255,59,59,.12) 1.5px, transparent 1.5px);
+    z-index: 1;
+    background-image: radial-gradient(circle, rgba(44,44,44,.08) 1px, transparent 1px);
     background-size: 6px 6px;
-    mix-blend-mode: multiply;
   }
 
   /* === COMIC PANEL COMPONENT === */
@@ -68,7 +67,7 @@
 
   /* === HERO SECTION === */
   .hero {
-    padding: 3rem 1.5rem 2rem;
+    padding: 4rem 2rem;
     text-align: center;
     position: relative;
     z-index: 2;
@@ -80,110 +79,140 @@
   }
 
   .hero-logo {
-    max-width: 350px;
+    max-width: 400px;
     width: 100%;
     height: auto;
     margin-bottom: 2rem;
-    filter: drop-shadow(8px 8px 0 rgba(0,0,0,.8)) contrast(1.2) saturate(1.3);
-    transition: transform 0.3s ease;
-    border: 6px solid var(--comic-black);
-    background: white;
-    padding: 1rem;
-  }
-
-  .hero-logo:hover {
-    transform: scale(1.05) rotate(-2deg);
+    filter: drop-shadow(6px 6px 0 rgba(0,0,0,.3));
   }
 
   .hero-subtitle {
     font-family: 'Bangers', cursive;
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-size: clamp(2rem, 4vw, 3rem);
     color: var(--comic-red);
-    text-shadow: 4px 4px 0 var(--comic-black), 2px 2px 0 var(--comic-yellow);
+    text-shadow: 3px 3px 0 var(--comic-black);
     letter-spacing: 2px;
-    line-height: 1;
+    line-height: 1.3;
     margin-bottom: 2rem;
     text-transform: uppercase;
-    background: white;
-    padding: 1.5rem 2.5rem;
-    border: 6px solid var(--comic-black);
-    border-radius: 0;
+    background: var(--comic-white);
+    padding: 1.5rem 2rem;
+    border: 5px solid var(--comic-black);
+    border-radius: 30px;
     position: relative;
     display: inline-block;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
-    transition: transform 0.3s ease;
-    font-weight: 400;
-    transform: rotate(-1deg);
+    box-shadow: 6px 6px 0 rgba(0,0,0,.3);
   }
 
-  .hero-subtitle:hover {
-    transform: rotate(-1deg) scale(1.02);
+  .hero-subtitle::after {
+    content: '';
+    position: absolute;
+    bottom: -25px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 25px solid var(--comic-black);
+    transform: translateX(-50%);
   }
 
+  .hero-subtitle::before {
+    content: '';
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 20px solid var(--comic-white);
+    transform: translateX(-50%);
+    z-index: 1;
+  }
 
   .hero-description {
-    font-size: 1.15rem;
+    font-size: 1.3rem;
     color: var(--comic-black);
-    max-width: 850px;
-    margin: 0 auto 2.5rem;
+    max-width: 900px;
+    margin: 0 auto 3rem;
     line-height: 1.6;
-    background: white;
-    padding: 2rem;
+    background: var(--comic-white);
+    padding: 2.5rem;
     border: 6px solid var(--comic-black);
-    border-radius: 0;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
+    box-shadow: inset -3px -3px 0 rgba(0,0,0,.15), 10px 10px 0 rgba(0,0,0,.3);
     position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    font-weight: 600;
   }
 
-  .hero-description:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 10px 10px 0 rgba(0,0,0,.9);
+  .hero-description::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--comic-black);
+    pointer-events: none;
   }
 
   /* === EDITION CARDS === */
   .two-cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    gap: 2.5rem;
     max-width: 1200px;
-    margin: 2.5rem auto;
-    padding: 0 1.5rem;
+    margin: 2rem auto;
+    padding: 0 1rem;
   }
 
   .edition-card {
-    background: white;
+    background: var(--comic-white);
     border: 6px solid var(--comic-black);
-    border-radius: 0;
-    padding: 2rem;
-    transition: all 0.2s ease;
+    padding: 2.5rem;
+    transition: .3s;
     position: relative;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
-    overflow: visible;
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,.15), 10px 10px 0 rgba(0,0,0,.3);
   }
 
   .edition-card::before {
-    display: none;
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--comic-black);
+    pointer-events: none;
+  }
+
+  .edition-card::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, var(--comic-yellow) 30%, transparent 31%);
+    background-size: 8px 8px;
+    opacity: .3;
+    pointer-events: none;
   }
 
   .edition-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 10px 10px 0 rgba(0,0,0,.9);
+    transform: translateY(-8px) rotate(-1deg);
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,.15), 12px 12px 0 rgba(0,0,0,.4);
   }
 
   .edition-card.stage-edition {
-    background: #FFE5E5;
-    border-color: var(--comic-black);
+    background: linear-gradient(135deg, #FFE5E5 0%, #FFB3B3 100%);
   }
 
-  .edition-card.stage-edition::before {
-    display: none;
+  .edition-card.stage-edition::after {
+    background: radial-gradient(circle, var(--comic-red) 30%, transparent 31%);
   }
 
   .edition-card.screen-edition {
-    background: #E3F2FF;
-    border-color: var(--comic-black);
+    background: linear-gradient(135deg, #E3F2FF 0%, #B3D9FF 100%);
   }
 
   .edition-card.screen-edition h3 {
@@ -192,68 +221,71 @@
 
   .edition-card.screen-edition .subtitle {
     color: #2C5AA0;
-    background: #B3D9FF;
   }
 
-  .edition-card.screen-edition::before {
-    display: none;
+  .edition-card.screen-edition::after {
+    background: radial-gradient(circle, var(--comic-blue) 30%, transparent 31%);
   }
 
   .edition-card h3 {
     font-family: 'Bangers', cursive;
-    font-size: clamp(2.5rem, 4vw, 3.5rem);
+    font-size: 2.8rem;
     color: var(--comic-red);
-    text-shadow: 3px 3px 0 var(--comic-black);
+    text-shadow: 4px 4px 0 var(--comic-black), 2px 2px 0 var(--comic-yellow);
     letter-spacing: 2px;
     margin-bottom: 1rem;
-    position: relative;
-    z-index: 1;
-    line-height: 1;
+    transform: rotate(-2deg);
   }
 
   .edition-card .subtitle {
-    font-size: 0.9rem;
-    color: var(--comic-black);
-    font-weight: 900;
+    font-size: 1.1rem;
+    color: #C0392B;
+    font-weight: 700;
     margin-bottom: 1.5rem;
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     background: var(--comic-yellow);
     display: inline-block;
-    padding: 0.5rem 1rem;
-    border: 4px solid var(--comic-black);
-    border-radius: 0;
-    box-shadow: 4px 4px 0 rgba(0,0,0,.9);
+    padding: .5rem 1rem;
+    border: 3px solid var(--comic-black);
+    box-shadow: 4px 4px 0 rgba(0,0,0,.3);
+    transform: rotate(1deg);
   }
 
   .edition-card p {
     font-size: 1.15rem;
-    line-height: 1.8;
+    line-height: 1.7;
     color: var(--comic-black);
-    font-weight: 400;
-    position: relative;
-    z-index: 1;
+    font-weight: 500;
   }
 
   /* === THEMES SECTION === */
   .themes-section {
-    background: rgba(255, 217, 61, 0.15);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 217, 61, 0.3);
-    border-radius: 20px;
-    padding: 2rem;
-    margin-top: 2rem;
+    background: var(--comic-yellow);
+    border: 4px solid var(--comic-black);
+    padding: 1.5rem;
+    margin-top: 1.5rem;
     text-align: left;
-    box-shadow: 0 8px 25px rgba(0,0,0,.05);
+    box-shadow: 5px 5px 0 rgba(0,0,0,.3);
     position: relative;
-    z-index: 1;
+  }
+
+  .themes-section::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border: 2px solid var(--comic-black);
+    pointer-events: none;
   }
 
   .themes-section h4 {
     font-family: 'Bangers', cursive;
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     color: var(--comic-black);
-    text-shadow: none;
+    text-shadow: 2px 2px 0 var(--comic-white);
     letter-spacing: 1.5px;
     margin-bottom: 1rem;
   }
@@ -287,262 +319,165 @@
 
   /* === SCHEDULE SECTION === */
   .schedule-section {
-    background: var(--comic-green);
+    background: linear-gradient(135deg, var(--comic-green) 0%, #58D68D 100%);
     color: var(--comic-white);
-    padding: 2.5rem 2rem;
-    margin: 2.5rem auto;
+    padding: 3rem 2rem;
+    margin: 3rem auto;
     max-width: 1200px;
     border: 6px solid var(--comic-black);
-    border-radius: 0;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,.2), 10px 10px 0 rgba(0,0,0,.3);
     position: relative;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .schedule-section:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 10px 10px 0 rgba(0,0,0,.9);
+  .schedule-section::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--comic-black);
+    pointer-events: none;
   }
 
   .schedule-section h2 {
     font-family: 'Bangers', cursive;
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
-    color: var(--comic-white);
+    font-size: 2.8rem;
+    color: var(--comic-yellow);
     text-shadow: 4px 4px 0 var(--comic-black);
-    margin-bottom: 0.75rem;
+    margin-bottom: .5rem;
     text-align: center;
     font-weight: 400;
-    letter-spacing: 3px;
-    line-height: 1;
+    letter-spacing: 2px;
   }
 
   .schedule-section > p {
     text-align: center;
-    font-size: 1rem;
-    font-weight: 700;
-    margin-bottom: 2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
     color: var(--comic-white);
     text-shadow: 2px 2px 0 var(--comic-black);
-    text-transform: uppercase;
-    letter-spacing: 1px;
   }
 
   #schedule-container {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    grid-auto-rows: minmax(200px, auto);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
-  }
-
-  /* Bento box pattern - varied sizes */
-  #schedule-container > div:nth-child(6n + 1) {
-    grid-column: span 2;
-    grid-row: span 2;
-  }
-
-  #schedule-container > div:nth-child(6n + 2) {
-    grid-column: span 2;
-    grid-row: span 1;
-  }
-
-  #schedule-container > div:nth-child(6n + 3) {
-    grid-column: span 2;
-    grid-row: span 1;
-  }
-
-  #schedule-container > div:nth-child(6n + 4) {
-    grid-column: span 3;
-    grid-row: span 1;
-  }
-
-  #schedule-container > div:nth-child(6n + 5) {
-    grid-column: span 3;
-    grid-row: span 1;
-  }
-
-  #schedule-container > div:nth-child(6n + 6) {
-    grid-column: span 2;
-    grid-row: span 2;
   }
 
   /* === CONSIGNMENT SECTION === */
   .consignment-section {
-    background: var(--comic-purple);
+    background: linear-gradient(135deg, var(--comic-purple) 0%, #C39BD3 100%);
     color: var(--comic-white);
-    padding: 2.5rem 2rem;
-    margin: 2.5rem auto;
+    padding: 3rem 2.5rem;
+    margin: 3rem auto;
     max-width: 1200px;
     border: 6px solid var(--comic-black);
-    border-radius: 0;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
+    box-shadow: inset -4px -4px 0 rgba(0,0,0,.2), 10px 10px 0 rgba(0,0,0,.3);
     position: relative;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
 
-  .consignment-section:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 10px 10px 0 rgba(0,0,0,.9);
+  .consignment-section::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--comic-black);
+    pointer-events: none;
   }
 
   .consignment-section h2 {
     font-family: 'Bangers', cursive;
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    color: var(--comic-white);
+    font-size: 2.8rem;
+    color: var(--comic-yellow);
     text-shadow: 4px 4px 0 var(--comic-black);
     margin-bottom: 1.5rem;
     text-align: center;
     font-weight: 400;
     letter-spacing: 2px;
-    line-height: 1.1;
   }
 
   .consignment-section p {
-    font-size: 1.05rem;
-    line-height: 1.6;
+    font-size: 1.2rem;
+    line-height: 1.8;
     margin: 0;
     text-align: center;
-    font-weight: 600;
-    text-shadow: 2px 2px 0 var(--comic-black);
+    font-weight: 500;
+    text-shadow: 2px 2px 0 rgba(0,0,0,.3);
   }
 
   /* === REVIEWS SECTION === */
   .reviews-section {
     background: var(--comic-orange);
     color: var(--comic-white);
-    padding: 3rem 2rem;
-    margin: 2.5rem 0;
-    border: 6px solid var(--comic-black);
-    border-left: none;
-    border-right: none;
+    padding: 4rem 2rem;
+    margin: 3rem 0;
+    border: 8px solid var(--comic-black);
     position: relative;
-    box-shadow: inset 0 6px 0 rgba(0,0,0,.3), inset 0 -6px 0 rgba(0,0,0,.3);
+    box-shadow: inset -5px -5px 0 rgba(0,0,0,.2), 12px 12px 0 rgba(0,0,0,.3);
+  }
+
+  .reviews-section::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    right: -8px;
+    bottom: -8px;
+    border: 4px solid var(--comic-black);
+    pointer-events: none;
   }
 
   .reviews-section .section-title {
     font-family: 'Bangers', cursive;
     font-size: clamp(2.5rem, 5vw, 4.5rem);
     text-align: center;
-    margin-bottom: 2.5rem;
+    margin-bottom: 3rem;
     color: var(--comic-white);
-    text-shadow: 4px 4px 0 var(--comic-black);
+    text-shadow: 5px 5px 0 var(--comic-black), 3px 3px 0 var(--comic-red);
     letter-spacing: 3px;
-    line-height: 1;
   }
 
   .reviews-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2.5rem;
-    max-width: 1400px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
     margin: 0 auto;
-    justify-content: center;
   }
 
   .review-card {
-    background: transparent;
+    background: var(--comic-white);
     color: var(--comic-black);
-    padding: 0;
-    border: none;
-    box-shadow: none;
-    transition: all 0.2s ease;
+    padding: 1.5rem;
+    border: 5px solid var(--comic-black);
+    box-shadow: inset -3px -3px 0 rgba(0,0,0,.15), 6px 6px 0 rgba(0,0,0,.4);
+    transition: .3s;
     position: relative;
-    overflow: visible;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  }
+
+  .review-card::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid var(--comic-black);
+    pointer-events: none;
   }
 
   .review-card:hover {
-    transform: translate(-2px, -2px) rotate(0deg) !important;
-  }
-
-  /* Rotating and shifting variations */
-  .review-card:nth-child(7n + 1) {
-    transform: rotate(-2deg) translateY(5px);
-  }
-
-  .review-card:nth-child(7n + 2) {
-    transform: rotate(3deg) translateY(-8px);
-  }
-
-  .review-card:nth-child(7n + 3) {
-    transform: rotate(-3deg) translateY(10px);
-  }
-
-  .review-card:nth-child(7n + 4) {
-    transform: rotate(1deg) translateY(-5px);
-  }
-
-  .review-card:nth-child(7n + 5) {
-    transform: rotate(2deg) translateY(8px);
-  }
-
-  .review-card:nth-child(7n + 6) {
-    transform: rotate(-1deg) translateY(-10px);
-  }
-
-  .review-card:nth-child(7n + 7) {
-    transform: rotate(2deg) translateY(5px);
-  }
-
-  .review-photo {
-    max-width: 280px;
-    max-height: 280px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
-    border: 6px solid var(--comic-black);
-    filter: contrast(1.3) saturate(1.4);
-    background: white;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
-    display: block;
-    padding: 1rem;
-  }
-
-  .review-content {
-    margin-top: 15px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    background: white;
-    border: 5px solid var(--comic-black);
-    border-radius: 30px;
-    box-shadow: 6px 6px 0 rgba(0,0,0,.7);
-    min-height: 160px;
-    width: 280px;
-    max-width: 280px;
-  }
-
-  .review-content::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: 30px;
-    width: 0;
-    height: 0;
-    border-left: 15px solid transparent;
-    border-right: 15px solid transparent;
-    border-bottom: 20px solid white;
-    z-index: 2;
-  }
-
-  .review-content::after {
-    content: '';
-    position: absolute;
-    top: -27px;
-    left: 27px;
-    width: 0;
-    height: 0;
-    border-left: 18px solid transparent;
-    border-right: 18px solid transparent;
-    border-bottom: 25px solid var(--comic-black);
-    z-index: 1;
+    transform: translateY(-5px) rotate(1deg);
+    box-shadow: inset -3px -3px 0 rgba(0,0,0,.15), 8px 8px 0 rgba(0,0,0,.5);
   }
 
   .stars {
-    font-size: 1.5rem;
-    margin-bottom: 0.75rem;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
   }
 
   .filled-star {
@@ -556,22 +491,18 @@
   }
 
   .review-text {
-    font-size: 1rem;
-    line-height: 1.4;
-    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
     font-style: italic;
-    font-weight: 600;
-    flex: 1;
+    font-weight: 500;
   }
 
   .reviewer {
-    font-weight: 900;
-    color: var(--comic-black);
+    font-weight: 700;
+    color: var(--comic-blue);
     text-align: right;
-    text-shadow: none;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    text-shadow: 1px 1px 0 rgba(0,0,0,.1);
   }
 
   /* === CTA SECTION === */
@@ -715,282 +646,71 @@
     color: #dee2e6;
   }
 
-  /* === MODAL/POPUP === */
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(8px);
-    z-index: 9999;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .modal-overlay.active {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 1;
-  }
-
-  .modal-content {
-    background: white;
-    border-radius: 24px;
-    max-width: 700px;
-    width: 90%;
-    max-height: 85vh;
-    box-shadow: 0 30px 80px rgba(0,0,0,.2);
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    transform: scale(0.9);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .modal-overlay.active .modal-content {
-    transform: scale(1);
-  }
-
-  .modal-header {
-    padding: 2.5rem 2.5rem 1.5rem;
-    border-bottom: 2px solid #f0f0f0;
-  }
-
-  .modal-header h2 {
-    font-family: 'Bangers', cursive;
-    font-size: 2.5rem;
-    color: var(--comic-red);
-    margin: 0;
-    letter-spacing: 2px;
-  }
-
-  .modal-close {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    background: #f5f5f5;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.5rem;
-    color: #666;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-  }
-
-  .modal-close:hover {
-    background: #e0e0e0;
-    color: #333;
-    transform: rotate(90deg);
-  }
-
-  .modal-body {
-    padding: 2rem 2.5rem;
-    overflow-y: auto;
-    flex: 1;
-  }
-
-  .modal-body h3 {
-    font-family: 'Bangers', cursive;
-    font-size: 1.5rem;
-    color: var(--comic-black);
-    margin: 1.5rem 0 1rem;
-    letter-spacing: 1px;
-  }
-
-  .modal-body h3:first-child {
-    margin-top: 0;
-  }
-
-  .modal-body p {
-    font-size: 1rem;
-    line-height: 1.7;
-    color: #444;
-    margin-bottom: 1rem;
-  }
-
-  .modal-body strong {
-    color: var(--comic-red);
-    font-weight: 600;
-  }
-
-  .modal-body ul {
-    list-style: none;
-    padding-left: 0;
-    margin: 1rem 0;
-  }
-
-  .modal-body ul li {
-    padding-left: 1.5rem;
-    margin-bottom: 0.75rem;
-    position: relative;
-    line-height: 1.6;
-  }
-
-  .modal-body ul li::before {
-    content: "→";
-    position: absolute;
-    left: 0;
-    color: var(--comic-red);
-    font-weight: bold;
-  }
-
-  @media (max-width: 768px) {
-    .modal-content {
-      width: 95%;
-      max-height: 90vh;
-    }
-
-    .modal-header {
-      padding: 2rem 1.5rem 1rem;
-    }
-
-    .modal-header h2 {
-      font-size: 2rem;
-    }
-
-    .modal-body {
-      padding: 1.5rem;
-    }
-
-    .modal-close {
-      top: 1rem;
-      right: 1rem;
-      width: 36px;
-      height: 36px;
-    }
-  }
-
   /* === RESPONSIVE === */
-  @media (max-width: 1024px) {
-    .two-cards {
-      grid-template-columns: 1fr;
-    }
-
+  @media (max-width: 900px) {
     #schedule-container {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    /* Simplify bento box for tablets */
-    #schedule-container > div:nth-child(n) {
-      grid-column: span 1;
-      grid-row: span 1;
-    }
-
-    #schedule-container > div:nth-child(3n + 1) {
-      grid-column: span 2;
-    }
-
-    .reviews-grid {
       grid-template-columns: repeat(2, 1fr);
-    }
-
-    .reviews-grid > div:nth-child(n) {
-      grid-column: span 1;
-    }
-
-    .reviews-grid > div:nth-child(odd) {
-      grid-column: span 1;
     }
   }
 
   @media (max-width: 768px) {
     .hero {
-      padding: 3rem 1.5rem;
+      padding: 2rem 1rem;
       min-height: auto;
     }
 
     .hero-logo {
-      max-width: 280px;
-      margin-bottom: 2rem;
+      max-width: 300px;
     }
 
     .hero-subtitle {
       font-size: clamp(1.6rem, 5vw, 2.2rem);
-      padding: 1.2rem 2rem;
-      margin-bottom: 2rem;
+      padding: 1rem 1.5rem;
     }
 
     .hero-description {
-      font-size: 1.1rem;
-      padding: 2rem;
-      margin-bottom: 3rem;
+      font-size: 1.05rem;
+      padding: 1.5rem;
     }
 
     .two-cards {
       grid-template-columns: 1fr;
-      gap: 2rem;
-      margin: 2rem auto;
-      padding: 0 1.5rem;
+      gap: 1.5rem;
+      margin: 1rem auto;
     }
 
     .edition-card {
-      padding: 2.5rem;
+      padding: 2rem;
     }
 
     .edition-card h3 {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
     }
 
-    .edition-card p {
-      font-size: 1.1rem;
-    }
-
-    .schedule-section {
-      padding: 3rem 2rem;
-      margin: 3rem auto;
-      border-radius: 30px;
-    }
-
-    .schedule-section h2 {
-      font-size: 2.5rem;
-    }
-
-    #schedule-container {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    #schedule-container > div:nth-child(n) {
-      grid-column: span 1;
-      grid-row: span 1;
-    }
-
-    .consignment-section {
-      padding: 3rem 2rem;
-      margin: 3rem auto;
-      border-radius: 30px;
-    }
-
-    .consignment-section h2 {
-      font-size: 2.5rem;
-    }
-
-    .consignment-section p {
-      font-size: 1.1rem;
-    }
-
-    .reviews-section {
-      padding: 3rem 2rem;
-      margin: 3rem 0;
+    .edition-card p,
+    .edition-card li {
+      font-size: 1rem;
     }
 
     .reviews-grid {
       grid-template-columns: 1fr;
-      gap: 2rem;
+      gap: 1.5rem;
     }
 
-    .reviews-grid > div:nth-child(n) {
-      grid-column: span 1;
+    .reviews-section {
+      padding: 2rem 1rem;
     }
 
-    .review-card {
-      padding: 1.8rem;
+    .consignment-section {
+      padding: 2rem 1.5rem;
+    }
+
+    .consignment-section h2 {
+      font-size: 2rem;
+    }
+
+    .consignment-section p {
+      font-size: 1.05rem;
     }
 
     .social-links {
@@ -998,37 +718,12 @@
     }
 
     .social-link {
-      width: 60px;
-      height: 60px;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .hero {
-      padding: 2rem 1rem;
+      width: 70px;
+      height: 70px;
     }
 
-    .hero-subtitle {
-      padding: 1rem 1.5rem;
-    }
-
-    .hero-description {
-      font-size: 1rem;
-      padding: 1.5rem;
-    }
-
-    .edition-card {
-      padding: 2rem;
-    }
-
-    .schedule-section,
-    .consignment-section {
-      padding: 2.5rem 1.5rem;
-      border-radius: 24px;
-    }
-
-    .reviews-section {
-      padding: 2.5rem 1.5rem;
+    #schedule-container {
+      grid-template-columns: 1fr;
     }
   }
 </style>
@@ -1090,60 +785,39 @@
       <h2 class="section-title">The Fake Reviews Are In</h2>
       <div class="reviews-grid">
         <div class="review-card">
-          <img src="web/images/comicsans.png" alt="Jorge B." class="review-photo">
-          <div class="review-content">
-            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
-            <p class="review-text">"I can't believe they didn't use Comic Sans on their website. It seems like a website that would have Comic Sans on it."</p>
-            <div class="reviewer">- Jorge B.</div>
-          </div>
+          <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+          <p class="review-text">"I can't believe they didn't use Comic Sans on their website. It seems like a website that would have Comic Sans on it."</p>
+          <div class="reviewer">- Jorge B.</div>
         </div>
         <div class="review-card">
-          <img src="web/images/traderjoes.png" alt="Confused Customer" class="review-photo">
-          <div class="review-content">
-            <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
-            <p class="review-text">"I thought I was going to Trader Joe's"</p>
-            <div class="reviewer">- Confused Customer</div>
-          </div>
+          <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
+          <p class="review-text">"I thought I was going to Trader Joe's"</p>
+          <div class="reviewer">- Confused Customer</div>
         </div>
         <div class="review-card">
-          <img src="web/images/banana.png" alt="Fruit Enthusiast" class="review-photo">
-          <div class="review-content">
-            <div class="stars"><span class="filled-star">★★</span><span class="empty-star">★★★</span></div>
-            <p class="review-text">"They sold me a banana for $47. It wasn't even ripe."</p>
-            <div class="reviewer">- Fruit Enthusiast</div>
-          </div>
+          <div class="stars"><span class="filled-star">★★</span><span class="empty-star">★★★</span></div>
+          <p class="review-text">"They sold me a banana for $47. It wasn't even ripe."</p>
+          <div class="reviewer">- Fruit Enthusiast</div>
         </div>
         <div class="review-card">
-          <img src="web/images/knives.png" alt="Sharp Shopper" class="review-photo">
-          <div class="review-content">
-            <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
-            <p class="review-text">"I came for the improv but left with 12 kitchen knives. Still confused."</p>
-            <div class="reviewer">- Sharp Shopper</div>
-          </div>
+          <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
+          <p class="review-text">"I came for the improv but left with 12 kitchen knives. Still confused."</p>
+          <div class="reviewer">- Sharp Shopper</div>
         </div>
         <div class="review-card">
-          <img src="web/images/treadmill.png" alt="Concerned Grandchild" class="review-photo">
-          <div class="review-content">
-            <div class="stars"><span class="filled-star">★★★★</span><span class="empty-star">★</span></div>
-            <p class="review-text">"My grandmother swiped wrong during the show and bought a treadmill. She's 94."</p>
-            <div class="reviewer">- Concerned Grandchild</div>
-          </div>
+          <div class="stars"><span class="filled-star">★★★★</span><span class="empty-star">★</span></div>
+          <p class="review-text">"My grandmother swiped wrong during the show and bought a treadmill. She's 94."</p>
+          <div class="reviewer">- Concerned Grandchild</div>
         </div>
         <div class="review-card">
-          <img src="web/images/rainman.png" alt="Raymond Babbitt" class="review-photo">
-          <div class="review-content">
-            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
-            <p class="review-text">"Charlie Babbitt squeezed and pulled and hurt my neck in 1988"</p>
-            <div class="reviewer">- Raymond Babbitt</div>
-          </div>
+          <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+          <p class="review-text">"Charlie Babbitt squeezed and pulled and hurt my neck in 1988"</p>
+          <div class="reviewer">- Raymond Babbitt</div>
         </div>
         <div class="review-card">
-          <img src="web/images/pinkfloyd.png" alt="Floyd" class="review-photo">
-          <div class="review-content">
-            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
-            <p class="review-text">"If tickets are still available, you can't be sold out! How can you be sold out if tickets are still available?!"</p>
-            <div class="reviewer">- Floyd</div>
-          </div>
+          <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+          <p class="review-text">"If tickets are still available, you can't be sold out! How can you be sold out if tickets are still available?!"</p>
+          <div class="reviewer">- Floyd</div>
         </div>
       </div>
     </section>
@@ -1218,69 +892,11 @@
     <div class="boring-footer-content">
       <a href="https://www.notion.so/SOLD-OUT-Comedy-BACKSTAGE-26360a0626ed80d2babee637915de291">BACKSTAGE</a>
       <span class="separator">|</span>
-      <a href="#" id="consignmentGuidelinesLink">CONSIGNMENT GUIDELINES</a>
-      <span class="separator">|</span>
       <a href="https://help.whatnot.com/hc/en-us/articles/360061224972-Prohibited-or-Restricted-Items-on-Whatnot" target="_blank" rel="noopener noreferrer">PROHIBITED ITEMS</a>
       <span class="separator">|</span>
       <a href="https://news.uchicago.edu/explainer/improv-explained" target="_blank" rel="noopener noreferrer">IMPROV EXPLAINED</a>
     </div>
   </footer>
-
-  <!-- CONSIGNMENT GUIDELINES MODAL -->
-  <div class="modal-overlay" id="consignmentModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2>Consignment Guidelines</h2>
-        <button class="modal-close" id="closeModal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <h3>How It Works</h3>
-        <p><strong>Auction Format:</strong> Your item will be auctioned during a SOLD OUT! Comedy Show in a format determined by our production team. Think of it as consignment theater—we provide the audience and entertainment, you provide the props!</p>
-
-        <h3>Pricing & Payment</h3>
-        <ul>
-          <li><strong>Net Price:</strong> You set the amount you're willing to receive for your item</li>
-          <li><strong>Listing Price:</strong> We set the listing price, which includes all taxes, fees, shipping, and handling costs</li>
-          <li><strong>Our Cut:</strong> Any amount received above your Net Price belongs to SOLD OUT! Comedy</li>
-          <li><strong>Payment:</strong> If your item sells, you receive exactly your Net Price within 3 days of sale</li>
-        </ul>
-
-        <h3>Check-In Process</h3>
-        <ul>
-          <li>Bring your item in an unsealed, mail-ready box</li>
-          <li>Arrive no earlier than one hour before showtime</li>
-          <li>Check in with our Appraiser to set your net price</li>
-          <li>You can choose to participate in selling your item or watch from your seat</li>
-        </ul>
-
-        <h3>During the Show</h3>
-        <ul>
-          <li>Comedians use your items as props in improv scenes</li>
-          <li>You never know when or if your prop will pop up!</li>
-          <li>If it isn't used in a skit, it will be auctioned during the Lightning Round</li>
-          <li>The production team has final say on item participation and usage</li>
-        </ul>
-
-        <h3>If Your Item Doesn't Sell</h3>
-        <ul>
-          <li>We'll return it to you after the show (our goal is immediate, in-person return)</li>
-          <li>Official policy: returned within 14 days at consignor's expense</li>
-        </ul>
-
-        <h3>Important Terms</h3>
-        <ul>
-          <li><strong>Condition:</strong> You warrant the item is as described and you have clear title to sell</li>
-          <li><strong>Final Sales:</strong> All sales are final—no returns or refunds permitted. No takesy backsies!</li>
-          <li><strong>Liability:</strong> You release SOLD OUT! Comedy from any liability related to your item, its sale, or your participation</li>
-          <li><strong>Promotion:</strong> You grant permission to photograph and promote the item across all media platforms</li>
-        </ul>
-
-        <p style="margin-top: 2rem; padding-top: 1.5rem; border-top: 2px solid #f0f0f0; font-size: 0.9rem; color: #666;">
-          Ready to consign? Check in with our Appraiser when you arrive at the show, or visit our <a href="props/input.html" style="color: var(--comic-red); font-weight: 600;">Prop Check-In form</a> to get started.
-        </p>
-      </div>
-    </div>
-  </div>
 
 <script>
 // === INITIALIZATION ===
@@ -1288,7 +904,6 @@ document.addEventListener('DOMContentLoaded', () => {
   loadRandomTagline();
   randomizeSocialIconTilts();
   loadSchedule();
-  initConsignmentModal();
 });
 
 // === HELPER FUNCTIONS ===
@@ -1556,7 +1171,9 @@ async function loadSchedule() {
 
           <div style="padding:2.5rem 2rem 2rem 2rem;display:flex;flex-direction:column;align-items:center;flex-grow:1;${isPast ? 'opacity:.5;' : ''}">
             ${s.icon ? `<img src="${s.icon}" alt="${s.theme || 'Show'}" style="width:120px;height:120px;object-fit:contain;margin-bottom:1rem;border-radius:10px;border:3px solid var(--comic-black);box-shadow:4px 4px 0 rgba(0,0,0,.3);" onerror="this.style.display='none'">` : ''}
-            ${s.theme ? `<div style="font-family:'Bangers',cursive;font-size:2rem;color:${burstFill};letter-spacing:1px;margin-bottom:1rem;line-height:1.2;text-align:center;width:100%;">${s.theme}</div>` : ''}
+            ${s.theme ? `<div style="font-family:'Bangers',cursive;font-size:2rem;color:${burstFill};letter-spacing:1px;margin-bottom:.25rem;line-height:1.2;text-align:center;width:100%;">${s.theme}</div>` : ''}
+            <div style="font-family:Inter,sans-serif;font-size:.75rem;font-weight:400;color:rgba(44,44,44,.6);margin-bottom:.75rem;text-align:center;width:100%;">A SOLD OUT! Comedy Show</div>
+
             ${s.venue ? (s.address && mapsLink
                 ? `<a href="${mapsLink}" target="_blank" style="color:var(--comic-black);text-decoration:none;font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;display:block;">${s.venue}</a>`
                 : `<div style="color:var(--comic-black);font-family:'Bangers',cursive;font-size:1.6rem;font-weight:400;margin-bottom:.25rem;letter-spacing:1px;line-height:1.2;text-align:center;width:100%;">${s.venue}</div>`)
@@ -1595,44 +1212,6 @@ async function loadSchedule() {
     console.error('[schedule] load failed:', err);
     container.innerHTML = '<p style="text-align:center;font-weight:600">More Shows Coming Soon</p>';
   }
-}
-
-// === CONSIGNMENT MODAL ===
-function initConsignmentModal() {
-  const modal = document.getElementById('consignmentModal');
-  const openLink = document.getElementById('consignmentGuidelinesLink');
-  const closeBtn = document.getElementById('closeModal');
-
-  if (!modal || !openLink || !closeBtn) return;
-
-  // Open modal
-  openLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
-  });
-
-  // Close modal on X button click
-  closeBtn.addEventListener('click', () => {
-    modal.classList.remove('active');
-    document.body.style.overflow = '';
-  });
-
-  // Close modal on overlay click
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-  });
-
-  // Close modal on ESC key
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modal.classList.contains('active')) {
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
-    }
-  });
 }
 </script>
 </body>

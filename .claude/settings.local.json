@@ -7,7 +7,10 @@
       "Bash(if [ -d \"web/images/shows\" ])",
       "Bash(then ls -la web/images/shows/)",
       "Bash(else echo \"Directory does not exist\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(git log:*)",
+      "Bash(git fsck:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []
