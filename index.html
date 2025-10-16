@@ -43,15 +43,14 @@
     overflow-x: hidden;
   }
 
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+
   /* === OVERLAYS === */
   .halftone-overlay {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9998;
-    background-image: radial-gradient(circle, rgba(255,59,59,.12) 1.5px, transparent 1.5px);
-    background-size: 6px 6px;
-    mix-blend-mode: multiply;
+    display: none;
   }
 
   /* === COMIC PANEL COMPONENT === */
@@ -90,40 +89,42 @@
     width: 100%;
     height: auto;
     margin-bottom: 1.5rem;
-    filter: drop-shadow(8px 8px 0 rgba(0,0,0,.8)) contrast(1.2) saturate(1.3);
-    transition: transform 0.3s ease;
-    border: 6px solid var(--comic-black);
+    filter: drop-shadow(6px 6px 0 rgba(0,0,0,.3)) contrast(1.1) saturate(1.2);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 5px solid var(--comic-black);
     background: white;
     padding: 1rem;
   }
 
   .hero-logo:hover {
-    transform: scale(1.05) rotate(-2deg);
+    transform: scale(1.03) rotate(-2deg);
+    filter: drop-shadow(8px 8px 0 rgba(0,0,0,.4)) contrast(1.15) saturate(1.3);
   }
 
   .hero-subtitle {
     font-family: 'Bangers', cursive;
     font-size: clamp(2.5rem, 5vw, 4.5rem);
     color: var(--comic-red);
-    text-shadow: 4px 4px 0 var(--comic-black), 2px 2px 0 var(--comic-yellow);
+    text-shadow: 3px 3px 0 var(--comic-black);
     letter-spacing: 2px;
     line-height: 1;
     margin-bottom: 1.5rem;
     text-transform: uppercase;
     background: white;
     padding: 1.5rem 2.5rem;
-    border: 6px solid var(--comic-black);
+    border: 5px solid var(--comic-black);
     border-radius: 0;
     position: relative;
     display: inline-block;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
-    transition: transform 0.3s ease;
+    box-shadow: 8px 8px 0 rgba(0,0,0,.2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 400;
     transform: rotate(-1deg);
   }
 
   .hero-subtitle:hover {
-    transform: rotate(-1deg) scale(1.02);
+    transform: rotate(-1deg) translate(-2px, -2px);
+    box-shadow: 10px 10px 0 rgba(0,0,0,.3);
   }
 
 
@@ -131,21 +132,21 @@
     font-size: 1.15rem;
     color: var(--comic-black);
     max-width: 850px;
-    margin: 0 auto 1.5rem;
-    line-height: 1.6;
+    margin: 0 auto 2.5rem;
+    line-height: 1.7;
     background: white;
     padding: 2rem;
-    border: 6px solid var(--comic-black);
+    border: 4px solid var(--comic-black);
     border-radius: 0;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
+    box-shadow: 6px 6px 0 rgba(0,0,0,.15);
     position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-weight: 500;
   }
 
   .hero-description:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 10px 10px 0 rgba(0,0,0,.9);
+    box-shadow: 8px 8px 0 rgba(0,0,0,.25);
   }
 
   /* === EDITION CARDS === */
@@ -160,12 +161,12 @@
 
   .edition-card {
     background: white;
-    border: 6px solid var(--comic-black);
+    border: 5px solid var(--comic-black);
     border-radius: 0;
-    padding: 2rem;
-    transition: all 0.2s ease;
+    padding: 2.5rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
+    box-shadow: 10px 10px 0 rgba(0,0,0,.15);
     overflow: visible;
   }
 
@@ -174,8 +175,8 @@
   }
 
   .edition-card:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: 10px 10px 0 rgba(0,0,0,.9);
+    transform: translate(-4px, -4px);
+    box-shadow: 14px 14px 0 rgba(0,0,0,.25);
   }
 
   .edition-card.stage-edition {
@@ -243,14 +244,14 @@
 
   /* === THEMES SECTION === */
   .themes-section {
-    background: rgba(255, 217, 61, 0.15);
+    background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 217, 61, 0.3);
-    border-radius: 20px;
-    padding: 2rem;
+    border: 4px solid var(--comic-black);
+    border-radius: 0;
+    padding: 1.5rem;
     margin-top: 2rem;
     text-align: left;
-    box-shadow: 0 8px 25px rgba(0,0,0,.05);
+    box-shadow: 4px 4px 0 rgba(0,0,0,.2);
     position: relative;
     z-index: 1;
   }
@@ -295,12 +296,12 @@
   .schedule-section {
     background: #FFFFFF;
     color: var(--comic-black);
-    padding: var(--section-padding);
+    padding: 3rem 2.5rem;
     margin: 0 auto;
-    max-width: 1000px;
-    border: none;
+    max-width: 1100px;
+    border: 5px solid var(--comic-black);
     border-radius: 0;
-    box-shadow: none;
+    box-shadow: 10px 10px 0 rgba(0,0,0,.15);
     position: relative;
     isolation: isolate;
   }
@@ -314,27 +315,27 @@
   }
 
   .schedule-section h2 {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 2rem;
-    color: var(--comic-black);
-    text-shadow: none;
+    font-family: 'Bangers', cursive;
+    font-size: 2.5rem;
+    color: var(--comic-red);
+    text-shadow: 2px 2px 0 var(--comic-black);
     margin-bottom: 0.5rem;
     text-align: left;
-    font-weight: 700;
-    letter-spacing: -0.5px;
+    font-weight: 400;
+    letter-spacing: 2px;
     line-height: 1.2;
     text-transform: uppercase;
   }
 
   .schedule-section > p {
     text-align: left;
-    font-size: 0.875rem;
-    font-weight: 400;
-    margin-bottom: 3rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-bottom: 2.5rem;
     color: #666;
     text-shadow: none;
     text-transform: none;
-    letter-spacing: 0;
+    letter-spacing: 0.3px;
   }
 
   #schedule-container {
@@ -367,7 +368,7 @@
     font-family: 'Bangers', cursive;
     font-size: clamp(2rem, 4vw, 3.5rem);
     color: var(--comic-white);
-    text-shadow: 4px 4px 0 var(--comic-black);
+    text-shadow: 3px 3px 0 rgba(0,0,0,.5);
     margin-bottom: 1.5rem;
     text-align: center;
     font-weight: 400;
@@ -377,18 +378,18 @@
 
   .consignment-section p {
     font-size: 1.05rem;
-    line-height: 1.6;
+    line-height: 1.7;
     margin: 0;
     text-align: center;
-    font-weight: 600;
-    text-shadow: 2px 2px 0 var(--comic-black);
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0,0,0,.3);
   }
 
   /* === REVIEWS SECTION === */
   .reviews-section {
     background: var(--comic-orange);
     color: var(--comic-white);
-    padding: var(--section-padding);
+    padding: 4rem 2rem;
     margin: var(--section-gap) 0;
     border: 6px solid var(--comic-black);
     border-left: none;
@@ -401,17 +402,17 @@
     font-family: 'Bangers', cursive;
     font-size: clamp(2.5rem, 5vw, 4.5rem);
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2.5rem;
     color: var(--comic-white);
-    text-shadow: 4px 4px 0 var(--comic-black);
+    text-shadow: 3px 3px 0 rgba(0,0,0,.5);
     letter-spacing: 3px;
     line-height: 1;
   }
 
   .reviews-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--card-gap);
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 3rem 2rem;
     max-width: 1400px;
     margin: 0 auto;
     justify-content: center;
@@ -424,7 +425,7 @@
   }
 
   .review-card {
-    background: transparent;
+    background: var(--comic-orange);
     color: var(--comic-black);
     padding: 0;
     border: none;
@@ -476,12 +477,18 @@
     width: auto;
     height: auto;
     object-fit: contain;
-    border: 6px solid var(--comic-black);
-    filter: contrast(1.3) saturate(1.4);
+    border: 5px solid var(--comic-black);
+    filter: contrast(1.2) saturate(1.3);
     background: white;
-    box-shadow: 8px 8px 0 rgba(0,0,0,.9);
+    box-shadow: 6px 6px 0 rgba(0,0,0,.25);
     display: block;
     padding: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .review-card:hover .review-photo {
+    filter: contrast(1.3) saturate(1.4) brightness(1.05);
+    box-shadow: 8px 8px 0 rgba(0,0,0,.35);
   }
 
   .review-content {
@@ -565,18 +572,30 @@
     display: flex;
     justify-content: center;
     margin: var(--section-gap) 0;
+    padding: 2rem 0;
   }
 
   .burst-wrap {
     position: relative;
     display: inline-block;
+    animation: pulseGlow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      transform: scale(1);
+      filter: drop-shadow(12px 12px 0 rgba(0,0,0,.4));
+    }
+    50% {
+      transform: scale(1.02);
+      filter: drop-shadow(14px 14px 0 rgba(0,0,0,.5));
+    }
   }
 
   .burst-svg {
     width: min(90vw, 900px);
     height: auto;
     display: block;
-    filter: drop-shadow(12px 12px 0 rgba(0,0,0,.4));
   }
 
   .tagline {
@@ -588,11 +607,21 @@
     font-family: 'Bangers', cursive;
     font-size: clamp(3rem, 7vw, 7rem);
     color: var(--comic-red);
-    text-shadow: 5px 5px 0 var(--comic-black), 3px 3px 0 var(--comic-yellow);
+    text-shadow: 4px 4px 0 var(--comic-black);
     letter-spacing: 5px;
     line-height: 1.1;
     transform: rotate(-2deg);
     pointer-events: none;
+    animation: taglinePulse 3s ease-in-out infinite;
+  }
+
+  @keyframes taglinePulse {
+    0%, 100% {
+      transform: rotate(-2deg) scale(1);
+    }
+    50% {
+      transform: rotate(-2deg) scale(1.03);
+    }
   }
 
   /* === FOOTER === */
@@ -641,19 +670,21 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 60px;
-    height: 60px;
+    width: 65px;
+    height: 65px;
     text-decoration: none;
     background: var(--comic-white);
-    border: 4px solid var(--comic-yellow);
-    transition: .2s;
-    box-shadow: 4px 4px 0 rgba(0,0,0,.3);
+    border: 3px solid var(--comic-black);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 4px 0 rgba(0,0,0,.2);
+    position: relative;
   }
 
   .social-link:hover {
-    transform: rotate(0deg) scale(1.15) !important;
-    box-shadow: 6px 6px 0 rgba(0,0,0,.4);
+    transform: rotate(0deg) translate(-2px, -2px) scale(1.1) !important;
+    box-shadow: 6px 6px 0 rgba(0,0,0,.35);
     border-color: var(--comic-red);
+    background: #FFFEF7;
   }
 
   .copyright {
@@ -1084,7 +1115,7 @@
       <h2 class="section-title">The Fake Reviews Are In</h2>
       <div class="reviews-grid">
         <div class="review-card">
-          <img src="web/images/comicsansguy.gif" alt="Jorge B." class="review-photo">
+          <video src="web/images/comicsansguy.mp4" alt="Jorge B." class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
             <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
             <p class="review-text">"I can't believe they didn't use Comic Sans on their website. It seems like a website that would have Comic Sans on it."</p>
@@ -1092,7 +1123,7 @@
           </div>
         </div>
         <div class="review-card">
-          <img src="web/images/traderjoes.png" alt="Confused Customer" class="review-photo">
+          <video src="web/images/traderjoes.mp4" alt="Confused Customer" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
             <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
             <p class="review-text">"I thought I was going to Trader Joe's"</p>
@@ -1116,7 +1147,7 @@
           </div>
         </div>
         <div class="review-card">
-          <img src="web/images/treadmill.png" alt="Concerned Grandchild" class="review-photo">
+          <video src="web/images/treadmill.mp4" alt="Concerned Grandchild" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
             <div class="stars"><span class="filled-star">★★★★</span><span class="empty-star">★</span></div>
             <p class="review-text">"My grandmother swiped wrong during the show and bought a treadmill. She's 94."</p>
@@ -1140,7 +1171,7 @@
           </div>
         </div>
         <div class="review-card">
-          <img src="web/images/theater.png" alt="Theater Critic" class="review-photo">
+          <video src="web/images/shakespeare.mp4" alt="Theater Critic" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
             <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
             <p class="review-text">"Was expecting Shakespeare. Got a guy selling tube socks. Honestly? Not disappointed."</p>
