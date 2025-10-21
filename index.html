@@ -1,14 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Character Encoding and Viewport -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Page Title and Favicon -->
   <title>SOLD OUT! Comedy</title>
   <link rel="icon" type="image/png" href="web/images/soldoutlogo.png">
+
+  <!-- Google Fonts: Bangers (comic book style) and Inter (body text) -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap">
+
 <style>
-  /* === CSS VARIABLES === */
+  /* ================================================
+     CSS CUSTOM PROPERTIES (VARIABLES)
+     ================================================ */
   :root {
+    /* Comic Book Color Palette */
     --comic-red: #FF3B3B;
     --comic-blue: #4A90E2;
     --comic-yellow: #FFD93D;
@@ -18,22 +27,33 @@
     --comic-black: #2C2C2C;
     --comic-white: #FFFFFF;
 
-    /* Spacing Variables */
+    /* Layout Spacing */
     --section-gap: 3rem;
     --section-padding: 2.5rem 2rem;
     --card-gap: 2rem;
   }
 
-  /* === BASE STYLES === */
+  /* ================================================
+     GLOBAL RESET & BASE STYLES
+     ================================================ */
+
+  /* CSS Reset - Normalize all elements */
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
 
+  /* Smooth scrolling behavior for anchor links */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Body: Comic book textured background with subtle gradients */
   body {
     font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    background: #F5F1E8;
+    background: #F5F1E8; /* Cream/paper color */
+    /* Layered background: grid pattern + subtle color accents */
     background-image:
       repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.02) 2px, rgba(0,0,0,.02) 4px),
       repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.02) 2px, rgba(0,0,0,.02) 4px),
@@ -43,17 +63,20 @@
     overflow-x: hidden;
   }
 
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
+  /* ================================================
+     LEGACY/UNUSED ELEMENTS
+     ================================================ */
 
-  /* === OVERLAYS === */
+  /* Halftone overlay - currently disabled */
   .halftone-overlay {
     display: none;
   }
 
-  /* === COMIC PANEL COMPONENT === */
+  /* ================================================
+     REUSABLE COMIC PANEL COMPONENT
+     ================================================ */
+
+  /* Comic panel style with 3D effect (currently unused but available) */
   .comic-panel {
     background: var(--comic-white);
     border: 5px solid var(--comic-black);
@@ -61,6 +84,7 @@
     position: relative;
   }
 
+  /* Double border effect for comic panels */
   .comic-panel::before {
     content: '';
     position: absolute;
@@ -69,21 +93,25 @@
     right: -5px;
     bottom: -5px;
     border: 2px solid var(--comic-black);
-    pointer-events: none;
+    pointer-events: none; /* Don't interfere with clicking */
   }
 
-  /* === HERO SECTION === */
+  /* ================================================
+     HERO SECTION (Top of page)
+     ================================================ */
+  /* Main hero container - centered flexbox layout */
   .hero {
     padding: var(--section-padding);
     text-align: center;
     position: relative;
-    z-index: 2;
+    z-index: 2; /* Above background elements */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
 
+  /* SOLD OUT! logo image */
   .hero-logo {
     max-width: 350px;
     width: 100%;
@@ -96,16 +124,18 @@
     padding: 1rem;
   }
 
+  /* Logo hover effect - slight scale and rotation */
   .hero-logo:hover {
     transform: scale(1.03) rotate(-2deg);
     filter: drop-shadow(8px 8px 0 rgba(0,0,0,.4)) contrast(1.15) saturate(1.3);
   }
 
+  /* Hero subtitle/tagline - dynamically loaded from taglines.xml */
   .hero-subtitle {
     font-family: 'Bangers', cursive;
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-size: clamp(2.5rem, 5vw, 4.5rem); /* Responsive sizing */
     color: var(--comic-red);
-    text-shadow: 3px 3px 0 var(--comic-black);
+    text-shadow: 3px 3px 0 var(--comic-black); /* Comic book text effect */
     letter-spacing: 2px;
     line-height: 1;
     margin-bottom: 1.5rem;
@@ -113,21 +143,22 @@
     background: white;
     padding: 1.5rem 2.5rem;
     border: 5px solid var(--comic-black);
-    border-radius: 0;
+    border-radius: 0; /* Sharp corners for comic style */
     position: relative;
     display: inline-block;
     box-shadow: 8px 8px 0 rgba(0,0,0,.2);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-weight: 400;
-    transform: rotate(-1deg);
+    transform: rotate(-1deg); /* Slight tilt for dynamic feel */
   }
 
+  /* Subtitle hover - enhanced shadow */
   .hero-subtitle:hover {
     transform: rotate(-1deg) translate(-2px, -2px);
     box-shadow: 10px 10px 0 rgba(0,0,0,.3);
   }
 
-
+  /* Main description text with link to example */
   .hero-description {
     font-size: 1.15rem;
     color: var(--comic-black);
@@ -144,41 +175,50 @@
     font-weight: 500;
   }
 
+  /* Description hover - lift effect */
   .hero-description:hover {
     transform: translate(-2px, -2px);
     box-shadow: 8px 8px 0 rgba(0,0,0,.25);
   }
 
-  /* === EDITION CARDS === */
+  /* ================================================
+     EDITION CARDS (Stage Edition & Screen Edition)
+     ================================================ */
+
+  /* Two-column grid container for the edition cards */
   .two-cards {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr; /* Equal columns */
     gap: var(--card-gap);
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1.5rem;
   }
 
+  /* Base card styling with comic book aesthetic */
   .edition-card {
     background: white;
     border: 5px solid var(--comic-black);
-    border-radius: 0;
+    border-radius: 0; /* Sharp corners */
     padding: 2.5rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    box-shadow: 10px 10px 0 rgba(0,0,0,.15);
+    box-shadow: 10px 10px 0 rgba(0,0,0,.15); /* Drop shadow effect */
     overflow: visible;
   }
 
+  /* Disable ::before pseudo-element (inherited from comic-panel) */
   .edition-card::before {
     display: none;
   }
 
+  /* Card hover - enhanced lift effect */
   .edition-card:hover {
     transform: translate(-4px, -4px);
     box-shadow: 14px 14px 0 rgba(0,0,0,.25);
   }
 
+  /* Stage Edition card - light red background */
   .edition-card.stage-edition {
     background: #FFE5E5;
     border-color: var(--comic-black);
@@ -188,15 +228,18 @@
     display: none;
   }
 
+  /* Screen Edition card - light blue background */
   .edition-card.screen-edition {
     background: #E3F2FF;
     border-color: var(--comic-black);
   }
 
+  /* Screen Edition title color override */
   .edition-card.screen-edition h3 {
     color: var(--comic-blue);
   }
 
+  /* Screen Edition subtitle color override */
   .edition-card.screen-edition .subtitle {
     color: #2C5AA0;
     background: #B3D9FF;
@@ -206,6 +249,7 @@
     display: none;
   }
 
+  /* Edition card title (Stage Edition / Screen Edition) */
   .edition-card h3 {
     font-family: 'Bangers', cursive;
     font-size: clamp(2.5rem, 4vw, 3.5rem);
@@ -218,6 +262,7 @@
     line-height: 1;
   }
 
+  /* Edition card subtitle badge */
   .edition-card .subtitle {
     font-size: 0.9rem;
     color: var(--comic-black);
@@ -233,6 +278,7 @@
     box-shadow: 4px 4px 0 rgba(0,0,0,.9);
   }
 
+  /* Edition card description paragraph */
   .edition-card p {
     font-size: 1.15rem;
     line-height: 1.8;
@@ -242,10 +288,14 @@
     z-index: 1;
   }
 
-  /* === THEMES SECTION === */
+  /* ================================================
+     THEMES/FEATURES SECTION (Inside edition cards)
+     ================================================ */
+
+  /* Semi-transparent box for themes/features list */
   .themes-section {
     background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px); /* Glassmorphism effect */
     border: 4px solid var(--comic-black);
     border-radius: 0;
     padding: 1.5rem;
@@ -256,6 +306,7 @@
     z-index: 1;
   }
 
+  /* Themes section heading */
   .themes-section h4 {
     font-family: 'Bangers', cursive;
     font-size: 1.5rem;
@@ -265,6 +316,7 @@
     margin-bottom: 1rem;
   }
 
+  /* Unstyled list container */
   .themes-list {
     list-style: none;
     padding: 0;
@@ -272,15 +324,17 @@
     text-align: left;
   }
 
+  /* Individual theme/feature items */
   .themes-list li {
     font-size: 1.1rem;
     margin: .7rem 0;
     position: relative;
-    padding-left: 2rem;
+    padding-left: 2rem; /* Space for star icon */
     font-weight: 600;
     color: var(--comic-black);
   }
 
+  /* Star bullet icon before each item */
   .themes-list li::before {
     content: "★";
     position: absolute;
@@ -1053,18 +1107,29 @@
 </style>
 </head>
 <body>
+  <!-- Legacy overlay element (currently hidden) -->
   <div class="halftone-overlay"></div>
 
+  <!-- ================================================
+       HERO SECTION - Top of page with logo and tagline
+       ================================================ -->
   <section class="hero">
+    <!-- Dynamic tagline loaded from taglines.xml via JavaScript -->
     <p class="hero-subtitle">Live Comedy Meets Live Shopping</p>
 
+    <!-- Main logo -->
     <img src="web/images/soldoutlogo.png" alt="SOLD OUT! Comedy" class="hero-logo">
 
+    <!-- Main description with example link -->
     <div class="hero-description">
       Live selling is a $68 billion market, but let's be real, <a href="https://www.reddit.com/r/whatnotapp/comments/1ntac3q/once_again_crashout_on_whatnot_pt1/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button" target="_blank" rel="noopener noreferrer" style="color: var(--comic-red); font-weight: 700; text-decoration: underline;">it's painful to watch</a>. We're changing that. Give us that dusty juicer to sell and it becomes a prop in an improv sketch while the live and online audiences both bid on it. We'll sell out our dignity to sell out your stuff.
     </div>
 
+    <!-- ================================================
+         EDITION CARDS - Stage and Screen descriptions
+         ================================================ -->
     <div class="two-cards">
+      <!-- STAGE EDITION CARD -->
       <div class="edition-card stage-edition">
         <h3>Stage Edition</h3>
         <div class="subtitle">Live-In-Person and Online Audiences</div>
@@ -1079,6 +1144,7 @@
         </div>
       </div>
 
+      <!-- SCREEN EDITION CARD -->
       <div class="edition-card screen-edition">
         <h3>Screen Edition</h3>
         <div class="subtitle">Online Audience Only</div>
@@ -1096,24 +1162,35 @@
 
   </section>
 
+  <!-- ================================================
+       SCHEDULE SECTION - Dynamically loaded shows
+       ================================================ -->
   <section style="background: #FFFFFF; position: relative; z-index: 9999; padding: var(--section-padding); margin: var(--section-gap) 0;">
     <div class="schedule-section" style="margin: 0 auto; padding: 0;">
       <h2>SOLD OUT! Shows</h2>
       <p>Tickets Still Available</p>
+      <!-- Schedule loaded from shows.xml via JavaScript -->
       <div id="schedule-container"></div>
     </div>
   </section>
 
   <section class="hero" style="padding-top: 0;">
 
+    <!-- ================================================
+         CONSIGNMENT EXPLANATION SECTION
+         ================================================ -->
     <div class="consignment-section">
       <h2>Consignment Meets Comedy: How Props Work</h2>
       <p>The Stage Edition of SOLD OUT! Comedy is a consignment marketplace that gives your items something you don't have: an audience. Bring your item in an unsealed, mail-ready box and arrive no earlier than one hour before showtime to check in with our Appraiser. You'll set your net price (what you take home), and we'll set the listing price higher to cover our expenses. If your item sells above the listing price, HEY LOOK A SQUIRREL! During the show, comedians use your items as props in improv scenes—you never know when and if your prop will pop up. If it isn't used in a skit, it will be auctioned off during the Lightning Round! If it sells, you get paid your net price within 3 days. If it doesn't sell, we return it to you after the show. You can choose to participate in selling your item or watch from your seat. It's consignment theater: we provide the audience and entertainment, you provide the props.</p>
     </div>
 
+    <!-- ================================================
+         FAKE REVIEWS SECTION - Humorous video testimonials
+         ================================================ -->
     <section class="reviews-section">
       <h2 class="section-title">The Fake Reviews Are In</h2>
       <div class="reviews-grid">
+        <!-- Each review card contains a looping video and review bubble -->
         <div class="review-card">
           <video src="web/images/comicsansguy.mp4" alt="Jorge B." class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
@@ -1181,8 +1258,12 @@
       </div>
     </section>
 
+    <!-- ================================================
+         CTA SECTION - Comic burst with animated tagline
+         ================================================ -->
     <div class="cta-section">
       <div class="burst-wrap">
+        <!-- SVG comic burst shape with drop shadow -->
         <svg class="burst-svg" viewBox="0 0 1200 600" role="img" aria-label="Comic burst">
           <defs>
             <filter id="comicShadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -1196,13 +1277,18 @@
                 fill="#FFD93D" stroke="#2C2C2C" stroke-width="24" stroke-linejoin="round"
                 filter="url(#comicShadow)"/>
         </svg>
+        <!-- Overlaid tagline text with pulse animation -->
         <div class="tagline">SELL OUT WITH US.</div>
       </div>
     </div>
   </section>
 
+  <!-- ================================================
+       FOOTER - Social links and copyright
+       ================================================ -->
   <footer id="contact">
     <div class="footer-content">
+      <!-- Social media icon grid with random rotations applied via JS -->
       <div class="social-links">
         <a href="https://www.instagram.com/soldout.comedy" class="social-link" title="Instagram">
           <img src="web/images/instagram_logo.svg" alt="Instagram" style="width: 70%; height: 70%; object-fit: contain;">
@@ -1246,11 +1332,14 @@
     </div>
   </footer>
 
-  <!-- BORING LINKS -->
+  <!-- ================================================
+       SECONDARY FOOTER - Legal/informational links
+       ================================================ -->
   <footer class="boring-footer">
     <div class="boring-footer-content">
       <a href="https://www.notion.so/SOLD-OUT-Comedy-BACKSTAGE-26360a0626ed80d2babee637915de291">BACKSTAGE</a>
       <span class="separator">|</span>
+      <!-- Opens modal popup with consignment terms -->
       <a href="#" id="consignmentGuidelinesLink">CONSIGNMENT GUIDELINES</a>
       <span class="separator">|</span>
       <a href="https://help.whatnot.com/hc/en-us/articles/360061224972-Prohibited-or-Restricted-Items-on-Whatnot" target="_blank" rel="noopener noreferrer">PROHIBITED ITEMS</a>
@@ -1259,12 +1348,16 @@
     </div>
   </footer>
 
-  <!-- IMAGE LIGHTBOX -->
+  <!-- ================================================
+       IMAGE LIGHTBOX - Full-screen image viewer
+       ================================================ -->
   <div class="image-lightbox" id="imageLightbox">
     <img src="" alt="Full size image">
   </div>
 
-  <!-- CONSIGNMENT GUIDELINES MODAL -->
+  <!-- ================================================
+       CONSIGNMENT GUIDELINES MODAL - Terms popup
+       ================================================ -->
   <div class="modal-overlay" id="consignmentModal">
     <div class="modal-content">
       <div class="modal-header">
@@ -1321,28 +1414,55 @@
   </div>
 
 <script>
-// === INITIALIZATION ===
+/* ================================================
+   JAVASCRIPT INITIALIZATION
+   ================================================ */
+
+/**
+ * Main initialization function - runs when DOM is fully loaded
+ * Initializes all dynamic content and interactive features
+ */
 document.addEventListener('DOMContentLoaded', () => {
-  loadRandomTagline();
-  randomizeSocialIconTilts();
-  loadSchedule();
-  initConsignmentModal();
-  initImageLightbox();
+  loadRandomTagline();       // Load random tagline from XML
+  randomizeSocialIconTilts(); // Randomize social icon rotations
+  loadSchedule();             // Load show schedule from XML
+  initConsignmentModal();     // Initialize modal popup
+  initImageLightbox();        // Initialize image zoom lightbox
 });
 
-// === HELPER FUNCTIONS ===
+/* ================================================
+   HELPER FUNCTIONS
+   ================================================ */
+
+/**
+ * Creates a logging function for debugging
+ * @param {HTMLElement} targetEl - The element being worked on
+ * @param {string} id - Identifier for log messages
+ * @param {boolean} above - Unused legacy parameter
+ * @returns {Function} - Logger function
+ */
 function makeStatusLine(targetEl, id, above = true) {
   return (msg) => { console.log(`[SOLD OUT][${id}]`, msg); };
 }
 
+/**
+ * Applies random rotation to social media icons for comic book feel
+ */
 function randomizeSocialIconTilts() {
   const socialLinks = document.querySelectorAll('.social-link');
   socialLinks.forEach(link => {
-    const randomTilt = (Math.random() - 0.5) * 30;
+    const randomTilt = (Math.random() - 0.5) * 30; // -15deg to +15deg
     link.style.transform = `rotate(${randomTilt}deg)`;
   });
 }
 
+/**
+ * Tries multiple URLs and returns the first one that works
+ * Used to handle different deployment paths (local, subdirectory, etc.)
+ * @param {string[]} candidates - Array of URLs to try
+ * @param {string} idForLogs - Identifier for logging
+ * @returns {Promise<string>} - Response text from first successful fetch
+ */
 async function fetchFirstWorking(candidates, idForLogs) {
   let lastErr;
   for (const url of candidates) {
@@ -1363,19 +1483,28 @@ async function fetchFirstWorking(candidates, idForLogs) {
   throw lastErr || new Error('No candidate URL worked.');
 }
 
-// === TAGLINE LOADER ===
+/* ================================================
+   TAGLINE LOADER
+   ================================================ */
+
+/**
+ * Loads a random tagline from taglines.xml and displays it
+ * Falls back to default tagline if loading fails
+ */
 async function loadRandomTagline() {
   const el = document.querySelector('.hero-subtitle');
   if (!el) return;
 
   const status = makeStatusLine(el, 'taglines-debug');
 
+  // Check if running from file:// protocol (won't work due to CORS)
   if (location.protocol === 'file:') {
     status('Cannot load taglines.xml over file:// — run a local server (e.g., "npx serve").');
     el.textContent = 'Live Comedy Meets Live Shopping';
     return;
   }
 
+  // Try multiple paths to find taglines.xml
   const candidates = [
     'web/taglines.xml',
     './taglines.xml',
@@ -1383,10 +1512,12 @@ async function loadRandomTagline() {
   ];
 
   try {
+    // Fetch and parse XML
     const xmlText = await fetchFirstWorking(candidates, 'taglines');
     const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
     const parseErr = doc.querySelector('parsererror');
 
+    // Check for XML parsing errors
     if (parseErr) {
       status('taglines.xml parser error — check console');
       console.error('[taglines] parsererror:', parseErr.textContent);
@@ -1394,62 +1525,97 @@ async function loadRandomTagline() {
       return;
     }
 
+    // Extract all tagline elements
     const items = [...doc.querySelectorAll('taglines > tagline')]
       .map(n => n.textContent?.trim())
       .filter(Boolean);
 
+    // Validate we have taglines
     if (!items.length) {
       status('taglines.xml loaded, but no <tagline> items found');
       el.textContent = 'Live Comedy Meets Live Shopping';
       return;
     }
 
+    // Pick a random tagline and display it
     const choice = items[Math.floor(Math.random() * items.length)];
     el.textContent = choice;
     status(`Loaded ${items.length} taglines`);
   } catch (err) {
+    // Fallback to default tagline on any error
     status('Failed to load taglines (see console)');
     console.error('[taglines] load failed:', err);
     el.textContent = 'Live Comedy Meets Live Shopping';
   }
 }
 
-// === SCHEDULE LOADER ===
+/* ================================================
+   SCHEDULE LOADER
+   ================================================ */
+
+/**
+ * Loads show schedule from shows.xml and renders it dynamically
+ * Handles both upcoming and past shows, creates calendar links
+ */
 async function loadSchedule() {
   const container = document.getElementById('schedule-container');
   if (!container) return;
 
   const status = makeStatusLine(container, 'schedule-debug');
 
-  const ADD_TO_CAL = 'https://cnn.com';
+  // Default URLs
+  const ADD_TO_CAL = 'https://cnn.com'; // Legacy fallback
   const WATCH_URL = 'https://www.whatnot.com/user/soldoutcomedy';
 
+  // Check if running from file:// protocol
   if (location.protocol === 'file:') {
     status('Cannot load shows.xml over file:// — run a local server (e.g., "npx serve").');
     container.innerHTML = '<p style="text-align:center;font-weight:600">More Shows Coming Soon</p>';
     return;
   }
 
+  // Try multiple paths to find shows.xml
   const candidates = [
     'web/shows.xml',
     './shows.xml',
     '../web/shows.xml'
   ];
 
+  /* ------ DATE/TIME UTILITY FUNCTIONS ------ */
+
+  /**
+   * Parses ISO 8601 datetime string to Date object
+   * @param {string} datetimeStr - ISO datetime string
+   * @returns {Date|null} - Parsed date or null if invalid
+   */
   function parseUTCDateTime(datetimeStr) {
     if (!datetimeStr) return null;
     const dt = new Date(datetimeStr);
     return isNaN(dt.getTime()) ? null : dt;
   }
 
+  /**
+   * Extracts timezone abbreviation from date (e.g., PST, EST)
+   * @param {Date} date - Date object
+   * @returns {string} - Timezone abbreviation
+   */
   function getTimezoneAbbr(date) {
     const str = date.toLocaleTimeString('en-US', { timeZoneName: 'short' });
     const match = str.match(/\b([A-Z]{3,5})\b/);
     return match ? match[1] : '';
   }
 
+  /**
+   * Formats date as "Monday, January 1"
+   */
   const fmtDate = (d) => d?.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' }) || '';
 
+  /**
+   * Formats time with optional timezone (e.g., "7:00 pm PST")
+   * @param {Date} d - Date object
+   * @param {boolean} includeTZ - Whether to include timezone
+   * @returns {string} - Formatted time string
+   */
   const fmtTime = (d, includeTZ = true) => {
     if (!d) return '';
     const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).toLowerCase();
@@ -1458,6 +1624,11 @@ async function loadSchedule() {
     return `${time} ${tz}`;
   };
 
+  /**
+   * Parses appraisal time range (format: "2024-01-01T10:00Z - 2024-01-01T11:00Z")
+   * @param {string} appraisalStr - Appraisal time range string
+   * @returns {Object|null} - Object with start/end dates or null
+   */
   function parseAppraisalTimes(appraisalStr) {
     if (!appraisalStr) return null;
     const parts = appraisalStr.split(' - ').map(s => s.trim());
@@ -1468,9 +1639,15 @@ async function loadSchedule() {
     return { start, end };
   }
 
+  /**
+   * Generates a Google Calendar "Add Event" link for a show
+   * @param {Object} show - Show object with start, end, type, venue, etc.
+   * @returns {string} - Google Calendar URL
+   */
   function makeGoogleCalendarLink(show) {
     if (!show.start) return ADD_TO_CAL;
 
+    // Calculate end time (use explicit end or estimate based on show type)
     let endTime;
     if (show.end) {
       endTime = show.end;
@@ -1479,14 +1656,19 @@ async function loadSchedule() {
       endTime = new Date(show.start.getTime() + (durationHours * 60 * 60 * 1000));
     }
 
+    // Format date for Google Calendar (YYYYMMDDTHHmmss)
     const formatGCal = (d) => {
       const pad = (n) => String(n).padStart(2, '0');
       return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
     };
 
+    // Build event title
     const title = `SOLD OUT! Comedy - ${show.type === 'stage' ? 'Stage Edition' : 'Screen Edition'}`;
+
+    // Build location field
     const location = show.address || (show.type === 'screen' ? 'Online' : show.location || '');
 
+    // Build detailed description
     let description = '';
     if (show.venue) description += `${show.venue}\n`;
     if (show.location && show.type === 'stage') description += `${show.location}\n`;
@@ -1497,6 +1679,7 @@ async function loadSchedule() {
     }
     if (show.watch) description += `\nWatch Live: ${show.watch}`;
 
+    // Add show-type-specific description
     if (show.type === 'stage') {
       description += '\n\nLive comedy meets live shopping! Your items become props in improv scenes.';
     } else {
@@ -1505,6 +1688,7 @@ async function loadSchedule() {
 
     description += '\n\nhttps://soldoutcomedy.com';
 
+    // Build Google Calendar URL with query parameters
     const params = new URLSearchParams({
       action: 'TEMPLATE',
       text: title,
@@ -1689,20 +1873,27 @@ async function loadSchedule() {
   }
 }
 
-// === IMAGE LIGHTBOX ===
+/* ================================================
+   IMAGE LIGHTBOX (Click to zoom show icons)
+   ================================================ */
+
+/**
+ * Initializes the image lightbox/zoom functionality
+ * Allows clicking show icons to view them full-screen
+ */
 function initImageLightbox() {
   const lightbox = document.getElementById('imageLightbox');
   const lightboxImg = lightbox.querySelector('img');
 
   if (!lightbox || !lightboxImg) return;
 
-  // Close lightbox on click
+  // Close lightbox when clicking anywhere on the overlay
   lightbox.addEventListener('click', () => {
     lightbox.classList.remove('active');
-    document.body.style.overflow = '';
+    document.body.style.overflow = ''; // Re-enable scrolling
   });
 
-  // Close on ESC key
+  // Close lightbox with ESC key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && lightbox.classList.contains('active')) {
       lightbox.classList.remove('active');
@@ -1710,15 +1901,25 @@ function initImageLightbox() {
     }
   });
 
-  // Global function to open lightbox
+  /**
+   * Global function to open lightbox (called from inline onclick handlers)
+   * @param {string} src - Image URL to display
+   */
   window.openImageLightbox = (src) => {
     lightboxImg.src = src;
     lightbox.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
   };
 }
 
-// === CONSIGNMENT MODAL ===
+/* ================================================
+   CONSIGNMENT GUIDELINES MODAL
+   ================================================ */
+
+/**
+ * Initializes the consignment guidelines modal popup
+ * Shows terms and conditions when footer link is clicked
+ */
 function initConsignmentModal() {
   const modal = document.getElementById('consignmentModal');
   const openLink = document.getElementById('consignmentGuidelinesLink');
@@ -1726,20 +1927,20 @@ function initConsignmentModal() {
 
   if (!modal || !openLink || !closeBtn) return;
 
-  // Open modal
+  // Open modal when "CONSIGNMENT GUIDELINES" link is clicked
   openLink.addEventListener('click', (e) => {
     e.preventDefault();
     modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden'; // Prevent background scrolling
   });
 
-  // Close modal on X button click
+  // Close modal via X button
   closeBtn.addEventListener('click', () => {
     modal.classList.remove('active');
     document.body.style.overflow = '';
   });
 
-  // Close modal on overlay click
+  // Close modal when clicking outside the content (on the overlay)
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.classList.remove('active');
@@ -1747,7 +1948,7 @@ function initConsignmentModal() {
     }
   });
 
-  // Close modal on ESC key
+  // Close modal with ESC key
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && modal.classList.contains('active')) {
       modal.classList.remove('active');
