@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920, height=1080">
+    <title>Opulent Countdown</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bangers&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Bangers', cursive;
+        }
+
+        .countdown-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .confetti-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .ornate-frame {
+            display: none;
+        }
+
+        .number {
+            font-size: 450px;
+            font-weight: 900;
+            color: #d4af37;
+            text-shadow:
+                /* Depth layers */
+                4px 4px 0px rgba(180, 140, 40, 0.9),
+                8px 8px 0px rgba(150, 120, 35, 0.8),
+                12px 12px 0px rgba(120, 100, 30, 0.7),
+                16px 16px 0px rgba(90, 75, 25, 0.6),
+                20px 20px 0px rgba(60, 50, 20, 0.5),
+                24px 24px 0px rgba(40, 35, 15, 0.4),
+                /* Glow effects */
+                0 0 30px rgba(255, 215, 0, 1),
+                0 0 60px rgba(255, 215, 0, 0.8),
+                0 0 90px rgba(255, 215, 0, 0.6),
+                0 0 120px rgba(255, 215, 0, 0.4);
+            letter-spacing: -10px;
+            position: relative;
+            z-index: 10;
+            background: linear-gradient(180deg, #fff9e6 0%, #ffd700 20%, #d4af37 60%, #b8941e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            transform: scale(0.5);
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+        }
+
+        .subtitle {
+            display: none;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            opacity: 0;
+            z-index: 5;
+        }
+
+        .confetti.coin {
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #fff9e6 0%, #ffd700 20%, #d4af37 50%, #b8941e 80%, #8b6914 100%);
+            border: 3px solid #d4af37;
+            box-shadow:
+                inset -2px -2px 6px rgba(0, 0, 0, 0.3),
+                inset 2px 2px 6px rgba(255, 255, 255, 0.4),
+                0 0 15px rgba(255, 215, 0, 0.8),
+                0 4px 8px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+
+        .confetti.coin::before {
+            content: '$';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: 400;
+            color: #8b6914;
+            text-shadow:
+                1px 1px 0px rgba(255, 255, 255, 0.3),
+                -1px -1px 0px rgba(0, 0, 0, 0.2);
+            font-family: 'Bangers', cursive;
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                box-shadow:
+                    0 0 30px rgba(212, 175, 55, 0.8),
+                    inset 0 0 30px rgba(212, 175, 55, 0.4),
+                    0 0 60px rgba(255, 215, 0, 0.6);
+            }
+            50% {
+                box-shadow:
+                    0 0 50px rgba(212, 175, 55, 1),
+                    inset 0 0 50px rgba(212, 175, 55, 0.6),
+                    0 0 100px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        @keyframes sparkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeInScale {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            60% {
+                opacity: 1;
+                transform: scale(1.15);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(2.5);
+            }
+        }
+
+        @keyframes confettiFall {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotateY(0deg) rotateZ(0deg);
+            }
+            100% {
+                opacity: 0.3;
+                transform: translateY(1200px) rotateY(1080deg) rotateZ(360deg);
+            }
+        }
+
+        @keyframes containerFadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .show {
+            animation: fadeInScale 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .hide {
+            animation: fadeOut 0.5s ease-out forwards;
+        }
+
+        .confetti-burst {
+            animation: confettiFall 2s ease-out forwards;
+        }
+
+        .container-show {
+            animation: containerFadeIn 0.8s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <audio id="audio" src="C:\_sold\AUCTION START vidnoz Nancy and A Terrible Piece of Music.wav"></audio>
+
+    <div class="confetti-wrapper" id="confettiWrapper"></div>
+
+    <div class="countdown-container" id="container">
+        <div class="number" id="number"></div>
+    </div>
+
+    <script>
+        const numberEl = document.getElementById('number');
+        const containerEl = document.getElementById('container');
+        const confettiWrapperEl = document.getElementById('confettiWrapper');
+        const audioEl = document.getElementById('audio');
+
+        const countdown = [3, 2, 1];
+
+        function createConfetti() {
+            const confettiCount = 80; // Gold coins raining down
+
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti coin';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `${-50 + Math.random() * 100}px`;
+                confetti.style.animationDelay = `${Math.random() * 0.5}s`;
+                confetti.style.animationDuration = `${2.5 + Math.random() * 1.5}s`;
+
+                // Vary coin sizes for depth
+                const scale = 0.7 + Math.random() * 0.6;
+                confetti.style.transform = `scale(${scale})`;
+
+                confettiWrapperEl.appendChild(confetti);
+
+                // Trigger animation
+                setTimeout(() => {
+                    confetti.classList.add('confetti-burst');
+                }, 10);
+            }
+        }
+
+        async function startCountdown() {
+            // Play audio immediately
+            audioEl.play().catch(err => console.error('Audio playback failed:', err));
+
+            // Start confetti immediately
+            createConfetti();
+
+            // Wait 1 second before starting numbers
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Show container
+            containerEl.classList.add('container-show');
+
+            // Wait for container animation
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Start countdown
+            for (let i = 0; i < countdown.length; i++) {
+                // Create more confetti burst for each number
+                createConfetti();
+
+                numberEl.textContent = countdown[i];
+                numberEl.classList.remove('hide');
+                numberEl.classList.add('show');
+
+                // Wait for number to display
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                // Hide number before next
+                if (i < countdown.length - 1) {
+                    numberEl.classList.remove('show');
+                    numberEl.classList.add('hide');
+                    await new Promise(resolve => setTimeout(resolve, 400));
+                }
+            }
+
+            // Final fade out after countdown completes
+            await new Promise(resolve => setTimeout(resolve, 500));
+            containerEl.style.animation = 'fadeOut 0.8s ease-out forwards';
+        }
+
+        // Start the countdown when page loads
+        startCountdown();
+    </script>
+</body>
+</html>
