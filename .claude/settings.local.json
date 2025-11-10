@@ -12,7 +12,14 @@
       "Bash(git fsck:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(if [ -f \"socs.css\" ])",
+      "Bash(then echo \"File exists in root\")",
+      "Bash(elif [ -f \"web/socs.css\" ])",
+      "Bash(then echo \"File already in web folder\")",
+      "Bash(else echo \"File not found\")",
+      "Bash(mv:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []
