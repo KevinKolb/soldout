@@ -19,7 +19,9 @@
       "Bash(then echo \"File already in web folder\")",
       "Bash(else echo \"File not found\")",
       "Bash(mv:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(convert:*)",
+      "Bash(npx:*)"
     ],
     "deny": [],
     "ask": []
