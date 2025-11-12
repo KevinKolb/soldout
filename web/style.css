@@ -1173,3 +1173,72 @@ footer::before {
     padding: 1.5rem;
   }
 }
+
+/* === SCHEDULE MOBILE RESPONSIVENESS === */
+@media (max-width: 768px) {
+  .show-item {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 1.5rem 0 !important;
+  }
+
+  .show-icon {
+    justify-content: flex-start !important;
+    order: -1;
+  }
+
+  .show-icon img {
+    width: 50px !important;
+    height: 50px !important;
+  }
+
+  .show-date {
+    display: flex !important;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: left !important;
+  }
+
+  .show-date > div:first-child {
+    font-size: 2rem !important;
+  }
+
+  .show-date > div:nth-child(2) {
+    font-size: 0.8rem !important;
+  }
+
+  .show-date > div:last-child {
+    font-size: 0.7rem !important;
+  }
+
+  .show-info {
+    order: 2;
+  }
+
+  .show-info h3 {
+    font-size: 1.1rem !important;
+  }
+
+  .show-info span {
+    font-size: 0.7rem !important;
+  }
+
+  .show-info div {
+    font-size: 0.85rem !important;
+  }
+
+  .show-actions {
+    order: 3;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0.75rem !important;
+    flex-wrap: wrap;
+  }
+
+  .show-actions a {
+    font-size: 0.7rem !important;
+    padding: 0.5rem 0.75rem !important;
+    flex: 0 1 auto;
+  }
+}

@@ -676,7 +676,7 @@ async function loadSchedule() {
       const calUrl = makeGoogleCalendarLink(s);
 
       return `
-        <div style="
+        <div class="show-item" style="
           display: grid;
           grid-template-columns: ${s.icon ? '80px ' : ''}120px 1fr auto;
           gap: 2rem;
@@ -686,13 +686,13 @@ async function loadSchedule() {
         ">
           ${s.icon ? `
           <!-- Icon Column -->
-          <div style="display: flex; align-items: center; justify-content: center;">
+          <div class="show-icon" style="display: flex; align-items: center; justify-content: center;">
             <img src="${s.icon}" style="width: 60px; height: 60px; object-fit: contain; display: block; cursor: pointer;" onclick="openImageLightbox('${s.icon}')" onerror="this.parentElement.style.display='none'">
           </div>
           ` : ''}
 
           <!-- Date Column -->
-          <div style="text-align: left;">
+          <div class="show-date" style="text-align: left;">
             <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 2.5rem; font-weight: 700; line-height: 1; color: #2C2C2C; letter-spacing: -1px;">
               ${s.start.toLocaleDateString('en-US', { day: 'numeric' })}
             </div>
@@ -705,8 +705,8 @@ async function loadSchedule() {
           </div>
 
           <!-- Info Column -->
-          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-            <div style="display: flex; align-items: baseline; gap: 0.75rem;">
+          <div class="show-info" style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="display: flex; align-items: baseline; gap: 0.75rem; flex-wrap: wrap;">
               <h3 style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 1.25rem; font-weight: 700; margin: 0; color: #2C2C2C; letter-spacing: -0.25px;">
                 ${s.theme || 'SOLD OUT! Comedy'}
               </h3>
@@ -732,7 +732,7 @@ async function loadSchedule() {
           </div>
 
           <!-- Action Column -->
-          <div style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; justify-content: center;">
+          <div class="show-actions" style="display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-end; justify-content: center;">
             <a href="${calUrl}" target="_blank" style="
               font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
               font-size: 0.75rem;
@@ -744,6 +744,8 @@ async function loadSchedule() {
               text-transform: uppercase;
               letter-spacing: 0.5px;
               transition: all 0.2s;
+              white-space: nowrap;
+              text-align: center;
               ${isPast ? 'opacity: 0.3; pointer-events: none;' : ''}
             " onmouseover="this.style.background='#2C2C2C'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#2C2C2C';">
               Add to Calendar
@@ -760,6 +762,8 @@ async function loadSchedule() {
               text-transform: uppercase;
               letter-spacing: 0.5px;
               transition: all 0.2s;
+              white-space: nowrap;
+              text-align: center;
             " onmouseover="this.style.background='white'; this.style.color='#2C2C2C';" onmouseout="this.style.background='#2C2C2C'; this.style.color='white';">
               ${isPast ? 'Watch Rerun' : 'Watch Live'}
             </a>
