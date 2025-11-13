@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap">
 
   <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="web/style.css">
+  <link rel="stylesheet" href="web/style.css" id="main-stylesheet">
 </head>
 <body>
   <!-- Legacy overlay element (currently hidden) -->
@@ -75,10 +75,10 @@
   <!-- ================================================
        SCHEDULE SECTION - Dynamically loaded shows
        ================================================ -->
-  <section style="background: #FFFFFF; position: relative; z-index: 9999; padding: var(--section-padding); margin: var(--section-gap) 0;">
-    <div class="schedule-section" style="margin: 0 auto; padding: 0;">
-      <h2>SOLD OUT! Shows</h2>
-      <p>Tickets Still Available</p>
+  <section style="background: #FFFFFF; position: relative; z-index: 9999; padding: 3rem 2rem; margin: 3rem 0;">
+    <div class="schedule-section" style="max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem 2rem; background: #FAFAFA; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+      <h2 style="font-size: 3rem; text-align: center; margin-bottom: 0.25rem; color: #2C2C2C; letter-spacing: 2px;">SOLD OUT! Shows</h2>
+      <p style="font-family: 'Inter', sans-serif; text-align: center; font-size: 1.1rem; color: #666; margin-bottom: 2.5rem; font-weight: 400; padding-bottom: 1.5rem; border-bottom: 2px solid #E0E0E0;">Tickets Still Available</p>
       <!-- Schedule loaded from shows.xml via JavaScript -->
       <div id="schedule-container"></div>
     </div>
@@ -332,6 +332,7 @@
  * Initializes all dynamic content and interactive features
  */
 document.addEventListener('DOMContentLoaded', () => {
+  applyThemeFromURL();        // Apply theme from URL parameter
   loadRandomTagline();       // Load random tagline from XML
   randomizeSocialIconTilts(); // Randomize social icon rotations
   loadSchedule();             // Load show schedule from XML
@@ -344,6 +345,30 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ================================================
    HELPER FUNCTIONS
    ================================================ */
+
+/**
+ * Applies theme stylesheet based on URL parameter
+ * Usage: ?theme=1 loads style1.css, ?theme=2 loads style2.css, etc.
+ * Default: style.css (no theme parameter)
+ */
+function applyThemeFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const theme = urlParams.get('theme');
+
+  if (theme) {
+    const themeNumber = parseInt(theme, 10);
+    // Valid themes are 1-8 (style1.css through style8.css)
+    if (themeNumber >= 1 && themeNumber <= 8) {
+      const stylesheet = document.getElementById('main-stylesheet');
+      if (stylesheet) {
+        stylesheet.href = `web/style${themeNumber}.css`;
+        console.log(`[SOLD OUT][theme] Loaded theme ${themeNumber}: style${themeNumber}.css`);
+      }
+    } else {
+      console.warn(`[SOLD OUT][theme] Invalid theme number: ${theme}. Use 1-8.`);
+    }
+  }
+}
 
 /**
  * Creates a logging function for debugging
