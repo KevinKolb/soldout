@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Potential Props - SOLD OUT! Comedy</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+    <!-- Open Graph meta tags for rich link previews -->
+    <meta property="og:title" content="Potential Props - SOLD OUT! Comedy">
+    <meta property="og:description" content="Let us know what props you might bring to an upcoming show">
+    <meta property="og:image" content="https://soldoutcomedy.com/web/images/soldoutlogo.png">
+    <meta property="og:url" content="https://soldoutcomedy.com/props/input.html">
+    <meta property="og:type" content="website">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Helvetica Neue', 'Arial', sans-serif; background: #f5f5f5; color: #1a1a1a; line-height: 1.4; padding: 16px 0; -webkit-font-smoothing: antialiased; }
+        .container { max-width: 420px; margin: 0 auto; background: #ffffff; border: 1px solid #e0e0e0; overflow: hidden; }
+        .header { background: #f0f0f0; color: #333333; padding: 32px 24px; border-bottom: 1px solid #d0d0d0; display: flex; align-items: center; gap: 16px; }
+        .header-logo { width: 72px; height: 72px; flex-shrink: 0; }
+        .header-content { flex: 1; }
+        .header h1 { font-size: 28px; font-weight: 300; margin-bottom: 12px; letter-spacing: -0.02em; color: #444444; }
+        .header p { font-size: 13px; color: #777777; margin-bottom: 0; font-weight: 400; }
+        .form-section { display: none; padding: 32px 24px; border-bottom: 1px solid #e8e8e8; }
+        .form-section.active { display: block; }
+        .form-section h2 { font-size: 20px; font-weight: 400; margin-bottom: 8px; color: #1a1a1a; letter-spacing: -0.01em; }
+        .form-section p { font-size: 13px; color: #666666; margin-bottom: 28px; line-height: 1.5; }
+        .form-group { margin-bottom: 24px; }
+        label { display: block; font-size: 12px; font-weight: 500; margin-bottom: 8px; color: #444444; text-transform: uppercase; letter-spacing: 0.02em; }
+        input[type="text"], input[type="email"], input[type="number"], textarea { width: 100%; padding: 16px; border: 1px solid #cccccc; background: #fafafa; font-size: 15px; font-family: inherit; transition: all 0.15s ease; color: #1a1a1a; }
+        input:focus, textarea:focus { outline: none; border-color: #666666; background: #ffffff; }
+        input.error { border-color: #999999; background: #f8f8f8; }
+        .error-message { color: #777777; font-size: 11px; margin-top: 6px; font-weight: 400; }
+        .radio-group { display: flex; flex-direction: column; gap: 2px; }
+        .radio-option { display: flex; align-items: center; padding: 16px; border: 1px solid #e0e0e0; background: #fafafa; cursor: pointer; transition: all 0.15s ease; }
+        .radio-option:hover { border-color: #cccccc; background: #f5f5f5; }
+        .radio-option.selected { border-color: #666666; background: #f0f0f0; }
+        .radio-option input[type="radio"] { margin-right: 14px; accent-color: #666666; }
+        .radio-option label { margin: 0; text-transform: none; font-size: 14px; font-weight: 400; color: #1a1a1a; cursor: pointer; }
+        .button-group { display: flex; gap: 12px; margin-top: 24px; }
+        .back-btn { background: #e0e0e0; color: #666666; border: 1px solid #cccccc; padding: 18px; font-size: 12px; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; transition: all 0.15s ease; text-transform: uppercase; flex: 0 0 80px; }
+        .back-btn:hover { background: #d0d0d0; border-color: #bbbbbb; }
+        .next-btn { background: #777777; color: #ffffff; border: 1px solid #999999; padding: 18px; font-size: 12px; font-weight: 500; letter-spacing: 0.05em; cursor: pointer; transition: all 0.15s ease; text-transform: uppercase; flex: 1; }
+        .next-btn:hover { background: #666666; border-color: #888888; }
+        .next-btn:disabled { background: #cccccc; border-color: #dddddd; cursor: not-allowed; }
+        .price-display { background: #f8f8f8; border: 1px solid #e0e0e0; padding: 24px; margin-bottom: 24px; }
+        .price-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; }
+        .price-row:last-child { margin-bottom: 0; font-weight: 500; border-top: 1px solid #d0d0d0; padding-top: 12px; color: #1a1a1a; }
+        .price-row span:first-child { color: #666666; }
+        .terms { background: #f8f8f8; border: 1px solid #e0e0e0; padding: 20px; font-size: 12px; line-height: 1.6; margin-bottom: 24px; max-height: 220px; overflow-y: auto; color: #444444; }
+        .terms p { margin-bottom: 12px; }
+        .signature-container { border: 1px solid #cccccc; background: #fafafa; margin-bottom: 24px; }
+        .signature-label { padding: 12px 16px; background: #eeeeee; border-bottom: 1px solid #cccccc; font-size: 11px; text-transform: uppercase; letter-spacing: 0.02em; color: #666666; font-weight: 500; }
+        #signatureCanvas { display: block; width: 100%; height: 120px; cursor: crosshair; background: #ffffff; touch-action: none; }
+        .signature-controls { padding: 12px 16px; background: #f5f5f5; border-top: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .clear-signature { background: none; border: 1px solid #cccccc; color: #666666; padding: 6px 12px; font-size: 11px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.02em; transition: all 0.15s ease; }
+        .clear-signature:hover { border-color: #999999; color: #444444; }
+        .signature-status { font-size: 11px; color: #666666; }
+        .signature-status.signed { color: #555555; }
+        .final-screen { text-align: left; padding: 32px 24px; }
+        .final-screen h2 { color: #1a1a1a; margin-bottom: 16px; font-weight: 400; }
+        .final-screen p { color: #666666; margin-bottom: 32px; }
+        .results-section { background: #f8f8f8; border: 1px solid #e0e0e0; padding: 24px; margin-top: 24px; }
+        .results-section h3 { font-size: 14px; font-weight: 500; margin-bottom: 16px; color: #1a1a1a; text-transform: uppercase; letter-spacing: 0.02em; }
+        .result-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+        .result-item:last-child { margin-bottom: 0; }
+        .result-label { color: #666666; font-weight: 400; }
+        .result-value { color: #1a1a1a; font-weight: 500; }
+        .progress { height: 2px; background: #e8e8e8; }
+        .progress-bar { height: 100%; background: #888888; transition: width 0.3s ease; }
+        select { width: 100%; padding: 16px; border: 1px solid #cccccc; background: #fafafa; font-size: 15px; font-family: inherit; color: #1a1a1a; cursor: pointer; }
+        select:focus { outline: none; border-color: #666666; background: #ffffff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="../web/images/soldoutlogo.png" alt="Sold Out Logo" class="header-logo">
+            <div class="header-content">
+                <h1>Potential Props</h1>
+                <p>Let us know what props you might bring to an upcoming show!</p>
+            </div>
+        </div>
+        
+        <div class="progress">
+            <div class="progress-bar" style="width: 33.33%"></div>
+        </div>
+        
+        <div class="form-section active" id="step1">
+            <h2>Your Info</h2>
+            <p>Just need your basic contact information.</p>
+            <div class="form-group">
+                <label for="name">Name (required)</label>
+                <input type="text" id="name" required>
+                <div class="error-message" id="nameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email (required)</label>
+                <input type="email" id="email" required>
+                <div class="error-message" id="emailError"></div>
+            </div>
+            <div class="button-group">
+                <button class="next-btn" id="step1Next">NEXT ≫</button>
+            </div>
+        </div>
+        
+        <div class="form-section" id="step2">
+            <h2>Which Show?</h2>
+            <p>Which show are you planning to bring props to?</p>
+            <div class="form-group">
+                <label for="showSelect">Select Show</label>
+                <select id="showSelect">
+                    <option value="">Loading shows...</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button class="back-btn" id="step2Back">≪ BACK</button>
+                <button class="next-btn" id="step2Next">NEXT ≫</button>
+            </div>
+        </div>
+        
+        <div class="form-section" id="step3">
+            <h2>Whatcha got there?</h2>
+            <p>Tell us about your potential prop(s).</p>
+            <div class="form-group">
+                <label for="quantity">How many props?</label>
+                <input type="number" id="quantity" min="1" value="1" placeholder="1">
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" rows="4" placeholder="Family heirloom lava lamp, vintage toaster, etc."></textarea>
+            </div>
+            <div class="button-group">
+                <button class="back-btn" id="step3Back">≪ BACK</button>
+                <button class="next-btn" id="finalSubmit">SUBMIT</button>
+            </div>
+        </div>
+        
+        <div class="form-section" id="final">
+            <div class="final-screen">
+                <h2>Thanks!</h2>
+                <p>We've received your potential prop submission. Check your email for confirmation.</p>
+                <div class="results-section">
+                    <h3>Submission Details</h3>
+                    <div class="result-item"><span class="result-label">Name:</span><span class="result-value" id="resultName"></span></div>
+                    <div class="result-item"><span class="result-label">Email:</span><span class="result-value" id="resultEmail"></span></div>
+                    <div class="result-item"><span class="result-label">Show:</span><span class="result-value" id="resultShow"></span></div>
+                    <div class="result-item"><span class="result-label">Quantity:</span><span class="result-value" id="resultQuantity"></span></div>
+                    <div class="result-item"><span class="result-label">Description:</span><span class="result-value" id="resultDescription"></span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const CONFIG = {
+    AIRTABLE_API_KEY: 'patv1p4GwzZUH3Whd.4fb4bcc89097466a60a830b3f29dc85eb4296d8c0196b74e0374116421d7822a',
+    AIRTABLE_BASE_ID: 'appryObcmJdPmk9ls',
+    AIRTABLE_TABLE_NAME: 'Props',
+    EMAILJS_SERVICE_ID: 'service_151yelq',
+    EMAILJS_TEMPLATE_ID: 'template_nroyna9',
+    EMAILJS_PUBLIC_KEY: 'yi2bgGVokQizGNBWi'
+};
+
+let currentStep = 1;
+let formData = {};
+let shows = [];
+
+// Load shows from XML
+async function loadShows() {
+    try {
+        const response = await fetch('../web/shows.xml');
+        const text = await response.text();
+        const parser = new DOMParser();
+        const xml = parser.parseFromString(text, 'text/xml');
+
+        const showElements = xml.getElementsByTagName('show');
+        const select = document.getElementById('showSelect');
+        select.innerHTML = '<option value="">Select a show...</option>';
+
+        const now = new Date();
+
+        for (let show of showElements) {
+            const datetime = show.getElementsByTagName('datetime')[0]?.textContent;
+            const theme = show.getElementsByTagName('theme')[0]?.textContent || 'TBD';
+            const location = show.getElementsByTagName('location')[0]?.textContent || '';
+
+            if (datetime) {
+                const showDate = new Date(datetime);
+
+                // Only show future shows
+                if (showDate > now) {
+                    const dateStr = showDate.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                    });
+
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({ date: datetime, theme: theme, location: location });
+                    option.textContent = `${dateStr} - ${theme} (${location})`;
+                    select.appendChild(option);
+
+                    shows.push({ date: datetime, theme: theme, location: location, dateStr: dateStr });
+                }
+            }
+        }
+
+        // Add "Don't know yet" option
+        const dontKnowOption = document.createElement('option');
+        dontKnowOption.value = JSON.stringify({ date: 'TBD', theme: 'Don\'t know yet', location: '' });
+        dontKnowOption.textContent = 'Don\'t know yet';
+        select.appendChild(dontKnowOption);
+
+    } catch (error) {
+        console.error('Error loading shows:', error);
+        const select = document.getElementById('showSelect');
+        select.innerHTML = '<option value="">Error loading shows</option>';
+    }
+}
+
+function validateEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validateStep1() {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    let isValid = true;
+    document.getElementById('nameError').textContent = '';
+    document.getElementById('emailError').textContent = '';
+    document.getElementById('name').classList.remove('error');
+    document.getElementById('email').classList.remove('error');
+    if (!name) {
+        document.getElementById('nameError').textContent = 'Name is required';
+        document.getElementById('name').classList.add('error');
+        isValid = false;
+    }
+    if (!email) {
+        document.getElementById('emailError').textContent = 'Email is required';
+        document.getElementById('email').classList.add('error');
+        isValid = false;
+    } else if (!validateEmail(email)) {
+        document.getElementById('emailError').textContent = 'Please enter a valid email address';
+        document.getElementById('email').classList.add('error');
+        isValid = false;
+    }
+    return isValid;
+}
+
+function nextStep(step) {
+    if (step === 1 && !validateStep1()) return;
+    currentStep++;
+    showStep(currentStep);
+    updateProgress();
+}
+
+function previousStep() {
+    if (currentStep > 1) {
+        currentStep--;
+        showStep(currentStep);
+        updateProgress();
+    }
+}
+
+function showStep(step) {
+    document.querySelectorAll('.form-section').forEach(section => section.classList.remove('active'));
+    document.getElementById('step' + step).classList.add('active');
+}
+
+function updateProgress() {
+    document.querySelector('.progress-bar').style.width = (currentStep / 3) * 100 + '%';
+}
+
+async function submitForm() {
+    formData.name = document.getElementById('name').value;
+    formData.email = document.getElementById('email').value;
+    formData.quantity = parseInt(document.getElementById('quantity').value) || 1;
+    formData.description = document.getElementById('description').value;
+
+    const showSelectValue = document.getElementById('showSelect').value;
+    if (!showSelectValue) {
+        alert('Please select a show');
+        return;
+    }
+
+    const showData = JSON.parse(showSelectValue);
+    formData.showDate = showData.date;
+    formData.showTheme = showData.theme;
+    formData.showLocation = showData.location;
+
+    const btn = document.getElementById('finalSubmit');
+    btn.textContent = 'SUBMITTING...';
+    btn.disabled = true;
+
+    console.log('Form data being submitted:', formData);
+
+    try {
+        await submitToAirtable(formData);
+        await sendEmailConfirmation(formData);
+        showSuccessScreen();
+    } catch (error) {
+        console.error('Submit error:', error);
+        alert('Error: ' + error.message);
+        btn.textContent = 'SUBMIT';
+        btn.disabled = false;
+    }
+}
+
+async function submitToAirtable(data) {
+    const fields = {
+        'Type': 'Potential',
+        'Seller': data.name,
+        'Email': data.email,
+        'Quantity': data.quantity,
+        'Description': data.description || 'No description provided',
+        'Show Theme': data.showTheme,
+        'Show Info': data.showLocation
+    };
+
+    // Only include Show Date if it's not "TBD"
+    if (data.showDate && data.showDate !== 'TBD') {
+        fields['Show Date'] = data.showDate;
+    }
+
+    const response = await fetch(`https://api.airtable.com/v0/${CONFIG.AIRTABLE_BASE_ID}/${CONFIG.AIRTABLE_TABLE_NAME}`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${CONFIG.AIRTABLE_API_KEY}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fields })
+    });
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Airtable error:', errorText);
+        throw new Error(`Failed to submit to database: ${errorText}`);
+    }
+}
+
+async function sendEmailConfirmation(data) {
+    const showInfo = data.showTheme === 'Don\'t know yet'
+        ? 'Don\'t know yet'
+        : `${data.showTheme} (${data.showLocation})`;
+
+    await emailjs.send(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, {
+        seller_name: data.name,
+        seller_email: data.email,
+        quantity: data.quantity,
+        description: data.description || 'No description provided',
+        show_info: showInfo
+    }, CONFIG.EMAILJS_PUBLIC_KEY);
+}
+
+function showSuccessScreen() {
+    const showInfo = formData.showTheme === 'Don\'t know yet'
+        ? 'Don\'t know yet'
+        : `${formData.showTheme} (${formData.showLocation})`;
+
+    document.getElementById('resultName').textContent = formData.name;
+    document.getElementById('resultEmail').textContent = formData.email;
+    document.getElementById('resultShow').textContent = showInfo;
+    document.getElementById('resultQuantity').textContent = formData.quantity;
+    document.getElementById('resultDescription').textContent = formData.description || 'No description provided';
+
+    document.querySelectorAll('.form-section').forEach(section => section.classList.remove('active'));
+    document.getElementById('final').classList.add('active');
+    document.querySelector('.progress-bar').style.width = '100%';
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Load shows from XML
+  loadShows();
+
+  // Setup form navigation
+  updateProgress();
+  document.getElementById('step1Next').addEventListener('click', () => nextStep(1));
+  document.getElementById('step2Back').addEventListener('click', previousStep);
+  document.getElementById('step2Next').addEventListener('click', () => nextStep(2));
+  document.getElementById('step3Back').addEventListener('click', previousStep);
+  document.getElementById('finalSubmit').addEventListener('click', submitForm);
+});
+</script>
+</body>
+</html>
