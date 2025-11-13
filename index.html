@@ -931,7 +931,7 @@ function initVideoUnmuteButton() {
 
 /**
  * Loads a random video from the web/videos directory
- * Dynamically fetches the list of available videos
+ * Automatically detects all .mp4 files with numeric names (1.mp4, 2.mp4, etc.)
  */
 async function loadRandomVideo() {
   const videoElement = document.getElementById('comicFrameVideo');
@@ -946,30 +946,36 @@ async function loadRandomVideo() {
   }
 
   try {
-    // Try multiple paths to find videos.xml
-    const candidates = [
-      'web/videos.xml',
-      './videos.xml',
-      '../web/videos.xml'
-    ];
+    const videos = [];
+    const videoDir = 'web/videos/';
 
-    const xmlText = await fetchFirstWorking(candidates, 'videos');
-    const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
-    const parseErr = doc.querySelector('parsererror');
+    // Try to load numbered videos (1.mp4, 2.mp4, 3.mp4, etc.)
+    // Keep trying until we get a 404
+    let videoNum = 1;
+    let consecutiveFailures = 0;
+    const maxConsecutiveFailures = 3; // Stop after 3 consecutive missing files
 
-    if (parseErr) {
-      status('videos.xml parser error — check console');
-      console.error('[videos] parsererror:', parseErr.textContent);
-      return;
+    while (consecutiveFailures < maxConsecutiveFailures && videoNum < 100) {
+      const videoPath = `${videoDir}${videoNum}.mp4`;
+
+      try {
+        const res = await fetch(videoPath, { method: 'HEAD', cache: 'no-cache' });
+        if (res.ok) {
+          videos.push(videoPath);
+          consecutiveFailures = 0; // Reset counter on success
+          status(`Found video: ${videoPath}`);
+        } else {
+          consecutiveFailures++;
+        }
+      } catch (err) {
+        consecutiveFailures++;
+      }
+
+      videoNum++;
     }
 
-    // Extract all video file paths
-    const videos = [...doc.querySelectorAll('videos > video')]
-      .map(n => n.textContent?.trim())
-      .filter(Boolean);
-
     if (!videos.length) {
-      status('videos.xml loaded, but no <video> items found');
+      status('No numbered videos found (looking for 1.mp4, 2.mp4, etc.)');
       return;
     }
 
@@ -985,7 +991,7 @@ async function loadRandomVideo() {
       console.log('[comic-frame] Autoplay prevented:', err);
     });
 
-    status(`Loaded random video from ${videos.length} options`);
+    status(`Loaded random video from ${videos.length} options: ${randomVideo}`);
   } catch (err) {
     status('Failed to load videos (see console)');
     console.error('[videos] load failed:', err);
