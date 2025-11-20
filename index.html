@@ -196,6 +196,29 @@
   </section>
 
   <!-- ================================================
+       OLD TV SECTION - Retro TV with YouTube videos
+       ================================================ -->
+  <section class="old-tv-section">
+    <h2 class="section-title">SOLD OUT! TV</h2>
+    <div class="tv-grid">
+      <!-- Single Large TV -->
+      <div class="old-tv">
+        <div class="tv-screen">
+          <iframe
+            class="tv-iframe"
+            frameborder="0"
+            allow="autoplay; encrypted-media"
+            allowfullscreen
+          ></iframe>
+          <button class="tv-mute-btn" aria-label="Unmute TV" data-tv-index="0">🔇</button>
+          <button class="tv-channel-btn" aria-label="Change channel" data-tv-index="0"></button>
+        </div>
+        <div class="tv-stand"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================
        FOOTER - Social links and copyright
        ================================================ -->
   <footer id="contact">
@@ -340,6 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initImageLightbox();        // Initialize image zoom lightbox
   loadRandomVideo();          // Load random video in comic frame
   initVideoUnmuteButton();    // Initialize video mute/unmute button
+  loadTVPlaylistVideos();     // Load random videos from YouTube playlist into TVs
 });
 
 /* ================================================
@@ -923,6 +947,138 @@ function initVideoUnmuteButton() {
       unmuteBtn.setAttribute('aria-label', 'Mute video');
     }
   });
+}
+
+/* ================================================
+   OLD TV PLAYLIST LOADER
+   ================================================ */
+
+/**
+ * Loads random videos from musicvids.xml into the old TV iframes
+ * Videos are loaded from web/musicvids.xml
+ */
+async function loadTVPlaylistVideos() {
+  const status = makeStatusLine(document.querySelector('.old-tv-section'), 'tv-playlist');
+
+  try {
+    // Load video IDs from XML file
+    status('Loading musicvids.xml...');
+    const response = await fetch('web/musicvids.xml');
+
+    if (!response.ok) {
+      throw new Error(`Failed to load XML: ${response.status} ${response.statusText}`);
+    }
+
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+    // Check for XML parsing errors
+    const parserError = xmlDoc.querySelector('parsererror');
+    if (parserError) {
+      throw new Error('XML parsing error: ' + parserError.textContent);
+    }
+
+    const videos = xmlDoc.querySelectorAll('video');
+
+    if (videos.length === 0) {
+      throw new Error('No videos found in XML file');
+    }
+
+    const embeddableVideos = Array.from(videos).map(video => ({
+      id: video.querySelector('videoid').textContent,
+      title: video.querySelector('title').textContent
+    }));
+
+    status(`Loaded ${embeddableVideos.length} videos from musicvids.xml`);
+    console.log('Embeddable videos:', embeddableVideos);
+
+    const tvIframes = document.querySelectorAll('.tv-iframe');
+    const muteButtons = document.querySelectorAll('.tv-mute-btn');
+
+    if (tvIframes.length === 0) {
+      status('No TV iframes found');
+      return;
+    }
+
+    // Track mute state for each TV
+    const tvMuteStates = new Array(tvIframes.length).fill(true); // All start muted
+
+    // Randomly shuffle the videos array
+    const shuffledVideos = [...embeddableVideos].sort(() => Math.random() - 0.5);
+
+    // Assign a random video to each TV
+    tvIframes.forEach((iframe, index) => {
+      // Pick a random video from the shuffled list
+      const video = shuffledVideos[index % shuffledVideos.length];
+      const embedUrl = `https://www.youtube.com/embed/${video.id}?autoplay=1&mute=1&loop=1&playlist=${video.id}`;
+
+      console.log(`Setting TV ${index + 1} to: ${video.title} (${video.id})`);
+      iframe.src = embedUrl;
+      iframe.setAttribute('data-base-url', embedUrl);
+      status(`TV ${index + 1}: ${video.title}`);
+    });
+
+    // Initialize mute/unmute buttons
+    muteButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tvIndex = parseInt(btn.getAttribute('data-tv-index'));
+        const iframe = tvIframes[tvIndex];
+        const baseUrl = iframe.getAttribute('data-base-url');
+
+        // Toggle mute state
+        tvMuteStates[tvIndex] = !tvMuteStates[tvIndex];
+        const isMuted = tvMuteStates[tvIndex];
+
+        // Update iframe src to change mute parameter
+        const newUrl = baseUrl.replace(/mute=[01]/, `mute=${isMuted ? '1' : '0'}`);
+        iframe.src = newUrl;
+
+        // Update button icon and label
+        if (isMuted) {
+          btn.textContent = '🔇';
+          btn.setAttribute('aria-label', 'Unmute TV');
+        } else {
+          btn.textContent = '🔊';
+          btn.setAttribute('aria-label', 'Mute TV');
+        }
+
+        status(`TV ${tvIndex + 1} ${isMuted ? 'muted' : 'unmuted'}`);
+      });
+    });
+
+    // Initialize channel changer buttons
+    const channelButtons = document.querySelectorAll('.tv-channel-btn');
+    channelButtons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const tvIndex = parseInt(btn.getAttribute('data-tv-index'));
+        const iframe = tvIframes[tvIndex];
+        const isMuted = tvMuteStates[tvIndex];
+
+        // Get a random video that's different from the current one
+        const currentUrl = iframe.src;
+        const currentVideoId = currentUrl.match(/embed\/([^?]+)/)?.[1];
+
+        // Filter out the current video
+        const availableVideos = shuffledVideos.filter(v => v.id !== currentVideoId);
+
+        // Pick a random different video
+        const randomIndex = Math.floor(Math.random() * availableVideos.length);
+        const newVideo = availableVideos[randomIndex];
+
+        // Create new embed URL with current mute state
+        const embedUrl = `https://www.youtube.com/embed/${newVideo.id}?autoplay=1&mute=${isMuted ? '1' : '0'}&loop=1&playlist=${newVideo.id}`;
+
+        console.log(`Changing TV ${tvIndex + 1} to: ${newVideo.title} (${newVideo.id})`);
+        iframe.src = embedUrl;
+        iframe.setAttribute('data-base-url', embedUrl.replace(/mute=[01]/, 'mute=1')); // Store base URL with mute=1
+        status(`TV ${tvIndex + 1}: ${newVideo.title}`);
+      });
+    });
+  } catch (error) {
+    status(`Error loading videos: ${error.message}`);
+    console.error('Error loading music videos:', error);
+  }
 }
 
 /* ================================================

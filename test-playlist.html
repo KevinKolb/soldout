@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Video Embedding Tester</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      background: #f5f5f5;
+    }
+    h1 {
+      color: #333;
+    }
+    .info {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .info h2 {
+      margin-top: 0;
+      color: #2563eb;
+    }
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    .video-test {
+      background: white;
+      border: 3px solid #ddd;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .video-test.success {
+      border-color: #10b981;
+      background: #f0fdf4;
+    }
+    .video-test.error {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+    .video-test h3 {
+      margin-top: 0;
+      color: #333;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .status {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    .status.loading {
+      background: #fbbf24;
+      color: #78350f;
+    }
+    .status.works {
+      background: #10b981;
+      color: white;
+    }
+    .status.blocked {
+      background: #ef4444;
+      color: white;
+    }
+    iframe {
+      width: 100%;
+      height: 280px;
+      border: 2px solid #333;
+      border-radius: 4px;
+      margin-top: 1rem;
+    }
+    .video-id {
+      font-family: 'Courier New', monospace;
+      background: #e5e7eb;
+      padding: 0.5rem;
+      border-radius: 4px;
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+      word-break: break-all;
+    }
+    .test-url {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 0.5rem;
+    }
+    code {
+      background: #e5e7eb;
+      padding: 0.2rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎬 YouTube Video Embedding Tester</h1>
+
+  <div class="info">
+    <h2>Instructions:</h2>
+    <ol>
+      <li><strong>Look at each video below</strong> - If it plays, embedding works! ✅</li>
+      <li><strong>If you see an error</strong> - That video has embedding disabled ❌</li>
+      <li><strong>Copy the Video IDs</strong> that work and add them to your index.html file</li>
+      <li><strong>Update line 942</strong> in index.html with the working video IDs</li>
+    </ol>
+    <p><strong>Testing videos from your "Money/Materialism" playlist:</strong></p>
+  </div>
+
+  <h2>📺 All Money-Themed Music Videos</h2>
+  <p style="color: #666; margin-bottom: 2rem;">Testing all videos from musicvids.xml for embedding support.</p>
+
+  <div class="video-grid" id="videoGrid">
+    <!-- Videos will be loaded dynamically from web/musicvids.xml -->
+  </div>
+
+  <div class="info">
+    <h2>📋 Next Steps:</h2>
+    <p><strong>Copy the Video IDs that work above</strong> and add them to your <code>index.html</code> file at line 942:</p>
+    <pre style="background: #1f2937; color: #10b981; padding: 1rem; border-radius: 4px; overflow-x: auto;">const embeddableVideos = [
+  'nlcIKh6sBtc',  // Lorde - Royals
+  'VIDEO_ID_2',   // Add working IDs here
+  'VIDEO_ID_3',   // Add working IDs here
+  'VIDEO_ID_4',   // Add working IDs here
+];</pre>
+    <p><strong>Once you have 4+ working video IDs,</strong> each TV will show a different video!</p>
+  </div>
+
+  <script>
+    console.log('Loading music videos from XML...');
+
+    // Load and parse XML file
+    async function loadMusicVideos() {
+      try {
+        const response = await fetch('web/musicvids.xml');
+        const xmlText = await response.text();
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+        const videos = xmlDoc.querySelectorAll('video');
+        const videoGrid = document.getElementById('videoGrid');
+
+        console.log(`Found ${videos.length} videos in XML`);
+
+        videos.forEach((video, index) => {
+          const title = video.querySelector('title').textContent;
+          const videoid = video.querySelector('videoid').textContent;
+          const artist = video.querySelector('artist').textContent;
+
+          // Create video test container
+          const videoTest = document.createElement('div');
+          videoTest.className = 'video-test';
+
+          videoTest.innerHTML = `
+            <h3>
+              ${title}
+              <span class="status loading">TESTING...</span>
+            </h3>
+            <div class="video-id">Video ID: <code>${videoid}</code></div>
+            <iframe
+              src="https://www.youtube.com/embed/${videoid}"
+              allowfullscreen
+              onload="markSuccess(this)"
+              onerror="markError(this)">
+            </iframe>
+            <div class="test-url">Test URL: https://www.youtube.com/embed/${videoid}</div>
+          `;
+
+          videoGrid.appendChild(videoTest);
+        });
+
+        console.log('All videos loaded. Testing embedding support...');
+      } catch (error) {
+        console.error('Error loading music videos:', error);
+        document.getElementById('videoGrid').innerHTML = `
+          <div style="color: red; padding: 2rem;">
+            <strong>Error loading videos:</strong> ${error.message}
+          </div>
+        `;
+      }
+    }
+
+    function markSuccess(iframe) {
+      const container = iframe.closest('.video-test');
+      const status = container.querySelector('.status');
+      status.textContent = '✅ WORKS';
+      status.className = 'status works';
+      container.classList.add('success');
+
+      const videoId = container.querySelector('code').textContent;
+      console.log(`✅ ${videoId} - Embedding ALLOWED`);
+    }
+
+    function markError(iframe) {
+      const container = iframe.closest('.video-test');
+      const status = container.querySelector('.status');
+      status.textContent = '❌ BLOCKED';
+      status.className = 'status blocked';
+      container.classList.add('error');
+
+      const videoId = container.querySelector('code').textContent;
+      console.log(`❌ ${videoId} - Embedding BLOCKED`);
+    }
+
+    // Auto-update status after 3 seconds (gives iframes time to load)
+    setTimeout(() => {
+      document.querySelectorAll('.video-test').forEach(test => {
+        const status = test.querySelector('.status');
+        if (status.classList.contains('loading')) {
+          // Still loading = probably works
+          status.textContent = '✅ WORKS';
+          status.className = 'status works';
+          test.classList.add('success');
+        }
+      });
+    }, 3000);
+
+    // Load videos when page loads
+    loadMusicVideos();
+  </script>
+</body>
+</html>

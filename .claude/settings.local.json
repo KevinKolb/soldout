@@ -21,7 +21,12 @@
       "Bash(mv:*)",
       "Bash(git restore:*)",
       "Bash(convert:*)",
-      "Bash(npx:*)"
+      "Bash(npx:*)",
+      "Bash(if netstat -ano)",
+      "Bash(findstr:*)",
+      "Bash(then echo 'Server already running on port 8080')",
+      "Bash(else echo 'No server detected on port 8080')",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
