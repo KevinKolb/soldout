@@ -26,7 +26,9 @@
       "Bash(findstr:*)",
       "Bash(then echo 'Server already running on port 8080')",
       "Bash(else echo 'No server detected on port 8080')",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(test:*)",
+      "Bash(git config:*)"
     ],
     "deny": [],
     "ask": []
