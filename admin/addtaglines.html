@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taglines Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #000;
+            background: #fff;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 40px;
+            letter-spacing: -0.5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+        }
+
+        .form-section {
+            border-left: 1px solid #000;
+            padding-left: 20px;
+        }
+
+        .list-section {
+            border-right: 1px solid #000;
+            padding-right: 20px;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #000;
+            background: #fff;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input:focus, textarea:focus {
+            outline: 2px solid #000;
+            outline-offset: 2px;
+        }
+
+        button {
+            padding: 10px 24px;
+            background: #000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 8px;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        button.secondary {
+            background: #fff;
+            color: #000;
+            border: 1px solid #000;
+        }
+
+        button.secondary:hover {
+            background: #f0f0f0;
+        }
+
+        button.danger {
+            background: #fff;
+            color: #d00;
+            border: 1px solid #d00;
+        }
+
+        button.danger:hover {
+            background: #d00;
+            color: #fff;
+        }
+
+        .tagline-item {
+            padding: 16px;
+            border: 1px solid #000;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .tagline-item:hover {
+            background: #f8f8f8;
+        }
+
+        .tagline-item.active {
+            background: #000;
+            color: #fff;
+        }
+
+        .button-group {
+            margin-top: 24px;
+        }
+
+        .status {
+            padding: 8px 12px;
+            background: #f0f0f0;
+            margin-top: 16px;
+            font-size: 12px;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .tagline-count {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Taglines Manager</h1>
+
+        <div class="grid">
+            <div class="list-section">
+                <h2>Taglines</h2>
+                <div class="tagline-count" id="taglineCount"></div>
+                <div id="taglinesList"></div>
+            </div>
+
+            <div class="form-section">
+                <h2 id="formTitle">Add Tagline</h2>
+                <form id="taglineForm">
+                    <div class="form-group">
+                        <label for="tagline">Tagline</label>
+                        <textarea id="tagline" name="tagline" required placeholder="Enter a witty tagline..."></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit">Save Tagline</button>
+                        <button type="button" class="secondary" id="cancelBtn">Cancel</button>
+                        <button type="button" class="danger" id="deleteBtn" style="display:none;">Delete</button>
+                    </div>
+                </form>
+
+                <div id="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let taglines = [];
+        let editingIndex = -1;
+        let xmlDoc = null;
+
+        // Load XML file
+        async function loadXML() {
+            try {
+                const response = await fetch('../web/taglines.xml');
+                const text = await response.text();
+                const parser = new DOMParser();
+                xmlDoc = parser.parseFromString(text, 'text/xml');
+                parseTaglines();
+                renderTaglinesList();
+            } catch (error) {
+                showStatus('Error loading taglines.xml', 'error');
+            }
+        }
+
+        // Parse taglines from XML
+        function parseTaglines() {
+            taglines = [];
+            const taglineNodes = xmlDoc.querySelectorAll('tagline');
+
+            taglineNodes.forEach((node, index) => {
+                const tagline = {
+                    text: node.textContent.trim(),
+                    node: node
+                };
+                taglines.push(tagline);
+            });
+        }
+
+        // Render taglines list
+        function renderTaglinesList() {
+            const list = document.getElementById('taglinesList');
+            const count = document.getElementById('taglineCount');
+
+            count.textContent = `${taglines.length} tagline${taglines.length !== 1 ? 's' : ''}`;
+            list.innerHTML = '';
+
+            taglines.forEach((tagline, index) => {
+                const div = document.createElement('div');
+                div.className = 'tagline-item';
+                div.onclick = () => editTagline(index);
+                div.textContent = tagline.text;
+                list.appendChild(div);
+            });
+        }
+
+        // Form handling
+        const form = document.getElementById('taglineForm');
+
+        function editTagline(index) {
+            editingIndex = index;
+            const tagline = taglines[index];
+
+            document.getElementById('formTitle').textContent = 'Edit Tagline';
+            document.getElementById('deleteBtn').style.display = 'inline-block';
+            document.getElementById('tagline').value = tagline.text;
+
+            document.querySelectorAll('.tagline-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const taglineText = formData.get('tagline').trim();
+
+            if (!taglineText) {
+                showStatus('Tagline cannot be empty', 'error');
+                return;
+            }
+
+            if (editingIndex >= 0) {
+                updateTagline(editingIndex, taglineText);
+            } else {
+                addTagline(taglineText);
+            }
+
+            await saveXML();
+            resetForm();
+        });
+
+        function addTagline(taglineText) {
+            const taglinesRoot = xmlDoc.querySelector('taglines');
+            const newTagline = xmlDoc.createElement('tagline');
+            newTagline.textContent = taglineText;
+
+            // Add with proper indentation
+            taglinesRoot.appendChild(xmlDoc.createTextNode('\n  '));
+            taglinesRoot.appendChild(newTagline);
+
+            parseTaglines();
+            renderTaglinesList();
+        }
+
+        function updateTagline(index, taglineText) {
+            const tagline = taglines[index];
+            if (tagline.node) {
+                tagline.node.textContent = taglineText;
+            }
+
+            parseTaglines();
+            renderTaglinesList();
+        }
+
+        document.getElementById('deleteBtn').addEventListener('click', async () => {
+            if (editingIndex < 0) return;
+            if (!confirm('Delete this tagline?')) return;
+
+            const tagline = taglines[editingIndex];
+            if (tagline.node) {
+                // Remove the tagline and any adjacent text node (for proper formatting)
+                const nextSibling = tagline.node.nextSibling;
+                if (nextSibling && nextSibling.nodeType === 3 && nextSibling.textContent.trim() === '') {
+                    nextSibling.remove();
+                }
+                tagline.node.remove();
+            }
+
+            await saveXML();
+            resetForm();
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', resetForm);
+
+        function resetForm() {
+            form.reset();
+            editingIndex = -1;
+            document.getElementById('formTitle').textContent = 'Add Tagline';
+            document.getElementById('deleteBtn').style.display = 'none';
+            document.querySelectorAll('.tagline-item').forEach(item => item.classList.remove('active'));
+        }
+
+        async function saveXML() {
+            const serializer = new XMLSerializer();
+            let xmlString = serializer.serializeToString(xmlDoc);
+
+            // Auto-download the file
+            showStatus('Downloading updated XML...', 'success');
+            console.log('Full XML for manual save:', xmlString);
+
+            // Trigger download
+            const blob = new Blob([xmlString], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'taglines.xml';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showStatus('XML downloaded. Replace web/taglines.xml with downloaded file.', 'success');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+            setTimeout(() => status.className = 'status', 3000);
+        }
+
+        // Initialize
+        loadXML();
+    </script>
+</body>
+</html>

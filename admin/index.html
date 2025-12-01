@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOLD OUT! Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #000;
+            background: #fff;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 60px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            border: 2px solid #000;
+            padding: 32px 24px;
+            text-decoration: none;
+            color: #000;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card:hover {
+            background: #000;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .card-icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.25px;
+        }
+
+        .card-description {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .footer a {
+            color: #666;
+            text-decoration: none;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .footer a:hover {
+            color: #000;
+            border-bottom-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SOLD OUT! Admin</h1>
+        <div class="subtitle">Content Management System</div>
+
+        <div class="grid">
+            <a href="addshows.html" class="card">
+                <div class="card-icon">🎭</div>
+                <div class="card-title">Shows Manager</div>
+                <div class="card-description">Add, edit, and manage upcoming and past shows</div>
+            </a>
+
+            <a href="addtaglines.html" class="card">
+                <div class="card-icon">💬</div>
+                <div class="card-title">Taglines Manager</div>
+                <div class="card-description">Manage witty taglines for the hero section</div>
+            </a>
+
+            <a href="addvideos.html" class="card">
+                <div class="card-icon">🎬</div>
+                <div class="card-title">Videos Manager</div>
+                <div class="card-description">Manage video paths for the comic frame section</div>
+            </a>
+
+            <a href="../index.html" class="card">
+                <div class="card-icon">🏠</div>
+                <div class="card-title">View Site</div>
+                <div class="card-description">Return to the main website</div>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>&copy; 2025 SOLD OUT! Comedy | <a href="https://soldoutcomedy.com">soldoutcomedy.com</a></p>
+        </div>
+    </div>
+</body>
+</html>
