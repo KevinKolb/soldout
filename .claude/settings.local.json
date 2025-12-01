@@ -28,7 +28,10 @@
       "Bash(else echo 'No server detected on port 8080')",
       "Bash(rm:*)",
       "Bash(test:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(if [ -f \"admin/start-server.bat\" ])",
+      "Bash(then rm admin/start-server.bat)",
+      "Bash(else echo \"Batch file not found\")"
     ],
     "deny": [],
     "ask": []

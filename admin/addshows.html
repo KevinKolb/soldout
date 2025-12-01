@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shows Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #000;
+            background: #fff;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 40px;
+            letter-spacing: -0.5px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+        }
+
+        .form-section {
+            border-left: 1px solid #000;
+            padding-left: 20px;
+        }
+
+        .list-section {
+            border-right: 1px solid #000;
+            padding-right: 20px;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #000;
+            background: #fff;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: 2px solid #000;
+            outline-offset: 2px;
+        }
+
+        button {
+            padding: 10px 24px;
+            background: #000;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 8px;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        button.secondary {
+            background: #fff;
+            color: #000;
+            border: 1px solid #000;
+        }
+
+        button.secondary:hover {
+            background: #f0f0f0;
+        }
+
+        button.danger {
+            background: #fff;
+            color: #d00;
+            border: 1px solid #d00;
+        }
+
+        button.danger:hover {
+            background: #d00;
+            color: #fff;
+        }
+
+        .show-item {
+            padding: 16px;
+            border: 1px solid #000;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .show-item:hover {
+            background: #f8f8f8;
+        }
+
+        .show-item.active {
+            background: #000;
+            color: #fff;
+        }
+
+        .show-item.commented {
+            opacity: 0.5;
+            border-style: dashed;
+        }
+
+        .show-meta {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .show-theme {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .show-venue {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .button-group {
+            margin-top: 24px;
+        }
+
+        .status {
+            padding: 8px 12px;
+            background: #f0f0f0;
+            margin-top: 16px;
+            font-size: 12px;
+        }
+
+        .status.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shows Manager</h1>
+
+        <div class="grid">
+            <div class="list-section">
+                <h2>Shows</h2>
+                <div id="showsList"></div>
+            </div>
+
+            <div class="form-section">
+                <h2 id="formTitle">Add Show</h2>
+                <form id="showForm">
+                    <div class="form-group">
+                        <label for="type">Type</label>
+                        <select id="type" name="type" required>
+                            <option value="stage">Stage</option>
+                            <option value="screen">Screen</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="datetime">Start Date/Time (ISO Format)</label>
+                        <input type="datetime-local" id="datetime" name="datetime" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="datetimeend">End Date/Time (ISO Format)</label>
+                        <input type="datetime-local" id="datetimeend" name="datetimeend" required>
+                    </div>
+
+                    <div class="form-group" id="appraisalGroup">
+                        <label for="appraisal">Appraisal Time</label>
+                        <input type="text" id="appraisal" name="appraisal" placeholder="Optional">
+                    </div>
+
+                    <div class="form-group" id="platformGroup" style="display:none;">
+                        <label for="platform">Platform</label>
+                        <input type="text" id="platform" name="platform" placeholder="e.g., Whatnot">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="theme">Theme</label>
+                        <input type="text" id="theme" name="theme">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="venue">Venue</label>
+                        <input type="text" id="venue" name="venue" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" name="location" required>
+                    </div>
+
+                    <div class="form-group" id="addressGroup">
+                        <label for="address">Address</label>
+                        <input type="text" id="address" name="address">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="watch">Watch URL</label>
+                        <input type="url" id="watch" name="watch" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="icon">Icon Path</label>
+                        <input type="text" id="icon" name="icon" required placeholder="web/images/filename.png">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="verified">Verified</label>
+                        <select id="verified" name="verified" required>
+                            <option value="no">No</option>
+                            <option value="yes">Yes</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button type="submit">Save Show</button>
+                        <button type="button" class="secondary" id="cancelBtn">Cancel</button>
+                        <button type="button" class="danger" id="deleteBtn" style="display:none;">Delete</button>
+                    </div>
+                </form>
+
+                <div id="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let shows = [];
+        let editingIndex = -1;
+        let xmlDoc = null;
+
+        // Load XML file
+        async function loadXML() {
+            try {
+                const response = await fetch('../web/shows.xml');
+                const text = await response.text();
+                const parser = new DOMParser();
+                xmlDoc = parser.parseFromString(text, 'text/xml');
+                parseShows();
+                renderShowsList();
+            } catch (error) {
+                showStatus('Error loading shows.xml', 'error');
+            }
+        }
+
+        // Parse shows from XML
+        function parseShows() {
+            shows = [];
+            const showNodes = xmlDoc.querySelectorAll('show');
+
+            showNodes.forEach((node, index) => {
+                const isCommented = node.parentNode.nodeType === 8;
+                const show = {
+                    type: node.getAttribute('type'),
+                    datetime: getNodeValue(node, 'datetime'),
+                    datetimeend: getNodeValue(node, 'datetimeend'),
+                    appraisal: getNodeValue(node, 'appraisal'),
+                    platform: getNodeValue(node, 'platform'),
+                    theme: getNodeValue(node, 'theme'),
+                    venue: getNodeValue(node, 'venue'),
+                    location: getNodeValue(node, 'location'),
+                    address: getNodeValue(node, 'address'),
+                    watch: getNodeValue(node, 'watch'),
+                    icon: getNodeValue(node, 'icon'),
+                    verified: getNodeValue(node, 'verified'),
+                    commented: isCommented,
+                    node: node
+                };
+                shows.push(show);
+            });
+
+            // Also parse commented shows
+            const comments = xmlDoc.evaluate('//comment()', xmlDoc, null, XPathResult.ANY_TYPE, null);
+            let comment = comments.iterateNext();
+            while (comment) {
+                const commentText = comment.textContent.trim();
+                if (commentText.includes('<show')) {
+                    const tempDoc = new DOMParser().parseFromString('<root>' + commentText + '</root>', 'text/xml');
+                    const commentedShow = tempDoc.querySelector('show');
+                    if (commentedShow) {
+                        const show = {
+                            type: commentedShow.getAttribute('type'),
+                            datetime: getNodeValue(commentedShow, 'datetime'),
+                            datetimeend: getNodeValue(commentedShow, 'datetimeend'),
+                            appraisal: getNodeValue(commentedShow, 'appraisal'),
+                            platform: getNodeValue(commentedShow, 'platform'),
+                            theme: getNodeValue(commentedShow, 'theme'),
+                            venue: getNodeValue(commentedShow, 'venue'),
+                            location: getNodeValue(commentedShow, 'location'),
+                            address: getNodeValue(commentedShow, 'address'),
+                            watch: getNodeValue(commentedShow, 'watch'),
+                            icon: getNodeValue(commentedShow, 'icon'),
+                            verified: getNodeValue(commentedShow, 'verified'),
+                            visible: getNodeValue(commentedShow, 'visible'),
+                            commented: true,
+                            commentNode: comment
+                        };
+                        shows.push(show);
+                    }
+                }
+                comment = comments.iterateNext();
+            }
+        }
+
+        function getNodeValue(parent, tagName) {
+            const node = parent.querySelector(tagName);
+            return node ? node.textContent : '';
+        }
+
+        // Render shows list
+        function renderShowsList() {
+            const list = document.getElementById('showsList');
+            list.innerHTML = '';
+
+            shows.forEach((show, index) => {
+                const div = document.createElement('div');
+                div.className = 'show-item' + (show.commented ? ' commented' : '');
+                div.onclick = () => editShow(index);
+                div.style.display = 'grid';
+                div.style.gridTemplateColumns = '40px 1fr';
+                div.style.gap = '12px';
+                div.style.alignItems = 'center';
+
+                // Thumbnail
+                const thumbnail = document.createElement('img');
+                thumbnail.src = show.icon ? '../' + show.icon : '';
+                thumbnail.style.width = '40px';
+                thumbnail.style.height = '40px';
+                thumbnail.style.objectFit = 'contain';
+                thumbnail.style.border = '1px solid #000';
+                thumbnail.style.display = show.icon ? 'block' : 'none';
+
+                // Content wrapper
+                const content = document.createElement('div');
+
+                const meta = document.createElement('div');
+                meta.className = 'show-meta';
+                meta.textContent = `${show.type.toUpperCase()} " ${formatDate(show.datetime)}${show.commented ? ' " COMMENTED' : ''}`;
+
+                const theme = document.createElement('div');
+                theme.className = 'show-theme';
+                theme.textContent = show.theme || 'No theme';
+
+                const venue = document.createElement('div');
+                venue.className = 'show-venue';
+                venue.textContent = `${show.venue} " ${show.location}`;
+
+                content.appendChild(meta);
+                content.appendChild(theme);
+                content.appendChild(venue);
+
+                div.appendChild(thumbnail);
+                div.appendChild(content);
+                list.appendChild(div);
+            });
+        }
+
+        function formatDate(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        // Form handling
+        const form = document.getElementById('showForm');
+        const typeSelect = document.getElementById('type');
+
+        typeSelect.addEventListener('change', () => {
+            const isScreen = typeSelect.value === 'screen';
+            document.getElementById('platformGroup').style.display = isScreen ? 'block' : 'none';
+            document.getElementById('addressGroup').style.display = isScreen ? 'none' : 'block';
+        });
+
+        function editShow(index) {
+            editingIndex = index;
+            const show = shows[index];
+
+            document.getElementById('formTitle').textContent = 'Edit Show';
+            document.getElementById('deleteBtn').style.display = 'inline-block';
+
+            document.getElementById('type').value = show.type;
+            document.getElementById('datetime').value = toLocalDateTime(show.datetime);
+            document.getElementById('datetimeend').value = toLocalDateTime(show.datetimeend);
+            document.getElementById('appraisal').value = show.appraisal;
+            document.getElementById('platform').value = show.platform;
+            document.getElementById('theme').value = show.theme;
+            document.getElementById('venue').value = show.venue;
+            document.getElementById('location').value = show.location;
+            document.getElementById('address').value = show.address;
+            document.getElementById('watch').value = show.watch;
+            document.getElementById('icon').value = show.icon;
+            document.getElementById('verified').value = show.verified;
+
+            typeSelect.dispatchEvent(new Event('change'));
+
+            document.querySelectorAll('.show-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+        }
+
+        function toLocalDateTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            const offset = date.getTimezoneOffset() * 60000;
+            const localDate = new Date(date.getTime() - offset);
+            return localDate.toISOString().slice(0, 16);
+        }
+
+        function toISOString(localDateTime) {
+            return new Date(localDateTime).toISOString();
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            const showData = {
+                type: formData.get('type'),
+                datetime: toISOString(formData.get('datetime')),
+                datetimeend: toISOString(formData.get('datetimeend')),
+                appraisal: formData.get('appraisal'),
+                platform: formData.get('platform'),
+                theme: formData.get('theme'),
+                venue: formData.get('venue'),
+                location: formData.get('location'),
+                address: formData.get('address'),
+                watch: formData.get('watch'),
+                icon: formData.get('icon'),
+                verified: formData.get('verified')
+            };
+
+            if (editingIndex >= 0) {
+                updateShow(editingIndex, showData);
+            } else {
+                addShow(showData);
+            }
+
+            await saveXML();
+            resetForm();
+        });
+
+        function addShow(showData) {
+            const showsRoot = xmlDoc.querySelector('shows');
+            const newShow = xmlDoc.createElement('show');
+            newShow.setAttribute('type', showData.type);
+
+            const fields = ['datetime', 'datetimeend', 'appraisal', 'platform', 'theme', 'venue', 'location', 'address', 'watch', 'icon', 'verified'];
+            fields.forEach(field => {
+                if (showData[field]) {
+                    const elem = xmlDoc.createElement(field);
+                    elem.textContent = showData[field];
+                    newShow.appendChild(elem);
+                    newShow.appendChild(xmlDoc.createTextNode('\n    '));
+                }
+            });
+
+            showsRoot.insertBefore(xmlDoc.createTextNode('\n  '), showsRoot.firstChild);
+            showsRoot.insertBefore(newShow, showsRoot.firstChild);
+
+            parseShows();
+            renderShowsList();
+        }
+
+        function updateShow(index, showData) {
+            const show = shows[index];
+
+            if (show.commented && show.commentNode) {
+                // If editing a commented show, uncomment it
+                const showsRoot = xmlDoc.querySelector('shows');
+                const newShow = xmlDoc.createElement('show');
+                newShow.setAttribute('type', showData.type);
+
+                const fields = ['datetime', 'datetimeend', 'appraisal', 'platform', 'theme', 'venue', 'location', 'address', 'watch', 'icon', 'verified'];
+                fields.forEach(field => {
+                    if (showData[field]) {
+                        const elem = xmlDoc.createElement(field);
+                        elem.textContent = showData[field];
+                        newShow.appendChild(elem);
+                        newShow.appendChild(xmlDoc.createTextNode('\n    '));
+                    }
+                });
+
+                showsRoot.replaceChild(newShow, show.commentNode);
+            } else if (show.node) {
+                // Update existing show
+                const node = show.node;
+                node.setAttribute('type', showData.type);
+
+                // Clear existing children
+                while (node.firstChild) {
+                    node.removeChild(node.firstChild);
+                }
+
+                // Add updated fields
+                const fields = ['datetime', 'datetimeend', 'appraisal', 'platform', 'theme', 'venue', 'location', 'address', 'watch', 'icon', 'verified'];
+                fields.forEach(field => {
+                    if (showData[field]) {
+                        node.appendChild(xmlDoc.createTextNode('\n    '));
+                        const elem = xmlDoc.createElement(field);
+                        elem.textContent = showData[field];
+                        node.appendChild(elem);
+                    }
+                });
+                node.appendChild(xmlDoc.createTextNode('\n  '));
+            }
+
+            parseShows();
+            renderShowsList();
+        }
+
+        document.getElementById('deleteBtn').addEventListener('click', async () => {
+            if (editingIndex < 0) return;
+            if (!confirm('Delete this show?')) return;
+
+            const show = shows[editingIndex];
+            if (show.node) {
+                show.node.remove();
+            } else if (show.commentNode) {
+                show.commentNode.remove();
+            }
+
+            await saveXML();
+            resetForm();
+        });
+
+        document.getElementById('cancelBtn').addEventListener('click', resetForm);
+
+        function resetForm() {
+            form.reset();
+            editingIndex = -1;
+            document.getElementById('formTitle').textContent = 'Add Show';
+            document.getElementById('deleteBtn').style.display = 'none';
+            document.querySelectorAll('.show-item').forEach(item => item.classList.remove('active'));
+            typeSelect.dispatchEvent(new Event('change'));
+        }
+
+        async function saveXML() {
+            const serializer = new XMLSerializer();
+            let xmlString = serializer.serializeToString(xmlDoc);
+
+            // Auto-download the file
+            showStatus('Downloading updated XML...', 'success');
+            console.log('Full XML for manual save:', xmlString);
+
+            // Trigger download
+            const blob = new Blob([xmlString], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'shows.xml';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showStatus('XML downloaded. Replace web/shows.xml with downloaded file.', 'success');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + type;
+            setTimeout(() => status.className = 'status', 3000);
+        }
+
+        // Initialize
+        loadXML();
+    </script>
+</body>
+</html>
