@@ -47,19 +47,38 @@
     <!-- Main logo -->
     <img src="web/images/soldoutlogo.png" alt="SOLD OUT! Comedy" class="hero-logo">
 
-    <!-- Main description with example link -->
-    <div class="hero-description">
-      Live selling is a $68 billion market, but let's be real, <a href="https://www.reddit.com/r/whatnotapp/comments/1ntac3q/once_again_crashout_on_whatnot_pt1/?utm_source=share&utm_medium=web3x&utm_name=web3xcss&utm_term=1&utm_content=share_button" target="_blank" rel="noopener noreferrer" style="color: var(--comic-red); font-weight: 700; text-decoration: underline;">it's painful to watch</a>. We're changing that. Give us that dusty juicer to sell and it becomes a prop in an improv sketch while the live and online audiences both bid on it. We'll sell out our dignity to sell out your stuff.
+    <!-- Main description with video -->
+    <div class="hero-description" style="max-width: 1200px; display: grid; grid-template-columns: 1fr 400px; gap: 2rem; align-items: center;">
+      <div>
+        Live selling is a $68 billion market, but let's be real, it's painful to watch. We're changing that. Give us that dusty juicer to sell and it becomes a prop in an improv sketch while the live and online audiences both bid on it. We'll sell out our dignity to sell out your stuff.
+      </div>
+      <div class="comic-frame-container" style="margin: 0;">
+        <video id="comicFrameVideo" class="comic-frame-video" autoplay loop muted playsinline></video>
+        <button id="videoUnmuteBtn" class="video-unmute-btn" aria-label="Toggle sound">🔇</button>
+      </div>
     </div>
+
+    <style>
+      @media (max-width: 768px) {
+        .hero-description {
+          grid-template-columns: 1fr !important;
+          gap: 1.5rem !important;
+        }
+        .hero-description .comic-frame-container {
+          max-width: 300px;
+          margin: 0 auto !important;
+        }
+      }
+    </style>
 
     <!-- ================================================
          EDITION CARDS - Stage and Screen descriptions
          ================================================ -->
     <div class="two-cards">
       <!-- STAGE EDITION CARD -->
-      <div class="edition-card stage-edition">
-        <h3>Stage Edition</h3>
-        <div class="subtitle">Live-In-Person and Online Audiences</div>
+      <div class="edition-card stage-edition" style="background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px); background-size: 4px 4px; background-color: #FFE5E5;">
+        <h3 style="color: #D32F2F;">Stage Edition</h3>
+        <div class="subtitle" style="background: var(--comic-yellow); color: var(--comic-black);">Live-In-Person and Online Audiences</div>
         <p>Full theatrical improv where YOUR items become props in hilarious sketches. Bring something to sell, watch comedians transform it on stage, and let both live and online audiences battle it out in the bidding war. That bread maker? It's about to become a flux capacitor.</p>
         <div class="themes-section">
           <h4>Stage Edition Features</h4>
@@ -72,9 +91,9 @@
       </div>
 
       <!-- SCREEN EDITION CARD -->
-      <div class="edition-card screen-edition">
-        <h3>Screen Edition</h3>
-        <div class="subtitle">Online Audience Only</div>
+      <div class="edition-card screen-edition" style="background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px); background-size: 4px 4px; background-color: #E3F2FF;">
+        <h3 style="color: #1976D2;">Screen Edition</h3>
+        <div class="subtitle" style="background: var(--comic-yellow); color: var(--comic-black);">Online Audience Only</div>
         <p>Join us online/live for skits where we try and sell you a random pile of socks we impulse-bought from Temu at 2 AM. Baby needs a new pair of shoes! -Baby already has plenty of socks.</p>
         <div class="themes-section">
           <h4>Upcoming Themes</h4>
@@ -84,6 +103,26 @@
             <li>The Junk in the Trunk Show</li>
           </ul>
         </div>
+      </div>
+    </div>
+
+    <!-- ================================================
+         LEARN IMPROV SECTION - For Sellers
+         ================================================ -->
+    <div class="edition-card" style="background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px); background-size: 4px 4px; background-color: #E3FFE8; border-color: var(--comic-black); margin: 2rem auto; max-width: 100%; box-sizing: border-box;">
+      <h3 style="color: #388E3C;">Are You Experienced?</h3>
+
+      <img src="web/images/jimi.png" alt="Are You Experienced Comic Panels" style="width: 100%; max-width: 400px; height: auto; display: block; margin: 1rem auto; border: 4px solid var(--comic-black); box-shadow: 6px 6px 0 rgba(0,0,0,0.2);">
+
+      <p style="color: var(--comic-black); font-style: italic; margin-top: 1.5rem; margin-bottom: 1.5rem;">You don't have to be to sell your stuff on stage with us. BUT...</p>
+      <div class="themes-section" style="background: white;">
+        <h4 style="color: var(--comic-black);">Improv Learning Resources</h4>
+        <ul class="themes-list">
+          <li><a href="https://news.uchicago.edu/explainer/improv-explained" target="_blank" rel="noopener noreferrer" style="color: #388E3C; text-decoration: underline; font-weight: 700;">Improv Explained</a> - UChicago's comprehensive guide</li>
+          <li><a href="https://www.youtube.com/results?search_query=improv+comedy+yes+and+tutorial" target="_blank" rel="noopener noreferrer" style="color: #388E3C; text-decoration: underline; font-weight: 700;">Yes, And...</a> - YouTube tutorials on the foundation</li>
+          <li><a href="https://nowthisimprov.com/best-improv-videos-on-youtube/" target="_blank" rel="noopener noreferrer" style="color: #388E3C; text-decoration: underline; font-weight: 700;">Best Improv Videos</a> - Curated YouTube list</li>
+          <li><a href="https://www.learnimprov.com/" target="_blank" rel="noopener noreferrer" style="color: #388E3C; text-decoration: underline; font-weight: 700;">Improv Games</a> - Free exercises and games</li>
+        </ul>
       </div>
     </div>
 
@@ -113,7 +152,7 @@
         <div class="review-card">
           <video src="web/images/comicsansguy.mp4" alt="Jorge B." class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
-            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <div class="stars"><span class="filled-star">💥</span><span class="empty-star">💢💢💢💢</span></div>
             <p class="review-text">"I can't believe they didn't use Comic Sans on their website. It seems like a website that would have Comic Sans on it."</p>
             <div class="reviewer">- Jorge B.</div>
           </div>
@@ -121,7 +160,7 @@
         <div class="review-card">
           <video src="web/images/traderjoes.mp4" alt="Confused Customer" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
-            <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
+            <div class="stars"><span class="filled-star">💥💥💥</span><span class="empty-star">💢💢</span></div>
             <p class="review-text">"I thought I was going to Trader Joe's"</p>
             <div class="reviewer">- Confused Customer</div>
           </div>
@@ -129,7 +168,7 @@
         <div class="review-card">
           <video src="web/images/banana.mp4" alt="Fruit Enthusiast" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
-            <div class="stars"><span class="filled-star">★★</span><span class="empty-star">★★★</span></div>
+            <div class="stars"><span class="filled-star">💥💥</span><span class="empty-star">💢💢💢</span></div>
             <p class="review-text">"They sold me a banana for $47. It wasn't even ripe."</p>
             <div class="reviewer">- Fruit Enthusiast</div>
           </div>
@@ -137,7 +176,7 @@
         <div class="review-card">
           <video src="web/images/knives.mp4" alt="Sharp Shopper" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
-            <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
+            <div class="stars"><span class="filled-star">💥💥💥</span><span class="empty-star">💢💢</span></div>
             <p class="review-text">"I came for the improv but left with 12 kitchen knives. Still confused. -and stop counting the knives in the butcher block. You're taking this way too seriously."</p>
             <div class="reviewer">- Sharp Shopper</div>
           </div>
@@ -145,7 +184,7 @@
         <div class="review-card">
           <video src="web/images/treadmill.mp4" alt="Concerned Grandchild" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
-            <div class="stars"><span class="filled-star">★★★★</span><span class="empty-star">★</span></div>
+            <div class="stars"><span class="filled-star">💥💥💥💥</span><span class="empty-star">💢</span></div>
             <p class="review-text">"My grandmother swiped wrong during the show and bought a treadmill. She's 94."</p>
             <div class="reviewer">- Concerned Grandchild</div>
           </div>
@@ -153,7 +192,7 @@
         <div class="review-card">
           <video src="web/images/rainman.mp4" alt="Raymond Babbitt" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
-            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <div class="stars"><span class="filled-star">💥</span><span class="empty-star">💢💢💢💢</span></div>
             <p class="review-text">"Charlie Babbitt squeezed and pulled and hurt my neck in 1988"</p>
             <div class="reviewer">- Raymond Babbitt</div>
           </div>
@@ -161,7 +200,7 @@
         <div class="review-card">
           <video src="web/images/floyd.mp4" alt="Floyd" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
-            <div class="stars"><span class="filled-star">★</span><span class="empty-star">★★★★</span></div>
+            <div class="stars"><span class="filled-star">💥</span><span class="empty-star">💢💢💢💢</span></div>
             <p class="review-text">"If tickets are still available, you can't be sold out! How can you be sold out if tickets are still available?!"</p>
             <div class="reviewer">- Pink Floyd Fan</div>
           </div>
@@ -169,7 +208,7 @@
         <div class="review-card">
           <video src="web/images/shakespeare.mp4" alt="Theater Critic" class="review-photo" autoplay loop muted playsinline></video>
           <div class="review-content">
-            <div class="stars"><span class="filled-star">★★★</span><span class="empty-star">★★</span></div>
+            <div class="stars"><span class="filled-star">💥💥💥</span><span class="empty-star">💢💢</span></div>
             <p class="review-text">"Was expecting Shakespeare. Got a guy selling tube socks. Honestly? Not disappointed."</p>
             <div class="reviewer">- Theater Critic</div>
           </div>
@@ -199,16 +238,6 @@
         <!-- Overlaid tagline text with pulse animation -->
         <div class="tagline">SELL OUT WITH US.</div>
       </div>
-    </div>
-  </section>
-
-  <!-- ================================================
-       COMIC FRAME VIDEO SECTION - Random video player
-       ================================================ -->
-  <section class="comic-frame-section">
-    <div class="comic-frame-container">
-      <video id="comicFrameVideo" class="comic-frame-video" autoplay loop muted playsinline></video>
-      <button id="videoUnmuteBtn" class="video-unmute-btn" aria-label="Toggle sound">🔇</button>
     </div>
   </section>
 
@@ -1103,8 +1132,8 @@ async function loadTVPlaylistVideos() {
    ================================================ */
 
 /**
- * Loads a random video from the web/videos directory
- * Automatically detects all .mp4 files with numeric names (1.mp4, 2.mp4, etc.)
+ * Loads a random video from web/videos.xml
+ * Videos are loaded from the XML file dynamically
  */
 async function loadRandomVideo() {
   const videoElement = document.getElementById('comicFrameVideo');
@@ -1119,38 +1148,35 @@ async function loadRandomVideo() {
   }
 
   try {
-    const videos = [];
-    const videoDir = 'web/videos/';
+    // Load video paths from XML file
+    status('Loading videos.xml...');
+    const response = await fetch('web/videos.xml');
 
-    // Try to load numbered videos (1.mp4, 2.mp4, 3.mp4, etc.)
-    // Keep trying until we get a 404
-    let videoNum = 1;
-    let consecutiveFailures = 0;
-    const maxConsecutiveFailures = 3; // Stop after 3 consecutive missing files
-
-    while (consecutiveFailures < maxConsecutiveFailures && videoNum < 100) {
-      const videoPath = `${videoDir}${videoNum}.mp4`;
-
-      try {
-        const res = await fetch(videoPath, { method: 'HEAD', cache: 'no-cache' });
-        if (res.ok) {
-          videos.push(videoPath);
-          consecutiveFailures = 0; // Reset counter on success
-          status(`Found video: ${videoPath}`);
-        } else {
-          consecutiveFailures++;
-        }
-      } catch (err) {
-        consecutiveFailures++;
-      }
-
-      videoNum++;
+    if (!response.ok) {
+      throw new Error(`Failed to load XML: ${response.status} ${response.statusText}`);
     }
 
-    if (!videos.length) {
-      status('No numbered videos found (looking for 1.mp4, 2.mp4, etc.)');
-      return;
+    const xmlText = await response.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+
+    // Check for XML parsing errors
+    const parserError = xmlDoc.querySelector('parsererror');
+    if (parserError) {
+      throw new Error('XML parsing error: ' + parserError.textContent);
     }
+
+    const videoNodes = xmlDoc.querySelectorAll('video');
+
+    if (videoNodes.length === 0) {
+      throw new Error('No videos found in XML file');
+    }
+
+    // Extract video paths from XML
+    const videos = Array.from(videoNodes).map(node => node.textContent.trim());
+
+    status(`Loaded ${videos.length} videos from videos.xml`);
+    console.log('Available videos:', videos);
 
     // Select a random video
     const randomVideo = videos[Math.floor(Math.random() * videos.length)];
