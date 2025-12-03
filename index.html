@@ -34,46 +34,40 @@
   <link rel="stylesheet" href="web/style.css" id="main-stylesheet">
 </head>
 <body>
-  <!-- Legacy overlay element (currently hidden) -->
-  <div class="halftone-overlay"></div>
-
   <!-- ================================================
-       HERO SECTION - Top of page with logo and tagline
+       HERO SECTION
        ================================================ -->
   <section class="hero">
-    <!-- Dynamic tagline loaded from taglines.xml via JavaScript -->
-    <p class="hero-subtitle">Live Comedy Meets Live Shopping</p>
+    <div class="hero-container">
+      <div class="hero-split">
+        <div class="hero-text">
+          <h1 class="hero-subtitle">Live Comedy Meets Live Shopping</h1>
+          <p class="hero-description">
+            Live selling is a $68 billion market, but let's be real, it's painful to watch. We're changing that. Give us that dusty juicer to sell and it becomes a prop in an improv sketch while the live and online audiences both bid on it. We'll sell out our dignity to sell out your stuff.
+          </p>
+        </div>
 
-    <!-- Main logo -->
-    <img src="web/images/soldoutlogo.png" alt="SOLD OUT! Comedy" class="hero-logo">
-
-    <!-- Main description with video -->
-    <div class="hero-description" style="max-width: 1200px; display: grid; grid-template-columns: 1fr 400px; gap: 2rem; align-items: center;">
-      <div>
-        Live selling is a $68 billion market, but let's be real, it's painful to watch. We're changing that. Give us that dusty juicer to sell and it becomes a prop in an improv sketch while the live and online audiences both bid on it. We'll sell out our dignity to sell out your stuff.
-      </div>
-      <div class="comic-frame-container" style="margin: 0;">
-        <video id="comicFrameVideo" class="comic-frame-video" autoplay loop muted playsinline></video>
-        <button id="videoUnmuteBtn" class="video-unmute-btn" aria-label="Toggle sound">🔇</button>
+        <div class="hero-visual">
+          <div class="comic-frame-container">
+            <video id="comicFrameVideo" class="comic-frame-video" autoplay loop muted playsinline></video>
+            <button id="videoUnmuteBtn" class="video-unmute-btn" aria-label="Toggle sound">🔇</button>
+          </div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <style>
-      @media (max-width: 768px) {
-        .hero-description {
-          grid-template-columns: 1fr !important;
-          gap: 1.5rem !important;
-        }
-        .hero-description .comic-frame-container {
-          max-width: 300px;
-          margin: 0 auto !important;
-        }
-      }
-    </style>
+  <!-- ================================================
+       LOGO SECTION
+       ================================================ -->
+  <section class="logo-section">
+    <img src="web/images/soldoutlogo.png" alt="SOLD OUT! Comedy" class="main-logo">
+  </section>
 
-    <!-- ================================================
-         EDITION CARDS - Stage and Screen descriptions
-         ================================================ -->
+  <!-- ================================================
+       EDITION CARDS SECTION
+       ================================================ -->
+  <section class="editions-section">
     <div class="two-cards">
       <!-- STAGE EDITION CARD -->
       <div class="edition-card stage-edition" style="background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px); background-size: 4px 4px; background-color: #FFE5E5;">
@@ -106,41 +100,64 @@
       </div>
     </div>
 
-    <!-- ================================================
-         LEARN IMPROV SECTION - For Sellers
-         ================================================ -->
-    <div class="edition-card" style="background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px); background-size: 4px 4px; background-color: #F3E5F5; border-color: var(--comic-black); margin: 2rem auto; max-width: 100%; box-sizing: border-box;">
-      <h3 style="color: #7B1FA2;">Are You Experienced?</h3>
+    <div class="two-cards">
+      <!-- ARE YOU EXPERIENCED CARD -->
+      <div class="edition-card" style="background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px); background-size: 4px 4px; background-color: #F3E5F5; border-color: var(--comic-black);">
+        <h3 style="color: #7B1FA2;">Are You Experienced?</h3>
 
-      <img src="web/images/jimi.png" alt="Are You Experienced Comic Panels" style="width: 100%; max-width: 400px; height: auto; display: block; margin: 1rem auto; border: 4px solid var(--comic-black); box-shadow: 6px 6px 0 rgba(0,0,0,0.2);">
+        <img src="web/images/jimi.png" alt="Are You Experienced Comic Panels" style="width: 100%; max-width: 400px; height: auto; display: block; margin: 1rem auto; border: 5px solid var(--comic-black); box-shadow: 10px 10px 0 rgba(0,0,0,0.15);">
 
-      <p style="color: var(--comic-black); font-style: italic; margin-top: 1.5rem; margin-bottom: 1.5rem;">You don't have to be to sell your stuff on stage with us. BUT...</p>
-      <div class="themes-section" style="background: white;">
-        <h4 style="color: var(--comic-black);">Improv Learning Resources</h4>
-        <ul class="themes-list">
-          <li><a href="https://news.uchicago.edu/explainer/improv-explained" target="_blank" rel="noopener noreferrer" style="color: #8E24AA; text-decoration: underline; font-weight: 700;">Improv Explained</a> - UChicago's comprehensive guide</li>
-          <li><a href="https://www.youtube.com/results?search_query=improv+comedy+yes+and+tutorial" target="_blank" rel="noopener noreferrer" style="color: #8E24AA; text-decoration: underline; font-weight: 700;">Yes, And...</a> - YouTube tutorials on the foundation</li>
-          <li><a href="https://nowthisimprov.com/best-improv-videos-on-youtube/" target="_blank" rel="noopener noreferrer" style="color: #8E24AA; text-decoration: underline; font-weight: 700;">Best Improv Videos</a> - Curated YouTube list</li>
-          <li><a href="https://www.learnimprov.com/" target="_blank" rel="noopener noreferrer" style="color: #8E24AA; text-decoration: underline; font-weight: 700;">Improv Games</a> - Free exercises and games</li>
-        </ul>
+        <p style="color: var(--comic-black); font-style: italic; margin-top: 1.5rem; margin-bottom: 1.5rem;">You don't have to be to sell your stuff on stage with us. BUT...</p>
+        <div class="themes-section" style="background: white;">
+          <h4 style="color: var(--comic-black);">Improv Learning Resources</h4>
+          <ul class="themes-list">
+            <li><a href="https://news.uchicago.edu/explainer/improv-explained" target="_blank" rel="noopener noreferrer" style="color: #8E24AA; text-decoration: underline; font-weight: 700;">Improv Explained</a> - UChicago's comprehensive guide</li>
+            <li><a href="https://www.youtube.com/results?search_query=improv+comedy+yes+and+tutorial" target="_blank" rel="noopener noreferrer" style="color: #8E24AA; text-decoration: underline; font-weight: 700;">Yes, And...</a> - YouTube tutorials on the foundation</li>
+            <li><a href="https://nowthisimprov.com/best-improv-videos-on-youtube/" target="_blank" rel="noopener noreferrer" style="color: #8E24AA; text-decoration: underline; font-weight: 700;">Best Improv Videos</a> - Curated YouTube list</li>
+            <li><a href="https://www.learnimprov.com/" target="_blank" rel="noopener noreferrer" style="color: #8E24AA; text-decoration: underline; font-weight: 700;">Improv Games</a> - Free exercises and games</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PROPS CARD -->
+      <div class="edition-card" style="background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px); background-size: 4px 4px; background-color: #E8F5E9; border-color: var(--comic-black);">
+        <h3 style="color: #2E7D32;">Props</h3>
+        <div class="subtitle" style="background: #FFD93D; color: var(--comic-black);">Sell Your Stuff As Stage Props</div>
+        <p>Bring your items to sell and watch comedians transform them into props for improv scenes. That dusty juicer might become a jetpack. Your old exercise bike? Time machine fuel.</p>
+        <div class="themes-section">
+          <h4>How It Works</h4>
+          <ul class="themes-list">
+            <li>Arrive up to 1 hour before showtime with your item in an unsealed, mail-ready box</li>
+            <li>Set your net price (what you take home) with our Appraiser</li>
+            <li>Comedians use your items as props in improv scenes—you never know when or if they'll pop up</li>
+            <li>If it doesn't appear in a scene, it gets auctioned in the Lightning Round</li>
+            <li>If it sells, you get paid your net price via Venmo within 3 days</li>
+            <li>If it doesn't sell, take it home after the show</li>
+          </ul>
+          <p style="margin-top: 1.5rem; text-align: center;">
+            <a href="https://help.whatnot.com/hc/en-us/articles/360061224972-Prohibited-or-Restricted-Items-on-Whatnot" target="_blank" rel="noopener noreferrer" style="color: #2E7D32; text-decoration: underline; font-weight: 700;">View Prohibited Items</a> •
+            <a href="mailto:appraiser@soldoutcomedy.com" style="color: #2E7D32; text-decoration: underline; font-weight: 700;">Contact Appraiser</a>
+          </p>
+        </div>
       </div>
     </div>
-
   </section>
 
   <!-- ================================================
-       SCHEDULE SECTION - Dynamically loaded shows
+       SCHEDULE SECTION
        ================================================ -->
-  <section style="background: #FFFFFF; position: relative; z-index: 9999; padding: 3rem 2rem; margin: 3rem 0;">
-    <div class="schedule-section" style="max-width: 1200px; margin: 0 auto; padding: 2.5rem 2rem 2rem; background: #FAFAFA; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
-      <h2 style="font-size: 3rem; text-align: center; margin-bottom: 0.25rem; color: #2C2C2C; letter-spacing: 2px;">SOLD OUT! Shows</h2>
-      <p style="font-family: 'Inter', sans-serif; text-align: center; font-size: 1.1rem; color: #666; margin-bottom: 2.5rem; font-weight: 400; padding-bottom: 1.5rem; border-bottom: 2px solid #E0E0E0;">Tickets Still Available</p>
-      <!-- Schedule loaded from shows.xml via JavaScript -->
+  <section class="schedule-wrapper">
+    <div class="schedule-section">
+      <h2>SOLD OUT! Shows</h2>
+      <p>Tickets Still Available</p>
       <div id="schedule-container"></div>
     </div>
   </section>
 
-  <section class="hero" style="padding-top: 0;">
+  <!-- ================================================
+       ADDITIONAL SECTIONS
+       ================================================ -->
+  <section class="content-sections">
 
     <!-- ================================================
          FAKE REVIEWS SECTION - Humorous video testimonials
@@ -216,29 +233,6 @@
       </div>
     </section>
 
-    <!-- ================================================
-         CTA SECTION - Comic burst with animated tagline
-         ================================================ -->
-    <div class="cta-section">
-      <div class="burst-wrap">
-        <!-- SVG comic burst shape with drop shadow -->
-        <svg class="burst-svg" viewBox="0 0 1200 600" role="img" aria-label="Comic burst">
-          <defs>
-            <filter id="comicShadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="12" dy="12" stdDeviation="4" flood-color="#000" flood-opacity="0.4"/>
-            </filter>
-          </defs>
-          <path d="M600 40  690 120 820 60 770 170 1080 210 820 250
-                   1140 340 780 330 910 520 640 400 600 560 560 400
-                   290 520 420 330 60 340 380 250 120 210 430 170
-                   380 60 510 120 Z"
-                fill="#FFD93D" stroke="#2C2C2C" stroke-width="24" stroke-linejoin="round"
-                filter="url(#comicShadow)"/>
-        </svg>
-        <!-- Overlaid tagline text with pulse animation -->
-        <div class="tagline">SELL OUT WITH US.</div>
-      </div>
-    </div>
   </section>
 
   <!-- ================================================
@@ -265,12 +259,36 @@
   </section> -->
 
   <!-- ================================================
-       FOOTER - Social links and copyright
+       FOOTER - Movie Poster Credits Style
        ================================================ -->
   <footer id="contact">
     <div class="footer-content">
-      <!-- Social media icon grid with random rotations applied via JS -->
-      <div class="social-links">
+
+      <!-- Left side: Burst graphic -->
+      <div class="footer-left">
+        <div class="burst-wrap-footer">
+          <svg class="burst-svg-footer" viewBox="0 0 1200 600" role="img" aria-label="Comic burst">
+            <defs>
+              <filter id="comicShadowFooter" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="8" dy="8" stdDeviation="3" flood-color="#000" flood-opacity="0.4"/>
+              </filter>
+            </defs>
+            <path d="M600 40  690 120 820 60 770 170 1080 210 820 250
+                     1140 340 780 330 910 520 640 400 600 560 560 400
+                     290 520 420 330 60 340 380 250 120 210 430 170
+                     380 60 510 120 Z"
+                  fill="#FFD93D" stroke="#2C2C2C" stroke-width="20" stroke-linejoin="round"
+                  filter="url(#comicShadowFooter)"/>
+          </svg>
+          <div class="tagline-footer">SELL OUT<br>WITH US.</div>
+        </div>
+      </div>
+
+      <!-- Right side: Social links and credits -->
+      <div class="footer-right">
+        <div class="credits-title">FOLLOW THE SHOW</div>
+
+        <div class="social-links">
         <a href="https://www.instagram.com/soldout.comedy" class="social-link" title="Instagram">
           <img src="web/images/instagram_logo.svg" alt="Instagram" style="width: 70%; height: 70%; object-fit: contain;">
         </a>
@@ -307,24 +325,18 @@
           </svg>
         </a>
       </div>
-      <div class="copyright">
-        <p>&copy; 2025 SOLD OUT! Comedy</p>
+
       </div>
+
     </div>
   </footer>
 
-  <!-- ================================================
-       SECONDARY FOOTER - Legal/informational links
-       ================================================ -->
-  <footer class="boring-footer">
-    <div class="boring-footer-content">
-      <a href="https://backstage.soldoutcomedy.com">BACKSTAGE</a>
-      <span class="separator">|</span>
-      <a href="https://help.whatnot.com/hc/en-us/articles/360061224972-Prohibited-or-Restricted-Items-on-Whatnot" target="_blank" rel="noopener noreferrer">PROHIBITED ITEMS</a>
-      <span class="separator">|</span>
-      <a href="https://news.uchicago.edu/explainer/improv-explained" target="_blank" rel="noopener noreferrer">IMPROV EXPLAINED</a>
-    </div>
-  </footer>
+  <!-- Bottom border section -->
+  <div class="footer-bottom">
+    <a href="https://backstage.soldoutcomedy.com" class="backstage-link-bottom">BACKSTAGE ACCESS</a>
+    <span class="footer-separator">•</span>
+    <span class="footer-copyright">&copy; 2025 SOLD OUT! COMEDY</span>
+  </div>
 
   <!-- ================================================
        IMAGE LIGHTBOX - Full-screen image viewer
