@@ -1,18 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <shows>
-  <show type="stage">
-    <datetime>2025-10-16T01:00:00Z</datetime>
-    <datetimeend>2025-10-16T03:00:00Z</datetimeend>
-    <appraisal>2025-10-16T00:00:00Z - 2025-10-16T00:45:00Z</appraisal>
-    <theme>Live Studio Audience</theme>
-    <venue>Location TBD</venue>
-    <location>New Orleans, LA</location>
-    <address>Location TBD</address>
-    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <icon>web/images/soldoutlogo.png</icon>
-    <verified>no</verified>
-  </show>
-  <!-- <show type="screen">
+  <show type="screen">
     <datetime>2025-11-09T04:30:00Z</datetime>
     <datetimeend>2025-11-09T05:30:00Z</datetimeend>
     <platform>Whatnot</platform>
@@ -21,8 +9,8 @@
     <location>Online Only</location>
     <watch>https://www.whatnot.com/live/922fcb2d-a32e-4bb7-96a0-dbcd9382c380?app=web&amp;sharing_channel=copyLink&amp;invitedBy=soldoutcomedy&amp;sender_id=24510767</watch>
     <icon>web/images/brain-that-wouldnt-die.png</icon>
-    <verified>yes</verified>
-  </show> -->
+    <verified>no</verified>
+  </show>
   <show type="stage">
     <datetime>2023-11-06T01:00:00Z</datetime>
     <datetimeend>2023-11-06T03:00:00Z</datetimeend>
@@ -46,7 +34,7 @@
     <icon>web/images/tech_rehearsal.png</icon>
     <verified>yes</verified>
   </show>
-  <!-- <show type="stage">
+  <show type="stage">
     <datetime>2025-12-05T01:00:00Z</datetime>
     <datetimeend>2025-12-05T03:00:00Z</datetimeend>
     <appraisal>2025-12-05T00:00:00Z - 2025-12-05T00:45:00Z</appraisal>
@@ -56,46 +44,14 @@
     <address>Location TBD</address>
     <watch>https://www.whatnot.com/live/57150856-a002-4665-880c-18ca1382dd80</watch>
     <icon>web/images/conman.png</icon>
-    <verified>yes</verified>
-  </show> -->
-  <!-- <show type="screen">
+    <verified>no</verified>
+  </show>
+  <show type="screen">
     <datetime>2025-12-11T01:00:00Z</datetime>
     <datetimeend>2025-12-11T02:00:00Z</datetimeend>
     <appraisal>2025-12-11T00:00:00Z - 2025-12-11T00:45:00Z</appraisal>
     <platform>Whatnot</platform>
     <theme>The Junk in the Trunk Show</theme>
-    <venue>Whatnot App</venue>
-    <location>Online</location>
-    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <icon>web/images/soldoutlogo.png</icon>
-    <verified>no</verified>
-  </show> -->
-  <!-- <show type="stage">
-    <datetime>2025-12-18T01:00:00Z</datetime>
-    <datetimeend>2025-12-18T03:00:00Z</datetimeend>
-    <appraisal>2025-12-18T00:00:00Z - 2025-12-18T00:45:00Z</appraisal>
-    <venue>Location TBD</venue>
-    <location>New Orleans, LA</location>
-    <address>Location TBD</address>
-    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <icon>web/images/soldoutlogo.png</icon>
-    <verified>no</verified>
-  </show> -->
-  <!-- <show type="screen">
-    <datetime>2026-01-08T01:00:00Z</datetime>
-    <datetimeend>2026-01-08T02:00:00Z</datetimeend>
-    <appraisal>2026-01-08T00:00:00Z - 2026-01-08T00:45:00Z</appraisal>
-    <platform>Whatnot</platform>
-    <venue>Whatnot App</venue>
-    <location>Online Only</location>
-    <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <icon>web/images/soldoutlogo.png</icon>
-    <verified>no</verified>
-  </show> -->
-  <show type="screen">
-    <datetime>2024-02-05T01:00:00Z</datetime>
-    <datetimeend>2024-02-05T02:00:00Z</datetimeend>
-    <appraisal>2024-02-05T00:00:00Z - 2024-02-05T00:45:00Z</appraisal>
     <venue>Whatnot App</venue>
     <location>Online</location>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
