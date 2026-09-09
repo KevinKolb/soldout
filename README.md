@@ -1,6 +1,6 @@
 # SOLD OUT! Comedy
 
-The website for SOLD OUT! Comedy — live comedy meets live shopping.
+The website for SOLD OUT! Comedy: live comedy meets live shopping.
 
 Static site hosted on GitHub Pages at [www.soldoutcomedy.com](https://www.soldoutcomedy.com),
 deployed automatically from `main` by [.github/workflows/deploy.yml](.github/workflows/deploy.yml).
@@ -35,7 +35,7 @@ file for you to download and commit.
 
 ## Local development
 
-The pages fetch XML over HTTP, so `file://` will not work — serve the folder instead:
+The pages fetch XML over HTTP, so `file://` will not work. Serve the folder instead:
 
 ```sh
 python -m http.server 8080
@@ -58,7 +58,7 @@ Airtable and EmailJS credentials. The deploy workflow substitutes them from GitH
 secrets, so the real keys are never committed. The build fails if a secret is missing or a
 placeholder survives substitution.
 
-Never replace a placeholder with a real value in a committed file — these pages are served
+Never replace a placeholder with a real value in a committed file. These pages are served
 as plain static HTML, so anything hardcoded there is readable by every visitor.
 
 Required secrets:

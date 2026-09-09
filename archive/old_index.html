@@ -129,7 +129,7 @@
           <ul class="themes-list">
             <li>Arrive up to 1 hour before showtime with your item in an unsealed, mail-ready box</li>
             <li>Set your net price (what you take home) with our Appraiser</li>
-            <li>Comedians use your items as props in improv scenes—you never know when or if they'll pop up</li>
+            <li>Comedians use your items as props in improv scenes. You never know when or if they'll pop up</li>
             <li>If it doesn't appear in a scene, it gets auctioned in the Lightning Round</li>
             <li>If it sells, you get paid your net price via Venmo within 3 days</li>
             <li>If it doesn't sell, take it home after the show</li>
@@ -356,7 +356,7 @@
       </div>
       <div class="modal-body">
         <h3>How It Works</h3>
-        <p><strong>Auction Format:</strong> Your item will be auctioned during a SOLD OUT! Comedy Show in a format determined by our production team. Think of it as consignment theater—we provide the audience and entertainment, you provide the props!</p>
+        <p><strong>Auction Format:</strong> Your item will be auctioned during a SOLD OUT! Comedy Show in a format determined by our production team. Think of it as consignment theater: we provide the audience and entertainment, you provide the props!</p>
 
         <h3>Pricing & Payment</h3>
         <ul>
@@ -391,7 +391,7 @@
         <h3>Important Terms</h3>
         <ul>
           <li><strong>Condition:</strong> You warrant the item is as described and you have clear title to sell</li>
-          <li><strong>Final Sales:</strong> All sales are final—no returns or refunds permitted. No takesy backsies!</li>
+          <li><strong>Final Sales:</strong> All sales are final. No returns or refunds permitted. No takesy backsies!</li>
           <li><strong>Liability:</strong> You release SOLD OUT! Comedy from any liability related to your item, its sale, or your participation</li>
           <li><strong>Promotion:</strong> You grant permission to photograph and promote the item across all media platforms</li>
         </ul>
@@ -517,7 +517,7 @@ async function loadRandomTagline() {
 
   // Check if running from file:// protocol (won't work due to CORS)
   if (location.protocol === 'file:') {
-    status('Cannot load taglines.xml over file:// — run a local server (e.g., "npx serve").');
+    status('Cannot load taglines.xml over file:// - run a local server (e.g., "npx serve").');
     el.textContent = 'Live Comedy Meets Live Shopping';
     return;
   }
@@ -536,7 +536,7 @@ async function loadRandomTagline() {
 
     // Check for XML parsing errors
     if (parseErr) {
-      status('taglines.xml parser error — check console');
+      status('taglines.xml parser error - check console');
       console.error('[taglines] parsererror:', parseErr.textContent);
       el.textContent = 'Live Comedy Meets Live Shopping';
       return;
@@ -586,7 +586,7 @@ async function loadSchedule() {
 
   // Check if running from file:// protocol
   if (location.protocol === 'file:') {
-    status('Cannot load shows.xml over file:// — run a local server (e.g., "npx serve").');
+    status('Cannot load shows.xml over file:// - run a local server (e.g., "npx serve").');
     container.innerHTML = '<p style="text-align:center;font-weight:600">More Shows Coming Soon</p>';
     return;
   }
@@ -722,7 +722,7 @@ async function loadSchedule() {
     const parseErr = doc.querySelector('parsererror');
 
     if (parseErr) {
-      status('shows.xml parser error — check console');
+      status('shows.xml parser error - check console');
       console.error('[schedule] parsererror:', parseErr.textContent);
       container.innerHTML = '<p style="text-align:center;font-weight:600">Problem parsing <code>shows.xml</code>.</p>';
       return;
@@ -762,7 +762,7 @@ async function loadSchedule() {
       });
 
     if (shows.every(s => !s.start)) {
-      status('All shows failed datetime parsing — see console');
+      status('All shows failed datetime parsing - see console');
       console.table(shows.map(s => ({ datetime: s.datetime, error: s._parseError || null })));
       container.innerHTML = '<p style="text-align:center;font-weight:600;grid-column:1/-1;font-size:1.2rem;">More Shows Coming Soon</p>';
       return;
@@ -1153,7 +1153,7 @@ async function loadRandomVideo() {
 
   // Check if running from file:// protocol
   if (location.protocol === 'file:') {
-    status('Cannot load videos over file:// — run a local server (e.g., "npx serve").');
+    status('Cannot load videos over file:// - run a local server (e.g., "npx serve").');
     return;
   }
 
