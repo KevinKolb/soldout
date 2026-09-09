@@ -20,37 +20,56 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Debug - Check secrets availability
+    - name: Check required secrets are set
       run: |
-        echo "Checking if secrets are available..."
-        echo "AIRTABLE_API_KEY length: ${#AIRTABLE_API_KEY}"
-        echo "AIRTABLE_BASE_ID length: ${#AIRTABLE_BASE_ID}"
-        if [ -z "${{ secrets.AIRTABLE_API_KEY }}" ]; then
-          echo "ERROR: AIRTABLE_API_KEY secret is empty!"
-        else
-          echo "AIRTABLE_API_KEY secret is set"
+        missing=""
+        for name in AIRTABLE_API_KEY AIRTABLE_BASE_ID AIRTABLE_TABLE_NAME \
+                    EMAILJS_SERVICE_ID EMAILJS_TEMPLATE_ID EMAILJS_PUBLIC_KEY; do
+          [ -z "${!name}" ] && missing="$missing $name"
+        done
+        if [ -n "$missing" ]; then
+          echo "Missing repository secrets:$missing"
+          exit 1
         fi
-    
-    - name: Debug - Show file before replacement
+        echo "All six secrets are set."
+      env:
+        AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+        AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
+        AIRTABLE_TABLE_NAME: ${{ secrets.AIRTABLE_TABLE_NAME }}
+        EMAILJS_SERVICE_ID: ${{ secrets.EMAILJS_SERVICE_ID }}
+        EMAILJS_TEMPLATE_ID: ${{ secrets.EMAILJS_TEMPLATE_ID }}
+        EMAILJS_PUBLIC_KEY: ${{ secrets.EMAILJS_PUBLIC_KEY }}
+
+    - name: Inject credentials into show-day pages
       run: |
-        echo "=== BEFORE replacement ==="
-        grep -A 8 "const CONFIG" ./live/input.html || echo "CONFIG not found"
-    
-    - name: Replace environment variables
+        python3 - <<'EOF'
+        import os, pathlib
+        names = ["AIRTABLE_API_KEY", "AIRTABLE_BASE_ID", "AIRTABLE_TABLE_NAME",
+                 "EMAILJS_SERVICE_ID", "EMAILJS_TEMPLATE_ID", "EMAILJS_PUBLIC_KEY"]
+        for target in ["live/input.html", "live/prop.html"]:
+            p = pathlib.Path(target)
+            text = p.read_text(encoding="utf-8")
+            for n in names:
+                text = text.replace("{{%s}}" % n, os.environ[n])
+            p.write_text(text, encoding="utf-8")
+            print(f"injected credentials into {target}")
+        EOF
+      env:
+        AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+        AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
+        AIRTABLE_TABLE_NAME: ${{ secrets.AIRTABLE_TABLE_NAME }}
+        EMAILJS_SERVICE_ID: ${{ secrets.EMAILJS_SERVICE_ID }}
+        EMAILJS_TEMPLATE_ID: ${{ secrets.EMAILJS_TEMPLATE_ID }}
+        EMAILJS_PUBLIC_KEY: ${{ secrets.EMAILJS_PUBLIC_KEY }}
+
+    - name: Verify no placeholders remain
       run: |
-        # Replace placeholders with actual secrets - using different approach
-        sed -i 's/{{AIRTABLE_API_KEY}}/${{ secrets.AIRTABLE_API_KEY }}/g' ./live/input.html
-        sed -i 's/{{AIRTABLE_BASE_ID}}/${{ secrets.AIRTABLE_BASE_ID }}/g' ./live/input.html
-        sed -i 's/{{AIRTABLE_TABLE_NAME}}/${{ secrets.AIRTABLE_TABLE_NAME }}/g' ./live/input.html
-        sed -i 's/{{EMAILJS_SERVICE_ID}}/${{ secrets.EMAILJS_SERVICE_ID }}/g' ./live/input.html
-        sed -i 's/{{EMAILJS_TEMPLATE_ID}}/${{ secrets.EMAILJS_TEMPLATE_ID }}/g' ./live/input.html
-        sed -i 's/{{EMAILJS_PUBLIC_KEY}}/${{ secrets.EMAILJS_PUBLIC_KEY }}/g' ./live/input.html
-    
-    - name: Debug - Show file after replacement
-      run: |
-        echo "=== AFTER replacement ==="
-        grep -A 8 "const CONFIG" ./live/input.html || echo "CONFIG not found"
-    
+        if grep -rn "{{[A-Z_]*}}" ./live/; then
+          echo "Unsubstituted placeholders found above."
+          exit 1
+        fi
+        echo "No placeholders remain."
+
     - name: Setup Pages
       uses: actions/configure-pages@v4
       

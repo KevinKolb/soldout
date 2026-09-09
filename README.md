@@ -53,9 +53,15 @@ Then open <http://localhost:8080/admin/addshows.html>.
 
 ## Deployment secrets
 
-`live/input.html` ships with `{{PLACEHOLDER}}` tokens for its Airtable and EmailJS
-credentials. The deploy workflow substitutes them from GitHub repository secrets, so the
-real keys are never committed:
+`live/input.html` and `live/prop.html` ship with `{{PLACEHOLDER}}` tokens in place of their
+Airtable and EmailJS credentials. The deploy workflow substitutes them from GitHub repository
+secrets, so the real keys are never committed. The build fails if a secret is missing or a
+placeholder survives substitution.
+
+Never replace a placeholder with a real value in a committed file — these pages are served
+as plain static HTML, so anything hardcoded there is readable by every visitor.
+
+Required secrets:
 
 `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID`, `AIRTABLE_TABLE_NAME`,
 `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, `EMAILJS_PUBLIC_KEY`
