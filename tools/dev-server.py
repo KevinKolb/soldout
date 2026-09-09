@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Simple development server for Shows Admin
-Run this script and visit http://localhost:8080/addshows.html
+Run this script and visit http://localhost:8080/admin/addshows.html
 """
 
 import http.server
@@ -30,7 +30,7 @@ class ShowsHandler(http.server.SimpleHTTPRequestHandler):
                     return
 
                 # Write to shows.xml
-                shows_path = Path(__file__).parent.parent / 'web' / 'shows.xml'
+                shows_path = Path(__file__).parent.parent / 'assets' / 'data' / 'shows.xml'
                 with open(shows_path, 'w', encoding='utf-8') as f:
                     f.write(xml_content)
 

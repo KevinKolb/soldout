@@ -8,7 +8,7 @@
     <venue>Whatnot App</venue>
     <location>Online Only</location>
     <watch>https://www.whatnot.com/live/922fcb2d-a32e-4bb7-96a0-dbcd9382c380?app=web&amp;sharing_channel=copyLink&amp;invitedBy=soldoutcomedy&amp;sender_id=24510767</watch>
-    <icon>web/images/brain-that-wouldnt-die.png</icon>
+    <icon>/assets/images/brain-that-wouldnt-die.png</icon>
     <verified>no</verified>
   </show>
   <show type="stage">
@@ -20,7 +20,7 @@
     <location>New Orleans, LA</location>
     <address>Location TBD</address>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <icon>web/images/soldoutlogo.png</icon>
+    <icon>/assets/images/soldoutlogo.png</icon>
     <verified>no</verified>
   </show>
   <show type="screen">
@@ -31,7 +31,7 @@
     <venue>Whatnot App</venue>
     <location>Online Only</location>
     <watch>https://www.whatnot.com/live/2122efaa-87ec-402e-afb5-b2cf1588d847</watch>
-    <icon>web/images/tech_rehearsal.png</icon>
+    <icon>/assets/images/tech_rehearsal.png</icon>
     <verified>yes</verified>
   </show>
   <show type="stage">
@@ -43,7 +43,7 @@
     <location>New Orleans, LA</location>
     <address>Location TBD</address>
     <watch>https://www.whatnot.com/live/57150856-a002-4665-880c-18ca1382dd80</watch>
-    <icon>web/images/conman.png</icon>
+    <icon>/assets/images/conman.png</icon>
     <verified>no</verified>
   </show>
   <show type="screen">
@@ -55,7 +55,7 @@
     <venue>Whatnot App</venue>
     <location>Online</location>
     <watch>https://www.whatnot.com/user/soldoutcomedy</watch>
-    <icon>web/images/soldoutlogo.png</icon>
+    <icon>/assets/images/soldoutlogo.png</icon>
     <verified>no</verified>
   </show>
 </shows>

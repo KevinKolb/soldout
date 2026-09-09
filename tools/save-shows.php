@@ -40,7 +40,7 @@ if (!@$doc->loadXML($xmlContent)) {
 $formattedXml = $doc->saveXML();
 
 // Save to file
-$filePath = '../web/shows.xml';
+$filePath = '../assets/data/shows.xml';
 
 if (file_put_contents($filePath, $formattedXml) !== false) {
     echo json_encode(['success' => true, 'message' => 'Shows saved successfully']);

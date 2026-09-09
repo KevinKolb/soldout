@@ -10,8 +10,8 @@
     <!-- Open Graph meta tags for rich link previews -->
     <meta property="og:title" content="Potential Props - SOLD OUT! Comedy">
     <meta property="og:description" content="Let us know what props you might bring to an upcoming show">
-    <meta property="og:image" content="https://soldoutcomedy.com/web/images/soldoutlogo.png">
-    <meta property="og:url" content="https://soldoutcomedy.com/props/input.html">
+    <meta property="og:image" content="https://soldoutcomedy.com/assets/images/soldoutlogo.png">
+    <meta property="og:url" content="https://soldoutcomedy.com/live/input.html">
     <meta property="og:type" content="website">
     
     <style>
@@ -77,7 +77,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <img src="../web/images/soldoutlogo.png" alt="Sold Out Logo" class="header-logo">
+            <img src="../assets/images/soldoutlogo.png" alt="Sold Out Logo" class="header-logo">
             <div class="header-content">
                 <h1>Potential Props</h1>
                 <p>Let us know what props you might bring to an upcoming show!</p>
@@ -171,7 +171,7 @@ let shows = [];
 // Load shows from XML
 async function loadShows() {
     try {
-        const response = await fetch('../web/shows.xml');
+        const response = await fetch('../assets/data/shows.xml');
         const text = await response.text();
         const parser = new DOMParser();
         const xml = parser.parseFromString(text, 'text/xml');

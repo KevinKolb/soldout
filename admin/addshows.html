@@ -246,7 +246,7 @@
 
                     <div class="form-group">
                         <label for="icon">Icon Path</label>
-                        <input type="text" id="icon" name="icon" required placeholder="web/images/filename.png">
+                        <input type="text" id="icon" name="icon" required placeholder="/assets/images/filename.png">
                     </div>
 
                     <div class="form-group">
@@ -277,7 +277,7 @@
         // Load XML file
         async function loadXML() {
             try {
-                const response = await fetch('../web/shows.xml');
+                const response = await fetch('../assets/data/shows.xml');
                 const text = await response.text();
                 const parser = new DOMParser();
                 xmlDoc = parser.parseFromString(text, 'text/xml');
@@ -598,7 +598,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            showStatus('XML downloaded. Replace web/shows.xml with downloaded file.', 'success');
+            showStatus('XML downloaded. Replace assets/data/shows.xml with downloaded file.', 'success');
         }
 
         function showStatus(message, type) {

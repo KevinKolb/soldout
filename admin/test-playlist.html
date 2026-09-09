@@ -120,7 +120,7 @@
   <p style="color: #666; margin-bottom: 2rem;">Testing all videos from musicvids.xml for embedding support.</p>
 
   <div class="video-grid" id="videoGrid">
-    <!-- Videos will be loaded dynamically from web/musicvids.xml -->
+    <!-- Videos will be loaded dynamically from assets/data/musicvids.xml -->
   </div>
 
   <div class="info">
@@ -141,7 +141,7 @@
     // Load and parse XML file
     async function loadMusicVideos() {
       try {
-        const response = await fetch('web/musicvids.xml');
+        const response = await fetch('../assets/data/musicvids.xml');
         const xmlText = await response.text();
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(xmlText, 'text/xml');

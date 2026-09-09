@@ -210,8 +210,8 @@
                 <form id="videoForm">
                     <div class="form-group">
                         <label for="videoPath">Video Path</label>
-                        <input type="text" id="videoPath" name="videoPath" required placeholder="web/videos/1.mp4">
-                        <div class="helper-text">Example: web/videos/1.mp4 or web/videos/myVideo.mp4</div>
+                        <input type="text" id="videoPath" name="videoPath" required placeholder="/assets/videos/1.mp4">
+                        <div class="helper-text">Example: /assets/videos/1.mp4 or /assets/videos/myVideo.mp4</div>
                     </div>
 
                     <div class="button-group">
@@ -234,7 +234,7 @@
         // Load XML file
         async function loadXML() {
             try {
-                const response = await fetch('../web/videos.xml');
+                const response = await fetch('../assets/data/videos.xml');
                 const text = await response.text();
                 const parser = new DOMParser();
                 xmlDoc = parser.parseFromString(text, 'text/xml');
@@ -395,7 +395,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            showStatus('XML downloaded. Replace web/videos.xml with downloaded file.', 'success');
+            showStatus('XML downloaded. Replace assets/data/videos.xml with downloaded file.', 'success');
         }
 
         function showStatus(message, type) {
