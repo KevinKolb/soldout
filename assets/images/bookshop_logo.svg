@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 60" role="img" aria-label="Bookshop.org">
+  <title>Bookshop.org</title>
+  <text x="90" y="30"
+        text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="26"
+        font-weight="bold"
+        fill="#1B1B1B">Bookshop</text>
+  <text x="90" y="50"
+        text-anchor="middle"
+        font-family="Georgia, 'Times New Roman', serif"
+        font-size="20"
+        fill="#D2492A">.org</text>
+</svg>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  GENERATED FILE - do not edit by hand; the next deploy overwrites it.
+  Built by tools/build-inventory.py from the Ambassador table in Airtable,
+  enriched with live title/price/image from the eBay influencer storefront.
+  To change what appears here, use the eBay Ambassador section of
+  admin/crosslist.html.
+-->
+<inventory>
+  <item>
+    <title>Dryer Vent Cleaner Kit Lint Brush Drill Attachment Duct Cleaning Tool Snake 32FT</title>
+    <price>24.99</price>
+    <condition>3 remaining</condition>
+    <url>https://www.ebay.com/itm/336676054781?mkcid=1&amp;mkrid=711-53200-19255-0&amp;siteid=0&amp;campid=5339205855&amp;toolid=80008&amp;mkevt=1</url>
+    <image>https://i.ebayimg.com/images/g/4-0AAeSw8sJqTJbe/s-l800.jpg</image>
+    <status>active</status>
+    <platform>eBay</platform>
+  </item>
+</inventory>

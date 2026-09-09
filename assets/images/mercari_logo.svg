@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48" role="img" aria-label="Mercari">
+  <title>Mercari</title>
+  <text x="80" y="35"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="34"
+        font-weight="bold"
+        fill="#FF0211"
+        letter-spacing="-1">mercari</text>
+</svg>

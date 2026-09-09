@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>SOLD OUT! Comedy</title>
+  <link rel="icon" type="image/png" href="images/soldoutlogo.png">
+  <link rel="apple-touch-icon" href="images/soldoutlogo.png">
+
+  <meta property="og:title" content="SOLD OUT! Comedy">
+  <meta property="og:description" content="Every place you can buy the props, the merch and the beautiful junk we could not stop ourselves from selling.">
+  <meta property="og:image" content="https://soldoutcomedy.com/assets/images/soldoutlogo.png">
+  <meta property="og:url" content="https://soldoutcomedy.com/assets/storefronts.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SOLD OUT! Comedy">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SOLD OUT! Comedy">
+  <meta name="twitter:description" content="Every place you can buy the props, the merch and the beautiful junk we could not stop ourselves from selling.">
+  <meta name="twitter:image" content="https://soldoutcomedy.com/assets/images/soldoutlogo.png">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap">
+  <link rel="stylesheet" href="css/footer.css">
+
+  <style>
+    :root {
+      --comic-red: #FF3B3B;
+      --comic-blue: #4A90E2;
+      --comic-yellow: #FFD93D;
+      --comic-black: #2C2C2C;
+      --comic-white: #FFFFFF;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+      color: var(--comic-black);
+      background-color: var(--comic-yellow);
+      background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px);
+      background-size: 4px 4px;
+    }
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+    .back-link {
+      position: absolute;
+      top: 1.4rem;
+      right: 1.5rem;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--comic-black);
+      text-decoration: none;
+      border-bottom: 2px solid var(--comic-black);
+      padding-bottom: 2px;
+    }
+    .back-link:hover { color: var(--comic-red); border-bottom-color: var(--comic-red); }
+
+    .hero {
+      position: relative;
+      background: var(--comic-white);
+      border: 5px solid var(--comic-black);
+      box-shadow: 10px 10px 0 rgba(0,0,0,0.2);
+      padding: 3rem 2rem;
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .hero-logo {
+      position: absolute;
+      top: 1.1rem;
+      left: 1.25rem;
+      line-height: 0;
+    }
+
+    .hero-logo img { width: clamp(64px, 11vw, 120px); height: auto; display: block; }
+
+    /* Below this the banner is too narrow for the logo to sit beside the
+       headline without colliding, so it goes back into the flow. */
+    @media (max-width: 620px) {
+      .hero { padding-top: 1.5rem; }
+      .hero-logo { position: static; margin: 0 auto 0.75rem; }
+      .hero-logo img { width: 96px; }
+      .back-link { position: static; display: block; margin: 0 auto 1.25rem; width: fit-content; }
+    }
+
+
+    .hero h1 {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(3.6rem, 13vw, 7.5rem);
+      letter-spacing: 3px;
+      color: var(--comic-red);
+      text-shadow: 4px 4px 0 var(--comic-black);
+      margin: 0 0 1rem;
+      line-height: 1;
+    }
+
+    .hero p {
+      font-family: Inter, system-ui, sans-serif;
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--comic-black);
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.4;
+    }
+
+    .hero p.hero-kicker { margin-bottom: 0.2rem; }
+
+    .section-note { font-size: 0.9rem; margin: 0 0 1.5rem; max-width: 640px; }
+
+    section { margin-bottom: 3.5rem; }
+
+    .footer-bottom a { text-decoration: none; }
+
+    .item-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .item-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--comic-white);
+      border: 4px solid var(--comic-black);
+      text-decoration: none;
+      color: var(--comic-black);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .item-card:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 8px 8px 0 var(--comic-black);
+    }
+
+    .item-card .shot {
+      aspect-ratio: 1 / 1;
+      border-bottom: 4px solid var(--comic-black);
+      background: #f6f6f6;
+      overflow: hidden;
+    }
+    .item-card .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .item-card .body { padding: 0.9rem 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.35rem; }
+    .item-card .item-title { font-weight: 700; font-size: 0.95rem; line-height: 1.35; }
+    .item-card .meta { font-size: 0.75rem; color: #666; }
+    .item-card .price {
+      font-family: 'Bangers', cursive;
+      font-size: 1.5rem;
+      letter-spacing: 1px;
+      color: var(--comic-red);
+    }
+
+    .item-badge {
+      align-self: flex-start;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border: 2px solid var(--comic-black);
+      background: var(--comic-yellow);
+      padding: 2px 7px;
+    }
+
+    .item-card.sold { opacity: 0.55; }
+    .item-card.sold .item-badge { background: var(--comic-black); color: #fff; }
+    .item-card.sold .price { color: #888; text-decoration: line-through; }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hero">
+    <a href="../index.html" class="hero-logo">
+      <img src="images/soldoutlogo.png" alt="SOLD OUT! Comedy">
+    </a>
+    <a href="../index.html" class="back-link">Back to the show</a>
+    <p class="hero-kicker">Nothing on this page is</p>
+    <h1>Sold Out!</h1>
+    <p>We know. It's confusing.</p>
+  </div>
+
+  <section id="listings">
+    <div class="item-grid" id="itemGrid">
+      <p class="section-note" id="itemsStatus">Loading items...</p>
+    </div>
+  </section>
+</div>
+
+<div id="site-footer" data-footer="minimal">
+<!-- footer:start -->
+<!-- generated from assets/footer.html - do not edit here -->
+<footer id="contact" class="footer-minimal">
+  <div class="social-links">
+        <a href="https://www.instagram.com/soldout.comedy" class="social-link" title="Instagram">
+          <img src="/assets/images/instagram_logo.svg" alt="Instagram" style="width: 70%; height: 70%; object-fit: contain;">
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Facebook">
+          <img src="/assets/images/facebook_logo.png" alt="Facebook" style="width: 70%; height: 70%; object-fit: contain;">
+        </a>
+        <a href="https://x.com/soldoutcomedy" class="social-link" title="X">
+          <img src="/assets/images/x_logo.png" alt="X" style="width: 60%; height: 60%; object-fit: contain; filter: invert(1);">
+        </a>
+        <a href="https://www.youtube.com/@SOLDOUTComedy" class="social-link" title="YouTube">
+          <img src="/assets/images/yt_logo.png" alt="YouTube" style="width: 60%; height: 60%; object-fit: contain;">
+        </a>
+        <a href="https://www.tiktok.com/@sold.out.comedy" class="social-link" title="TikTok">
+          <img src="/assets/images/tiktok_logo.png" alt="TikTok" style="width: 60%; height: 60%; object-fit: contain;">
+        </a>
+        <a href="https://soldoutcomedy.bsky.social" class="social-link" title="Blue Sky">
+          <img src="/assets/images/Bluesky_Logo.svg" alt="Blue Sky" style="width: 70%; height: 70%; object-fit: contain;">
+        </a>
+        <a href="https://www.threads.com/@soldout.comedy?hl=en" class="social-link" title="Threads">
+          <img src="/assets/images/threads_logo.png" alt="Threads" style="width: 70%; height: 70%; object-fit: contain;">
+        </a>
+        <a href="https://www.reddit.com/user/SOLDOUTComedy/submitted/" class="social-link" title="Reddit">
+          <svg viewBox="0 0 24 24" style="width: 70%; height: 70%;" fill="#FF4500">
+            <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+          </svg>
+        </a>
+      </div>
+</footer>
+
+<div class="footer-bottom">
+  <a href="https://backstage.soldoutcomedy.com" class="backstage-link-bottom">BACKSTAGE ACCESS</a>
+  <span class="footer-separator">•</span>
+  <span class="footer-copyright">&copy; 2025 SOLD OUT! COMEDY</span>
+</div>
+
+<script>
+/* Footer behaviour. Inlined into each page with the markup above by
+   tools/build-footer.py, so it needs no separate request and cannot go stale
+   against the markup it drives. */
+(function () {
+  var toggle = document.getElementById('shopToggle');
+  var list = document.getElementById('shopList');
+  if (toggle && list) {
+    toggle.addEventListener('click', function () {
+      var open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      list.hidden = open;
+    });
+  }
+  /* Comic-book wobble on the social icons. */
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.social-link'),
+    function (link) {
+      link.style.transform = 'rotate(' + ((Math.random() - 0.5) * 30) + 'deg)';
+    }
+  );
+})();
+</script>
+<!-- footer:end -->
+</div>
+
+<script>
+const text = (node, tag) => (node.querySelector(tag)?.textContent || '').trim();
+
+async function loadInventory() {
+  const grid = document.getElementById('itemGrid');
+  const note = document.getElementById('itemsStatus');
+
+  if (location.protocol === 'file:') {
+    note.textContent = 'Item list needs a web server; open this page over http rather than from disk.';
+    return;
+  }
+
+  let items;
+  try {
+    const res = await fetch('data/inventory.xml', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const doc = new DOMParser().parseFromString(await res.text(), 'text/xml');
+    if (doc.querySelector('parsererror')) throw new Error('inventory.xml is not valid XML');
+    items = [...doc.querySelectorAll('item')];
+  } catch (err) {
+    note.textContent = 'Could not load the item list right now.';
+    console.warn('[shop] inventory load failed:', err);
+    return;
+  }
+
+  if (!items.length) {
+    note.textContent = 'Nothing listed at the moment. Check the storefronts above.';
+    return;
+  }
+
+  grid.innerHTML = '';
+  for (const it of items) {
+    const sold = text(it, 'status').toLowerCase() === 'sold';
+    const price = text(it, 'price');
+
+    const card = document.createElement('a');
+    card.className = 'item-card' + (sold ? ' sold' : '');
+    card.href = text(it, 'url');
+    card.target = '_blank';
+    card.rel = 'noopener';
+
+    const shot = document.createElement('div');
+    shot.className = 'shot';
+    const img = document.createElement('img');
+    img.src = text(it, 'image') || '/assets/images/soldoutlogo.png';
+    img.alt = text(it, 'title');
+    img.loading = 'lazy';
+    shot.appendChild(img);
+
+    const body = document.createElement('div');
+    body.className = 'body';
+
+    const badge = document.createElement('span');
+    badge.className = 'item-badge';
+    badge.textContent = sold ? 'Sold' : (text(it, 'platform') || 'For sale');
+
+    const title = document.createElement('div');
+    title.className = 'item-title';
+    title.textContent = text(it, 'title');
+
+    const priceEl = document.createElement('div');
+    priceEl.className = 'price';
+    priceEl.textContent = price ? '$' + price : 'See listing';
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = [text(it, 'condition'), text(it, 'platform')].filter(Boolean).join(' • ');
+
+    body.append(badge, title, priceEl, meta);
+    card.append(shot, body);
+    grid.appendChild(card);
+  }
+}
+
+loadInventory();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,366 @@
+/* ==========================================================================
+   Footer - movie poster credits style
+   Extracted from style.css. Depends on the Bangers and Inter web fonts.
+   The palette variables are redeclared here so this file also works on its
+   own; the values match style.css, so loading both is harmless.
+   ========================================================================== */
+
+:root {
+  --comic-red: #FF3B3B;
+  --comic-yellow: #FFD93D;
+  --comic-black: #2C2C2C;
+}
+
+/* === FOOTER === */
+/* === FOOTER - MOVIE POSTER CREDITS STYLE === */
+footer {
+  background: #0a0a0a;
+  color: #d4d4d4;
+  padding: 4rem 2rem 3rem;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid #333;
+}
+
+footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    linear-gradient(180deg,
+      rgba(0,0,0,0) 0%,
+      rgba(0,0,0,0.3) 50%,
+      rgba(0,0,0,0.6) 100%
+    );
+  pointer-events: none;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+}
+
+.footer-left {
+  flex: 0 0 25%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.footer-right {
+  flex: 1;
+  text-align: center;
+}
+
+.burst-wrap-footer {
+  position: relative;
+  width: 100%;
+  max-width: 280px;
+  animation: pulseGlowFooter 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlowFooter {
+  0%, 100% {
+    transform: scale(1) rotate(-8deg);
+    filter: drop-shadow(8px 8px 0 rgba(0,0,0,.3));
+  }
+  50% {
+    transform: scale(1.02) rotate(-8deg);
+    filter: drop-shadow(10px 10px 0 rgba(0,0,0,.4));
+  }
+}
+
+.burst-svg-footer {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.tagline-footer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Bangers', cursive;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
+  color: var(--comic-red);
+  text-shadow: 3px 3px 0 var(--comic-black);
+  text-align: center;
+  letter-spacing: 3px;
+  line-height: 1.1;
+  transform: rotate(-2deg);
+  pointer-events: none;
+  animation: taglinePulseFooter 3s ease-in-out infinite;
+}
+
+@keyframes taglinePulseFooter {
+  0%, 100% {
+    transform: rotate(-2deg) scale(1);
+  }
+  50% {
+    transform: rotate(-2deg) scale(1.03);
+  }
+}
+
+.credits-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.5rem;
+  letter-spacing: 4px;
+  color: var(--comic-yellow);
+  margin-bottom: 2rem;
+  text-transform: uppercase;
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  text-decoration: none;
+  background: white;
+  border: 2px solid rgba(255,255,255,0.3);
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  position: relative;
+}
+
+.social-link:hover {
+  background: var(--comic-yellow);
+  border-color: var(--comic-yellow);
+  transform: scale(1.1);
+}
+
+/* Credits block - movie poster style */
+.credits-block {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.credits-line {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #888;
+  margin: 0.75rem 0;
+  line-height: 1.8;
+}
+
+.credits-copyright {
+  font-weight: 700;
+  color: #aaa;
+  margin-top: 1.5rem;
+}
+
+.credits-tagline {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: #666;
+  letter-spacing: 1px;
+  margin-top: 1rem;
+}
+
+.backstage-link {
+  color: var(--comic-yellow);
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: 3px;
+  transition: all 0.2s;
+  display: inline-block;
+  padding: 0.5rem 0;
+}
+
+.backstage-link:hover {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,217,61,0.5);
+}
+
+/* Footer bottom bar - black on white */
+.footer-bottom {
+  background: white;
+  color: var(--comic-black);
+  text-align: center;
+  padding: 0.75rem 2rem;
+  margin-top: 3rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.backstage-link-bottom {
+  color: var(--comic-black);
+  text-decoration: none;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+
+.backstage-link-bottom:hover {
+  color: var(--comic-red);
+}
+
+.footer-separator {
+  margin: 0 0.75rem;
+  opacity: 0.5;
+}
+
+.footer-copyright {
+  font-weight: 400;
+}
+
+/* Footer mobile responsive */
+@media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .footer-left {
+    flex: 1 1 auto;
+  }
+
+  .burst-wrap-footer {
+    max-width: 200px;
+  }
+
+  .tagline-footer {
+    font-size: 1.5rem;
+  }
+
+  .credits-title {
+    font-size: 1.2rem;
+  }
+}
+
+/* Social icons enlarge on narrow screens */
+@media (max-width: 768px) {
+  .social-links {
+    gap: 1rem;
+  }
+
+  .social-link {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* ==========================================================================
+   Storefront menu
+   Collapses the marketplace links so the social row stays scannable.
+   ========================================================================== */
+
+.shop-menu {
+  margin-top: 2.5rem;
+  position: relative;
+}
+
+.shop-toggle {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--comic-yellow);
+  background: transparent;
+  border: 2px solid var(--comic-yellow);
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.shop-toggle:hover,
+.shop-toggle[aria-expanded="true"] {
+  background: var(--comic-yellow);
+  color: var(--comic-black);
+}
+
+.shop-caret {
+  display: inline-block;
+  margin-left: 0.5rem;
+  transition: transform 0.2s;
+}
+
+.shop-toggle[aria-expanded="true"] .shop-caret {
+  transform: rotate(180deg);
+}
+
+.shop-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem;
+  max-width: 720px;
+  margin: 1.25rem auto 0;
+  text-align: left;
+}
+
+.shop-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  text-decoration: none;
+  color: #d4d4d4;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.03);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.shop-item:hover {
+  border-color: var(--comic-yellow);
+  color: #fff;
+  background: rgba(255, 217, 61, 0.08);
+}
+
+.shop-item img {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 50%;
+  padding: 4px;
+}
+
+@media (max-width: 768px) {
+  .shop-list {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+}
+
+/* ==========================================================================
+   Minimal footer
+   Social icons over the white bottom bar, for pages that do not need the
+   full credits block. Built by tools/build-footer.py from the same markup.
+   ========================================================================== */
+
+.footer-minimal {
+  padding: 2.5rem 2rem 2rem;
+}
+
+.footer-minimal::before { display: none; }
+
+.footer-minimal .social-links {
+  margin-bottom: 0;
+}

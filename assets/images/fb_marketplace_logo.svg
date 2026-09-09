@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Facebook Marketplace">
+  <title>Facebook Marketplace</title>
+  <path d="M6 8h36l4 12a6 6 0 0 1-11.5 3A6 6 0 0 1 24 23a6 6 0 0 1-10.5 0A6 6 0 0 1 2 20z" fill="#1877F2"/>
+  <path d="M8 24v16h32V24" fill="none" stroke="#1877F2" stroke-width="4" stroke-linejoin="round"/>
+  <rect x="19" y="29" width="10" height="11" fill="#1877F2"/>
+</svg>

@@ -3,6 +3,11 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+  # Rebuild without a push, so curating on eBay or adding an Airtable row
+  # reaches the site on its own.
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -69,6 +74,22 @@ jobs:
           exit 1
         fi
         echo "No placeholders remain."
+
+    # Rebuilds the shop listings from the Ambassador table, enriched with live
+    # title/price/image from the eBay storefront. Deliberately not a hard failure:
+    # if either source is unreachable the committed inventory.xml still ships, so
+    # the shop goes slightly stale rather than blank.
+    - name: Build shop inventory
+      continue-on-error: true
+      env:
+        AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
+        AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
+      run: python3 tools/build-inventory.py
+
+    # Re-inlines assets/footer.html into every page carrying the markers, so a
+    # footer edit cannot ship half-applied if someone forgot to run it locally.
+    - name: Inline shared footer
+      run: python3 tools/build-footer.py
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
