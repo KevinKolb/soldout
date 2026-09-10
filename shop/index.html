@@ -675,17 +675,11 @@ async function loadInventory() {
     return;
   }
 
+  /* The order is the file's own, which the build writes in position order - and
+     position is what dragging a prop or a tab rewrites. It used to sort by price here,
+     but a grid cannot be both sorted and arranged: the sort would have undone every
+     drag on the next load. */
   rankTabs(items.map(it => text(it, 'tab_tag')).filter(Boolean));
-
-  /* Cheapest first. A missing price sorts last rather than as zero, so an item
-     the build could not put a price on does not lead the grid. */
-  items.sort((a, b) => {
-    const pa = parseFloat(text(a, 'price'));
-    const pb = parseFloat(text(b, 'price'));
-    const na = Number.isFinite(pa), nb = Number.isFinite(pb);
-    if (na !== nb) return na ? -1 : 1;
-    return na ? pa - pb : 0;
-  });
 
   allItems = items;
   allTabs = tabsFrom(items);
@@ -790,8 +784,20 @@ async function applyLive() {
   const byKey = new Map(rows.map(r => [itemKey(r.item_url), r]));
   let changed = false;
 
-  /* The rows arrive in position order, so their tab_tags in that order are the tab
-     order - including a drag saved a moment ago, with no build in between. */
+  /* The rows arrive in position order, so that is the prop order too - including a
+     drag saved a moment ago, with no build in between. Anything the rows do not
+     mention keeps its place at the end. */
+  const slot = new Map(rows.map((r, i) => [itemKey(r.item_url), i]));
+  const place = it => {
+    const at = slot.get(itemKey(text(it, 'url')));
+    return at === undefined ? Number.MAX_SAFE_INTEGER : at;
+  };
+  const wanted = [...allItems].sort((a, b) => place(a) - place(b));
+  if (wanted.some((it, i) => it !== allItems[i])) {
+    allItems = wanted;
+    changed = true;
+  }
+
   const ranked = rows.map(r => (r.tab_tag || '')).filter(Boolean);
   const before = [...tabRank.keys()].join('\u0000');
   rankTabs(ranked);

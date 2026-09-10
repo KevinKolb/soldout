@@ -315,6 +315,9 @@ function injectStyles() {
     .tab[draggable="true"]:active { cursor: grabbing; }
     .tab.dragging { opacity: 0.4; }
 
+    .item-card[draggable="true"] { cursor: grab; }
+    .item-card.dragging { opacity: 0.4; }
+
     .tab-x {
       position: absolute;
       top: -7px;
@@ -1065,9 +1068,86 @@ async function start(u) {
     if (typeof buildTabs === 'function') buildTabs();
     buildBar();
     decorate();
+    makeCardsDraggable();
     ghostTab();
     tabDeleters();
     makeTabsDraggable();
+}
+
+/* ---------- dragging props into order ----------
+   The props on screen swap positions among themselves and nothing else moves. The slots
+   are the positions those same props already occupy, sorted - so dragging inside one tab
+   cannot disturb a prop in another, and the tab order, read off the same numbers, only
+   changes if a prop actually crossed a tab boundary. */
+let draggingCard = null;
+
+async function persistPropOrder() {
+    const grid = document.getElementById('itemGrid');
+    if (!grid) return;
+
+    const cards = [...grid.querySelectorAll('.item-card')].filter(c => c._row);
+    if (cards.length < 2) return;
+
+    const slots = cards.map(c => Number(c._row.position) || 0).sort((a, b) => a - b);
+    /* A tab drag parks a whole tab on one number, so the slots can arrive equal.
+       Spreading them stops the new order collapsing straight back into a tie. */
+    for (let i = 1; i < slots.length; i++) {
+        if (slots[i] <= slots[i - 1]) slots[i] = slots[i - 1] + 5;
+    }
+
+    for (let i = 0; i < cards.length; i++) {
+        const row = cards[i]._row;
+        if (Number(row.position) === slots[i]) continue;
+        const { error } = await commit(row, 'position', slots[i]);
+        if (error) {
+            panelSay('Could not save the order: ' + error.message);
+            return;
+        }
+    }
+
+    await loadRows();
+    if (typeof applyLive === 'function') await applyLive();
+    panelSay('Order saved.');
+}
+
+function makeCardsDraggable() {
+    const grid = document.getElementById('itemGrid');
+    if (!grid || document.body.classList.contains('viewing-public')) return;
+
+    for (const card of grid.querySelectorAll('.item-card')) {
+        if (card.dataset.drag) continue;
+        card.dataset.drag = '1';
+        card.draggable = true;
+
+        card.addEventListener('dragstart', e => {
+            /* A drag that starts in a field is the browser moving text, not the prop. */
+            const tag = (e.target.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'textarea' || tag === 'select') {
+                e.preventDefault();
+                return;
+            }
+            draggingCard = card;
+            card.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', cardUrl(card));
+        });
+
+        card.addEventListener('dragend', async () => {
+            card.classList.remove('dragging');
+            draggingCard = null;
+            await persistPropOrder();
+        });
+
+        card.addEventListener('dragover', e => {
+            if (!draggingCard || draggingCard === card) return;
+            e.preventDefault();
+            const box = card.getBoundingClientRect();
+            /* A grid, so before means above, or left of on the same row. */
+            const before = e.clientY < box.top + box.height / 2
+                || (e.clientY < box.bottom && e.clientX < box.left + box.width / 2);
+            grid.insertBefore(draggingCard, before ? card : card.nextSibling);
+        });
+    }
 }
 
 /* ---------- dragging tabs into order ----------
@@ -1105,20 +1185,31 @@ async function persistTabOrder() {
         .concat(extraTabs.filter(n => !names.includes(n)));
     saveExtraTabs();
 
-    const used = new Set([...rows.values()].map(r => r.tab_tag).filter(Boolean));
-    let slot = 1;
+    /* One block of numbers per tab, and the props inside keep the order they already
+       had. Setting every prop in a tab to the same number would have moved the tab and
+       thrown away the arrangement inside it. */
+    let block = 1;
     for (const name of names) {
-        if (!used.has(name)) continue;
-        const { error } = await supabase.from(TABLE)
-            .update({ position: slot * 10 }).eq('tab_tag', name);
-        if (error) {
-            panelSay('Could not save the tab order: ' + error.message);
-            return;
+        const inTab = [...rows.values()].filter(r => (r.tab_tag || '') === name);
+        if (!inTab.length) continue;
+        inTab.sort((a, b) => (Number(a.position) || 0) - (Number(b.position) || 0));
+
+        let n = 1;
+        for (const row of inTab) {
+            const want = block * 1000 + n * 10;
+            n++;
+            if (Number(row.position) === want) continue;
+            const { error } = await commit(row, 'position', want);
+            if (error) {
+                panelSay('Could not save the tab order: ' + error.message);
+                return;
+            }
         }
-        slot++;
+        block++;
     }
 
     await loadRows();
+    if (typeof applyLive === 'function') await applyLive();
     panelSay('Tab order saved.');
 }
 
@@ -1278,6 +1369,7 @@ function ghostTab() {
 document.addEventListener('shop:rendered', () => {
     if (isOwner(user)) {
         decorate();
+        makeCardsDraggable();
         ghostTab();
         tabDeleters();
         makeTabsDraggable();
