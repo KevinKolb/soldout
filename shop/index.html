@@ -301,9 +301,23 @@
       border-radius: 11px;
       transform: rotate(-1.5deg);
       transform-origin: left center;
+      transition: transform 0.1s linear, filter 0.1s linear;
       clip-path: polygon(0 30%, 16px 0, 100% 0, 100% 100%, 16px 100%, 0 70%);
       filter: drop-shadow(3px 3px 0 var(--ink));
     }
+
+    /* The card lifts on hover; the tag and the chips lift with it rather than sitting
+       still while the thing under them moves. The tag grows from its left edge, so the
+       hole stays put and the price swings out - and its shadow deepens by the same 4px
+       the card's does, so the two read as one movement. */
+    .item-card:hover .price,
+    .item-card:focus-visible .price {
+      transform: rotate(-1.5deg) scale(1.07);
+      filter: drop-shadow(5px 5px 0 var(--ink));
+    }
+
+    .item-card:hover .tag,
+    .item-card:focus-visible .tag { transform: scale(1.06); }
 
     .price-face {
       display: block;
@@ -378,6 +392,8 @@
     .tags { display: flex; flex-wrap: wrap; gap: 4px; }
 
     .tag {
+      transform-origin: left center;
+      transition: transform 0.1s linear;
       font-family: var(--mono);
       font-size: 0.5rem;
       font-weight: 700;
