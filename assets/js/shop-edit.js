@@ -761,6 +761,57 @@ function cyclingTag(el, row, field, values) {
     paint();
 }
 
+/* The headline is the caption when there is one, so it is also where the caption is
+   written. Clicking it opens a box in the card rather than sending the eye to a field
+   below the fold of the tile. Clearing it and saving hands the headline back to the
+   marketplace's own title. */
+function inlineCaption(el, row, pulled) {
+    el.classList.add('cap-edit');
+    el.title = 'Click to write what we call it';
+
+    el.addEventListener('click', e => {
+        if (editingOff()) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (el.dataset.editing) return;
+        el.dataset.editing = '1';
+
+        const was = row.blurb || '';
+        const box = document.createElement('textarea');
+        box.className = 'title-input';
+        box.value = was;
+        box.placeholder = pulled;
+        el.textContent = '';
+        el.appendChild(box);
+        box.focus();
+        box.setSelectionRange(box.value.length, box.value.length);
+
+        let done = false;
+        const finish = async keep => {
+            if (done) return;
+            done = true;
+            delete el.dataset.editing;
+            const value = box.value.trim();
+
+            if (!keep || value === was) {
+                el.textContent = was || pulled;
+                return;
+            }
+            el.textContent = value || pulled;
+            if (!await saveTag(el, row, 'blurb', value)) el.textContent = was || pulled;
+        };
+
+        box.addEventListener('blur', () => finish(true));
+        box.addEventListener('keydown', ev => {
+            /* Enter commits, shift+Enter breaks the line - the caption is short enough
+               that committing is the far commoner intent. */
+            if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); box.blur(); }
+            if (ev.key === 'Escape') { ev.preventDefault(); finish(false); }
+        });
+        box.addEventListener('click', ev => ev.stopPropagation());
+    });
+}
+
 /* ---------- the editor on each card ---------- */
 function decorate() {
     /* Nothing at all in the public preview. Guarding each editor individually left the
