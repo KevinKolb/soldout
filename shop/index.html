@@ -982,14 +982,14 @@ function itemCard(it) {
    actually on the shop right now. A different prop each load, picked from what the
    grid is showing - so it is never naming something a visitor cannot see.
 
-   The marketplace title, never the caption. A caption is a joke about the thing, so
-   the sentence would come out as "trying to buy your You know, because you've lost
-   your mind." The title is the name of the thing, which is what the sentence wants.
+   The marketplace title exactly as it is, never our caption and never trimmed. A
+   caption is a joke about the thing, so the sentence would come out as "trying to buy
+   your You know, because you've lost your mind." And the title's full absurd length is
+   the joke here - BOBBY HEBERT Signed Autographed Auto Atlanta Falcons XL Custom Jersey
+   JSA COA is funny at seventy-seven characters and ordinary at forty.
 
-   eBay titles are written for a search engine: keyword runs, a pipe, then the keywords
-   again. Everything from the first comma or pipe onwards is cut, and what is left is
-   trimmed back to a word boundary if it is still long. If nothing usable turns up, the
-   line keeps the wording that is in the markup. */
+   If nothing turns up - no inventory, every prop hidden - the line keeps the wording
+   that is in the markup. */
 function nameAProp() {
   const el = document.getElementById('seriousProp');
   if (!el || !allItems.length) return;
@@ -997,12 +997,8 @@ function nameAProp() {
   const usable = [];
   for (const it of allItems) {
     if (text(it, 'status').toLowerCase() === 'hidden') continue;
-    let name = text(it, 'title').split('|')[0].split(',')[0].trim();
-    if (name.length > 46) {
-      const cut = name.slice(0, 46);
-      name = cut.slice(0, cut.lastIndexOf(' ')).trim();
-    }
-    if (name.length >= 6) usable.push(name);
+    const name = text(it, 'title').trim();
+    if (name) usable.push(name);
   }
   if (!usable.length) return;
 
