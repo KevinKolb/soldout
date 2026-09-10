@@ -1,11 +1,12 @@
 -- The Socializer's repost queue.
 --
 -- Run this once in the Supabase SQL editor for the SOLD OUT! project.
--- admin/socializer.html reads and writes this table with the project's anon key,
--- and so does the SOC SOCIALIZER BOT routine.
+-- admin/socializer.html reads and writes this table with the project's publishable
+-- key, and so does the SOC SOCIALIZER BOT routine. (That key is what Supabase used to
+-- call the anon key; it still maps to the anon role the policies below name.)
 --
--- The anon key is committed in admin/socializer.html and the page is served from a
--- public site, so treat everything below as reachable by anyone who finds the page.
+-- It is committed in admin/socializer.html and the page is served from a public site,
+-- so treat everything below as reachable by anyone who finds the page.
 -- The policies are written accordingly: read, add and rule on rows, nothing else.
 -- There is deliberately no delete policy, so nothing can be destroyed from a browser.
 

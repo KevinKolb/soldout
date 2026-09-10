@@ -55,14 +55,14 @@ Three things fill the queue, and all three write to the same Supabase table:
 
 ### Storage
 
-The queue lives in Supabase, in a table created by
-[tools/socializer-schema.sql](tools/socializer-schema.sql). Run that once in the project's
-SQL editor, then put the project URL and anon key into the `SUPABASE` block at the top of
-the page's script.
+The queue lives in Supabase, in the table created by
+[tools/socializer-schema.sql](tools/socializer-schema.sql). The project URL and publishable
+key go in the `SUPABASE` block at the top of the page's script.
 
-That anon key is committed on purpose — that is what a Supabase anon key is for. What it may
-do is fixed by the row-level security policies in that SQL file: read the queue, add to the
-queue, change a row's status. It cannot delete anything and it cannot reach any other table.
+That publishable key is committed on purpose — that is what it is for. (Supabase renamed the
+old `anon` key to the publishable key; both still work and both map to the `anon` role the
+policies name.) What it may do is fixed by the row-level security policies in that SQL file:
+read the queue, add to the queue, change a row's status. It cannot delete anything and it cannot reach any other table.
 The page is on a public site, so treat those three abilities as available to anyone who finds
 it; for a repost queue that is the price of nobody having to set anything up. To tighten it,
 put a Supabase login in front of the page and narrow the policies from `anon` to

@@ -93,16 +93,17 @@ have to explain.
 
 ### Getting in
 
-The project URL and the anon key are committed in the `SUPABASE` block near the top of the
-script in [admin/socializer.html](../admin/socializer.html). Read them out of that file — do
-not ask for them and do not hardcode them here, so rotating the key stays a one-file change.
+The project URL and the publishable key are committed in the `SUPABASE` block near the top
+of the script in [admin/socializer.html](../admin/socializer.html). Read them out of that
+file — do not ask for them and do not hardcode them here, so rotating the key stays a
+one-file change.
 
 Every call needs both headers:
 
 ```sh
 curl -s "$SUPABASE_URL/rest/v1/socializer?select=post_key" \
-  -H "apikey: $SUPABASE_ANON_KEY" \
-  -H "Authorization: Bearer $SUPABASE_ANON_KEY"
+  -H "apikey: $SUPABASE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_KEY"
 ```
 
 ### The dedupe key
@@ -129,8 +130,8 @@ re-nominating it would be arguing with them.
 
 ```sh
 curl -s -X POST "$SUPABASE_URL/rest/v1/socializer?on_conflict=post_key" \
-  -H "apikey: $SUPABASE_ANON_KEY" \
-  -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+  -H "apikey: $SUPABASE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_KEY" \
   -H "Content-Type: application/json" \
   -H "Prefer: return=representation,resolution=ignore-duplicates" \
   -d '[ ...rows... ]'

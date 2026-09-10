@@ -267,23 +267,19 @@
 
     <div id="setup" style="display:none">
         <h3>Not connected yet</h3>
-        <ol>
-            <li>In the Supabase project, open the SQL editor and run
-                <code>tools/socializer-schema.sql</code> from this repo. That creates the
-                <code>socializer</code> table and its row-level security policies.</li>
-            <li>Copy the project URL and the <b>anon</b> key from Project Settings &rarr; API.</li>
-            <li>Paste them below to try it right now, then put the same two values into the
-                <code>SUPABASE</code> block at the top of this file's script and commit, so the page
-                works for everyone without this step.</li>
-        </ol>
+        <p style="margin-bottom:16px">Paste the project's <b>publishable key</b>: Supabase &rarr;
+            Project Settings &rarr; API Keys, the one starting <code>sb_publishable_</code>.
+            (Older projects call it the <b>anon</b> key and it starts <code>eyJ</code> &mdash; either works.)
+            Then put it in the <code>SUPABASE</code> block at the top of this file's script and commit,
+            so nobody has to do this again.</p>
         <div class="row">
             <div class="field">
                 <label for="connUrl">Project URL</label>
                 <input type="text" id="connUrl" placeholder="https://xxxxxxxx.supabase.co">
             </div>
             <div class="field">
-                <label for="connKey">Anon key</label>
-                <input type="text" id="connKey" placeholder="eyJ...">
+                <label for="connKey">Publishable key</label>
+                <input type="text" id="connKey" placeholder="sb_publishable_...">
             </div>
         </div>
         <div class="actions">
@@ -472,11 +468,12 @@ window.open(BASE+'#capture='+encodeURIComponent(JSON.stringify(payload)),'_blank
 document.getElementById('year').textContent = new Date().getFullYear();
 
 /* ---------- connection ----------
-   The anon key belongs in this file. That is what a Supabase anon key is for: it is
-   the public half of the pair, and every rule about what it may do lives in the
-   row-level security policies in tools/socializer-schema.sql rather than in keeping
-   the key secret. Those policies let it read the queue, add to the queue, and change
-   a row's status. They do not let it delete anything or touch any other table.
+   The publishable key belongs in this file. That is what it is for: it is the public
+   half of the pair (Supabase renamed the old anon key to this; both still work and both
+   map to the anon role), and every rule about what it may do lives in the row-level
+   security policies in tools/socializer-schema.sql rather than in keeping the key
+   secret. Those policies let it read the queue, add to the queue, and change a row's
+   status. They do not let it delete anything or touch any other table.
 
    The page sits on a public site, so anyone who finds it can do those three things.
    For a repost queue that is a fair trade for nobody having to set anything up. If it
@@ -484,7 +481,7 @@ document.getElementById('year').textContent = new Date().getFullYear();
    policies from anon to authenticated. */
 const SUPABASE = {
     url:   'https://tjteeqofqozmncfoiofy.supabase.co',
-    key:   'YOUR-ANON-KEY',
+    key:   'YOUR-PUBLISHABLE-KEY',
     table: 'socializer'
 };
 
@@ -528,10 +525,10 @@ function paintConnection() {
 document.getElementById('connSave').onclick = () => {
     const url = document.getElementById('connUrl').value.trim();
     const key = document.getElementById('connKey').value.trim();
-    if (!url || !key) { status('Both the project URL and the anon key, please.', 'err'); return; }
+    if (!url || !key) { status('Both the project URL and the publishable key, please.', 'err'); return; }
     localStorage.setItem(LS_CONN, JSON.stringify({ url, key }));
     paintConnection();
-    status('Connected. Remember to commit these into the SUPABASE block too.', 'good');
+    status('Connected. Remember to commit the key into the SUPABASE block too.', 'good');
     loadQueue();
 };
 
@@ -550,7 +547,7 @@ function sbError(body, code) {
         const j = JSON.parse(body);
         msg = j.message || j.hint || j.error || body;
     } catch { /* the body was not JSON */ }
-    if (code === 401 || code === 403) return msg + ' - the anon key or the RLS policies are wrong.';
+    if (code === 401 || code === 403) return msg + ' - the publishable key or the RLS policies are wrong.';
     if (code === 404) return msg + ' - no such table. Run tools/socializer-schema.sql.';
     return msg || ('HTTP ' + code);
 }
