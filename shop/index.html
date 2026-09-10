@@ -719,9 +719,14 @@ async function loadInventory() {
 }
 
 /* Tab order follows the feed, not the price sort, so it does not reshuffle when
-   something is repriced. */
+   something is repriced.
+
+   window.extraShopTabs is how the editor adds a tab nothing is filed under yet. Only
+   the editor ever sets it, so a visitor's tab bar is still exactly the tabs their
+   props are in. */
 function tabsFrom(items) {
-  return [...new Set(items.map(it => text(it, 'tab_tag')).filter(Boolean))];
+  const fromFeed = items.map(it => text(it, 'tab_tag')).filter(Boolean);
+  return [...new Set([...fromFeed, ...(window.extraShopTabs || [])])];
 }
 
 /* ---- the live overlay ----------------------------------------------------
@@ -838,6 +843,18 @@ function renderGrid() {
   ).filter(it => showHidden || text(it, 'status') !== 'hidden');
 
   grid.innerHTML = '';
+
+  /* A tab can legitimately hold nothing - one just invented, or one whose props are
+     all hidden - and an empty grid under a lit tab reads as a page that broke. */
+  if (!list.length) {
+    const empty = document.createElement('p');
+    empty.className = 'section-note';
+    empty.textContent = activeTab === ALL_TAB
+      ? 'Nothing listed at the moment.'
+      : 'Nothing filed under this tab yet.';
+    grid.appendChild(empty);
+  }
+
   for (const it of list) grid.appendChild(itemCard(it));
 
   /* assets/js/shop-edit.js listens for this and attaches its editors. Nothing else

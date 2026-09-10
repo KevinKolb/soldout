@@ -530,6 +530,8 @@ function buildViewToggle(said) {
         /* Previewing the public page means seeing what they see, hidden props
            included - which is to say, not included. */
         document.body.classList.toggle('show-hidden', !publicView);
+        publishExtraTabs();
+        if (typeof buildTabs === 'function') buildTabs();
         if (typeof renderGrid === 'function') renderGrid();
         back.classList.toggle('active', !publicView);
         pub.classList.toggle('active', publicView);
@@ -637,6 +639,16 @@ function loadExtraTabs() {
 
 function saveExtraTabs() {
     try { localStorage.setItem(LS_TABS, JSON.stringify(extraTabs)); } catch { /* private mode */ }
+}
+
+/* Hand the page the tabs that have nothing in them, so it draws them alongside the
+   ones it found in the feed. Emptied in the public preview: a visitor's tab bar is
+   only ever the tabs their props are actually in. */
+function publishExtraTabs() {
+    const used = new Set([...rows.values()].map(r => r.tab_tag).filter(Boolean));
+    window.extraShopTabs = document.body.classList.contains('viewing-public')
+        ? []
+        : extraTabs.filter(t => !used.has(t));
 }
 
 function knownTabs() {
@@ -989,8 +1001,13 @@ async function start(u) {
 
     injectStyles();
     loadExtraTabs();
+    publishExtraTabs();
     document.body.classList.add('show-hidden');
     if (!await loadRows()) return;
+    /* Now the rows are known, drop any invented tab something is already filed under -
+       the feed carries it from here. */
+    publishExtraTabs();
+    if (typeof buildTabs === 'function') buildTabs();
     buildBar();
     decorate();
     addTile();
@@ -1018,15 +1035,16 @@ function ghostTab() {
             saveExtraTabs();
         }
 
-        /* Re-rendering rebuilds every card, and every picker with it. */
+        /* Draw it straight away, empty. buildTabs redraws the bar from the feed plus
+           whatever publishExtraTabs handed over; renderGrid rebuilds every card and
+           every picker with it. */
+        publishExtraTabs();
+        if (typeof buildTabs === 'function') buildTabs();
         if (typeof renderGrid === 'function') renderGrid();
 
-        /* No tab appears up here yet, and that is correct: a tab is a value on a row,
-           so one with nothing filed under it has nothing to show. Saying so beats
-           leaving the button looking broken. */
         panelSay(already
-            ? name + ' already exists. Pick it on a prop.'
-            : name + ' added. Pick it on a prop to file it there.');
+            ? name + ' already exists.'
+            : name + ' added. Pick it on a prop to file something there.');
     };
 
     bar.appendChild(b);
