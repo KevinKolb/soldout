@@ -463,7 +463,6 @@ function buildBar() {
     };
 
     document.body.appendChild(panel);
-    refreshTabList();
 }
 
 /* Build. There is nothing left to save all of - every control on a card commits the
@@ -600,14 +599,6 @@ function buildAddPanel() {
     url.type = 'text';
     url.placeholder = 'https://www.ebay.com/itm/...';
 
-    const tab = document.createElement('input');
-    tab.type = 'text';
-    tab.placeholder = 'PUMPKIN SPICE';
-    tab.setAttribute('list', 'tabList');
-
-    const list = document.createElement('datalist');
-    list.id = 'tabList';
-
     const caption = document.createElement('input');
     caption.type = 'text';
     caption.placeholder = 'Our own line about it';
@@ -634,9 +625,11 @@ function buildAddPanel() {
         note.textContent = 'Adding...';
         btn.disabled = true;
 
+        /* No tab here. The prop has no card to file yet, and once it has one the
+           picker in its corner is a better place to choose from than a text field
+           that would let a typo become a second tab. */
         const { error } = await supabase.from(TABLE).insert({
             item_url: clean,
-            tab_tag: tab.value.trim(),
             blurb: caption.value.trim(),
             position: (Math.max(0, ...[...rows.values()].map(r => r.position || 0)) + 10)
         });
@@ -651,7 +644,6 @@ function buildAddPanel() {
         url.value = caption.value = '';
         note.textContent = 'Added. It appears on the page after the next build picks up its title and price from eBay.';
         await loadRows();
-        refreshTabList();
     };
 
     /* Clicking the backdrop is the other way people close these. The dialog element
@@ -661,7 +653,7 @@ function buildAddPanel() {
 
     const form = document.createElement('div');
     form.className = 'add-fields';
-    form.append(field('Listing URL', url), field('Tab tag', tab), field('Caption', caption), list, go);
+    form.append(field('Listing URL', url), field('Caption', caption), go);
 
     panel.append(head, form);
     return panel;
@@ -704,14 +696,6 @@ function knownSources() {
 function knownTabs() {
     const used = [...rows.values()].map(r => r.tab_tag).filter(Boolean);
     return [...new Set([...used, ...extraTabs])];
-}
-
-/* Suggestions for the tab field, from the tabs already in use. */
-function refreshTabList() {
-    const list = document.getElementById('tabList');
-    if (!list) return;
-    const tabs = [...new Set([...rows.values()].map(r => r.tab_tag).filter(Boolean))];
-    list.innerHTML = tabs.map(t => `<option value="${t}"></option>`).join('');
 }
 
 /* ---------- tags, edited where they sit ---------- */
@@ -905,7 +889,6 @@ function decorateCard(card) {
                     return;
                 }
                 tabBadge.classList.toggle('is-empty', !wanted);
-                refreshTabList();
                 /* The tab bar is built from the feed, not from the table, so writing
                    tab_tag to Supabase is not enough to make a tab appear up there.
                    applyLive re-reads the rows over the feed and rebuilds the bar. */
@@ -976,7 +959,6 @@ function decorateCard(card) {
                 const saved = await save(row, { status: state }, note);
                 for (const x of Object.values(buttons)) x.disabled = false;
                 paint(saved ? saved.status : was);
-                if (saved) refreshTabList();
             };
             buttons[state] = b;
             states.appendChild(b);
@@ -1252,7 +1234,6 @@ document.addEventListener('shop:rendered', () => {
         ghostTab();
         tabDeleters();
         makeTabsDraggable();
-        refreshTabList();
     }
 });
 
