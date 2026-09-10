@@ -276,9 +276,13 @@
 
     .item-title { font-weight: 700; font-size: 0.9rem; line-height: 1.3; }
 
-    /* The Price Is Right silhouette: six sided, the left corners chamfered to a short
-       blunt edge rather than meeting at a point, punched for string. Tilted a degree and
-       a half so it sits on the card like an object rather than being another line of type.
+    /* Drawn from the reference tag: six sided, generously rounded, a chunky ink rule
+       all the way round, and the left corners chamfered back to a short blunt edge about
+       forty percent of the height. Tilted a degree and a half so it sits on the card like
+       an object rather than being another line of type.
+
+       The rounding is the one exception to the page's no-rounded-corners rule, and it is
+       deliberate: a price tag with square corners stops reading as a price tag.
 
        Built as two clipped layers rather than a bordered box, because clip-path cuts
        a border off along with everything else - so the outer layer is ink, the inner
@@ -292,48 +296,40 @@
       margin-top: auto;
       align-self: flex-start;
       max-width: 100%;
-      padding: 3px;
+      padding: 4px;
       background: var(--ink);
+      border-radius: 11px;
       transform: rotate(-1.5deg);
       transform-origin: left center;
-      clip-path: polygon(0 34%, 15px 0, 100% 0, 100% 100%, 15px 100%, 0 66%);
+      clip-path: polygon(0 30%, 16px 0, 100% 0, 100% 100%, 16px 100%, 0 70%);
       filter: drop-shadow(3px 3px 0 var(--ink));
-
-      /* A real hole rather than a dot the colour of the card: the mask removes the
-         alpha from both layers at once, so the card shows through and the drop-shadow
-         picks up the gap too. Applied here rather than on the face because the face
-         alone would leave the ink layer behind it filled in. */
-      -webkit-mask-image: radial-gradient(circle at 15px 50%, transparent 0 4px, #000 4.5px);
-      mask-image: radial-gradient(circle at 15px 50%, transparent 0 4px, #000 4.5px);
     }
 
     .price-face {
       display: block;
       position: relative;
-      padding: 0.12rem 0.75rem 0.18rem 1.25rem;
+      padding: 0.12rem 0.8rem 0.18rem 1.55rem;
       background: var(--acid);
       color: var(--ink);
+      border-radius: 8px;
       font-family: 'Bangers', cursive;
       font-size: 1.6rem;
       line-height: 1.15;
       letter-spacing: 1px;
-      clip-path: polygon(0 34%, 14px 0, 100% 0, 100% 100%, 14px 100%, 0 66%);
+      clip-path: polygon(0 30%, 14px 0, 100% 0, 100% 100%, 14px 100%, 0 70%);
     }
 
-    /* The eyelet round the hole. Its inner edge matches the mask, so the ring reads
-       as the rule following the punched edge like every other edge on the tag. */
+    /* The hole: solid ink, as in the guide. */
     .price-face::before {
       content: '';
       position: absolute;
-      box-sizing: border-box;
-      left: 7px;
+      left: 13px;
       top: 50%;
-      width: 14px;
-      height: 14px;
-      margin-top: -7px;
-      border: 3px solid var(--ink);
+      width: 10px;
+      height: 10px;
+      margin-top: -5px;
       border-radius: 50%;
-      background: transparent;
+      background: var(--ink);
     }
 
     .meta {
@@ -434,7 +430,7 @@
       color: #777;
       text-decoration: line-through;
     }
-    .item-card.sold .price-face::before { border-color: #777; }
+    .item-card.sold .price-face::before { background: #777; }
 
     .footer-bottom a { text-decoration: none; }
 
