@@ -883,9 +883,12 @@ function decorate() {
             const pick = document.createElement('select');
             pick.className = 'tab-pick';
 
+            /* Not "+ tab" - that read as an invitation to make one, when what it
+               actually means is that this prop is in no tab and so turns up only under
+               E'RYTHING. Naming the outcome beats naming the empty field. */
             const none = document.createElement('option');
             none.value = '';
-            none.textContent = '+ tab';
+            none.textContent = "E'RYTHING ONLY";
             pick.appendChild(none);
 
             for (const t of knownTabs()) {
