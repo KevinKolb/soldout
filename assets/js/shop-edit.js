@@ -77,7 +77,13 @@ function injectStyles() {
        flipping back does not have to rebuild anything. */
     body.viewing-public .editbox,
     body.viewing-public .pending,
+    body.viewing-public .add-tile,
     body.viewing-public .add-panel { display: none; }
+
+    /* The add tile borrows the grid's inverted card treatment, so it sits in the
+       first cell as an action rather than looking bolted on. */
+    .add-tile { cursor: pointer; text-align: left; }
+    .add-tile .cta-line { text-transform: none; letter-spacing: 0; font-family: var(--sans); }
 
     .add-panel {
       border: var(--rule) solid var(--ink); background: var(--paper);
@@ -447,11 +453,47 @@ async function start(u) {
     if (!await loadRows()) return;
     buildBar();
     decorate();
+    addTile();
+}
+
+/* The first cell of the grid, in edit mode only. It was the storefront tile on the
+   public page; a visitor gets no tile at all now, and the owner gets the one action
+   worth having in reach of the props themselves. */
+function addTile() {
+    const grid = document.getElementById('itemGrid');
+    const panel = document.getElementById('addPanel');
+    if (!grid || !panel || grid.querySelector('.add-tile')) return;
+
+    const tile = document.createElement('button');
+    tile.type = 'button';
+    tile.className = 'cta-card add-tile';
+
+    const kicker = document.createElement('span');
+    kicker.className = 'cta-kicker';
+    kicker.textContent = 'Not enough junk?';
+
+    const line = document.createElement('span');
+    line.className = 'cta-line';
+    line.textContent = 'Add a prop to the shop';
+
+    const plus = document.createElement('span');
+    plus.className = 'cta-arrow';
+    plus.textContent = '+';
+
+    tile.append(kicker, line, plus);
+    tile.onclick = () => {
+        panel.hidden = false;
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const first = panel.querySelector('input');
+        if (first) first.focus();
+    };
+
+    grid.prepend(tile);
 }
 
 /* The grid re-renders on every tab click, which throws the editors away with it. */
 document.addEventListener('shop:rendered', () => {
-    if (isOwner(user)) { decorate(); showPending(); }
+    if (isOwner(user)) { decorate(); addTile(); showPending(); }
 });
 
 start(await currentUser());

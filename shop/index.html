@@ -336,8 +336,9 @@
 
     .item-card.sold .tag { color: #777; border-color: #777; }
 
-    /* Closing tile. Inverted against the cards so it reads as a way out of the
-       grid rather than another listing. */
+    /* Inverted against the cards so it reads as an action rather than a listing.
+       Only ever rendered in edit mode now - assets/js/shop-edit.js builds the tile
+       and this styles it. A visitor never sees one. */
     .cta-card {
       display: flex;
       flex-direction: column;
@@ -602,29 +603,6 @@ function stampToday(el) {
 
 /* Appended after the cards, and on the empty state too, so the grid always
    ends somewhere useful. */
-function storefrontTile() {
-  const a = document.createElement('a');
-  a.className = 'cta-card';
-  a.href = 'https://www.ebay.com/inf/soldoutcomedy';
-  a.target = '_blank';
-  a.rel = 'noopener';
-
-  const kicker = document.createElement('span');
-  kicker.className = 'cta-kicker';
-  kicker.textContent = 'Not enough junk?';
-
-  const line = document.createElement('span');
-  line.className = 'cta-line';
-  line.textContent = 'See the whole eBay storefront';
-
-  const arrow = document.createElement('span');
-  arrow.className = 'cta-arrow';
-  arrow.textContent = '\u2192';
-
-  a.append(kicker, line, arrow);
-  return a;
-}
-
 async function loadInventory() {
   const grid = document.getElementById('itemGrid');
   const note = document.getElementById('itemsStatus');
@@ -653,7 +631,6 @@ async function loadInventory() {
   if (!items.length) {
     note.textContent = 'Nothing listed at the moment.';
     count.textContent = 'None';
-    grid.appendChild(storefrontTile());
     return;
   }
 
@@ -799,7 +776,6 @@ function renderGrid() {
   count.textContent = list.length + (list.length === 1 ? ' prop' : ' props');
   grid.innerHTML = '';
   for (const it of list) grid.appendChild(itemCard(it));
-  grid.appendChild(storefrontTile());
 
   /* assets/js/shop-edit.js listens for this and attaches its editors. Nothing else
      uses it, and it fires whether or not anyone is signed in. */
