@@ -3,10 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
-  # Rebuild without a push, so curating on eBay or adding a row to the shop table
-  # reaches the site on its own.
-  schedule:
-    - cron: '0 */6 * * *'
+  # No schedule. The shop used to rebuild every six hours whether anything had
+  # changed or not; captions, tabs and status now go live the moment they are saved,
+  # so the only thing a build still does is pick up a newly listed prop and refresh
+  # eBay's prices. That is worth a deliberate run, not a standing one.
   workflow_dispatch:
 
 jobs:

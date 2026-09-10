@@ -125,6 +125,10 @@ function injectStyles() {
       text-transform: uppercase; background: var(--ink); color: var(--paper);
       border: 2px solid var(--ink); padding: 6px 8px; cursor: pointer;
     }
+    .editbox button.danger {
+      background: var(--paper); color: var(--red); border-color: var(--red);
+    }
+    .editbox button.danger:hover { background: var(--red); color: var(--paper); }
     .editbox .note { font-family: var(--sans); font-size: 0.62rem; color: #555; }
     .editbox .note.bad { color: var(--red); font-weight: 700; }
 
@@ -185,6 +189,27 @@ function injectStyles() {
       user-select: text; -webkit-user-select: text;
     }
 
+    /* What the bot found. Nominations, so they read as a list to work down rather
+       than as anything already on the shop. */
+    .bot-panel {
+      border: var(--rule) solid var(--ink); background: var(--paper);
+      padding: 14px; margin-bottom: var(--gap);
+    }
+    .bot-panel[hidden] { display: none; }
+    .bot-panel h3 {
+      margin: 0 0 10px; font-family: var(--mono); font-size: 0.6rem;
+      letter-spacing: 0.14em; text-transform: uppercase;
+    }
+    .bot-panel ul { list-style: none; margin: 0; padding: 0; }
+    .bot-panel li {
+      display: flex; gap: 10px; align-items: baseline;
+      padding: 8px 0; border-top: 2px solid var(--ink);
+      font-family: var(--sans); font-size: 0.78rem; line-height: 1.5;
+    }
+    .bot-panel li .why { color: #555; }
+    .bot-panel a { color: var(--ink); font-weight: 700; }
+    .bot-panel .empty { font-family: var(--sans); font-size: 0.78rem; color: #555; }
+
     .pending {
       border: var(--rule) dashed var(--ink); padding: 12px 14px; margin-bottom: var(--gap);
       font-family: var(--sans); font-size: 0.78rem; line-height: 1.6;
@@ -198,6 +223,18 @@ function injectStyles() {
 }
 
 /* ---------- data ---------- */
+
+/* A prop adopted straight off the storefront has no row yet - the build publishes it
+   from eBay alone. The first edit is what creates one, so everything below can treat a
+   row and a not-yet-row the same way. */
+async function persist(row, patch) {
+    if (row.id) {
+        return supabase.from(TABLE).update(patch).eq('id', row.id).select().single();
+    }
+    return supabase.from(TABLE)
+        .insert({ item_url: row.item_url, ...patch })
+        .select().single();
+}
 async function loadRows() {
     const { data, error } = await supabase.from(TABLE).select('*').order('position', { ascending: true });
     if (error) {
@@ -211,7 +248,7 @@ async function loadRows() {
 async function save(row, patch, note) {
     note.textContent = 'Saving...';
     note.classList.remove('bad');
-    const { data, error } = await supabase.from(TABLE).update(patch).eq('id', row.id).select().single();
+    const { data, error } = await persist(row, patch);
     if (error) {
         note.textContent = error.message.includes('row-level security')
             ? 'The database refused that. Signed in as the wrong account?'
@@ -245,6 +282,9 @@ function buildBar() {
     spacer.className = 'spacer';
 
     const toggle = buildViewToggle(said);
+    const bot = document.createElement('button');
+    bot.type = 'button';
+    bot.textContent = 'SOC PROP BOT';
     const saveAll = buildSaveAll(said);
 
     const out = document.createElement('button');
@@ -253,7 +293,16 @@ function buildBar() {
     out.textContent = 'Sign out';
     out.onclick = async () => { await signOut(); location.reload(); };
 
-    bar.append(who, said, spacer, toggle, saveAll, out);
+    bar.append(who, said, spacer, toggle, bot, saveAll, out);
+
+    const botPanel = document.createElement('div');
+    botPanel.className = 'bot-panel';
+    botPanel.id = 'botPanel';
+    botPanel.hidden = true;
+    bot.onclick = () => {
+        botPanel.hidden = !botPanel.hidden;
+        if (!botPanel.hidden) loadCandidates(botPanel);
+    };
 
     const panel = buildAddPanel();
 
@@ -262,7 +311,7 @@ function buildBar() {
     pending.id = 'pendingNote';
     pending.hidden = true;
 
-    listings.prepend(bar, panel, pending);
+    listings.prepend(bar, botPanel, panel, pending);
     showPending();
 }
 
@@ -296,9 +345,7 @@ function buildSaveAll(said) {
         let saved = 0;
 
         for (const card of changed) {
-            const { data, error } = await supabase
-                .from(TABLE).update({ status: card._status.value })
-                .eq('id', card._row.id).select().single();
+            const { data, error } = await persist(card._row, { status: card._status.value });
             if (error) continue;
             rows.set(keyOf(data.item_url), data);
             Object.assign(card._row, data);
@@ -361,6 +408,58 @@ function buildViewToggle(said) {
     wrap.append(back, cb, track, pub);
     apply();
     return wrap;
+}
+
+/* The bot nominates into its own table; this is the reading end of that. It is a list
+   of links out to eBay on purpose - keeping one means putting it on the influencer
+   storefront, which is the only thing that gives a listing a photo, a price and a
+   commission, and that happens on eBay rather than here. */
+async function loadCandidates(panel) {
+    panel.innerHTML = '';
+    const head = document.createElement('h3');
+    head.textContent = 'What the bot found';
+    panel.appendChild(head);
+
+    const { data, error } = await supabase
+        .from('prop_candidates').select('*')
+        .eq('status', 'NEW').order('found_at', { ascending: false }).limit(40);
+
+    const say = text => {
+        const p = document.createElement('p');
+        p.className = 'empty';
+        p.textContent = text;
+        panel.appendChild(p);
+    };
+
+    if (error) {
+        say(error.message.includes('does not exist')
+            ? 'No candidates table yet. Run tools/prop-bot-schema.sql in Supabase.'
+            : error.message);
+        return;
+    }
+    if (!data.length) {
+        say('Nothing waiting. The bot writes here when it runs.');
+        return;
+    }
+
+    const list = document.createElement('ul');
+    for (const c of data) {
+        const li = document.createElement('li');
+
+        const a = document.createElement('a');
+        a.href = c.item_url;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = c.title || c.item_url;
+
+        const why = document.createElement('span');
+        why.className = 'why';
+        why.textContent = (c.price != null ? '$' + Number(c.price).toFixed(2) + ' - ' : '') + (c.why || '');
+
+        li.append(a, why);
+        list.appendChild(li);
+    }
+    panel.appendChild(list);
 }
 
 function buildAddPanel() {
@@ -473,8 +572,7 @@ async function saveTag(el, row, field, value) {
     el.classList.remove('failed');
     el.classList.add('saving');
 
-    const { data, error } = await supabase
-        .from(TABLE).update({ [field]: value }).eq('id', row.id).select().single();
+    const { data, error } = await persist(row, { [field]: value });
 
     el.classList.remove('saving');
     if (error) {
@@ -616,8 +714,15 @@ function inlineCaption(el, row, pulled) {
 function decorate() {
     for (const card of document.querySelectorAll('.item-card')) {
         if (card.querySelector('.editbox')) continue;
-        const row = rows.get(keyOf(card.href));
-        if (!row) continue;
+        /* An adopted prop has no row. Rather than leaving it uneditable - which would
+           make the commonest way of adding a prop the one you cannot touch - it gets a
+           stub that the first save turns into a real row. */
+        const key = keyOf(card.href);
+        let row = rows.get(key);
+        if (!row) {
+            row = { id: null, item_url: String(card.href).split('?')[0], status: 'Active' };
+            rows.set(key, row);
+        }
 
         /* The chips and the sticker become their own controls. The sticker is left
            alone on a sold prop, where it reads "Sold" rather than the marketplace -
@@ -708,10 +813,28 @@ function decorate() {
         original.className = 'original';
         original.textContent = pulled || 'Nothing came from the marketplace for this one.';
 
+        /* Hidden rather than a delete. The build republishes anything on the storefront
+           that no row mentions, so removing the row would put the prop back on the shop
+           at the next build - a Hidden row is what actually keeps it down, and it also
+           survives the listing still being live on eBay. */
+        const del = document.createElement('button');
+        del.type = 'button';
+        del.className = 'danger';
+        del.textContent = 'Delete';
+        del.onclick = async () => {
+            if (!confirm('Take this off the shop for good?\n\nIt stays on eBay. It will not come back, even while the listing is live.')) return;
+            del.disabled = true;
+            const saved = await save(row, { status: 'Hidden' }, note);
+            del.disabled = false;
+            if (!saved) return;
+            card.remove();
+            showPending();
+        };
+
         box.append(
             lab('Status'), status,
             lab('Original text'), original,
-            btn, note
+            btn, del, note
         );
         card.querySelector('.body').appendChild(box);
     }

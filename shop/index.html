@@ -263,8 +263,10 @@
        Built as two clipped layers rather than a bordered box, because clip-path cuts
        a border off along with everything else - so the outer layer is ink, the inner
        is acid and slightly smaller, and the ink showing round the edge is the rule.
-       For the same reason the hard shadow is a drop-shadow filter: box-shadow traces
-       the element's box, which is a rectangle, not the shape you can see.
+       It carries no shadow: the hard one the cards use has to be a drop-shadow filter
+       here, since box-shadow traces the element's rectangle rather than the shape you
+       can see, and at +3/+3 that filter sat in the bottom-right corner and filled the
+       radius in.
 
        align-self keeps it shrink-to-fit inside the flex column, and margin-top still
        pins it to the card foot so tags line up across a row. */
@@ -277,18 +279,15 @@
       border-radius: 11px;
       transform: rotate(-1.5deg);
       transform-origin: left center;
-      transition: transform 0.1s linear, filter 0.1s linear;
+      transition: transform 0.1s linear;
       clip-path: polygon(0 30%, 16px 0, 100% 0, 100% 100%, 16px 100%, 0 70%);
-      filter: drop-shadow(3px 3px 0 var(--ink));
     }
 
     /* Each responds to its own hover, not the card's. The tag grows from its left
-       edge so the hole stays put and the price swings out, and its shadow deepens with
-       it. */
-    .price:hover {
-      transform: rotate(-1.5deg) scale(1.07);
-      filter: drop-shadow(5px 5px 0 var(--ink));
-    }
+       edge, so the hole stays put and the price swings out. No shadow: a hard one at
+       +3/+3 sat exactly in the bottom-right corner and filled the radius in, which read
+       as a square corner and a thicker rule on that side. */
+    .price:hover { transform: rotate(-1.5deg) scale(1.07); }
 
     .tag:hover { transform: scale(1.06); }
 
@@ -413,7 +412,7 @@
     .item-card.sold .shot img { filter: grayscale(1) contrast(1.05); }
     .item-card.sold .item-badge { background: var(--ink); color: var(--paper); }
     /* A sold tag drains rather than disappears - still a tag, just spent. */
-    .item-card.sold .price { background: #777; filter: drop-shadow(3px 3px 0 #777); }
+    .item-card.sold .price { background: #777; }
     .item-card.sold .price-face {
       background: #e4e4e4;
       color: #777;
