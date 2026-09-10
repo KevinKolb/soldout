@@ -708,7 +708,10 @@ function buildAddPanel() {
         /* Hidden to begin with. A prop added here has no title, price or photo until
            a build reads them from the storefront, so publishing it straight away would
            put a blank card in front of a visitor. It arrives stamped HIDDEN in
-           backstage, and you press ACTIVE when it looks right.
+           backstage, and you press ACTIVE when it looks right. The column defaults to
+           Hidden as well, so a row added anywhere else - the dashboard, a future tool -
+           arrives the same way; this stays explicit because it should be readable here
+           rather than only in a migration.
 
            No caption either: it is written on the card, where you can see the thing it
            is about. */

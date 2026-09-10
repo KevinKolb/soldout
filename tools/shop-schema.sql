@@ -46,7 +46,10 @@ create table if not exists public.shop (
     condition     text        not null default '',
     image_url     text        not null default '',
 
-    status        text        not null default 'Active'
+    -- Hidden by default: a prop has no title, price or photo until a build reads them
+    -- from the storefront, so nothing should reach a visitor before somebody has looked
+    -- at it and pressed ACTIVE.
+    status        text        not null default 'Hidden'
                               check (status in ('Active', 'Sold', 'Hidden')),
 
     -- Hand ordering. The grid sorts by price in the browser, so this only decides
