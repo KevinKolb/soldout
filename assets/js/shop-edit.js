@@ -63,7 +63,7 @@ function injectStyles() {
       top: calc(var(--topbar-h, 40px) + 10px);
       right: 12px;
       z-index: 30;
-      width: 186px;
+      width: 212px;
       display: flex; flex-direction: column; gap: 8px;
       background: var(--ink); color: var(--paper);
       border: var(--rule) solid var(--ink);
@@ -105,10 +105,13 @@ function injectStyles() {
       border-top: 2px solid rgba(255, 255, 255, 0.25); padding-top: 7px;
     }
 
-    /* In the public preview the panel is only a way back: everything in it acts on a
-       page you are not currently looking at, so it collapses to the switch alone and
-       stops hanging a black slab of controls over a visitor's view of the shop. */
-    body.viewing-public .edit-panel { width: auto; }
+    /* In the public preview everything but the switch goes: the rest acts on a page
+       you are not currently looking at, and hanging a slab of controls over a
+       visitor's-eye view defeats the point of the preview.
+
+       The width does not change with it. Shrinking to fit the switch made the panel
+       jump sideways on every flip, and the switch is the one thing that has to stay
+       under the cursor - you flip it twice in a row more often than once. */
     body.viewing-public .edit-panel > *:not(.view-toggle) { display: none; }
 
     /* Too narrow for a column beside the grid, so it lies down under the header. */
