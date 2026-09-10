@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Socializer - SOLD OUT! Admin</title>
+    <link rel="icon" type="image/png" href="../assets/images/soldoutlogo.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #000;
+            background: #fff;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        h1 { font-size: 40px; font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; }
+        .subtitle { font-size: 16px; color: #666; margin-bottom: 40px; }
+
+        h2 {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+        }
+
+        section { margin-bottom: 48px; }
+
+        .uplink {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #666;
+            text-decoration: none;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 2px;
+        }
+        .uplink:hover { color: #000; border-bottom-color: #000; }
+
+        .field { margin-bottom: 18px; }
+        .field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        input[type="text"], input[type="password"], textarea, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #000;
+            font-family: inherit;
+            font-size: 14px;
+            background: #fff;
+            color: #000;
+        }
+        input:focus, textarea:focus, select:focus { outline: 3px solid #ffd93d; outline-offset: -1px; }
+        textarea { resize: vertical; min-height: 80px; }
+
+        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
+
+        button {
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 18px;
+            border: 2px solid #000;
+            background: #fff;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        button:hover:not(:disabled) { background: #000; color: #fff; }
+        button:disabled { opacity: 0.35; cursor: not-allowed; }
+        button.primary { background: #000; color: #fff; }
+        button.primary:hover:not(:disabled) { background: #fff; color: #000; }
+        button.small { font-size: 11px; padding: 6px 10px; }
+
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+        .note { font-size: 11px; color: #999; }
+        .warn { color: #c0392b; font-size: 11px; }
+
+        .pill {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 2px 7px;
+            border: 1px solid #000;
+        }
+        .pill.new { background: #ffd93d; }
+        .pill.skipped { background: #eee; color: #666; border-color: #ccc; }
+        .pill.posted { background: #2ecc71; border-color: #24a25b; }
+        .pill.src { background: #fff; color: #666; border-color: #ccc; }
+        .pill.plat { background: #000; color: #fff; }
+
+        #status {
+            padding: 12px 16px;
+            border: 2px solid #000;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 13px;
+        }
+        #status.show { display: block; }
+        #status.err { background: #ffe5e5; border-color: #c0392b; }
+        #status.good { background: #e8f5e9; border-color: #24a25b; }
+        #status.busy { background: #ffd93d; }
+
+        details { border: 2px solid #000; padding: 14px; margin-bottom: 32px; }
+        summary { cursor: pointer; font-weight: 600; font-size: 13px; }
+        details ol, details ul { margin: 14px 0 0 20px; }
+        details li { margin-bottom: 8px; font-size: 13px; }
+        code { background: #f4f4f4; padding: 1px 5px; font-size: 12px; border: 1px solid #e0e0e0; }
+        pre {
+            background: #f4f4f4; border: 1px solid #e0e0e0; padding: 12px;
+            font-size: 11px; overflow-x: auto; white-space: pre-wrap; word-break: break-all;
+            margin-top: 12px;
+        }
+
+        /* ---- connection ---- */
+        #setup { border: 2px solid #c0392b; background: #ffe5e5; padding: 20px 24px; margin-bottom: 32px; }
+        #setup h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        #setup ol { margin: 0 0 18px 20px; }
+        #setup li { margin-bottom: 8px; }
+        #setup input { background: #fff; }
+        .conn-line { font-size: 11px; color: #999; margin-bottom: 32px; }
+        .conn-line b { color: #24a25b; }
+
+        /* ---- criteria ---- */
+        .criteria { border: 2px solid #000; padding: 20px 24px; }
+        .criteria ol { margin-left: 20px; }
+        .criteria li { margin-bottom: 8px; }
+        .criteria .more { margin-top: 14px; font-size: 12px; color: #999; }
+
+        /* ---- queue ---- */
+        .tabs { display: flex; gap: 0; flex-wrap: wrap; margin-bottom: 20px; }
+        .tabs button { border-right-width: 0; }
+        .tabs button:last-child { border-right-width: 2px; }
+        .tabs button.on { background: #000; color: #fff; }
+
+        .queue-head {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
+        }
+        .counts { font-size: 12px; color: #666; }
+        .counts strong { color: #000; }
+
+        .article {
+            border: 2px solid #000;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+        }
+        .article.is-skipped { border-color: #ccc; color: #888; background: #fbfbfb; }
+        .article.is-posted { border-color: #24a25b; }
+
+        .article-top {
+            display: flex; justify-content: space-between; align-items: baseline;
+            gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+        }
+        .article-who { font-weight: 700; font-size: 14px; }
+        .article-meta { font-size: 11px; color: #999; margin-bottom: 12px; }
+        .article-tags { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+        .article-text {
+            white-space: pre-wrap;
+            font-size: 15px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+            border-left: 3px solid #ffd93d;
+            padding-left: 12px;
+        }
+        .article.is-skipped .article-text { border-left-color: #ddd; }
+
+        .article-why { font-size: 12px; color: #666; margin-bottom: 14px; }
+        .article-why b { text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; color: #999; }
+
+        .article-line { margin-bottom: 12px; }
+        .article-line input { font-size: 13px; padding: 8px 10px; }
+
+        .article-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .article-actions a {
+            font-size: 11px; color: #666; text-decoration: none;
+            border-bottom: 1px solid #ccc; padding-bottom: 1px;
+        }
+        .article-actions a:hover { color: #000; border-bottom-color: #000; }
+
+        .empty { border: 2px dashed #ccc; padding: 40px 20px; text-align: center; color: #999; font-size: 13px; }
+
+        /* ---- capture card ---- */
+        .capture { border: 2px solid #000; background: #ffd93d; padding: 18px 20px; margin-bottom: 32px; }
+        .capture h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+
+        /* ---- bookmarklet ---- */
+        .bm-wrap { border: 2px solid #000; padding: 24px; text-align: center; margin-bottom: 20px; }
+        .bm {
+            display: inline-block;
+            background: #ffd93d;
+            border: 3px solid #000;
+            box-shadow: 5px 5px 0 #000;
+            padding: 14px 28px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #000;
+            text-decoration: none;
+            cursor: grab;
+            user-select: none;
+        }
+        .bm:active { cursor: grabbing; transform: translate(2px, 2px); box-shadow: 3px 3px 0 #000; }
+        .bm-hint { margin-top: 16px; font-size: 12px; color: #666; }
+
+        /* ---- X container ---- */
+        .x-box { border: 3px solid #000; }
+        .x-box-head {
+            background: #000; color: #fff;
+            padding: 16px 24px;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .x-box-head img { width: 26px; height: 26px; display: block; filter: invert(1); }
+        .x-box-head .t { font-size: 16px; font-weight: 700; letter-spacing: -0.25px; }
+        .x-box-head .h { margin-left: auto; font-size: 12px; opacity: 0.7; }
+        .x-box-body { padding: 24px; }
+        .x-box-body p { margin-bottom: 14px; font-size: 14px; }
+        .x-box-body ol { margin: 0 0 18px 20px; }
+        .x-box-body li { margin-bottom: 8px; }
+        .x-box-body .compose {
+            display: inline-block;
+            background: #000; color: #fff;
+            padding: 12px 22px;
+            font-weight: 700; font-size: 14px;
+            text-decoration: none;
+            border: 2px solid #000;
+        }
+        .x-box-body .compose:hover { background: #fff; color: #000; }
+        .x-note {
+            margin-top: 18px; padding-top: 16px; border-top: 2px solid #000;
+            font-size: 12px; color: #666;
+        }
+
+        .footer { margin-top: 60px; text-align: center; font-size: 12px; color: #999; }
+        .footer a { color: #666; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="index.html" class="uplink">&larr; The Booth</a>
+
+    <h1>The Socializer</h1>
+    <div class="subtitle">Somebody else already made the joke. We just have to notice it and pass it on.</div>
+
+    <div id="status"></div>
+
+    <div id="setup" style="display:none">
+        <h3>Not connected yet</h3>
+        <ol>
+            <li>In the Supabase project, open the SQL editor and run
+                <code>tools/socializer-schema.sql</code> from this repo. That creates the
+                <code>socializer</code> table and its row-level security policies.</li>
+            <li>Copy the project URL and the <b>anon</b> key from Project Settings &rarr; API.</li>
+            <li>Paste them below to try it right now, then put the same two values into the
+                <code>SUPABASE</code> block at the top of this file's script and commit, so the page
+                works for everyone without this step.</li>
+        </ol>
+        <div class="row">
+            <div class="field">
+                <label for="connUrl">Project URL</label>
+                <input type="text" id="connUrl" placeholder="https://xxxxxxxx.supabase.co">
+            </div>
+            <div class="field">
+                <label for="connKey">Anon key</label>
+                <input type="text" id="connKey" placeholder="eyJ...">
+            </div>
+        </div>
+        <div class="actions">
+            <button class="primary" id="connSave">Connect</button>
+            <button class="small" id="connClear">Clear</button>
+        </div>
+    </div>
+
+    <div class="conn-line" id="connLine"></div>
+
+    <div id="captureSlot"></div>
+
+    <section>
+        <h2>What qualifies</h2>
+        <div class="criteria">
+            <ol>
+                <li>It is <b>funny</b>. Not relatable, not interesting. Funny.</li>
+                <li>It is about <b>selling</b> something &mdash; a listing, a price, a haggle, a flip, a marketplace
+                    message, a thing somebody is trying to move.</li>
+                <li>Or it is a <b>found object</b> &mdash; the beautiful junk somebody photographed in the wild.</li>
+                <li>It stands on its own. No thread, no context, no inside joke required.</li>
+                <li>Reposting it would not embarrass us tomorrow.</li>
+            </ol>
+            <div class="more">More criteria to come. This list is the whole spec for now, and it is the same
+                list SOC SOCIALIZER BOT is handed when it goes looking.</div>
+        </div>
+    </section>
+
+    <section>
+        <h2>The queue</h2>
+
+        <div class="tabs" id="tabs">
+            <button data-filter="NEW" class="on">New</button>
+            <button data-filter="SKIPPED">Skipped</button>
+            <button data-filter="POSTED">Posted</button>
+            <button data-filter="ALL">All</button>
+        </div>
+
+        <div class="queue-head">
+            <div class="counts" id="counts">Not loaded.</div>
+            <div class="actions">
+                <button class="small" id="refresh">Refresh</button>
+            </div>
+        </div>
+
+        <div id="queue"></div>
+    </section>
+
+    <section>
+        <h2>Add one by hand</h2>
+        <div class="field">
+            <label for="addUrl">Link <span class="note">(any platform)</span></label>
+            <input type="text" id="addUrl" placeholder="https://x.com/someone/status/1234567890">
+        </div>
+        <div class="field">
+            <label for="addWhy">Why it qualifies <span class="note">(optional, for future you)</span></label>
+            <input type="text" id="addWhy" placeholder="Guy trying to sell a haunted couch">
+        </div>
+        <div class="actions">
+            <button class="primary" id="addBtn">Add to queue</button>
+        </div>
+    </section>
+
+    <section>
+        <h2>That's Funny!</h2>
+        <div class="bm-wrap">
+            <a class="bm" id="bookmarklet" href="#">That's Funny!</a>
+            <div class="bm-hint">
+                Drag that button up to your bookmarks bar. Then, on any page anywhere that qualifies, click it.<br>
+                It grabs what it can and drops it into this queue as <b>NEW</b>.<br>
+                <span class="note">On X it reads the post itself. Everywhere else it takes the page's own
+                title and description, or whatever you highlighted before clicking.</span>
+            </div>
+        </div>
+        <details>
+            <summary>If dragging does not work</summary>
+            <ol>
+                <li>Right-click your bookmarks bar and choose <b>Add page</b> (Chrome) or <b>Add bookmark</b> (Firefox, Safari).</li>
+                <li>Name it <code>That's Funny!</code></li>
+                <li>Paste the whole block below into the URL field and save.</li>
+            </ol>
+            <pre id="bmSource"></pre>
+        </details>
+        <div class="note" id="bmTarget"></div>
+    </section>
+
+    <section>
+        <h2>Where it goes</h2>
+        <div class="x-box">
+            <div class="x-box-head">
+                <img src="../assets/images/x_logo.png" alt="X">
+                <span class="t">X</span>
+                <span class="h">@soldoutcomedy</span>
+            </div>
+            <div class="x-box-body">
+                <p><b>This is a cut and paste post method.</b> Nothing on this page talks to X. There is no API key,
+                    no scheduler, no automatic posting. The Socializer finds the post and holds the words. You are
+                    the one who presses Post.</p>
+                <ol>
+                    <li>Press <b>Copy &amp; open X</b> on an article in the queue. The text lands on your clipboard
+                        and <code>https://x.com/compose/post</code> opens in a new tab.</li>
+                    <li>Check that the tab is signed in as <b>@soldoutcomedy</b> and not your personal account.</li>
+                    <li>Paste. The pasted link renders as the original post, so it reads as a repost with our line on top.</li>
+                    <li>Press Post on X, come back here, and press <b>Mark posted</b> so it leaves the queue.</li>
+                </ol>
+                <a class="compose" href="https://x.com/compose/post" target="_blank" rel="noopener">Open x.com/compose/post</a>
+                <div class="x-note">
+                    X is where we post. It is not where the queue has to come from &mdash; an article can start life
+                    as a Facebook page, an Instagram reel, a YouTube video or any other link on the planet, and it
+                    still gets pasted into the X composer, where the link renders as a card. When a second
+                    destination shows up it gets its own container down here and the same cut and paste treatment.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="footer">
+        <p>&copy; <span id="year">2026</span> SOLD OUT! Comedy | <a href="https://soldoutcomedy.com">soldoutcomedy.com</a></p>
+    </div>
+</div>
+
+<!-- The bookmarklet lives here as inert text rather than as a JS string literal,
+     so its regexes keep their backslashes instead of losing them to an escape pass. -->
+<script type="text/plain" id="bmSrc">
+(function(){
+var BASE='__BASE__';
+var JUNK=['utm_source','utm_medium','utm_campaign','utm_term','utm_content','utm_id',
+'fbclid','gclid','msclkid','igshid','igsh','si','ref','ref_src','ref_url','feature','spm'];
+function meta(k){
+var e=document.querySelector('meta[property="'+k+'"]')||document.querySelector('meta[name="'+k+'"]');
+return e?(e.getAttribute('content')||'').trim():'';
+}
+function sel(){var s=window.getSelection&&window.getSelection();return s?String(s).trim():'';}
+function clean(h){
+try{var u=new URL(h,location.href);
+for(var i=0;i<JUNK.length;i++)u.searchParams.delete(JUNK[i]);
+return u.toString().split('#')[0];}catch(e){return String(h).split('#')[0];}
+}
+function canonical(){
+var l=document.querySelector('link[rel="canonical"]');
+return clean((l&&l.href)||meta('og:url')||location.href);
+}
+var host=location.hostname.replace(/^(?:www|m|mobile)\./,'');
+var url='',handle='',text='',when='';
+
+/* X hides everything behind generated class names, but the post itself is a real
+   <article> with stable testids, so it is worth reading properly. */
+if(host==='x.com'||host==='twitter.com'){
+var art=null;
+var s=window.getSelection&&window.getSelection();
+if(s&&s.rangeCount&&String(s).trim()){
+var n=s.getRangeAt(0).commonAncestorContainer;
+if(n.nodeType===3)n=n.parentElement;
+art=n&&n.closest?n.closest('article'):null;
+}
+var arts=document.querySelectorAll('article');
+var m=location.pathname.match(/\/status\/(\d+)/);
+if(!art&&m){for(var i=0;i<arts.length;i++){if(arts[i].querySelector('a[href*="/status/'+m[1]+'"]')){art=arts[i];break;}}}
+if(!art)art=arts[0]||null;
+if(art){
+var links=art.querySelectorAll('a[href*="/status/"]');
+for(var j=0;j<links.length;j++){if(links[j].querySelector('time')){url=links[j].href.split('?')[0];break;}}
+var tw=art.querySelector('[data-testid="tweetText"]');
+if(tw)text=tw.innerText;
+var tm=art.querySelector('time');
+if(tm)when=tm.getAttribute('datetime')||'';
+var mm=url.match(/(?:x|twitter)\.com\/([^\/]+)\/status\/\d+/);
+if(mm)handle='@'+mm[1];
+}
+}
+
+/* Everywhere else on the planet: whatever the page says about itself, plus
+   anything you highlighted before clicking. */
+if(!url)url=canonical();
+if(!handle)handle=meta('author')||meta('og:site_name')||host;
+if(!text)text=sel()||meta('og:description')||meta('description')||meta('og:title')||document.title||'';
+if(!when)when=meta('article:published_time')||meta('og:updated_time')||'';
+if(text.length>1200)text=text.slice(0,1200)+'...';
+
+var payload={u:url,h:handle,t:text,d:when,s:'Bookmarklet'};
+window.open(BASE+'#capture='+encodeURIComponent(JSON.stringify(payload)),'_blank');
+})();
+</script>
+
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---------- connection ----------
+   The anon key belongs in this file. That is what a Supabase anon key is for: it is
+   the public half of the pair, and every rule about what it may do lives in the
+   row-level security policies in tools/socializer-schema.sql rather than in keeping
+   the key secret. Those policies let it read the queue, add to the queue, and change
+   a row's status. They do not let it delete anything or touch any other table.
+
+   The page sits on a public site, so anyone who finds it can do those three things.
+   For a repost queue that is a fair trade for nobody having to set anything up. If it
+   stops being a fair trade, put a Supabase login in front of the page and narrow the
+   policies from anon to authenticated. */
+const SUPABASE = {
+    url:   'https://tjteeqofqozmncfoiofy.supabase.co',
+    key:   'YOUR-ANON-KEY',
+    table: 'socializer'
+};
+
+const LS_CONN = 'soldout_socializer_conn';   /* local override, for trying it before committing */
+const COMPOSE_URL = 'https://x.com/compose/post';
+
+function connection() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(LS_CONN) || 'null'); } catch { /* ignore */ }
+    const url = ((saved && saved.url) || SUPABASE.url).replace(/\/+$/, '');
+    const key = (saved && saved.key) || SUPABASE.key;
+    return { url, key, local: !!saved, ready: !/YOUR-/.test(url) && !/YOUR-/.test(key) };
+}
+
+/* ---------- status line ---------- */
+const statusEl = document.getElementById('status');
+function status(msg, kind) {
+    statusEl.textContent = msg;
+    statusEl.className = 'show ' + (kind || '');
+    if (kind === 'good') setTimeout(() => { statusEl.className = ''; }, 4000);
+}
+
+/* ---------- setup panel ---------- */
+function paintConnection() {
+    const c = connection();
+    document.getElementById('setup').style.display = c.ready ? 'none' : 'block';
+    const line = document.getElementById('connLine');
+    if (!c.ready) {
+        /* only ask for the half that is actually missing */
+        const urlEl = document.getElementById('connUrl');
+        const keyEl = document.getElementById('connKey');
+        if (!urlEl.value && !/YOUR-/.test(c.url)) urlEl.value = c.url;
+        if (!keyEl.value && !/YOUR-/.test(c.key)) keyEl.value = c.key;
+        line.textContent = '';
+        return;
+    }
+    line.innerHTML = '<b>Connected</b> to ' + c.url.replace(/^https?:\/\//, '')
+        + (c.local ? ' (from this browser, not yet committed)' : '');
+}
+
+document.getElementById('connSave').onclick = () => {
+    const url = document.getElementById('connUrl').value.trim();
+    const key = document.getElementById('connKey').value.trim();
+    if (!url || !key) { status('Both the project URL and the anon key, please.', 'err'); return; }
+    localStorage.setItem(LS_CONN, JSON.stringify({ url, key }));
+    paintConnection();
+    status('Connected. Remember to commit these into the SUPABASE block too.', 'good');
+    loadQueue();
+};
+
+document.getElementById('connClear').onclick = () => {
+    localStorage.removeItem(LS_CONN);
+    document.getElementById('connUrl').value = '';
+    document.getElementById('connKey').value = '';
+    paintConnection();
+    status('Local connection cleared.', 'good');
+};
+
+/* ---------- Supabase ---------- */
+function sbError(body, code) {
+    let msg = body;
+    try {
+        const j = JSON.parse(body);
+        msg = j.message || j.hint || j.error || body;
+    } catch { /* the body was not JSON */ }
+    if (code === 401 || code === 403) return msg + ' - the anon key or the RLS policies are wrong.';
+    if (code === 404) return msg + ' - no such table. Run tools/socializer-schema.sql.';
+    return msg || ('HTTP ' + code);
+}
+
+async function sb(path, options) {
+    const c = connection();
+    if (!c.ready) throw new Error('Not connected to Supabase yet.');
+    const res = await fetch(c.url + '/rest/v1/' + SUPABASE.table + path, {
+        ...options,
+        headers: {
+            'apikey': c.key,
+            'Authorization': 'Bearer ' + c.key,
+            'Content-Type': 'application/json',
+            ...(options && options.headers)
+        }
+    });
+    const body = await res.text();
+    if (!res.ok) throw new Error(sbError(body, res.status));
+    return body ? JSON.parse(body) : null;
+}
+
+/* ---------- post identity ----------
+   Where a post came FROM is not where it goes TO. A source can be any platform;
+   the repost is always cut and pasted into X. identify() turns a URL of any shape
+   into the stable key we dedupe on, so the same post caught twice - once by the
+   bookmarklet, once by the bot - lands as one article. */
+function identify(raw) {
+    const s = String(raw || '').trim();
+    if (!s) return null;
+
+    let u;
+    try {
+        u = new URL(/^https?:\/\//i.test(s) ? s : 'https://' + s);
+    } catch {
+        return null;
+    }
+
+    const host = u.hostname.replace(/^(?:www|m|mobile|web)\./i, '').toLowerCase();
+    const path = u.pathname.replace(/\/+$/, '');
+    const at = h => (h.charAt(0) === '@' ? h : '@' + h);
+
+    if (host === 'x.com' || host === 'twitter.com') {
+        const m = path.match(/^\/([^\/]+)\/status(?:es)?\/(\d+)/);
+        if (m) return { platform: 'X', key: 'x:' + m[2], author: at(m[1]),
+                        url: 'https://x.com/' + m[1] + '/status/' + m[2] };
+    }
+
+    if (host === 'youtube.com' || host === 'youtu.be') {
+        const v = host === 'youtu.be'
+            ? path.slice(1)
+            : (u.searchParams.get('v') || (path.match(/^\/(?:shorts|live|embed|v)\/([\w-]+)/) || [])[1]);
+        if (v) return { platform: 'YouTube', key: 'yt:' + v, author: '',
+                        url: 'https://www.youtube.com/watch?v=' + v };
+        const ch = path.match(/^\/(@[\w.\-]+)/);
+        if (ch) return { platform: 'YouTube', key: 'yt:' + ch[1].toLowerCase(), author: ch[1],
+                         url: 'https://www.youtube.com/' + ch[1] };
+    }
+
+    if (host === 'instagram.com') {
+        const m = path.match(/^\/(?:[^\/]+\/)?(?:p|reel|reels|tv)\/([\w\-]+)/);
+        if (m) return { platform: 'Instagram', key: 'ig:' + m[1], author: '',
+                        url: 'https://www.instagram.com/p/' + m[1] + '/' };
+        const prof = path.match(/^\/([\w.][\w.\-]*)$/);
+        if (prof) return { platform: 'Instagram', key: 'ig:' + prof[1].toLowerCase(), author: at(prof[1]),
+                           url: 'https://www.instagram.com/' + prof[1] };
+    }
+
+    if (host === 'facebook.com' || host === 'fb.watch') {
+        /* Facebook has a dozen permalink shapes. Take the longest digit run in the
+           path or query as the post id, and fall back to the path when there is none. */
+        const digits = (path + '?' + u.search).match(/\d{6,}/g);
+        const id = digits ? digits.sort((a, b) => b.length - a.length)[0] : path.toLowerCase();
+        return { platform: 'Facebook', key: 'fb:' + id, author: '', url: u.origin + path + u.search };
+    }
+
+    return { platform: 'Web', key: 'url:' + (host + path).toLowerCase(), author: '',
+             url: u.origin + path };
+}
+
+/* ---------- the queue ---------- */
+let ROWS = [];
+let FILTER = 'NEW';
+
+document.getElementById('tabs').onclick = e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    FILTER = btn.dataset.filter;
+    [...document.querySelectorAll('#tabs button')].forEach(b => b.classList.toggle('on', b === btn));
+    render();
+};
+
+document.getElementById('refresh').onclick = () => loadQueue();
+
+async function loadQueue() {
+    const wrap = document.getElementById('queue');
+    try {
+        status('Loading the queue...', 'busy');
+        ROWS = (await sb('?select=*&order=created_at.desc&limit=1000')) || [];
+        render();
+        status(ROWS.length + ' article(s) loaded.', 'good');
+    } catch (err) {
+        ROWS = [];
+        wrap.innerHTML = '';
+        document.getElementById('counts').textContent = 'Not loaded.';
+        const d = document.createElement('div');
+        d.className = 'empty';
+        d.textContent = err.message;
+        wrap.appendChild(d);
+        status(err.message, 'err');
+    }
+}
+
+function render() {
+    const wrap = document.getElementById('queue');
+    wrap.innerHTML = '';
+
+    const tally = { NEW: 0, SKIPPED: 0, POSTED: 0 };
+    for (const r of ROWS) if (tally[r.status] !== undefined) tally[r.status]++;
+
+    document.getElementById('counts').innerHTML =
+        '<strong>' + tally.NEW + '</strong> new &middot; ' +
+        '<strong>' + tally.SKIPPED + '</strong> skipped &middot; ' +
+        '<strong>' + tally.POSTED + '</strong> posted';
+
+    const shown = ROWS.filter(r => FILTER === 'ALL' || r.status === FILTER);
+
+    if (!shown.length) {
+        const d = document.createElement('div');
+        d.className = 'empty';
+        d.textContent = FILTER === 'NEW'
+            ? 'Nothing waiting. Go read something and press That’s Funny! on it.'
+            : 'No ' + FILTER.toLowerCase() + ' articles.';
+        wrap.appendChild(d);
+        return;
+    }
+
+    for (const row of shown) wrap.appendChild(card(row));
+}
+
+function card(row) {
+    const st = row.status || 'NEW';
+    const el = document.createElement('div');
+    el.className = 'article is-' + st.toLowerCase();
+
+    /* top line */
+    const top = document.createElement('div');
+    top.className = 'article-top';
+
+    const who = document.createElement('div');
+    who.className = 'article-who';
+    who.textContent = row.author || 'Unknown account';
+
+    const tags = document.createElement('div');
+    tags.className = 'article-tags';
+
+    const stPill = document.createElement('span');
+    stPill.className = 'pill ' + st.toLowerCase();
+    stPill.textContent = st;
+
+    const platPill = document.createElement('span');
+    platPill.className = 'pill plat';
+    platPill.textContent = row.platform || 'Web';
+
+    const srcPill = document.createElement('span');
+    srcPill.className = 'pill src';
+    srcPill.textContent = row.source || 'Manual';
+
+    tags.append(stPill, platPill, srcPill);
+    top.append(who, tags);
+
+    /* body */
+    const text = document.createElement('div');
+    text.className = 'article-text';
+    text.textContent = row.body || '(no text captured - open the post to read it)';
+
+    const meta = document.createElement('div');
+    meta.className = 'article-meta';
+    meta.textContent = [row.posted_at, row.post_key].filter(Boolean).join('  ·  ');
+
+    el.append(top, text, meta);
+
+    if (row.why) {
+        const why = document.createElement('div');
+        why.className = 'article-why';
+        const b = document.createElement('b');
+        b.textContent = 'Why  ';
+        why.append(b, document.createTextNode(row.why));
+        el.appendChild(why);
+    }
+
+    /* our line on top of the repost */
+    const lineWrap = document.createElement('div');
+    lineWrap.className = 'article-line';
+    const line = document.createElement('input');
+    line.type = 'text';
+    line.placeholder = 'Our line on top (optional)';
+    line.value = row.repost_text ? String(row.repost_text).split('\n')[0] : '';
+    lineWrap.appendChild(line);
+
+    const composed = () => {
+        const l = line.value.trim();
+        return l ? l + '\n\n' + row.post_url : row.post_url;
+    };
+
+    /* actions */
+    const acts = document.createElement('div');
+    acts.className = 'article-actions';
+
+    if (st !== 'SKIPPED') {
+        const skip = document.createElement('button');
+        skip.textContent = 'Skip';
+        skip.title = 'Mark this article SKIPPED so it never comes back';
+        skip.onclick = () => mark(row, 'SKIPPED', skip, composed());
+        acts.appendChild(skip);
+    } else {
+        const back = document.createElement('button');
+        back.className = 'small';
+        back.textContent = 'Put back';
+        back.onclick = () => mark(row, 'NEW', back, composed());
+        acts.appendChild(back);
+    }
+
+    if (st !== 'POSTED') {
+        const copy = document.createElement('button');
+        copy.className = 'primary';
+        copy.textContent = 'Copy & open X';
+        copy.onclick = async () => {
+            await copyText(composed());
+            window.open(COMPOSE_URL, '_blank', 'noopener');
+        };
+        acts.appendChild(copy);
+
+        const done = document.createElement('button');
+        done.textContent = 'Mark posted';
+        done.onclick = () => mark(row, 'POSTED', done, composed());
+        acts.appendChild(done);
+    }
+
+    const open = document.createElement('a');
+    open.href = row.post_url || '#';
+    open.target = '_blank';
+    open.rel = 'noopener';
+    open.textContent = 'Open the post';
+    acts.appendChild(open);
+
+    if (st === 'NEW') el.appendChild(lineWrap);
+    el.appendChild(acts);
+    return el;
+}
+
+async function copyText(txt) {
+    try {
+        await navigator.clipboard.writeText(txt);
+        status('Copied. Paste it into the composer as @soldoutcomedy.', 'good');
+    } catch {
+        status('Clipboard blocked by the browser. Copy the post URL by hand.', 'err');
+    }
+}
+
+async function mark(row, newStatus, btn, repostText) {
+    const patch = {
+        status: newStatus,
+        handled_at: newStatus === 'NEW' ? null : new Date().toISOString()
+    };
+    if (newStatus === 'POSTED') patch.repost_text = repostText;
+
+    btn.disabled = true;
+    try {
+        status(newStatus === 'SKIPPED' ? 'Marking SKIPPED...' : 'Saving...', 'busy');
+        await sb('?id=eq.' + row.id, { method: 'PATCH', body: JSON.stringify(patch) });
+        status('Marked ' + newStatus + '.', 'good');
+        loadQueue();
+    } catch (err) {
+        status(err.message, 'err');
+        btn.disabled = false;
+    }
+}
+
+/* ---------- adding ----------
+   post_key is unique, so catching the same thing twice is a no-op rather than a
+   duplicate. ignore-duplicates matters here: it means a re-capture can never
+   resurrect a row somebody already marked SKIPPED. */
+async function saveCapture(p) {
+    const seen = identify(p.u);
+    if (!seen) throw new Error('Could not read a link out of that.');
+
+    const existing = ROWS.find(r => r.post_key === seen.key);
+    if (existing) {
+        status('Already in the queue, marked ' + existing.status + '.', 'good');
+        return;
+    }
+
+    status('Saving to the queue...', 'busy');
+    const inserted = await sb('?on_conflict=post_key&select=status', {
+        method: 'POST',
+        headers: { 'Prefer': 'return=representation,resolution=ignore-duplicates' },
+        body: JSON.stringify({
+            post_key: seen.key,
+            post_url: seen.url,
+            platform: seen.platform,
+            author: p.h || seen.author || '',
+            body: p.t || '',
+            posted_at: p.d || '',
+            why: p.why || '',
+            source: p.s || 'Bookmarklet',
+            status: 'NEW'
+        })
+    });
+
+    status(Array.isArray(inserted) && !inserted.length
+        ? 'Already in the queue from an earlier run.'
+        : 'Added to the queue as NEW.', 'good');
+    loadQueue();
+}
+
+document.getElementById('addBtn').onclick = async () => {
+    const btn = document.getElementById('addBtn');
+    const url = document.getElementById('addUrl').value.trim();
+    try {
+        if (!url) throw new Error('Paste a link first.');
+        if (!identify(url)) throw new Error('That does not look like a link.');
+        btn.disabled = true;
+        await saveCapture({
+            u: url,
+            h: '',
+            t: '',
+            d: '',
+            s: 'Manual',
+            why: document.getElementById('addWhy').value.trim()
+        });
+        document.getElementById('addUrl').value = '';
+        document.getElementById('addWhy').value = '';
+    } catch (err) {
+        status(err.message, 'err');
+    } finally {
+        btn.disabled = false;
+    }
+};
+
+/* ---------- capture from the bookmarklet ---------- */
+function readCapture() {
+    const m = location.hash.match(/^#capture=(.*)$/);
+    if (!m) return null;
+    history.replaceState(null, '', location.pathname + location.search);
+    try {
+        return JSON.parse(decodeURIComponent(m[1]));
+    } catch {
+        status('That capture link was malformed.', 'err');
+        return null;
+    }
+}
+
+function showCapture(p) {
+    const slot = document.getElementById('captureSlot');
+    slot.innerHTML = '';
+
+    const box = document.createElement('div');
+    box.className = 'capture';
+
+    const h = document.createElement('h3');
+    h.textContent = 'Caught one';
+
+    const who = document.createElement('div');
+    who.style.fontWeight = '700';
+    who.textContent = p.h || p.u;
+
+    const tx = document.createElement('div');
+    tx.style.whiteSpace = 'pre-wrap';
+    tx.style.margin = '8px 0 14px';
+    tx.textContent = p.t || '(no text captured)';
+
+    const acts = document.createElement('div');
+    acts.className = 'actions';
+
+    const save = document.createElement('button');
+    save.className = 'primary';
+    save.textContent = 'Save to the queue';
+    save.onclick = async () => {
+        save.disabled = true;
+        try {
+            await saveCapture(p);
+            slot.innerHTML = '';
+        } catch (err) {
+            status(err.message, 'err');
+            save.disabled = false;
+        }
+    };
+
+    const drop = document.createElement('button');
+    drop.textContent = 'Never mind';
+    drop.onclick = () => { slot.innerHTML = ''; };
+
+    acts.append(save, drop);
+    box.append(h, who, tx, acts);
+    slot.appendChild(box);
+}
+
+/* ---------- the bookmarklet ---------- */
+function buildBookmarklet() {
+    const target = location.origin + location.pathname;
+    const src = document.getElementById('bmSrc').textContent.trim().replace('__BASE__', target);
+    const href = 'javascript:' + encodeURIComponent(src);
+
+    const a = document.getElementById('bookmarklet');
+    a.href = href;
+    a.onclick = e => {
+        e.preventDefault();
+        status('Do not click it here - drag it up to your bookmarks bar, then use it out on the web.', 'busy');
+    };
+
+    document.getElementById('bmSource').textContent = href;
+    document.getElementById('bmTarget').textContent =
+        location.protocol === 'file:'
+            ? 'Heads up: this page is open over file://, so the bookmarklet would point at a file path. Serve the site over HTTP, or open the deployed page, before you drag it.'
+            : 'Captures will be sent to ' + target;
+}
+
+/* ---------- boot ---------- */
+paintConnection();
+buildBookmarklet();
+
+const capture = readCapture();
+(async () => {
+    if (!connection().ready) {
+        if (capture) showCapture(capture);
+        status('Connect to Supabase to load the queue.', 'busy');
+        return;
+    }
+    await loadQueue();
+    if (capture) {
+        try {
+            await saveCapture(capture);
+        } catch (err) {
+            status(err.message, 'err');
+            showCapture(capture);
+        }
+    }
+})();
+</script>
+</body>
+</html>
