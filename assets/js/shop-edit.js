@@ -56,6 +56,7 @@ function injectStyles() {
        nothing else on this page is rounded. */
     .view-toggle {
       display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+      border: 2px solid var(--paper); padding: 5px 9px;
       font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.1em;
       text-transform: uppercase; user-select: none;
     }
@@ -244,6 +245,7 @@ function buildBar() {
     spacer.className = 'spacer';
 
     const toggle = buildViewToggle(said);
+    const saveAll = buildSaveAll(said);
 
     const out = document.createElement('button');
     out.type = 'button';
@@ -251,7 +253,7 @@ function buildBar() {
     out.textContent = 'Sign out';
     out.onclick = async () => { await signOut(); location.reload(); };
 
-    bar.append(who, said, spacer, toggle, out);
+    bar.append(who, said, spacer, toggle, saveAll, out);
 
     const panel = buildAddPanel();
 
@@ -262,6 +264,56 @@ function buildBar() {
 
     listings.prepend(bar, panel, pending);
     showPending();
+}
+
+/* Everything on a card commits on its own - the in-place editors save when they lose
+   focus, and each card's own Save handles its status. This is for the case where several
+   statuses have been changed and pressing four separate Saves is silly. It only writes
+   the ones that actually differ from the row, so pressing it with nothing pending says
+   so rather than making four pointless requests. */
+function buildSaveAll(said) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Save all';
+
+    btn.onclick = async () => {
+        /* An editor still focused has not committed yet; blurring it does that first,
+           so Save all does not miss the field being typed into as it is pressed. */
+        if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+
+        const cards = [...document.querySelectorAll('.item-card')]
+            .filter(c => c._row && c._status);
+        const changed = cards.filter(c => String(c._row.status || 'Active') !== c._status.value);
+
+        if (!changed.length) {
+            said.textContent = 'Nothing waiting to be saved.';
+            setTimeout(() => { said.textContent = ''; }, 2500);
+            return;
+        }
+
+        btn.disabled = true;
+        said.textContent = 'Saving ' + changed.length + '...';
+        let saved = 0;
+
+        for (const card of changed) {
+            const { data, error } = await supabase
+                .from(TABLE).update({ status: card._status.value })
+                .eq('id', card._row.id).select().single();
+            if (error) continue;
+            rows.set(keyOf(data.item_url), data);
+            Object.assign(card._row, data);
+            card.classList.toggle('sold', data.status === 'Sold');
+            saved++;
+        }
+
+        btn.disabled = false;
+        said.textContent = saved === changed.length
+            ? 'Saved ' + saved + '.'
+            : 'Saved ' + saved + ' of ' + changed.length + '; the rest were refused.';
+        setTimeout(() => { said.textContent = ''; }, 3000);
+    };
+
+    return btn;
 }
 
 /* Flips the page between the editing view and what a visitor sees. The choice is
@@ -591,6 +643,10 @@ function decorate() {
             shot.appendChild(tabBadge);
         }
 
+        /* Hung on the element so Save all can find them without a second registry to
+           keep in step with the grid re-rendering. */
+        card._row = row;
+
         const box = document.createElement('div');
         box.className = 'editbox';
 
@@ -605,6 +661,8 @@ function decorate() {
             if ((row.status || 'Active') === s) o.selected = true;
             status.appendChild(o);
         }
+
+        card._status = status;
 
         const note = document.createElement('div');
         note.className = 'note';
