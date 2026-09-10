@@ -441,8 +441,10 @@ function openFromBookmarklet() {
     if (field) field.value = asked.split('?')[0];
     panel.showModal();
 
-    const caption = panel.querySelectorAll('input')[1];
-    if (caption) caption.focus();
+    /* The URL is already filled, so the useful thing to have under the cursor is the
+       button that files it. */
+    const go = panel.querySelector('button');
+    if (go) go.focus();
 }
 
 /* ---------- the panel down the right ---------- */
@@ -664,10 +666,6 @@ function buildAddPanel() {
     url.type = 'text';
     url.placeholder = 'https://www.ebay.com/itm/...';
 
-    const caption = document.createElement('input');
-    caption.type = 'text';
-    caption.placeholder = 'Our own line about it';
-
     const go = document.createElement('div');
     go.className = 'go';
     const btn = document.createElement('button');
@@ -696,11 +694,13 @@ function buildAddPanel() {
         /* Hidden to begin with. A prop added here has no title, price or photo until
            a build reads them from the storefront, so publishing it straight away would
            put a blank card in front of a visitor. It arrives stamped HIDDEN in
-           backstage, and you press ACTIVE when it looks right. */
+           backstage, and you press ACTIVE when it looks right.
+
+           No caption either: it is written on the card, where you can see the thing it
+           is about. */
         const { error } = await supabase.from(TABLE).insert({
             item_url: clean,
             status: 'Hidden',
-            blurb: caption.value.trim(),
             position: (Math.max(0, ...[...rows.values()].map(r => r.position || 0)) + 10)
         });
         btn.disabled = false;
@@ -711,7 +711,7 @@ function buildAddPanel() {
                 : error.message;
             return;
         }
-        url.value = caption.value = '';
+        url.value = '';
         note.textContent = 'Added, hidden. Build to pull its title and price from eBay, then press ACTIVE on the card.';
         await loadRows();
     };
@@ -723,7 +723,7 @@ function buildAddPanel() {
 
     const form = document.createElement('div');
     form.className = 'add-fields';
-    form.append(field('Listing URL', url), field('Caption', caption), go);
+    form.append(field('Listing URL', url), go);
 
     panel.append(head, form);
     return panel;
