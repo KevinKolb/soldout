@@ -61,7 +61,7 @@
     .kicker, .sub, .hero-tag, .topbar, .meta,
     .item-badge, .section-note {
       font-family: var(--mono);
-      letter-spacing: 0.18em;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
@@ -75,10 +75,10 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
-      padding: 0.6rem 1.1rem;
+      padding: 0.7rem 1.1rem;
       background: var(--ink);
       color: var(--paper);
-      font-size: 0.66rem;
+      font-size: 0.8rem;
       font-weight: 700;
     }
 
@@ -124,13 +124,13 @@
       position: absolute;
       top: 1.1rem;
       right: 1.1rem;
-      font-size: 0.6rem;
+      font-size: 0.75rem;
       font-weight: 700;
       border: 2px solid var(--ink);
       padding: 3px 7px;
     }
 
-    .kicker, .sub { margin: 0; font-size: 0.7rem; font-weight: 700; }
+    .kicker, .sub { margin: 0; font-size: 0.85rem; font-weight: 700; line-height: 1.5; }
 
     .hero h1 {
       font-family: 'Bangers', cursive;
@@ -196,8 +196,8 @@
       margin: 0;
       background: var(--paper);
       border: var(--rule) solid var(--ink);
-      padding: 1rem 1.1rem;
-      font-size: 0.72rem;
+      padding: 1.1rem 1.2rem;
+      font-size: 0.85rem;
       font-weight: 700;
       line-height: 1.6;
     }
@@ -237,8 +237,8 @@
       color: var(--ink);
       border-right: var(--rule) solid var(--ink);
       border-bottom: var(--rule) solid var(--ink);
-      padding: 4px 9px;
-      font-size: 0.58rem;
+      padding: 5px 10px;
+      font-size: 0.72rem;
       font-weight: 700;
     }
 
@@ -254,7 +254,7 @@
        spaces still collapse, so it cannot be used to lay anything out - just to break
        a line where the writing wants one. eBay's own titles have no newlines, so this
        changes nothing for a prop without a caption. */
-    .item-title { font-weight: 700; font-size: 0.9rem; line-height: 1.3; white-space: pre-line; }
+    .item-title { font-weight: 700; font-size: 1.02rem; line-height: 1.4; white-space: pre-line; }
 
     /* Drawn from the reference tag: six sided, generously rounded, a chunky ink rule
        all the way round, and the left corners chamfered back to a short blunt edge about
@@ -299,12 +299,12 @@
     .price-face {
       display: block;
       position: relative;
-      padding: 0.12rem 0.8rem 0.18rem 1.55rem;
+      padding: 0.14rem 0.9rem 0.2rem 1.6rem;
       background: var(--acid);
       color: var(--ink);
       border-radius: 8px;
       font-family: 'Bangers', cursive;
-      font-size: 1.6rem;
+      font-size: 1.75rem;
       line-height: 1.15;
       letter-spacing: 1px;
       clip-path: polygon(0 30%, 14px 0, 100% 0, 100% 100%, 14px 100%, 0 70%);
@@ -324,11 +324,11 @@
     }
 
     .meta {
-      padding-top: 0.5rem;
+      padding-top: 0.55rem;
       border-top: 2px solid var(--ink);
-      font-size: 0.6rem;
+      font-size: 0.74rem;
       font-weight: 400;
-      color: #555;
+      color: #4a4a4a;
       line-height: 1.5;
     }
 
@@ -345,16 +345,16 @@
 
     .tab {
       font-family: var(--mono);
-      font-size: 0.6rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.14em;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
       background: var(--paper);
       color: var(--ink);
       border: var(--rule) solid var(--ink);
       border-bottom: none;
       margin-bottom: -4px;              /* overlaps the bar's rule */
-      padding: 7px 12px 9px;
+      padding: 9px 14px 11px;
       cursor: pointer;
     }
 
@@ -370,12 +370,12 @@
 
     .tag {
       font-family: var(--mono);
-      font-size: 0.5rem;
+      font-size: 0.66rem;
       font-weight: 700;
-      letter-spacing: 0.12em;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
       border: 2px solid var(--ink);
-      padding: 2px 5px;
+      padding: 3px 6px;
       line-height: 1.4;
     }
 
@@ -448,8 +448,9 @@
 
     .serious-body {
       margin: 0;
-      font-size: 0.95rem;
+      font-size: 1.05rem;
       line-height: 1.7;
+      max-width: 68ch;
     }
 
     /* Below this the banner is too narrow for the logo to sit beside the
@@ -463,8 +464,22 @@
         display: inline-block;
         margin: 0 auto 0.75rem;
       }
-      .item-grid { grid-template-columns: repeat(2, 1fr); }
+
+      /* One column. Two put a 160px card on a phone, which left the photo the size of
+         a stamp and the title in three words a line. */
+      .item-grid { grid-template-columns: 1fr; }
+
+      .wrap { padding: 1.25rem 0.9rem 2rem; }
       .serious { padding: 1.25rem 1.15rem 1.35rem; }
+      .serious-lead { font-size: 1rem; }
+      .serious-body { font-size: 1rem; }
+
+      /* The back link and the strip do not fit on one line at this width, and
+         squeezing them cost the strip its legibility. */
+      .topbar { flex-wrap: wrap; gap: 0.35rem 1rem; font-size: 0.74rem; }
+
+      .tabs { gap: 4px; }
+      .tab { font-size: 0.72rem; padding: 8px 11px 10px; }
     }
   </style>
 </head>

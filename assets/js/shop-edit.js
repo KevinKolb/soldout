@@ -78,19 +78,19 @@ function injectStyles() {
       top: calc(var(--topbar-h, 40px) + 10px);
       right: 12px;
       z-index: 30;
-      width: 212px;
+      width: 232px;
       display: flex; flex-direction: column; gap: 8px;
       background: var(--ink); color: var(--paper);
       border: var(--rule) solid var(--ink);
       box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.25);
       padding: 10px;
-      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
+      font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.1em;
       text-transform: uppercase;
     }
 
     .edit-panel button {
       width: 100%;
-      font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
+      font-family: var(--mono); font-size: 0.76rem; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase;
       background: var(--acid); color: var(--ink);
       border: 2px solid var(--acid); padding: 7px 10px; cursor: pointer;
@@ -100,7 +100,7 @@ function injectStyles() {
     /* A link that has to sit in a row of buttons without looking like the odd one. */
     .edit-panel .linkbtn {
       display: block; width: 100%; box-sizing: border-box; text-align: center;
-      font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
+      font-family: var(--mono); font-size: 0.76rem; font-weight: 700;
       letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
       background: var(--acid); color: var(--ink);
       border: 2px solid var(--acid); padding: 7px 10px;
@@ -109,14 +109,14 @@ function injectStyles() {
 
     .edit-panel .said {
       text-transform: none; letter-spacing: 0; font-family: var(--sans);
-      font-size: 0.72rem; line-height: 1.4;
+      font-size: 0.82rem; line-height: 1.45;
     }
     .edit-panel .said[hidden] { display: none; }
 
     /* Last, and quiet: useful to confirm once, not worth the top of the panel. */
     .edit-panel .who {
       text-transform: none; letter-spacing: 0; font-family: var(--sans);
-      font-size: 0.66rem; opacity: 0.6; word-break: break-all;
+      font-size: 0.8rem; opacity: 0.6; word-break: break-all;
       border-top: 2px solid rgba(255, 255, 255, 0.25); padding-top: 7px;
     }
 
@@ -145,7 +145,7 @@ function injectStyles() {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       cursor: pointer;
       border: 2px solid var(--paper); padding: 7px 9px;
-      font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.1em;
+      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em;
       text-transform: uppercase; user-select: none;
     }
     .view-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -193,7 +193,7 @@ function injectStyles() {
       display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     }
     .add-modal label {
-      font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.14em;
+      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em;
       text-transform: uppercase; display: block; margin-bottom: 4px;
     }
     .add-modal input, .add-modal select,
@@ -204,7 +204,7 @@ function injectStyles() {
     .editbox textarea { min-height: 4.5em; resize: vertical; line-height: 1.45; }
     .add-modal .go { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
     .add-modal button {
-      font-family: var(--mono); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      font-family: var(--mono); font-size: 0.76rem; font-weight: 700; letter-spacing: 0.1em;
       text-transform: uppercase; background: var(--ink); color: var(--paper);
       border: 2px solid var(--ink); padding: 8px 12px; cursor: pointer;
     }
@@ -215,13 +215,13 @@ function injectStyles() {
       display: grid; gap: 6px;
     }
     .editbox label {
-      font-family: var(--mono); font-size: 0.5rem; letter-spacing: 0.12em;
+      font-family: var(--mono); font-size: 0.68rem; letter-spacing: 0.09em;
       text-transform: uppercase; color: #555;
     }
     .editbox .row { display: flex; gap: 6px; }
     .editbox .row > * { flex: 1; min-width: 0; }
     .editbox button {
-      font-family: var(--mono); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em;
+      font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
       text-transform: uppercase; background: var(--ink); color: var(--paper);
       border: 2px solid var(--ink); padding: 6px 8px; cursor: pointer;
     }
@@ -239,7 +239,7 @@ function injectStyles() {
     .editbox .states .state[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
     .editbox .states .state.danger { color: var(--red); border-color: var(--red); }
     .editbox .states .state.danger[aria-pressed="true"] { background: var(--red); color: var(--paper); }
-    .editbox .note { font-family: var(--sans); font-size: 0.62rem; color: #555; }
+    .editbox .note { font-family: var(--sans); font-size: 0.78rem; color: #555; }
     .editbox .note.bad { color: var(--red); font-weight: 700; }
 
     /* Tags edit where they sit. The two classification chips only ever hold one of
@@ -272,7 +272,7 @@ function injectStyles() {
       border-bottom: var(--rule) solid var(--ink);
       padding: 4px 9px;
       font-family: var(--mono);
-      font-size: 0.58rem;
+      font-size: 0.74rem;
       font-weight: 700;
       letter-spacing: 0.18em;
       text-transform: uppercase;
