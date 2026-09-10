@@ -16,8 +16,8 @@
  *      - Repository access: only KevinKolb/soldout
  *      - Repository permissions: Actions -> Read and write
  *      Nothing else. It cannot read code or write to the repo with that scope.
- *   2. Give it to the function, never to the repo:
- *        supabase secrets set GITHUB_TOKEN=github_pat_...
+   2. Give it to the function, never to the repo:
+ *        supabase secrets set GITHUB_TOKEN_SOC=github_pat_...
  *      or Dashboard -> Edge Functions -> Secrets.
  *   3. supabase functions deploy build-shop
  *
@@ -66,9 +66,12 @@ Deno.serve(async (req) => {
         return json({ error: 'That account cannot start a build.' }, 403);
     }
 
-    const token = Deno.env.get('GITHUB_TOKEN');
+    /* GITHUB_TOKEN_SOC is the name it goes by here - SOC for SOLD OUT, so it does not
+       collide with the other projects' tokens in the same account. The plain name is
+       accepted too, so renaming it either way cannot break the button. */
+    const token = Deno.env.get('GITHUB_TOKEN_SOC') ?? Deno.env.get('GITHUB_TOKEN');
     if (!token) {
-        return json({ error: 'GITHUB_TOKEN is not set on this function.' }, 500);
+        return json({ error: 'GITHUB_TOKEN_SOC is not set on this function.' }, 500);
     }
 
     const res = await fetch(
