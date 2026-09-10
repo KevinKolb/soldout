@@ -199,9 +199,10 @@ function buildBar() {
     const who = document.createElement('span');
     who.textContent = 'Editing as ' + user.email;
 
+    /* Empty in backstage mode - the per-card note already says what a save did, and
+       edits are live now anyway. It still carries the public-preview message. */
     const said = document.createElement('span');
     said.className = 'said';
-    said.textContent = 'Saves reach the public page at the next build.';
 
     const spacer = document.createElement('span');
     spacer.className = 'spacer';
@@ -262,7 +263,7 @@ function buildViewToggle(said) {
         pub.classList.toggle('active', publicView);
         said.textContent = publicView
             ? 'Previewing the public page. Nothing here is editable.'
-            : 'Saves reach the public page at the next build.';
+            : '';
         try { localStorage.setItem(LS_VIEW, publicView ? 'public' : 'backstage'); } catch { /* private mode */ }
     };
 
