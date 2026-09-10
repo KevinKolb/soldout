@@ -68,8 +68,9 @@ The goal is to sell through every available channel, starting with commission.
 How it works now:
 
 1. Anything on the eBay influencer storefront is published automatically with the
-   default tags, so listing it there is enough to put it on the shop. Rows in the `shop`
-   table in Supabase ([tools/shop-schema.sql](tools/shop-schema.sql)) then say what we
+   default tags, but **hidden** — as is anything added through the shop page itself.
+   Nothing reaches a visitor until somebody presses ACTIVE on its card. Rows in the
+   `shop` table in Supabase ([tools/shop-schema.sql](tools/shop-schema.sql)) say what we
    want to add: a row carries the listing URL, three classification fields, and optional
    title/price/image overrides:
    `tag_source` (the marketplace, e.g. `eBay`), `tag_type` (how we get paid: `Commission`

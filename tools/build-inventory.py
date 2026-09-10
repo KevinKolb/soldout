@@ -23,10 +23,11 @@ eBay can be enriched, so a row from anywhere else has to carry its own title,
 price and image or its card publishes blank.
 
 A storefront listing that no row mentions is published anyway, with the default
-tags, so putting something on the influencer storefront is enough to put it on the
-shop. A row is then only needed to say something about it: a caption, a tab, or a
-Hidden that takes it back down. Hidden is checked before adoption, so a suppressed
-listing cannot creep back in as an unclaimed one.
+tags - but hidden, like anything else nobody has looked at yet. So listing something
+on the influencer storefront puts it in front of the owner rather than in front of an
+audience, and pressing ACTIVE on the card is what publishes it. That press is also
+what gives it a row. Hidden is checked before adoption, so a suppressed listing
+cannot creep back in as an unclaimed one.
 
 Every column on a row ships as an element of the same name:
 
@@ -195,14 +196,19 @@ def build_items(store, rows):
             f"{k}={v}" for k, v in EPN_PARAMS.items())
 
     def from_storefront(iid, v):
-        """A storefront listing nobody has said anything about yet."""
+        """A storefront listing nobody has said anything about yet.
+
+        Hidden, like anything else that arrives without being looked at. It is on the
+        shop, stamped, where the owner can see it and press ACTIVE; a visitor does not
+        get it until somebody has.
+        """
         return {
             "title": v["title"] or f"eBay item {iid}",
             "price": v["price"],
             "condition": v["condition"],
             "url": link(iid, ""),
             "image": v["image"],
-            "status": "active",
+            "status": "hidden",
             "tag_source": "eBay",
             "tag_type": "Commission",
             "tag_location": "External",
