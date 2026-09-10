@@ -378,36 +378,6 @@
 
     .item-card.sold .tag { color: #777; border-color: #777; }
 
-    /* Inverted against the cards so it reads as an action rather than a listing.
-       Only ever rendered in edit mode now - assets/js/shop-edit.js builds the tile
-       and this styles it. A visitor never sees one. */
-    .cta-card {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 1.25rem;
-      min-height: 190px;
-      padding: 1rem;
-      background: var(--ink);
-      color: var(--acid);
-      border: var(--rule) solid var(--ink);
-      text-decoration: none;
-      font-family: var(--mono);
-      text-transform: uppercase;
-      letter-spacing: 0.18em;
-      transition: transform 0.1s linear, box-shadow 0.1s linear;
-    }
-
-    .cta-card:hover, .cta-card:focus-visible {
-      transform: translate(-4px, -4px);
-      box-shadow: 8px 8px 0 var(--paper);
-      outline: none;
-    }
-
-    .cta-kicker { font-size: 0.6rem; font-weight: 400; color: var(--paper); }
-    .cta-line { font-size: 0.86rem; font-weight: 700; line-height: 1.45; }
-    .cta-arrow { font-size: 1.6rem; line-height: 1; }
-
     /* A hidden prop is only ever rendered for the owner, and it says so across its
        photograph rather than in a corner - the whole point is that it should not be
        mistaken at a glance for something still on sale. */

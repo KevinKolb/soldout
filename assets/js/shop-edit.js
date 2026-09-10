@@ -165,7 +165,6 @@ function injectStyles() {
     /* Previewing the public page. The editors are hidden rather than torn down, so
        flipping back does not have to rebuild anything. */
     body.viewing-public .editbox,
-    body.viewing-public .add-tile,
     body.viewing-public .add-panel { display: none; }
 
     /* Nothing offers itself for editing in the preview either - a hover that lights up
@@ -175,22 +174,6 @@ function injectStyles() {
     body.viewing-public .cap-edit:hover,
     body.viewing-public .tag-edit:hover,
     body.viewing-public .item-badge.tag-edit:hover { background: inherit; box-shadow: none; }
-
-    /* The add tile keeps the grid's inverted treatment but spans the full width, so
-       it always lands on a row of its own however many props there are - as a bar under
-       them rather than a card pretending to be a prop. */
-    .add-tile {
-      grid-column: 1 / -1;
-      flex-direction: row;
-      align-items: center;
-      gap: 0.9rem;
-      min-height: 0;
-      padding: 0.9rem 1.1rem;
-      cursor: pointer;
-      text-align: left;
-    }
-    .add-tile .cta-line { flex: 1; text-transform: none; letter-spacing: 0; font-family: var(--sans); }
-    .add-tile .cta-arrow { font-size: 1.9rem; }
 
     .add-panel {
       border: var(--rule) solid var(--ink); background: var(--paper);
@@ -409,6 +392,10 @@ function buildBar() {
     who.className = 'who';
     who.textContent = user.email;
 
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.textContent = '+ Add prop';
+
     /* Straight out to the routine, where its runs, its logs and its schedule are.
        Its orders live in tools/prop-bot.md; this is where you watch it work. */
     const bot = document.createElement('a');
@@ -430,11 +417,18 @@ function buildBar() {
        everything below it only makes sense in one of them. The message sits directly
        under Build, because that is the only thing that writes to it - a report belongs
        against the button that caused it, not at the top of the panel. */
-    bar.append(buildViewToggle(said), bot, saveAll, said, out, who);
+    bar.append(buildViewToggle(said), add, bot, saveAll, said, out, who);
     document.body.appendChild(bar);
     trackHeaderHeight();
 
     const panel = buildAddPanel();
+    add.onclick = () => {
+        panel.hidden = !panel.hidden;
+        if (panel.hidden) return;
+        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        const first = panel.querySelector('input');
+        if (first) first.focus();
+    };
 
     listings.prepend(panel);
     refreshTabList();
@@ -1010,7 +1004,6 @@ async function start(u) {
     if (typeof buildTabs === 'function') buildTabs();
     buildBar();
     decorate();
-    addTile();
     ghostTab();
 }
 
@@ -1050,45 +1043,9 @@ function ghostTab() {
     bar.appendChild(b);
 }
 
-/* The last cell of the grid, in edit mode only. It was the storefront tile on the
-   public page; a visitor gets no tile at all now, and the owner gets the one action
-   worth having in reach of the props themselves - after them, where the grid ends
-   and the eye already is. */
-function addTile() {
-    const grid = document.getElementById('itemGrid');
-    const panel = document.getElementById('addPanel');
-    if (!grid || !panel || grid.querySelector('.add-tile')) return;
-
-    const tile = document.createElement('button');
-    tile.type = 'button';
-    tile.className = 'cta-card add-tile';
-
-    const kicker = document.createElement('span');
-    kicker.className = 'cta-kicker';
-    kicker.textContent = 'Not enough junk?';
-
-    const line = document.createElement('span');
-    line.className = 'cta-line';
-    line.textContent = 'Add a prop to the shop';
-
-    const plus = document.createElement('span');
-    plus.className = 'cta-arrow';
-    plus.textContent = '+';
-
-    tile.append(kicker, line, plus);
-    tile.onclick = () => {
-        panel.hidden = false;
-        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        const first = panel.querySelector('input');
-        if (first) first.focus();
-    };
-
-    grid.appendChild(tile);
-}
-
 /* The grid re-renders on every tab click, which throws the editors away with it. */
 document.addEventListener('shop:rendered', () => {
-    if (isOwner(user)) { decorate(); addTile(); ghostTab(); refreshTabList(); }
+    if (isOwner(user)) { decorate(); ghostTab(); refreshTabList(); }
 });
 
 start(await currentUser());
