@@ -160,6 +160,15 @@
         .counts { font-size: 12px; color: #666; }
         .counts strong { color: #000; }
 
+        a.linkbtn {
+            font-family: inherit; font-size: 11px; font-weight: 600;
+            padding: 6px 10px; border: 2px solid #000;
+            background: #fff; color: #000;
+            text-decoration: none; display: inline-block;
+            transition: all 0.15s;
+        }
+        a.linkbtn:hover { background: #000; color: #fff; }
+
         .article {
             border: 2px solid #000;
             padding: 18px 20px;
@@ -322,6 +331,9 @@
             <div class="counts" id="counts">Not loaded.</div>
             <div class="actions">
                 <button class="small" id="refresh">Refresh</button>
+                <a class="linkbtn" href="https://claude.ai/code/routines/trig_01TwjWSP2bjnhptQgtg7DcQa"
+                   target="_blank" rel="noopener"
+                   title="SOC SOCIALIZER BOT - runs daily at 7:12am and fills this queue">SOC SOCIALIZER BOT &#8599;</a>
             </div>
         </div>
 
@@ -646,8 +658,12 @@ async function loadQueue() {
     try {
         status('Loading the queue...', 'busy');
         ROWS = (await sb('?select=*&order=created_at.desc&limit=1000')) || [];
-        render();
-        status(ROWS.length + ' article(s) loaded.', 'good');
+        /* say what is on screen, not what is in the table - the tabs filter the list,
+           so a raw row count reads as a bug when the other rows are just on another tab */
+        const shown = render();
+        status(shown === ROWS.length
+            ? shown + ' article(s).'
+            : shown + ' in ' + FILTER + ', ' + ROWS.length + ' in the queue all told.', 'good');
     } catch (err) {
         ROWS = [];
         wrap.innerHTML = '';
@@ -681,10 +697,11 @@ function render() {
             ? 'Nothing waiting. Go read something and press That’s Funny! on it.'
             : 'No ' + FILTER.toLowerCase() + ' articles.';
         wrap.appendChild(d);
-        return;
+        return 0;
     }
 
     for (const row of shown) wrap.appendChild(card(row));
+    return shown.length;
 }
 
 function card(row) {

@@ -23,6 +23,21 @@ un-skip something they already threw out.
 
 You make **no git commits**. Nothing in this job edits a file in the repo.
 
+## Getting into Supabase
+
+The project URL and the publishable key are committed in the `SUPABASE` block near the top
+of the script in [admin/socializer.html](../admin/socializer.html). Read them out of that
+file — do not ask for them and do not hardcode them here, so rotating the key stays a
+one-file change.
+
+Every call needs both headers:
+
+```sh
+curl -s "$SUPABASE_URL/rest/v1/socializer?select=post_key" \
+  -H "apikey: $SUPABASE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_KEY"
+```
+
 ## Step 1 — read the criteria from the repo, not from memory
 
 Open [admin/socializer.html](../admin/socializer.html) and find the section headed **What
@@ -40,7 +55,41 @@ At the time of writing it reads:
 
 If the list on the page differs from what is printed above, **the page wins**.
 
-## Step 2 — check the popular sources first
+## Step 2 — look at what already got posted
+
+The criteria tell you the rule. The queue tells you the taste. Before you go looking, read
+what has actually cleared the bar:
+
+```sh
+curl -s "$SUPABASE_URL/rest/v1/socializer?status=eq.POSTED&select=author,platform,body,why,repost_text&order=handled_at.desc&limit=30" \
+  -H "apikey: $SUPABASE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_KEY"
+```
+
+Those are the ones a human read and chose to put out under our name. Study them for the
+things the criteria cannot say out loud: how long a post tends to be, how broad or how dry
+the joke is, whether it leans more to selling or more to found objects, which platforms keep
+earning their place, and what `repost_text` shows about the line we like to put on top.
+
+Then read the other side, which is just as instructive:
+
+```sh
+curl -s "$SUPABASE_URL/rest/v1/socializer?status=eq.SKIPPED&select=author,platform,body,why&order=handled_at.desc&limit=30" \
+  -H "apikey: $SUPABASE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_KEY"
+```
+
+Every one of those is a candidate somebody looked at and threw out. If your nominations keep
+resembling that pile, the problem is your judgement, not their patience.
+
+Both lists start empty and stay thin for a while. That is fine — fall back on the criteria
+and do not invent a pattern out of two rows. Once there are ten or more POSTED, treat them
+as the sharper spec.
+
+If either call fails, say so in your final message and carry on with the criteria alone.
+A calibration you could not fetch is not a reason to skip the run.
+
+## Step 3 — check the popular sources first
 
 These are people who reliably make the kind of thing we want. Check them before you go
 searching the open web, and take roughly half a run's candidates from here whenever they
@@ -61,7 +110,7 @@ you can actually confirm and nominate it once.
 *(This list is the place to add sources. Add a heading and its links, commit, and the next
 run picks it up.)*
 
-## Step 3 — then search wide
+## Step 4 — then search wide
 
 Use WebSearch and WebFetch to find other public posts from roughly the last seven days.
 
@@ -79,7 +128,7 @@ original.
 to a feed or a profile. No confirmed permalink, no candidate. Never invent a URL, a handle,
 or post text, and never guess at an id.
 
-## Step 4 — judge hard
+## Step 5 — judge hard
 
 Aim for **3 to 8** candidates a run. Returning one, or none, is a fine outcome and a much
 better one than padding. A thin queue of things that are actually funny beats a fat queue of
@@ -89,22 +138,7 @@ Skip anything that is: an ad or brand marketing, engagement bait, cruel at someb
 expense, political, sexual, or about a named private individual. Skip anything you would
 have to explain.
 
-## Step 5 — write the rows to Supabase
-
-### Getting in
-
-The project URL and the publishable key are committed in the `SUPABASE` block near the top
-of the script in [admin/socializer.html](../admin/socializer.html). Read them out of that
-file — do not ask for them and do not hardcode them here, so rotating the key stays a
-one-file change.
-
-Every call needs both headers:
-
-```sh
-curl -s "$SUPABASE_URL/rest/v1/socializer?select=post_key" \
-  -H "apikey: $SUPABASE_KEY" \
-  -H "Authorization: Bearer $SUPABASE_KEY"
-```
+## Step 6 — write the rows to Supabase
 
 ### The dedupe key
 
@@ -157,12 +191,12 @@ description of the post there — `why` is where your own words go.
 `ignore-duplicates` means a key that already exists is silently left alone, so a re-run
 cannot overwrite a human's decision. Rely on it, but still check first.
 
-## Step 6 — report
+## Step 7 — report
 
 There is no commit and nothing to push, so the run's only output is your final message. Say:
 
 - how many rows you inserted, and the handle behind each
-- roughly how many candidates you threw out at Step 4, and for what
+- roughly how many candidates you threw out at Step 5, and for what
 - anything that got in the way: searches that turned up nothing, permalinks you could not
   confirm, a Supabase call that failed and what it said
 
