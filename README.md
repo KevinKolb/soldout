@@ -40,10 +40,19 @@ are funny and either selling-related or a found object, and you work the queue d
 article at a time: **Skip** marks it SKIPPED and it never comes back, **Copy & open X**
 puts the words on your clipboard and opens the composer.
 
-Posting is deliberately manual. Nothing on the page talks to X: you paste into
-<https://x.com/compose/post> signed in as @soldoutcomedy and press Post yourself. Where a
-post *came from* is a separate question — an article can start life on X, Facebook,
-Instagram, YouTube or any other link on the planet.
+Posting is deliberately manual. Nothing on the page talks to any platform: it holds the
+words, you press Post. Where a post *came from* and where it *goes* are separate questions —
+an article can start life on any link on the planet, and go out to any of three destinations.
+
+| Destination | How it works |
+| --- | --- |
+| **X** | Paste into the composer; the link unfurls into the original post |
+| **Facebook** | Same, into the Page composer. No prefill exists — its old sharer link lands text locked and uneditable |
+| **Instagram** | The odd one out: needs an image or video, has no composer to open, and a caption URL is not clickable. The button copies a caption and credits the author; you bring the screenshot. It greys out when the source has no media at all |
+
+`posted_to` records which destinations actually have it, so `POSTED` never has to mean
+"posted… somewhere". `has_media` is set at capture time from the source's `og:image` /
+`og:video`, and is what greys the Instagram button out.
 
 Three things fill the queue, and all three write to the same Supabase table:
 

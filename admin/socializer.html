@@ -202,6 +202,24 @@
         .article-line input { font-size: 13px; padding: 8px 10px; }
 
         .article-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .article-actions button:disabled { text-decoration: line-through; }
+
+        .posted-row {
+            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+            margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd;
+        }
+        .posted-row .lbl {
+            font-size: 10px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.5px; color: #999;
+        }
+        .chip {
+            font-family: inherit; font-size: 11px; font-weight: 600;
+            padding: 4px 10px; border: 2px solid #ccc; background: #fff; color: #999;
+            cursor: pointer; transition: all 0.15s;
+        }
+        .chip:hover:not(:disabled) { border-color: #000; color: #000; }
+        .chip.on { background: #2ecc71; border-color: #24a25b; color: #000; }
+        .chip:disabled { opacity: 0.4; cursor: not-allowed; }
         .article-actions a {
             font-size: 11px; color: #666; text-decoration: none;
             border-bottom: 1px solid #ccc; padding-bottom: 1px;
@@ -240,7 +258,10 @@
             padding: 16px 24px;
             display: flex; align-items: center; gap: 14px;
         }
-        .x-box-head img { width: 26px; height: 26px; display: block; filter: invert(1); }
+        .x-box-head img { width: 26px; height: 26px; display: block; object-fit: contain; }
+        .x-box-head img.mono { filter: invert(1); }   /* the X mark is black on transparent */
+        .x-box + .x-box { margin-top: 20px; }
+        .x-box-body .why-not { font-size: 13px; color: #c0392b; margin-bottom: 14px; }
         .x-box-head .t { font-size: 16px; font-weight: 700; letter-spacing: -0.25px; }
         .x-box-head .h { margin-left: auto; font-size: 12px; opacity: 0.7; }
         .x-box-body { padding: 24px; }
@@ -380,32 +401,11 @@
 
     <section>
         <h2>Where it goes</h2>
-        <div class="x-box">
-            <div class="x-box-head">
-                <img src="../assets/images/x_logo.png" alt="X">
-                <span class="t">X</span>
-                <span class="h">@soldoutcomedy</span>
-            </div>
-            <div class="x-box-body">
-                <p><b>This is a cut and paste post method.</b> Nothing on this page talks to X. There is no API key,
-                    no scheduler, no automatic posting. The Socializer finds the post and holds the words. You are
-                    the one who presses Post.</p>
-                <ol>
-                    <li>Press <b>Copy &amp; open X</b> on an article in the queue. The text lands on your clipboard
-                        and <code>https://x.com/compose/post</code> opens in a new tab.</li>
-                    <li>Check that the tab is signed in as <b>@soldoutcomedy</b> and not your personal account.</li>
-                    <li>Paste. The pasted link renders as the original post, so it reads as a repost with our line on top.</li>
-                    <li>Press Post on X, come back here, and press <b>Mark posted</b> so it leaves the queue.</li>
-                </ol>
-                <a class="compose" href="https://x.com/compose/post" target="_blank" rel="noopener">Open x.com/compose/post</a>
-                <div class="x-note">
-                    X is where we post. It is not where the queue has to come from &mdash; an article can start life
-                    as a Facebook page, an Instagram reel, a YouTube video or any other link on the planet, and it
-                    still gets pasted into the X composer, where the link renders as a card. When a second
-                    destination shows up it gets its own container down here and the same cut and paste treatment.
-                </div>
-            </div>
-        </div>
+        <p class="note" style="margin-bottom:20px">
+            Every one of these is a cut and paste method. Nothing on this page talks to any
+            platform: it holds the words, you press Post.
+        </p>
+        <div id="destinations"></div>
     </section>
 
     <div class="footer">
@@ -471,7 +471,8 @@ if(!text)text=sel()||meta('og:description')||meta('description')||meta('og:title
 if(!when)when=meta('article:published_time')||meta('og:updated_time')||'';
 if(text.length>1200)text=text.slice(0,1200)+'...';
 
-var payload={u:url,h:handle,t:text,d:when,s:'Bookmarklet'};
+var media=!!(meta('og:image')||meta('og:video')||meta('twitter:image')||document.querySelector('video'));
+var payload={u:url,h:handle,t:text,d:when,s:'Bookmarklet',m:media};
 window.open(BASE+'#capture='+encodeURIComponent(JSON.stringify(payload)),'_blank');
 })();
 </script>
@@ -498,7 +499,69 @@ const SUPABASE = {
 };
 
 const LS_CONN = 'soldout_socializer_conn';   /* local override, for trying it before committing */
-const COMPOSE_URL = 'https://x.com/compose/post';
+/* Where an article can go. Source platform and destination are different things:
+   anything can come in, but it only goes out somewhere in this list. */
+const DESTINATIONS = [
+    {
+        id: 'X',
+        handle: '@soldoutcomedy',
+        logo: '../assets/images/x_logo.png',
+        mono: true,                       /* black mark, needs inverting on the black bar */
+        compose: 'https://x.com/compose/post',
+        composeLabel: 'x.com/compose/post',
+        action: 'Copy & open X',
+        /* the pasted link unfurls, so the URL carries the post */
+        text: (row, line) => line ? line + '\n\n' + row.post_url : row.post_url,
+        steps: [
+            'The text lands on your clipboard and the composer opens in a new tab.',
+            'Check the tab is signed in as <b>@soldoutcomedy</b>, not your personal account.',
+            'Paste. The link renders as the original post, so it reads as a repost with our line on top.',
+            'Post, then come back and tick <b>X</b> under Posted.'
+        ],
+        note: 'The one that works exactly as you would hope.'
+    },
+    {
+        id: 'Facebook',
+        handle: 'SOLD OUT! Comedy',
+        logo: '../assets/images/facebook_logo.png',
+        compose: 'https://business.facebook.com/latest/composer',
+        composeLabel: 'Business Suite composer',
+        action: 'Copy & open Facebook',
+        text: (row, line) => line ? line + '\n\n' + row.post_url : row.post_url,
+        steps: [
+            'The text lands on your clipboard and the Page composer opens in a new tab.',
+            'Make sure the composer is set to post as the <b>Page</b>, not as you.',
+            'Paste. Facebook unfurls the link into a card, the same as X does.',
+            'Post, then come back and tick <b>Facebook</b> under Posted.'
+        ],
+        note: 'Facebook has no prefilled composer for Page posts. Its old sharer link can carry '
+            + 'text, but it lands locked and uneditable, which defeats the point of a line on top. '
+            + 'So: empty composer, paste, post.'
+    },
+    {
+        id: 'Instagram',
+        handle: '@soldoutcomedy',
+        logo: '../assets/images/instagram_logo.svg',
+        needsMedia: true,
+        compose: 'https://www.instagram.com/',
+        composeLabel: 'instagram.com',
+        action: 'Copy caption',
+        /* a URL in an Instagram caption is not a link, so it is left out entirely */
+        text: (row, line) => [line, row.author ? 'via ' + row.author : ''].filter(Boolean).join('\n\n'),
+        steps: [
+            'Screenshot the original post, or save its video. Instagram will not take a text-only post.',
+            'The caption lands on your clipboard. It credits the author but carries no link.',
+            'Upload the screenshot at instagram.com and paste the caption.',
+            'Post, then come back and tick <b>Instagram</b> under Posted.'
+        ],
+        note: 'Instagram is the odd one out. There is no composer to open, no way to prefill it, '
+            + 'and a URL in a caption is not clickable. Every post needs an image or a video, so '
+            + 'this one always costs you a screenshot. When the source has no image or video at '
+            + 'all, the button is greyed out.'
+    }
+];
+
+const DEST_BY_ID = Object.fromEntries(DESTINATIONS.map(d => [d.id, d]));
 
 function connection() {
     let saved = null;
@@ -777,30 +840,35 @@ function card(row) {
         const skip = document.createElement('button');
         skip.textContent = 'Skip';
         skip.title = 'Mark this article SKIPPED so it never comes back';
-        skip.onclick = () => mark(row, 'SKIPPED', skip, composed());
+        skip.onclick = () => mark(row, 'SKIPPED', skip, line.value.trim());
         acts.appendChild(skip);
     } else {
         const back = document.createElement('button');
         back.className = 'small';
         back.textContent = 'Put back';
-        back.onclick = () => mark(row, 'NEW', back, composed());
+        back.onclick = () => mark(row, 'NEW', back, line.value.trim());
         acts.appendChild(back);
     }
 
-    if (st !== 'POSTED') {
-        const copy = document.createElement('button');
-        copy.className = 'primary';
-        copy.textContent = 'Copy & open X';
-        copy.onclick = async () => {
-            await copyText(composed());
-            window.open(COMPOSE_URL, '_blank', 'noopener');
-        };
-        acts.appendChild(copy);
+    for (const d of DESTINATIONS) {
+        const b = document.createElement('button');
+        if (d.id === 'X') b.className = 'primary';
+        b.textContent = d.action;
 
-        const done = document.createElement('button');
-        done.textContent = 'Mark posted';
-        done.onclick = () => mark(row, 'POSTED', done, composed());
-        acts.appendChild(done);
+        /* Instagram cannot take a text-only post, so when we know the source had no
+           image or video there is nothing to upload and the button says so. */
+        const blocked = d.needsMedia && row.has_media === false;
+        if (blocked) {
+            b.disabled = true;
+            b.title = 'The source has no image or video, and Instagram will not take a '
+                    + 'text-only post. Screenshot it by hand if it is worth it.';
+        } else {
+            b.onclick = async () => {
+                await copyText(d.text(row, line.value.trim()));
+                window.open(d.compose, '_blank', 'noopener');
+            };
+        }
+        acts.appendChild(b);
     }
 
     const open = document.createElement('a');
@@ -810,8 +878,30 @@ function card(row) {
     open.textContent = 'Open the post';
     acts.appendChild(open);
 
-    if (st === 'NEW') el.appendChild(lineWrap);
+    if (st !== 'SKIPPED') el.appendChild(lineWrap);
     el.appendChild(acts);
+
+    /* which destinations actually have it */
+    const postedRow = document.createElement('div');
+    postedRow.className = 'posted-row';
+    const lbl = document.createElement('span');
+    lbl.className = 'lbl';
+    lbl.textContent = 'Posted';
+    postedRow.appendChild(lbl);
+
+    const already = new Set(row.posted_to || []);
+    for (const d of DESTINATIONS) {
+        const chip = document.createElement('button');
+        chip.className = 'chip' + (already.has(d.id) ? ' on' : '');
+        chip.textContent = d.id;
+        chip.title = already.has(d.id)
+            ? 'Posted on ' + d.id + '. Click to take it back.'
+            : 'Tick once it is actually up on ' + d.id + '.';
+        chip.onclick = () => togglePosted(row, d.id, chip, line.value.trim());
+        postedRow.appendChild(chip);
+    }
+    el.appendChild(postedRow);
+
     return el;
 }
 
@@ -824,12 +914,12 @@ async function copyText(txt) {
     }
 }
 
-async function mark(row, newStatus, btn, repostText) {
+async function mark(row, newStatus, btn, line) {
     const patch = {
         status: newStatus,
         handled_at: newStatus === 'NEW' ? null : new Date().toISOString()
     };
-    if (newStatus === 'POSTED') patch.repost_text = repostText;
+    if (line) patch.repost_text = line;
 
     btn.disabled = true;
     try {
@@ -840,6 +930,34 @@ async function mark(row, newStatus, btn, repostText) {
     } catch (err) {
         status(err.message, 'err');
         btn.disabled = false;
+    }
+}
+
+/* status says whether the article is still waiting; posted_to says where it went.
+   The two are kept in step here: anything with a destination is POSTED, and taking
+   the last destination back puts it in NEW rather than leaving a lie behind. */
+async function togglePosted(row, destId, chip, line) {
+    const set = new Set(row.posted_to || []);
+    const adding = !set.has(destId);
+    if (adding) set.add(destId); else set.delete(destId);
+    const posted_to = DESTINATIONS.map(d => d.id).filter(id => set.has(id));
+
+    const patch = {
+        posted_to,
+        status: posted_to.length ? 'POSTED' : 'NEW',
+        handled_at: posted_to.length ? new Date().toISOString() : null
+    };
+    if (line) patch.repost_text = line;
+
+    chip.disabled = true;
+    try {
+        status(adding ? 'Marking posted on ' + destId + '...' : 'Taking ' + destId + ' back...', 'busy');
+        await sb('?id=eq.' + row.id, { method: 'PATCH', body: JSON.stringify(patch) });
+        status(posted_to.length ? 'Posted on ' + posted_to.join(', ') + '.' : 'Back in the queue.', 'good');
+        loadQueue();
+    } catch (err) {
+        status(err.message, 'err');
+        chip.disabled = false;
     }
 }
 
@@ -870,6 +988,7 @@ async function saveCapture(p) {
             posted_at: p.d || '',
             why: p.why || '',
             source: p.s || 'Bookmarklet',
+            has_media: typeof p.m === 'boolean' ? p.m : null,
             status: 'NEW'
         })
     });
@@ -962,6 +1081,54 @@ function showCapture(p) {
     slot.appendChild(box);
 }
 
+/* ---------- the destination containers ---------- */
+function renderDestinations() {
+    const wrap = document.getElementById('destinations');
+    for (const d of DESTINATIONS) {
+        const box = document.createElement('div');
+        box.className = 'x-box';
+
+        const head = document.createElement('div');
+        head.className = 'x-box-head';
+        const img = document.createElement('img');
+        img.src = d.logo;
+        img.alt = d.id;
+        if (d.mono) img.className = 'mono';
+        const name = document.createElement('span');
+        name.className = 't';
+        name.textContent = d.id;
+        const who = document.createElement('span');
+        who.className = 'h';
+        who.textContent = d.handle;
+        head.append(img, name, who);
+
+        const body = document.createElement('div');
+        body.className = 'x-box-body';
+
+        const ol = document.createElement('ol');
+        for (const s of d.steps) {
+            const li = document.createElement('li');
+            li.innerHTML = s;              /* steps are ours, and carry <b> */
+            ol.appendChild(li);
+        }
+
+        const link = document.createElement('a');
+        link.className = 'compose';
+        link.href = d.compose;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = 'Open ' + d.composeLabel;
+
+        const note = document.createElement('div');
+        note.className = 'x-note';
+        note.textContent = d.note;
+
+        body.append(ol, link, note);
+        box.append(head, body);
+        wrap.appendChild(box);
+    }
+}
+
 /* ---------- the bookmarklet ---------- */
 function buildBookmarklet() {
     const target = location.origin + location.pathname;
@@ -985,6 +1152,7 @@ function buildBookmarklet() {
 /* ---------- boot ---------- */
 paintConnection();
 buildBookmarklet();
+renderDestinations();
 
 const capture = readCapture();
 (async () => {

@@ -61,7 +61,7 @@ The criteria tell you the rule. The queue tells you the taste. Before you go loo
 what has actually cleared the bar:
 
 ```sh
-curl -s "$SUPABASE_URL/rest/v1/socializer?status=eq.POSTED&select=author,platform,body,why,repost_text&order=handled_at.desc&limit=30" \
+curl -s "$SUPABASE_URL/rest/v1/socializer?status=eq.POSTED&select=author,platform,body,why,repost_text,posted_to&order=handled_at.desc&limit=30" \
   -H "apikey: $SUPABASE_KEY" \
   -H "Authorization: Bearer $SUPABASE_KEY"
 ```
@@ -70,6 +70,8 @@ Those are the ones a human read and chose to put out under our name. Study them 
 things the criteria cannot say out loud: how long a post tends to be, how broad or how dry
 the joke is, whether it leans more to selling or more to found objects, which platforms keep
 earning their place, and what `repost_text` shows about the line we like to put on top.
+`posted_to` tells you where each one went, which is worth noticing — something that made it
+onto all three destinations cleared a higher bar than something that only went to X.
 
 Then read the other side, which is just as instructive:
 
@@ -182,11 +184,19 @@ Send all of a run's candidates as one array. Each row:
 | `body` | the post's own words. Could not read them? Empty string. |
 | `posted_at` | the original post's timestamp if you have it, else empty string |
 | `why` | one sentence: which criterion it hits, and why it is funny |
+| `has_media` | `true` if the source carries an image or video, `false` if it plainly does not, omit if you could not tell |
 | `source` | always `Bot` |
 | `status` | always `NEW` |
 
 `body` is the post's own words and nothing else. Do not paraphrase it, and do not put a
 description of the post there — `why` is where your own words go.
+
+`has_media` decides whether the Instagram button is available on the card. Instagram will
+not take a text-only post, so an article whose source has no image or video cannot go there.
+Set it honestly: guessing `true` puts a dead button in front of somebody.
+
+Never write `posted_to`. That column records where an article actually went out, and only a
+human ticking a box puts anything in it.
 
 `ignore-duplicates` means a key that already exists is silently left alone, so a re-run
 cannot overwrite a human's decision. Rely on it, but still check first.
@@ -206,5 +216,6 @@ outcome, not a failure.
 ## What the human sees
 
 Everything you insert shows up in The Socializer as a **NEW** article, newest first. From
-there a human presses Skip, or copies it into the X composer and presses Mark posted. Those
-two buttons are the only things that change `status`, and you never touch it.
+there a human presses Skip, or copies it into a composer and ticks off the destinations it
+went out on — X, Facebook or Instagram. Those are the only things that change `status` and
+`posted_to`, and you never touch either.

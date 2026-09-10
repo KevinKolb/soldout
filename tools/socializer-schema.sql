@@ -35,6 +35,15 @@ create table if not exists public.socializer (
                             check (status in ('NEW', 'SKIPPED', 'POSTED')),
 
     repost_text text        not null default '',
+
+    -- Where it has actually gone out. status says whether the article is still
+    -- waiting; this says which destinations already have it.
+    posted_to   text[]      not null default '{}',
+
+    -- Did the source carry an image or video? Instagram will not take a text-only
+    -- post, so the page greys its button out when this is false. NULL = never checked.
+    has_media   boolean,
+
     handled_at  timestamptz,
     created_at  timestamptz not null default now()
 );
