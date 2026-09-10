@@ -5,8 +5,7 @@ Regenerate assets/data/inventory.xml, which drives the item grid on shop/index.h
 Two sources, merged:
 
   1. The Ambassador table in Airtable. This is the curated list: a row per item,
-     added by pasting an eBay URL into admin/crosslist.html. It decides WHICH
-     items appear and in what order.
+     added by hand in Airtable. It decides WHICH items appear and in what order.
   2. The eBay influencer storefront. This supplies the facts we cannot get any
      other way - title, price, image, remaining quantity - because eBay serves
      individual /itm/ pages a 403 to anything that is not a real browser, while
@@ -14,6 +13,11 @@ Two sources, merged:
 
 Airtable holds the intent, eBay holds the truth. A row whose item is also in the
 storefront gets live title and price; anything typed into Airtable overrides it.
+
+A row's Source field names the marketplace it came from and becomes <platform> on
+the shop card. Rows without one are treated as eBay, which is what every row was
+before the field existed. Only eBay can be enriched, so a row from anywhere else
+has to carry its own title, price and image, or its card publishes blank.
 
 Runs without credentials: with no Airtable env vars it falls back to publishing
 every storefront item, which is what a local `python tools/build-inventory.py` does.
@@ -162,6 +166,7 @@ def build_items(store, rows):
             "url": link(k, ""),
             "image": v["image"],
             "status": "active",
+            "platform": "eBay",
         } for k, v in store.items()]
 
     items = []
@@ -185,6 +190,7 @@ def build_items(store, rows):
             "url": link(iid, src),
             "image": image,
             "status": "sold" if status == "sold" else "active",
+            "platform": (f.get("Source") or "").strip() or "eBay",
         })
     return items
 
@@ -203,15 +209,13 @@ def render(items):
            "  GENERATED FILE - do not edit by hand; the next deploy overwrites it.",
            "  Built by tools/build-inventory.py from the Ambassador table in Airtable,",
            "  enriched with live title/price/image from the eBay influencer storefront.",
-           "  To change what appears here, use the eBay Ambassador section of",
-           "  admin/crosslist.html.",
+           "  To change what appears here, edit the Ambassador table in Airtable.",
            "-->",
            "<inventory>"]
     for it in items:
         out.append("  <item>")
-        for key in ("title", "price", "condition", "url", "image", "status"):
+        for key in ("title", "price", "condition", "url", "image", "status", "platform"):
             out.append(f"    <{key}>{escape(it[key])}</{key}>")
-        out.append("    <platform>eBay</platform>")
         out.append("  </item>")
     out.append("</inventory>")
     return "\n".join(out) + "\n"
@@ -234,7 +238,7 @@ def main():
     OUT.write_text(render(items), encoding="utf-8")
     print(f"wrote {len(items)} item(s) to {OUT}")
     for it in items:
-        print(f"  - [{it['status']}] {it['title'][:64]}  ${it['price'] or '?'}")
+        print(f"  - [{it['status']}] {it['platform']}: {it['title'][:56]}  ${it['price'] or '?'}")
     return 0
 
 

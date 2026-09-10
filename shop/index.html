@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>SOLD OUT! Comedy</title>
+  <title>Prop Shop - SOLD OUT! Comedy</title>
   <link rel="icon" type="image/png" href="../assets/images/soldoutlogo.png">
   <link rel="apple-touch-icon" href="../assets/images/soldoutlogo.png">
 
-  <meta property="og:title" content="SOLD OUT! Comedy">
+  <meta property="og:title" content="Prop Shop - SOLD OUT! Comedy">
   <meta property="og:description" content="Every place you can buy the props, the merch and the beautiful junk we could not stop ourselves from selling.">
   <meta property="og:image" content="https://soldoutcomedy.com/assets/images/soldoutlogo.png">
   <meta property="og:url" content="https://soldoutcomedy.com/shop/">
@@ -16,7 +16,7 @@
   <meta property="og:site_name" content="SOLD OUT! Comedy">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SOLD OUT! Comedy">
+  <meta name="twitter:title" content="Prop Shop - SOLD OUT! Comedy">
   <meta name="twitter:description" content="Every place you can buy the props, the merch and the beautiful junk we could not stop ourselves from selling.">
   <meta name="twitter:image" content="https://soldoutcomedy.com/assets/images/soldoutlogo.png">
 
@@ -321,6 +321,37 @@
 
     .footer-bottom a { text-decoration: none; }
 
+    /* --- The semi-serious note -------------------------------------------- */
+    /* Deliberately off-voice. Everything else on the page shouts in Bangers or
+       caps mono, so the one sincere paragraph earns its seriousness by being the
+       only thing on the page set quietly: Inter, sentence case, normal tracking,
+       a measure short enough to actually read. The mono lead-in keeps it tied to
+       the rest of the chrome, and the gear change happens at the paragraph. */
+
+    .serious {
+      max-width: 62ch;
+      margin: 2.5rem auto 0;
+      background: var(--paper);
+      border: var(--rule) solid var(--ink);
+      box-shadow: var(--drop);
+      padding: 1.5rem 1.6rem 1.65rem;
+    }
+
+    .serious-lead {
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin: 0 0 0.95rem;
+    }
+
+    .serious-body {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
     /* Below this the banner is too narrow for the logo to sit beside the
        headline without colliding, so it goes back into the flow. */
     @media (max-width: 620px) {
@@ -333,13 +364,14 @@
         margin: 0 auto 0.75rem;
       }
       .item-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .serious { padding: 1.25rem 1.15rem 1.35rem; }
     }
   </style>
 </head>
 <body>
 
 <div class="topbar">
-  <span>Sold Out! Comedy // Shop</span>
+  <span>Sold Out! Comedy // Prop Shop</span>
   <a href="../index.html">&larr; Back to the show</a>
 </div>
 
@@ -349,9 +381,9 @@
       <img src="../assets/images/soldoutlogo.png" alt="SOLD OUT! Comedy">
     </a>
     <span class="hero-tag" id="todayStamp" hidden></span>
-    <p class="kicker">Nothing on this page is</p>
-    <h1>Sold Out!</h1>
-    <p class="sub">We know. It's confusing.</p>
+    <p class="kicker">SOLD OUT! Comedy presents our</p>
+    <h1>Prop Shop</h1>
+    <p class="sub">Nothing on this page is sold out! We know. It's confusing.</p>
   </header>
 
   <div class="ticker" aria-hidden="true" hidden><div class="ticker-track"></div></div>
@@ -365,6 +397,13 @@
       <p class="section-note" id="itemsStatus">Loading items...</p>
     </div>
   </section>
+
+  <aside class="serious">
+    <p class="serious-lead">&mdash;and on a semi-serious note...</p>
+    <p class="serious-body">Everything here really is for sale. We realize trying to be funny
+      while you're just trying to buy your Pumpkin Spice Dude Wipes can be annoying, but we're
+      just over here biting the hand that feeds us, thanks for being part of the show.</p>
+  </aside>
 </div>
 
 <div id="site-footer" data-footer="minimal">
