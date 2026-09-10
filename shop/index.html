@@ -250,7 +250,11 @@
       padding: 0.85rem 0.9rem 0.95rem;
     }
 
-    .item-title { font-weight: 700; font-size: 0.9rem; line-height: 1.3; }
+    /* pre-line so a caption written with shift+enter keeps its line breaks. Runs of
+       spaces still collapse, so it cannot be used to lay anything out - just to break
+       a line where the writing wants one. eBay's own titles have no newlines, so this
+       changes nothing for a prop without a caption. */
+    .item-title { font-weight: 700; font-size: 0.9rem; line-height: 1.3; white-space: pre-line; }
 
     /* Drawn from the reference tag: six sided, generously rounded, a chunky ink rule
        all the way round, and the left corners chamfered back to a short blunt edge about
