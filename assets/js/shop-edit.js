@@ -813,16 +813,16 @@ function decorate() {
         original.className = 'original';
         original.textContent = pulled || 'Nothing came from the marketplace for this one.';
 
-        /* Hidden rather than a delete. The build republishes anything on the storefront
-           that no row mentions, so removing the row would put the prop back on the shop
-           at the next build - a Hidden row is what actually keeps it down, and it also
-           survives the listing still being live on eBay. */
+        /* Hide rather than delete, and the label says so. The build republishes anything
+           on the storefront that no row mentions, so removing the row would put the
+           prop back at the next build - a Hidden row is what actually keeps it down,
+           and it holds while the listing is still live on eBay. */
         const del = document.createElement('button');
         del.type = 'button';
         del.className = 'danger';
-        del.textContent = 'Delete';
+        del.textContent = 'Hide';
         del.onclick = async () => {
-            if (!confirm('Take this off the shop for good?\n\nIt stays on eBay. It will not come back, even while the listing is live.')) return;
+            if (!confirm('Hide this from the shop?\n\nIt stays listed on eBay, and it will not come back on its own. You can bring it back from the status menu.')) return;
             del.disabled = true;
             const saved = await save(row, { status: 'Hidden' }, note);
             del.disabled = false;
