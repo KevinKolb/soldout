@@ -278,7 +278,25 @@ function injectStyles() {
     }
     .tab-badge:hover { background: var(--acid); }
     .tab-badge.is-empty { color: #999; }
+    .tab-badge.failed { background: var(--red); color: var(--paper); }
     body.viewing-public .tab-badge { display: none; }
+
+    /* The select is the badge - no separate control, no second box to look at. */
+    .tab-pick {
+      font: inherit; letter-spacing: inherit; text-transform: inherit;
+      color: inherit; background: transparent; border: 0; padding: 0;
+      cursor: pointer; max-width: 100%;
+    }
+    .tab-pick:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    /* Dashed, so it reads as a slot rather than a tab with nothing in it. */
+    .tab-new {
+      border-style: dashed !important;
+      background: transparent;
+      opacity: 0.75;
+    }
+    .tab-new:hover { opacity: 1; }
+    body.viewing-public .tab-new { display: none; }
     .tag-edit.saving { opacity: 0.45; }
     .tag-edit.failed { background: var(--red); color: var(--paper); }
     .item-title.cap-edit { cursor: text; }
@@ -590,6 +608,26 @@ function buildAddPanel() {
     return panel;
 }
 
+/* A tab exists only as a value on a row, so a name invented before any prop wears it
+   would vanish the moment the page reloaded. These are kept in this browser until
+   something is filed under them, which is what makes "+ NEW then pick it" work. */
+const LS_TABS = 'shop.newTabs';
+let extraTabs = [];
+
+function loadExtraTabs() {
+    try { extraTabs = JSON.parse(localStorage.getItem(LS_TABS) || '[]'); } catch { extraTabs = []; }
+    if (!Array.isArray(extraTabs)) extraTabs = [];
+}
+
+function saveExtraTabs() {
+    try { localStorage.setItem(LS_TABS, JSON.stringify(extraTabs)); } catch { /* private mode */ }
+}
+
+function knownTabs() {
+    const used = [...rows.values()].map(r => r.tab_tag).filter(Boolean);
+    return [...new Set([...used, ...extraTabs])];
+}
+
 /* Suggestions for the tab field, from the tabs already in use. */
 function refreshTabList() {
     const list = document.getElementById('tabList');
@@ -602,6 +640,14 @@ function refreshTabList() {
 
 /* Writes one field and puts the chip back the way it was if the database says no.
    Shared by the cycling chips and the free-text source. */
+async function commit(row, field, value) {
+    const { data, error } = await persist(row, { [field]: value });
+    if (error) return { error };
+    rows.set(keyOf(data.item_url), data);
+    Object.assign(row, data);
+    return { data };
+}
+
 async function saveTag(el, row, field, value) {
     const was = el.textContent;
     el.classList.remove('failed');
@@ -775,14 +821,49 @@ function decorate() {
         }
 
         /* The tab, in the opposite corner. Built here rather than in the page's own
-           renderer, so it exists only while someone is signed in. */
+           renderer, so it exists only while someone is signed in.
+
+           A picker rather than a text field: tabs are a small shared set, and typing
+           them by hand is how you end up with PUMPKIN SPICE and Pumpkin Spice as two
+           different tabs. New names come from + NEW on the tab bar. */
         const shot = card.querySelector('.shot');
         if (shot && !shot.querySelector('.tab-badge')) {
             const tabBadge = document.createElement('span');
             tabBadge.className = 'tab-badge';
-            tabBadge.textContent = row.tab_tag || '+ tab';
             if (!row.tab_tag) tabBadge.classList.add('is-empty');
-            textTag(tabBadge, row, 'tab_tag', '+ tab');
+
+            const pick = document.createElement('select');
+            pick.className = 'tab-pick';
+
+            const none = document.createElement('option');
+            none.value = '';
+            none.textContent = '+ tab';
+            pick.appendChild(none);
+
+            for (const t of knownTabs()) {
+                const o = document.createElement('option');
+                o.value = o.textContent = t;
+                if ((row.tab_tag || '') === t) o.selected = true;
+                pick.appendChild(o);
+            }
+
+            pick.addEventListener('click', e => e.stopPropagation());
+            pick.addEventListener('change', async () => {
+                const wanted = pick.value;
+                pick.disabled = true;
+                const { error } = await commit(row, 'tab_tag', wanted);
+                pick.disabled = false;
+                if (error) {
+                    pick.value = row.tab_tag || '';
+                    tabBadge.classList.add('failed');
+                    setTimeout(() => tabBadge.classList.remove('failed'), 2000);
+                    return;
+                }
+                tabBadge.classList.toggle('is-empty', !wanted);
+                refreshTabList();
+            });
+
+            tabBadge.appendChild(pick);
             shot.appendChild(tabBadge);
         }
 
@@ -887,11 +968,39 @@ async function start(u) {
     if (!isOwner(user)) return;
 
     injectStyles();
+    loadExtraTabs();
     document.body.classList.add('show-hidden');
     if (!await loadRows()) return;
     buildBar();
     decorate();
     addTile();
+    ghostTab();
+}
+
+/* A tab that is not a tab yet. Clicking it names one, which then shows up in every
+   card's picker - the only way to invent a tab, since a tab with nothing filed under
+   it has nowhere else to live. It is not a filter: pressing it opens a prompt. */
+function ghostTab() {
+    const bar = document.getElementById('tabBar');
+    if (!bar || bar.querySelector('.tab-new')) return;
+
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tab tab-new';
+    b.textContent = '+ New';
+    b.title = 'Name a new tab, then pick it on any prop';
+    b.onclick = () => {
+        const name = (prompt('Name the new tab') || '').trim();
+        if (!name) return;
+        if (!knownTabs().some(t => t.toLowerCase() === name.toLowerCase())) {
+            extraTabs.push(name);
+            saveExtraTabs();
+        }
+        /* Re-rendering rebuilds every card, and every picker with it. */
+        if (typeof renderGrid === 'function') renderGrid();
+    };
+
+    bar.appendChild(b);
 }
 
 /* The last cell of the grid, in edit mode only. It was the storefront tile on the
@@ -932,7 +1041,7 @@ function addTile() {
 
 /* The grid re-renders on every tab click, which throws the editors away with it. */
 document.addEventListener('shop:rendered', () => {
-    if (isOwner(user)) { decorate(); addTile(); refreshTabList(); }
+    if (isOwner(user)) { decorate(); addTile(); ghostTab(); refreshTabList(); }
 });
 
 start(await currentUser());
