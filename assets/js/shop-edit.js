@@ -487,7 +487,10 @@ function buildBar() {
        Dragged to the bookmarks bar, not clicked: pressed here it would file the shop. */
     const mark = document.createElement('a');
     mark.className = 'bookmarklet';
-    mark.textContent = 'Drag me to bookmarks';
+    /* This text becomes the bookmark's name once it is dragged, so it reads as the
+       thing you are about to press on a listing rather than as an instruction that
+       would then live in the bookmarks bar forever. */
+    mark.textContent = 'FUNNY PRODUCT';
     mark.title = 'Drag to your bookmarks bar, then press it on any listing';
     mark.setAttribute('href',
         "javascript:(function(){location.href='" + location.origin
