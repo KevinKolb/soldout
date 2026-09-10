@@ -52,6 +52,33 @@ function injectStyles() {
     .edit-bar button.ghost { background: transparent; color: var(--paper); border-color: var(--paper); }
     .edit-bar .said { text-transform: none; letter-spacing: 0; font-family: var(--sans); }
 
+    /* Backstage / public. A hard-edged switch rather than a rounded one, because
+       nothing else on this page is rounded. */
+    .view-toggle {
+      display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+      font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.1em;
+      text-transform: uppercase; user-select: none;
+    }
+    .view-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .view-toggle .track {
+      width: 40px; height: 20px; flex: none; position: relative;
+      border: 2px solid var(--paper); background: transparent;
+    }
+    .view-toggle .knob {
+      position: absolute; top: 2px; left: 2px; width: 12px; height: 12px;
+      background: var(--acid); transition: transform 0.12s;
+    }
+    .view-toggle input:checked + .track .knob { transform: translateX(20px); }
+    .view-toggle input:focus-visible + .track { outline: 2px solid var(--acid); outline-offset: 3px; }
+    .view-toggle .lbl { opacity: 0.45; }
+    .view-toggle .lbl.active { opacity: 1; }
+
+    /* Previewing the public page. The editors are hidden rather than torn down, so
+       flipping back does not have to rebuild anything. */
+    body.viewing-public .editbox,
+    body.viewing-public .pending,
+    body.viewing-public .add-panel { display: none; }
+
     .add-panel {
       border: var(--rule) solid var(--ink); background: var(--paper);
       padding: 14px; margin-bottom: var(--gap);
@@ -162,13 +189,15 @@ function buildBar() {
     add.type = 'button';
     add.textContent = '+ Add prop';
 
+    const toggle = buildViewToggle(said);
+
     const out = document.createElement('button');
     out.type = 'button';
     out.className = 'ghost';
     out.textContent = 'Sign out';
     out.onclick = async () => { await signOut(); location.reload(); };
 
-    bar.append(who, said, spacer, add, out);
+    bar.append(who, said, spacer, add, toggle, out);
 
     const panel = buildAddPanel();
     add.onclick = () => { panel.hidden = !panel.hidden; };
@@ -180,6 +209,53 @@ function buildBar() {
 
     listings.prepend(bar, panel, pending);
     showPending();
+}
+
+/* Flips the page between the editing view and what a visitor sees. The choice is
+   remembered, because checking your own shop as a stranger sees it is something you
+   do repeatedly, and having it reset on every load would make that tedious. */
+const LS_VIEW = 'shop.view';
+
+function buildViewToggle(said) {
+    const wrap = document.createElement('label');
+    wrap.className = 'view-toggle';
+
+    const back = document.createElement('span');
+    back.className = 'lbl';
+    back.textContent = 'Backstage';
+
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.id = 'viewPublic';
+    cb.setAttribute('aria-label', 'Preview the shop as the public sees it');
+
+    const track = document.createElement('span');
+    track.className = 'track';
+    const knob = document.createElement('span');
+    knob.className = 'knob';
+    track.appendChild(knob);
+
+    const pub = document.createElement('span');
+    pub.className = 'lbl';
+    pub.textContent = 'Public';
+
+    const apply = () => {
+        const publicView = cb.checked;
+        document.body.classList.toggle('viewing-public', publicView);
+        back.classList.toggle('active', !publicView);
+        pub.classList.toggle('active', publicView);
+        said.textContent = publicView
+            ? 'Previewing the public page. Nothing here is editable.'
+            : 'Saves reach the public page at the next build.';
+        try { localStorage.setItem(LS_VIEW, publicView ? 'public' : 'backstage'); } catch { /* private mode */ }
+    };
+
+    cb.addEventListener('change', apply);
+    try { cb.checked = localStorage.getItem(LS_VIEW) === 'public'; } catch { /* private mode */ }
+
+    wrap.append(back, cb, track, pub);
+    apply();
+    return wrap;
 }
 
 function buildAddPanel() {
