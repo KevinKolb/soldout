@@ -276,42 +276,54 @@
 
     .item-title { font-weight: 700; font-size: 0.9rem; line-height: 1.3; }
 
-    /* An actual price tag: acid card, hard rule, hard shadow, and a punched hole
-       where the string would go. Tilted a degree and a half so it reads as an object
-       stuck onto the card rather than another line of type.
+    /* The Price Is Right silhouette: a pentagon pointed at the left, punched for
+       string. Tilted a degree and a half so it sits on the card like an object rather
+       than being another line of type.
 
-       align-self keeps it shrink-to-fit - the body is a flex column, so without it
-       the tag would stretch the full width and stop looking like a tag. margin-top
-       still pins it to the foot, so tags line up across the row. */
+       Built as two clipped layers rather than a bordered box, because clip-path cuts
+       a border off along with everything else - so the outer layer is ink, the inner
+       is acid and slightly smaller, and the ink showing round the edge is the rule.
+       For the same reason the hard shadow is a drop-shadow filter: box-shadow traces
+       the element's box, which is a rectangle, not the shape you can see.
+
+       align-self keeps it shrink-to-fit inside the flex column, and margin-top still
+       pins it to the card foot so tags line up across a row. */
     .price {
       margin-top: auto;
       align-self: flex-start;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.45rem;
       max-width: 100%;
-      padding: 0.12rem 0.7rem 0.18rem 0.5rem;
-      background: var(--acid);
-      color: var(--ink);
-      border: 3px solid var(--ink);
-      box-shadow: 3px 3px 0 var(--ink);
+      padding: 3px;
+      background: var(--ink);
       transform: rotate(-1.5deg);
       transform-origin: left center;
+      clip-path: polygon(0 50%, 15px 0, 100% 0, 100% 100%, 15px 100%);
+      filter: drop-shadow(3px 3px 0 var(--ink));
+    }
+
+    .price-face {
+      display: block;
+      position: relative;
+      padding: 0.12rem 0.75rem 0.18rem 1.25rem;
+      background: var(--acid);
+      color: var(--ink);
       font-family: 'Bangers', cursive;
       font-size: 1.6rem;
       line-height: 1.15;
       letter-spacing: 1px;
+      clip-path: polygon(0 50%, 14px 0, 100% 0, 100% 100%, 14px 100%);
     }
 
-    /* The hole. The one circle on the page, and it earns it. */
-    .price::before {
+    /* The hole, punched through the point. The one circle on the page. */
+    .price-face::before {
       content: '';
-      flex: none;
-      width: 9px;
-      height: 9px;
-      border: 3px solid var(--ink);
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      margin-top: -4px;
       border-radius: 50%;
-      background: var(--paper);
+      background: var(--ink);
     }
 
     .meta {
@@ -406,14 +418,13 @@
     .item-card.sold .shot img { filter: grayscale(1) contrast(1.05); }
     .item-card.sold .item-badge { background: var(--ink); color: var(--paper); }
     /* A sold tag drains rather than disappears - still a tag, just spent. */
-    .item-card.sold .price {
+    .item-card.sold .price { background: #777; filter: drop-shadow(3px 3px 0 #777); }
+    .item-card.sold .price-face {
       background: #e4e4e4;
       color: #777;
-      border-color: #777;
-      box-shadow: 3px 3px 0 #777;
       text-decoration: line-through;
     }
-    .item-card.sold .price::before { border-color: #777; }
+    .item-card.sold .price-face::before { background: #777; }
 
     .footer-bottom a { text-decoration: none; }
 
@@ -891,9 +902,14 @@ function itemCard(it) {
 
   /* tab_tag is deliberately absent from the card: it groups items into tabs, it
      is not a label anyone needs to read on the item itself. */
+  /* Two nested elements because the tag is a clipped shape: the outer is the rule,
+     the inner is the face. See the .price rules for why a border cannot do it. */
   const priceEl = document.createElement('div');
   priceEl.className = 'price';
-  priceEl.textContent = price ? '$' + price : 'See listing';
+  const priceFace = document.createElement('span');
+  priceFace.className = 'price-face';
+  priceFace.textContent = price ? '$' + price : 'See listing';
+  priceEl.appendChild(priceFace);
 
   /* The sticker already names the marketplace, so the foot line carries the
      remaining count alone rather than saying eBay a second time. Empty when a

@@ -126,6 +126,20 @@ function injectStyles() {
     .editbox .note { font-family: var(--sans); font-size: 0.62rem; color: #555; }
     .editbox .note.bad { color: var(--red); font-weight: 700; }
 
+    /* Tags edit where they sit. The two classification chips only ever hold one of
+       two values, so a click swaps them and saves - a dropdown for a binary is more
+       ceremony than the choice deserves. The source is free text, so it opens a field. */
+    .tag-edit { cursor: pointer; }
+    .tag-edit:hover { background: var(--acid); }
+    .item-badge.tag-edit:hover { background: var(--paper); }
+    .tag-edit.saving { opacity: 0.45; }
+    .tag-edit.failed { background: var(--red); color: var(--paper); }
+    .tag-input {
+      font: inherit; letter-spacing: inherit; text-transform: inherit;
+      width: 7em; padding: 0 2px; border: 0; outline: 2px solid var(--ink);
+      background: var(--paper); color: var(--ink);
+    }
+
     /* What eBay called it, kept visible while writing the replacement. Selectable so
        a phrase can be lifted out of it, but never editable: it is not ours to change. */
     .editbox .original {
@@ -359,12 +373,116 @@ function showPending() {
     el.hidden = false;
 }
 
+/* ---------- tags, edited where they sit ---------- */
+
+/* Writes one field and puts the chip back the way it was if the database says no.
+   Shared by the cycling chips and the free-text source. */
+async function saveTag(el, row, field, value) {
+    const was = el.textContent;
+    el.classList.remove('failed');
+    el.classList.add('saving');
+
+    const { data, error } = await supabase
+        .from(TABLE).update({ [field]: value }).eq('id', row.id).select().single();
+
+    el.classList.remove('saving');
+    if (error) {
+        el.textContent = was;
+        el.classList.add('failed');
+        el.title = error.message;
+        setTimeout(() => el.classList.remove('failed'), 2000);
+        return false;
+    }
+    rows.set(keyOf(data.item_url), data);
+    Object.assign(row, data);
+    return true;
+}
+
+/* Two values, so the chip is the switch. The tooltip names what a click will do,
+   which is the whole of the affordance. */
+function cyclingTag(el, row, field, values) {
+    el.classList.add('tag-edit');
+
+    const paint = () => {
+        const current = row[field] || values[0];
+        el.textContent = current;
+        const next = values[(values.indexOf(current) + 1) % values.length];
+        el.title = 'Click to make this ' + next;
+    };
+
+    el.addEventListener('click', async e => {
+        e.preventDefault();
+        e.stopPropagation();
+        const current = row[field] || values[0];
+        const i = values.indexOf(current);
+        const next = values[(i + 1) % values.length];
+        el.textContent = next;
+        if (await saveTag(el, row, field, next)) paint();
+    });
+
+    paint();
+}
+
+/* The marketplace can be anything, so this one opens a field. Enter or clicking
+   away commits, Escape abandons. */
+function textTag(el, row, field) {
+    el.classList.add('tag-edit');
+    el.title = 'Click to rename';
+
+    el.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (el.dataset.editing) return;
+        el.dataset.editing = '1';
+
+        const was = row[field] || el.textContent.trim();
+        const input = document.createElement('input');
+        input.className = 'tag-input';
+        input.value = was;
+        el.textContent = '';
+        el.appendChild(input);
+        input.focus();
+        input.select();
+
+        let done = false;
+        const finish = async commit => {
+            if (done) return;
+            done = true;
+            delete el.dataset.editing;
+            const value = input.value.trim();
+            el.textContent = commit && value ? value : was;
+            if (commit && value && value !== was) {
+                if (!await saveTag(el, row, field, value)) el.textContent = was;
+            }
+        };
+
+        input.addEventListener('blur', () => finish(true));
+        input.addEventListener('keydown', ev => {
+            if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
+            if (ev.key === 'Escape') { ev.preventDefault(); finish(false); }
+        });
+        input.addEventListener('click', ev => ev.stopPropagation());
+    });
+}
+
 /* ---------- the editor on each card ---------- */
 function decorate() {
     for (const card of document.querySelectorAll('.item-card')) {
         if (card.querySelector('.editbox')) continue;
         const row = rows.get(keyOf(card.href));
         if (!row) continue;
+
+        /* The chips and the sticker become their own controls. The sticker is left
+           alone on a sold prop, where it reads "Sold" rather than the marketplace -
+           editing it there would write the word Sold into tag_source. */
+        const chips = card.querySelectorAll('.tag');
+        if (chips[0]) cyclingTag(chips[0], row, 'tag_type', ['Commission', 'Owned']);
+        if (chips[1]) cyclingTag(chips[1], row, 'tag_location', ['External', 'First-party']);
+
+        const badge = card.querySelector('.item-badge');
+        if (badge && String(row.status || 'Active').toLowerCase() !== 'sold') {
+            textTag(badge, row, 'tag_source');
+        }
 
         const box = document.createElement('div');
         box.className = 'editbox';
