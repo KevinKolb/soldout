@@ -17,6 +17,12 @@ storefront gets live title and price; anything set on the row overrides it. Only
 eBay can be enriched, so a row from anywhere else has to carry its own title,
 price and image or its card publishes blank.
 
+A storefront listing that no row mentions is published anyway, with the default
+tags, so putting something on the influencer storefront is enough to put it on the
+shop. A row is then only needed to say something about it: a caption, a tab, or a
+Hidden that takes it back down. Hidden is checked before adoption, so a suppressed
+listing cannot creep back in as an unclaimed one.
+
 Every column on a row ships as an element of the same name:
 
   tag_source    the marketplace it came from, e.g. eBay
@@ -183,13 +189,13 @@ def build_items(store, rows):
         return f"https://www.ebay.com/itm/{iid}?" + "&".join(
             f"{k}={v}" for k, v in EPN_PARAMS.items())
 
-    # No curated list: publish everything on the storefront.
-    if rows is None:
-        return [{
-            "title": v["title"] or f"eBay item {k}",
+    def from_storefront(iid, v):
+        """A storefront listing nobody has said anything about yet."""
+        return {
+            "title": v["title"] or f"eBay item {iid}",
             "price": v["price"],
             "condition": v["condition"],
-            "url": link(k, ""),
+            "url": link(iid, ""),
             "image": v["image"],
             "status": "active",
             "tag_source": "eBay",
@@ -197,15 +203,25 @@ def build_items(store, rows):
             "tag_location": "External",
             "tab_tag": "",
             "blurb": "",
-        } for k, v in store.items()]
+        }
+
+    # No curated list at all: publish everything on the storefront.
+    if rows is None:
+        return [from_storefront(k, v) for k, v in store.items()]
 
     items = []
+    spoken_for = set()
     for f in rows:
         status = str(f.get("status") or "Active").strip().lower()
-        if status == "hidden":
-            continue
         src = f.get("item_url") or ""
         iid = item_id(src)
+
+        # Recorded before the hidden check, so a Hidden row still suppresses the
+        # listing rather than letting it back in as an unclaimed storefront item.
+        if iid:
+            spoken_for.add(iid)
+        if status == "hidden":
+            continue
         live = store.get(iid, {})
         title = (f.get("title") or "").strip() or live.get("title") or (f"eBay item {iid}" if iid else "Untitled")
         # PostgREST returns numeric as a string, which _num already handles.
@@ -226,7 +242,14 @@ def build_items(store, rows):
             "tab_tag": (f.get("tab_tag") or "").strip(),
             "blurb": (f.get("blurb") or "").strip(),
         })
-    return items
+
+    # Anything on the storefront that no row mentions. Listing it on eBay is enough
+    # to put it on the shop; a row is then only needed to say something about it -
+    # a caption, a tab, or a Hidden that takes it back down.
+    adopted = [from_storefront(k, v) for k, v in store.items() if k not in spoken_for]
+    if adopted:
+        print(f"  adopted {len(adopted)} storefront listing(s) with no row of their own")
+    return items + adopted
 
 
 def _num(v):

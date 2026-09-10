@@ -67,18 +67,21 @@ The goal is to sell through every available channel, starting with commission.
 
 How it works now:
 
-1. Items are curated directly in the `shop` table in Supabase
-   ([tools/shop-schema.sql](tools/shop-schema.sql)). A row carries the listing
-   URL, three classification fields, and optional title/price/image overrides:
+1. Anything on the eBay influencer storefront is published automatically with the
+   default tags, so listing it there is enough to put it on the shop. Rows in the `shop`
+   table in Supabase ([tools/shop-schema.sql](tools/shop-schema.sql)) then say what we
+   want to add: a row carries the listing URL, three classification fields, and optional
+   title/price/image overrides:
    `tag_source` (the marketplace, e.g. `eBay`), `tag_type` (how we get paid: `Commission`
    or `Owned`) and `tag_location` (whose stock it is: `External` or `First-party`). They
    default to `eBay` / `Commission` / `External`, which is what every row is today. On the
    card `tag_source` is the sticker on the photo and the other two are chips beneath it.
    Two further fields have no default: `tab_tag` groups items into the tabs across the top
-   of the shop and is never printed on a card, and `blurb` is our own caption for the item,
-   which replaces the marketplace's own title on the card when it is set. There is no admin page for this; rows are added in the
-   Supabase dashboard by hand. Anon can only read the table, so a stranger who finds the
-   publishable key cannot put a link on the shop.
+   of the shop and is never printed on a card, and `blurb` is our own caption, which
+   replaces the marketplace's own title on the card when it is set. A row with status
+   `Hidden` takes a storefront listing back down. Rows are edited on `/shop` itself when
+   signed in, or in the Supabase dashboard. Anon can only read the table, so a stranger
+   who finds the publishable key cannot put a link on the shop.
 2. [tools/build-inventory.py](tools/build-inventory.py) merges those rows with live
    data from the storefront at <https://www.ebay.com/inf/soldoutcomedy>, adds the EPN
    tracking parameters, and writes `assets/data/inventory.xml`. That file is generated, so
