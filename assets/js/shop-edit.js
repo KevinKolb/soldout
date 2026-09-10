@@ -574,9 +574,10 @@ async function start(u) {
     addTile();
 }
 
-/* The first cell of the grid, in edit mode only. It was the storefront tile on the
+/* The last cell of the grid, in edit mode only. It was the storefront tile on the
    public page; a visitor gets no tile at all now, and the owner gets the one action
-   worth having in reach of the props themselves. */
+   worth having in reach of the props themselves - after them, where the grid ends
+   and the eye already is. */
 function addTile() {
     const grid = document.getElementById('itemGrid');
     const panel = document.getElementById('addPanel');
@@ -606,7 +607,7 @@ function addTile() {
         if (first) first.focus();
     };
 
-    grid.prepend(tile);
+    grid.appendChild(tile);
 }
 
 /* The grid re-renders on every tab click, which throws the editors away with it. */
