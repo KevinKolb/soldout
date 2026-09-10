@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
-  # Rebuild without a push, so curating on eBay or adding an Airtable row
+  # Rebuild without a push, so curating on eBay or adding a row to the shop table
   # reaches the site on its own.
   schedule:
     - cron: '0 */6 * * *'
@@ -75,15 +75,13 @@ jobs:
         fi
         echo "No placeholders remain."
 
-    # Rebuilds the shop listings from the Ambassador table, enriched with live
-    # title/price/image from the eBay storefront. Deliberately not a hard failure:
-    # if either source is unreachable the committed inventory.xml still ships, so
-    # the shop goes slightly stale rather than blank.
+    # Rebuilds the shop listings from the shop table in Supabase, enriched with
+    # live title/price/image from the eBay storefront. Needs no secret: reading
+    # that table is a public select policy and the publishable key is committed.
+    # Deliberately not a hard failure: if a source is unreachable the committed
+    # inventory.xml still ships, so the shop goes stale rather than blank.
     - name: Build shop inventory
       continue-on-error: true
-      env:
-        AIRTABLE_API_KEY: ${{ secrets.AIRTABLE_API_KEY }}
-        AIRTABLE_BASE_ID: ${{ secrets.AIRTABLE_BASE_ID }}
       run: python3 tools/build-inventory.py
 
     # Re-inlines assets/footer.html into every page carrying the markers, so a

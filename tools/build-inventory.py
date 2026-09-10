@@ -4,32 +4,45 @@ Regenerate assets/data/inventory.xml, which drives the item grid on shop/index.h
 
 Two sources, merged:
 
-  1. The Ambassador table in Airtable. This is the curated list: a row per item,
-     added by hand in Airtable. It decides WHICH items appear and in what order.
+  1. The shop table in Supabase. This is the curated list: a row per item, added
+     by hand. It decides WHICH items appear and how they are tagged. See
+     tools/shop-schema.sql.
   2. The eBay influencer storefront. This supplies the facts we cannot get any
      other way - title, price, image, remaining quantity - because eBay serves
      individual /itm/ pages a 403 to anything that is not a real browser, while
      the storefront page still renders with a JSON payload of every card.
 
-Airtable holds the intent, eBay holds the truth. A row whose item is also in the
-storefront gets live title and price; anything typed into Airtable overrides it.
+Supabase holds the intent, eBay holds the truth. A row whose item is also in the
+storefront gets live title and price; anything set on the row overrides it. Only
+eBay can be enriched, so a row from anywhere else has to carry its own title,
+price and image or its card publishes blank.
 
-A row's Source field names the marketplace it came from and becomes <platform> on
-the shop card. Rows without one are treated as eBay, which is what every row was
-before the field existed. Only eBay can be enriched, so a row from anywhere else
-has to carry its own title, price and image, or its card publishes blank.
+Every column on a row ships as an element of the same name:
 
-Runs without credentials: with no Airtable env vars it falls back to publishing
-every storefront item, which is what a local `python tools/build-inventory.py` does.
+  tag_source    the marketplace it came from, e.g. eBay
+  tag_type      how we get paid: Commission, or Owned
+  tag_location  whose stock it is: External, or First-party
+  tab_tag       groups items into the shop's tabs; never printed on a card
+  blurb         our own caption; replaces eBay's title on the card when set
+
+The three tag_ columns default to eBay / Commission / External in the schema,
+which is what every row is today, so a row that sets none of them still
+publishes correctly.
+
+Needs no secret. Reading the shop table is a public select policy and the
+publishable key below is the same one committed in admin/socializer.html, so a
+local run and the deploy run see exactly the same rows. SUPABASE_URL and
+SUPABASE_KEY override it if the project ever moves.
 
 Never empties inventory.xml on failure. A blocked request or a changed page
 structure leaves the committed file in place, so the shop goes stale rather than
-blank.
+blank. If Supabase cannot be read at all it falls back to publishing every
+storefront item, which is better than publishing none.
 
-Env:
-  AIRTABLE_API_KEY   personal access token, needs data.records:read
-  AIRTABLE_BASE_ID   base holding the Ambassador table
-  AIRTABLE_AMBASSADOR_TABLE  optional, defaults to "Ambassador"
+Env (all optional):
+  SUPABASE_URL         defaults to the SOLD OUT! project
+  SUPABASE_KEY         publishable key; the committed default is public by design
+  SUPABASE_SHOP_TABLE  defaults to "shop"
 """
 
 import json
@@ -44,7 +57,13 @@ from xml.sax.saxutils import escape
 
 STOREFRONT = "https://www.ebay.com/inf/soldoutcomedy"
 OUT = Path(__file__).parent.parent / "assets" / "data" / "inventory.xml"
-TABLE = os.environ.get("AIRTABLE_AMBASSADOR_TABLE", "Ambassador")
+
+# The publishable key is the public half of the pair and is already committed in
+# admin/socializer.html. What it may do lives in the RLS policies in
+# tools/shop-schema.sql, which for this table is select and nothing else.
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://tjteeqofqozmncfoiofy.supabase.co").rstrip("/")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_publishable_AHzqW00erP1wModfz3mzVA_dxM6RtPr")
+TABLE = os.environ.get("SUPABASE_SHOP_TABLE", "shop")
 
 # eBay Partner Network attribution. Without these the link still works but the
 # commission is not credited, so every generated link carries them.
@@ -120,33 +139,40 @@ def load_storefront():
     return found
 
 
-def load_airtable():
-    """Curated rows, newest last. None means 'not configured', [] means 'empty'."""
-    key = os.environ.get("AIRTABLE_API_KEY")
-    base = os.environ.get("AIRTABLE_BASE_ID")
-    if not key or not base:
-        print("  Airtable not configured; using the whole storefront")
+def load_supabase():
+    """Curated rows in publishing order. None means 'could not read at all'."""
+    if not SUPABASE_URL or not SUPABASE_KEY:
+        print("  Supabase not configured; using the whole storefront")
         return None
 
-    rows, offset = [], None
-    url = f"https://api.airtable.com/v0/{base}/{urllib.parse.quote(TABLE)}"
+    query = urllib.parse.urlencode({
+        "select": "*",
+        "order": "position.asc,created_at.asc",
+    })
+    url = f"{SUPABASE_URL}/rest/v1/{urllib.parse.quote(TABLE)}?{query}"
     try:
-        while True:
-            page = url + (f"?offset={offset}" if offset else "")
-            body = json.loads(get(page, {"Authorization": f"Bearer {key}"}))
-            rows.extend(body.get("records", []))
-            offset = body.get("offset")
-            if not offset:
-                break
+        rows = json.loads(get(url, {
+            "apikey": SUPABASE_KEY,
+            "Authorization": f"Bearer {SUPABASE_KEY}",
+            "Accept": "application/json",
+        }))
     except urllib.error.HTTPError as e:
-        detail = "table not found" if e.code == 404 else f"HTTP {e.code}"
-        print(f"  Airtable read failed ({detail}); using the whole storefront")
+        detail = {
+            401: "the key or the select policy is wrong",
+            403: "the key or the select policy is wrong",
+            404: f"no such table; run tools/shop-schema.sql to create {TABLE}",
+        }.get(e.code, f"HTTP {e.code}")
+        print(f"  Supabase read failed ({detail}); using the whole storefront")
         return None
     except Exception as e:
-        print(f"  Airtable read failed ({e}); using the whole storefront")
+        print(f"  Supabase read failed ({e}); using the whole storefront")
         return None
 
-    print(f"  Airtable: {len(rows)} row(s) in {TABLE}")
+    if not isinstance(rows, list):
+        print("  Supabase returned something other than a list of rows")
+        return None
+
+    print(f"  Supabase: {len(rows)} row(s) in {TABLE}")
     return rows
 
 
@@ -166,31 +192,39 @@ def build_items(store, rows):
             "url": link(k, ""),
             "image": v["image"],
             "status": "active",
-            "platform": "eBay",
+            "tag_source": "eBay",
+            "tag_type": "Commission",
+            "tag_location": "External",
+            "tab_tag": "",
+            "blurb": "",
         } for k, v in store.items()]
 
     items = []
-    for rec in rows:
-        f = rec.get("fields", {})
-        status = (f.get("Status") or "Active").strip().lower()
+    for f in rows:
+        status = str(f.get("status") or "Active").strip().lower()
         if status == "hidden":
             continue
-        src = f.get("Item URL") or ""
+        src = f.get("item_url") or ""
         iid = item_id(src)
         live = store.get(iid, {})
-        title = (f.get("Title") or "").strip() or live.get("title") or (f"eBay item {iid}" if iid else "Untitled")
-        price = (str(f.get("Price")) if f.get("Price") not in (None, "") else "") or live.get("price", "")
-        image = (f.get("Image URL") or "").strip() or live.get("image", "")
+        title = (f.get("title") or "").strip() or live.get("title") or (f"eBay item {iid}" if iid else "Untitled")
+        # PostgREST returns numeric as a string, which _num already handles.
+        price = (str(f.get("price")) if f.get("price") not in (None, "") else "") or live.get("price", "")
+        image = (f.get("image_url") or "").strip() or live.get("image", "")
         if not iid and not src:
             continue
         items.append({
             "title": title,
             "price": f"{float(price):.2f}" if _num(price) else "",
-            "condition": (f.get("Condition") or "").strip() or live.get("condition", ""),
+            "condition": (f.get("condition") or "").strip() or live.get("condition", ""),
             "url": link(iid, src),
             "image": image,
             "status": "sold" if status == "sold" else "active",
-            "platform": (f.get("Source") or "").strip() or "eBay",
+            "tag_source": (f.get("tag_source") or "").strip() or "eBay",
+            "tag_type": (f.get("tag_type") or "").strip() or "Commission",
+            "tag_location": (f.get("tag_location") or "").strip() or "External",
+            "tab_tag": (f.get("tab_tag") or "").strip(),
+            "blurb": (f.get("blurb") or "").strip(),
         })
     return items
 
@@ -207,14 +241,15 @@ def render(items):
     out = ['<?xml version="1.0" encoding="UTF-8"?>',
            "<!--",
            "  GENERATED FILE - do not edit by hand; the next deploy overwrites it.",
-           "  Built by tools/build-inventory.py from the Ambassador table in Airtable,",
+           "  Built by tools/build-inventory.py from the shop table in Supabase,",
            "  enriched with live title/price/image from the eBay influencer storefront.",
-           "  To change what appears here, edit the Ambassador table in Airtable.",
+           "  To change what appears here, edit the shop table in Supabase.",
            "-->",
            "<inventory>"]
     for it in items:
         out.append("  <item>")
-        for key in ("title", "price", "condition", "url", "image", "status", "platform"):
+        for key in ("title", "price", "condition", "url", "image", "status",
+                    "tag_source", "tag_type", "tag_location", "tab_tag", "blurb"):
             out.append(f"    <{key}>{escape(it[key])}</{key}>")
         out.append("  </item>")
     out.append("</inventory>")
@@ -224,7 +259,7 @@ def render(items):
 def main():
     print("Building shop inventory")
     store = load_storefront()
-    rows = load_airtable()
+    rows = load_supabase()
 
     if not store and rows is None:
         print(f"nothing to build from; leaving {OUT.name} untouched")
@@ -238,7 +273,7 @@ def main():
     OUT.write_text(render(items), encoding="utf-8")
     print(f"wrote {len(items)} item(s) to {OUT}")
     for it in items:
-        print(f"  - [{it['status']}] {it['platform']}: {it['title'][:56]}  ${it['price'] or '?'}")
+        print(f"  - [{it['status']}] {it['tag_source']}: {it['title'][:56]}  ${it['price'] or '?'}")
     return 0
 
 

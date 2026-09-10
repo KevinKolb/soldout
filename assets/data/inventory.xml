@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
   GENERATED FILE - do not edit by hand; the next deploy overwrites it.
-  Built by tools/build-inventory.py from the Ambassador table in Airtable,
+  Built by tools/build-inventory.py from the shop table in Supabase,
   enriched with live title/price/image from the eBay influencer storefront.
-  To change what appears here, edit the Ambassador table in Airtable.
+  To change what appears here, edit the shop table in Supabase.
 -->
 <inventory>
   <item>
@@ -13,7 +13,11 @@
     <url>https://www.ebay.com/itm/336676054781?mkcid=1&amp;mkrid=711-53200-19255-0&amp;siteid=0&amp;campid=5339205855&amp;toolid=80008&amp;mkevt=1</url>
     <image>https://i.ebayimg.com/images/g/4-0AAeSw8sJqTJbe/s-l800.jpg</image>
     <status>active</status>
-    <platform>eBay</platform>
+    <tag_source>eBay</tag_source>
+    <tag_type>Commission</tag_type>
+    <tag_location>External</tag_location>
+    <tab_tag></tab_tag>
+    <blurb>My blurb my blurb my blurb</blurb>
   </item>
   <item>
     <title>Dumpkin Spice Adult Flushable Wipes, Pumpkin Scented, 144 Count | Pumpkin Spice</title>
@@ -22,6 +26,36 @@
     <url>https://www.ebay.com/itm/800501436417?mkcid=1&amp;mkrid=711-53200-19255-0&amp;siteid=0&amp;campid=5339205855&amp;toolid=80008&amp;mkevt=1</url>
     <image>https://i.ebayimg.com/images/g/52oAAeSwgIBqfZqu/s-l800.jpg</image>
     <status>active</status>
-    <platform>eBay</platform>
+    <tag_source>eBay</tag_source>
+    <tag_type>Commission</tag_type>
+    <tag_location>External</tag_location>
+    <tab_tag>PUMPKIN SPICE</tab_tag>
+    <blurb>Exactly what it says. We are as confused as you.</blurb>
+  </item>
+  <item>
+    <title>Vintage Catalog: J. Peterman Company Owner's Manual No. 23, Spring 2004</title>
+    <price>15.00</price>
+    <condition>1 remaining</condition>
+    <url>https://www.ebay.com/itm/188661521338?mkcid=1&amp;mkrid=711-53200-19255-0&amp;siteid=0&amp;campid=5339205855&amp;toolid=80008&amp;mkevt=1</url>
+    <image>https://i.ebayimg.com/images/g/msMAAeSwnjxp0AYh/s-l800.jpg</image>
+    <status>active</status>
+    <tag_source>eBay</tag_source>
+    <tag_type>Commission</tag_type>
+    <tag_location>External</tag_location>
+    <tab_tag>INSPIRED BY SEINFELD</tab_tag>
+    <blurb></blurb>
+  </item>
+  <item>
+    <title>San Francisco 49ers 1996-2008 Throwback Riddell NFL Speed Mini Helmet</title>
+    <price>29.49</price>
+    <condition>5 remaining</condition>
+    <url>https://www.ebay.com/itm/298366062400?mkcid=1&amp;mkrid=711-53200-19255-0&amp;siteid=0&amp;campid=5339205855&amp;toolid=80008&amp;mkevt=1</url>
+    <image>https://i.ebayimg.com/images/g/wDkAAeSw4LNpH1HK/s-l800.jpg</image>
+    <status>active</status>
+    <tag_source>eBay</tag_source>
+    <tag_type>Commission</tag_type>
+    <tag_location>External</tag_location>
+    <tab_tag>REAL NFL PLAYERS ONLY</tab_tag>
+    <blurb></blurb>
   </item>
 </inventory>

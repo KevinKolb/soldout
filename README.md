@@ -123,3 +123,7 @@ Required secrets:
 
 `AIRTABLE_API_KEY`, `AIRTABLE_BASE_ID`, `AIRTABLE_TABLE_NAME`,
 `EMAILJS_SERVICE_ID`, `EMAILJS_TEMPLATE_ID`, `EMAILJS_PUBLIC_KEY`
+
+These are for prop check-in (`live/`) only. The shop build needs no secret: it reads the
+`shop` table in Supabase through a public select policy, with the publishable key
+committed in `tools/build-inventory.py`.
