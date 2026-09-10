@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>SOLD OUT! Comedy - Coming Soon</title>
+  <title>SOLD OUT! Comedy</title>
   <link rel="icon" type="image/png" href="assets/images/soldoutlogo.png">
   <link rel="apple-touch-icon" href="assets/images/soldoutlogo.png">
 
-  <meta property="og:title" content="SOLD OUT! Comedy - Coming Soon">
-  <meta property="og:description" content="Live selling is a $68 billion market, but let's be real, it's painful to watch. We're changing that. Coming soon.">
+  <meta property="og:title" content="SOLD OUT! Comedy">
+  <meta property="og:description" content="Consignment theater: live improv where the audience brings the props and everybody bids. No shows scheduled right now, but the Prop Shop is open.">
   <meta property="og:image" content="https://soldoutcomedy.com/assets/images/soldoutlogo.png">
   <meta property="og:image:alt" content="SOLD OUT! Comedy Logo">
   <meta property="og:url" content="https://soldoutcomedy.com">
@@ -17,8 +17,8 @@
   <meta property="og:site_name" content="SOLD OUT! Comedy">
 
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="SOLD OUT! Comedy - Coming Soon">
-  <meta name="twitter:description" content="Live selling is a $68 billion market, but let's be real, it's painful to watch. We're changing that. Coming soon.">
+  <meta name="twitter:title" content="SOLD OUT! Comedy">
+  <meta name="twitter:description" content="Consignment theater: live improv where the audience brings the props and everybody bids. No shows scheduled right now, but the Prop Shop is open.">
   <meta name="twitter:image" content="https://soldoutcomedy.com/assets/images/soldoutlogo.png">
   <meta name="twitter:site" content="@soldoutcomedy">
   <meta name="twitter:creator" content="@soldoutcomedy">
@@ -52,7 +52,7 @@
       text-align: center;
     }
 
-    .coming-soon-card {
+    .notice-card {
       background: var(--comic-white);
       border: 5px solid var(--comic-black);
       border-radius: 20px;
@@ -93,15 +93,25 @@
       border: 4px solid var(--comic-black);
       border-radius: 999px;
       transform: rotate(-3deg);
+      text-decoration: none;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+
+    .badge:hover, .badge:focus-visible {
+      transform: rotate(-3deg) scale(1.05);
+      box-shadow: 4px 4px 0 var(--comic-black);
+      outline: none;
     }
   </style>
 </head>
 <body>
-  <div class="coming-soon-card">
+  <div class="notice-card">
     <img src="assets/images/soldoutlogo.png" alt="SOLD OUT! Comedy" class="logo">
-    <h1>Coming Soon</h1>
-    <p class="tagline">Live comedy meets live shopping. We're behind the curtain building something ridiculous. Check back soon.</p>
-    <span class="badge">Stay Tuned!</span>
+    <h1>No Shows Scheduled</h1>
+    <p class="tagline">Nothing on the calendar at the moment. The props, however, are not
+      waiting around &mdash; they are for sale right now, and every one of them is still
+      hoping to end up in a scene.</p>
+    <a class="badge" href="/shop/">Take a look at the Prop Shop</a>
   </div>
 </body>
 </html>
