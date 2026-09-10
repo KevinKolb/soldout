@@ -813,8 +813,6 @@ function decorate() {
         }
         paint(row.status || 'Active');
 
-        const lab = t => { const l = document.createElement('label'); l.textContent = t; return l; };
-
         /* Whatever eBay called it. Once a caption is saved the headline shows the
            caption instead, so the pulled title is read here at decorate time and kept
            on the card - otherwise the second edit would have nothing to compare against. */
@@ -848,10 +846,7 @@ function decorate() {
            stamped rather than vanishing: that is how you find it again to put it back. */
         /* The three buttons go last and unlabelled: ACTIVE, SOLD and HIDDEN say what
            they are, and a heading over them only repeated it. */
-        box.append(
-            lab('Original text'), original,
-            states, note
-        );
+        box.append(original, states, note);
         card.querySelector('.body').appendChild(box);
     }
 }
