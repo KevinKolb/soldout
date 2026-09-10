@@ -81,10 +81,21 @@ function injectStyles() {
     body.viewing-public .add-tile,
     body.viewing-public .add-panel { display: none; }
 
-    /* The add tile borrows the grid's inverted card treatment, so it sits in the
-       first cell as an action rather than looking bolted on. */
-    .add-tile { cursor: pointer; text-align: left; }
-    .add-tile .cta-line { text-transform: none; letter-spacing: 0; font-family: var(--sans); }
+    /* The add tile keeps the grid's inverted treatment but spans the full width, so
+       it always lands on a row of its own however many props there are - as a bar under
+       them rather than a card pretending to be a prop. */
+    .add-tile {
+      grid-column: 1 / -1;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.9rem;
+      min-height: 0;
+      padding: 0.9rem 1.1rem;
+      cursor: pointer;
+      text-align: left;
+    }
+    .add-tile .cta-line { flex: 1; text-transform: none; letter-spacing: 0; font-family: var(--sans); }
+    .add-tile .cta-arrow { font-size: 1.9rem; }
 
     .add-panel {
       border: var(--rule) solid var(--ink); background: var(--paper);
