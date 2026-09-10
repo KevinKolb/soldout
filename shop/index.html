@@ -408,6 +408,27 @@
     .cta-line { font-size: 0.86rem; font-weight: 700; line-height: 1.45; }
     .cta-arrow { font-size: 1.6rem; line-height: 1; }
 
+    /* A hidden prop is only ever rendered for the owner, and it says so across its
+       photograph rather than in a corner - the whole point is that it should not be
+       mistaken at a glance for something still on sale. */
+    .item-card.is-hidden .shot::after {
+      content: 'HIDDEN';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(17, 17, 17, 0.55);
+      color: var(--paper);
+      font-family: 'Bangers', cursive;
+      font-size: clamp(1.4rem, 6vw, 2.2rem);
+      letter-spacing: 4px;
+      transform: rotate(-8deg);
+      pointer-events: none;
+    }
+
+    .item-card.is-hidden .shot img { filter: grayscale(1); }
+
     /* Sold stock stays legible - drained of colour rather than faded out. */
     .item-card.sold .shot img { filter: grayscale(1) contrast(1.05); }
     .item-card.sold .item-badge { background: var(--ink); color: var(--paper); }
@@ -770,13 +791,11 @@ async function applyLive() {
     }
   }
 
-  /* Hiding a prop takes effect at once rather than at the next build, which is the
-     point of hiding one. */
-  const visible = allItems.filter(it => text(it, 'status') !== 'hidden');
-  if (visible.length !== allItems.length) changed = true;
+  /* Hiding takes effect at once rather than at the next build, which is the point of
+     hiding something. The status is enough: renderGrid drops hidden props for everyone
+     but the signed-in owner. */
   if (!changed) return;
 
-  allItems = visible;
   allTabs = tabsFrom(allItems);
   if (activeTab !== ALL_TAB && !allTabs.includes(activeTab)) activeTab = ALL_TAB;
   buildTabs();
@@ -809,9 +828,14 @@ function syncUrl() {
 
 function renderGrid() {
   const grid = document.getElementById('itemGrid');
-  const list = activeTab === ALL_TAB
+  /* Hidden props reach the page so the owner can find them again, but a visitor
+     never sees one. assets/js/shop-edit.js sets this class when the owner is signed
+     in and not previewing the public page. */
+  const showHidden = document.body.classList.contains('show-hidden');
+  const list = (activeTab === ALL_TAB
     ? allItems
-    : allItems.filter(it => text(it, 'tab_tag') === activeTab);
+    : allItems.filter(it => text(it, 'tab_tag') === activeTab)
+  ).filter(it => showHidden || text(it, 'status') !== 'hidden');
 
   grid.innerHTML = '';
   for (const it of list) grid.appendChild(itemCard(it));
@@ -851,7 +875,8 @@ function itemCard(it) {
   const price = text(it, 'price');
 
   const card = document.createElement('a');
-  card.className = 'item-card' + (sold ? ' sold' : '');
+  card.className = 'item-card' + (sold ? ' sold' : '')
+    + (text(it, 'status').toLowerCase() === 'hidden' ? ' is-hidden' : '');
   card.href = text(it, 'url');
   card.target = '_blank';
   card.rel = 'noopener';

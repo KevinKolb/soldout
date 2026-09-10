@@ -125,10 +125,12 @@ function injectStyles() {
       text-transform: uppercase; background: var(--ink); color: var(--paper);
       border: 2px solid var(--ink); padding: 6px 8px; cursor: pointer;
     }
-    .editbox button.danger {
-      background: var(--paper); color: var(--red); border-color: var(--red);
-    }
-    .editbox button.danger:hover { background: var(--red); color: var(--paper); }
+    .editbox .states { display: flex; gap: 4px; }
+    .editbox .states .state { flex: 1; background: var(--paper); color: var(--ink); }
+    .editbox .states .state:hover:not(:disabled) { background: var(--acid); }
+    .editbox .states .state[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+    .editbox .states .state.danger { color: var(--red); border-color: var(--red); }
+    .editbox .states .state.danger[aria-pressed="true"] { background: var(--red); color: var(--paper); }
     .editbox .note { font-family: var(--sans); font-size: 0.62rem; color: #555; }
     .editbox .note.bad { color: var(--red); font-weight: 700; }
 
@@ -315,49 +317,42 @@ function buildBar() {
     showPending();
 }
 
-/* Everything on a card commits on its own - the in-place editors save when they lose
-   focus, and each card's own Save handles its status. This is for the case where several
-   statuses have been changed and pressing four separate Saves is silly. It only writes
-   the ones that actually differ from the row, so pressing it with nothing pending says
-   so rather than making four pointless requests. */
+/* Build. There is nothing left to save all of - every control on a card commits the
+   moment it is used - so what this does is the half that actually matters. Nothing
+   rebuilds on a schedule any more, and a prop listed on the eBay storefront does not
+   reach the shop until a build reads the storefront, so this is the button that puts
+   it there.
+
+   The build is started by a Supabase Edge Function, not from here: it needs a GitHub
+   token with actions:write, and a token in a static page is readable by everyone who
+   loads the page. See supabase/functions/build-shop/index.ts. */
 function buildSaveAll(said) {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.textContent = 'Save all';
+    btn.textContent = 'Build';
 
     btn.onclick = async () => {
         /* An editor still focused has not committed yet; blurring it does that first,
-           so Save all does not miss the field being typed into as it is pressed. */
+           so a half-typed caption is not left behind by the build. */
         if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
 
-        const cards = [...document.querySelectorAll('.item-card')]
-            .filter(c => c._row && c._status);
-        const changed = cards.filter(c => String(c._row.status || 'Active') !== c._status.value);
 
-        if (!changed.length) {
-            said.textContent = 'Nothing waiting to be saved.';
-            setTimeout(() => { said.textContent = ''; }, 2500);
+        btn.disabled = true;
+        const note = '';
+
+        said.textContent = 'Starting a build...';
+        const { data: built, error: buildError } = await supabase.functions.invoke('build-shop');
+
+        btn.disabled = false;
+        if (buildError || (built && built.error)) {
+            const why = (built && built.error) || buildError.message || 'it did not say why';
+            said.textContent = note + 'Build did not start: ' + why;
+            setTimeout(() => { said.textContent = ''; }, 8000);
             return;
         }
 
-        btn.disabled = true;
-        said.textContent = 'Saving ' + changed.length + '...';
-        let saved = 0;
-
-        for (const card of changed) {
-            const { data, error } = await persist(card._row, { status: card._status.value });
-            if (error) continue;
-            rows.set(keyOf(data.item_url), data);
-            Object.assign(card._row, data);
-            card.classList.toggle('sold', data.status === 'Sold');
-            saved++;
-        }
-
-        btn.disabled = false;
-        said.textContent = saved === changed.length
-            ? 'Saved ' + saved + '.'
-            : 'Saved ' + saved + ' of ' + changed.length + '; the rest were refused.';
-        setTimeout(() => { said.textContent = ''; }, 3000);
+        said.textContent = note + 'Build started. New props appear in a couple of minutes.';
+        setTimeout(() => { said.textContent = ''; }, 8000);
     };
 
     return btn;
@@ -394,6 +389,10 @@ function buildViewToggle(said) {
     const apply = () => {
         const publicView = cb.checked;
         document.body.classList.toggle('viewing-public', publicView);
+        /* Previewing the public page means seeing what they see, hidden props
+           included - which is to say, not included. */
+        document.body.classList.toggle('show-hidden', !publicView);
+        if (typeof renderGrid === 'function') renderGrid();
         back.classList.toggle('active', !publicView);
         pub.classList.toggle('active', publicView);
         said.textContent = publicView
@@ -748,8 +747,6 @@ function decorate() {
             shot.appendChild(tabBadge);
         }
 
-        /* Hung on the element so Save all can find them without a second registry to
-           keep in step with the grid re-rendering. */
         card._row = row;
 
         const box = document.createElement('div');
@@ -759,31 +756,43 @@ function decorate() {
            navigate away on the first click. */
         box.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
 
-        const status = document.createElement('select');
-        for (const s of ['Active', 'Sold', 'Hidden']) {
-            const o = document.createElement('option');
-            o.value = o.textContent = s;
-            if ((row.status || 'Active') === s) o.selected = true;
-            status.appendChild(o);
-        }
-
-        card._status = status;
-
         const note = document.createElement('div');
         note.className = 'note';
 
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.textContent = 'Save';
-        btn.onclick = async () => {
-            btn.disabled = true;
-            const saved = await save(row, { status: status.value }, note);
-            btn.disabled = false;
-            if (!saved) return;
+        /* Three states, three buttons, each one press. A dropdown plus a Save was two
+           actions and a decision about which of them had actually taken; a lit button
+           says what the prop is now. */
+        const states = document.createElement('div');
+        states.className = 'states';
+        const buttons = {};
 
-            card.classList.toggle('sold', saved.status === 'Sold');
-            showPending();
+        const paint = current => {
+            for (const [name, b] of Object.entries(buttons)) {
+                b.setAttribute('aria-pressed', String(name === current));
+            }
+            card.classList.toggle('sold', current === 'Sold');
+            card.classList.toggle('is-hidden', current === 'Hidden');
         };
+
+        for (const state of ['Active', 'Sold', 'Hidden']) {
+            const b = document.createElement('button');
+            b.type = 'button';
+            b.className = 'state' + (state === 'Hidden' ? ' danger' : '');
+            b.textContent = state;
+            b.onclick = async () => {
+                const was = row.status || 'Active';
+                if (state === was) return;
+                paint(state);
+                for (const x of Object.values(buttons)) x.disabled = true;
+                const saved = await save(row, { status: state }, note);
+                for (const x of Object.values(buttons)) x.disabled = false;
+                paint(saved ? saved.status : was);
+                if (saved) showPending();
+            };
+            buttons[state] = b;
+            states.appendChild(b);
+        }
+        paint(row.status || 'Active');
 
         const lab = t => { const l = document.createElement('label'); l.textContent = t; return l; };
 
@@ -813,28 +822,15 @@ function decorate() {
         original.className = 'original';
         original.textContent = pulled || 'Nothing came from the marketplace for this one.';
 
-        /* Hide rather than delete, and the label says so. The build republishes anything
-           on the storefront that no row mentions, so removing the row would put the
-           prop back at the next build - a Hidden row is what actually keeps it down,
-           and it holds while the listing is still live on eBay. */
-        const del = document.createElement('button');
-        del.type = 'button';
-        del.className = 'danger';
-        del.textContent = 'Hide';
-        del.onclick = async () => {
-            if (!confirm('Hide this from the shop?\n\nIt stays listed on eBay, and it will not come back on its own. You can bring it back from the status menu.')) return;
-            del.disabled = true;
-            const saved = await save(row, { status: 'Hidden' }, note);
-            del.disabled = false;
-            if (!saved) return;
-            card.remove();
-            showPending();
-        };
-
+        /* Hidden is a state here, not a delete. The build republishes anything on the
+           storefront that no row mentions, so removing the row would put the prop back
+           at the next build - a Hidden row is what keeps it down, and it holds while
+           the listing is still live on eBay. Which is also why the prop stays on screen
+           stamped rather than vanishing: that is how you find it again to put it back. */
         box.append(
-            lab('Status'), status,
+            lab('Status'), states,
             lab('Original text'), original,
-            btn, del, note
+            note
         );
         card.querySelector('.body').appendChild(box);
     }
@@ -846,6 +842,7 @@ async function start(u) {
     if (!isOwner(user)) return;
 
     injectStyles();
+    document.body.classList.add('show-hidden');
     if (!await loadRows()) return;
     buildBar();
     decorate();

@@ -12,6 +12,11 @@ Two sources, merged:
      individual /itm/ pages a 403 to anything that is not a real browser, while
      the storefront page still renders with a JSON payload of every card.
 
+Hidden props are published too, marked hidden, rather than being left out. The
+shop drops them for visitors and the owner sees them stamped, which is the only way
+to find one again and put it back - a prop that vanishes from every view is a prop
+nobody can unhide.
+
 Supabase holds the intent, eBay holds the truth. A row whose item is also in the
 storefront gets live title and price; anything set on the row overrides it. Only
 eBay can be enriched, so a row from anywhere else has to carry its own title,
@@ -216,12 +221,10 @@ def build_items(store, rows):
         src = f.get("item_url") or ""
         iid = item_id(src)
 
-        # Recorded before the hidden check, so a Hidden row still suppresses the
-        # listing rather than letting it back in as an unclaimed storefront item.
+        # Recorded so a Hidden row still suppresses the listing rather than letting
+        # it back in below as an unclaimed storefront item.
         if iid:
             spoken_for.add(iid)
-        if status == "hidden":
-            continue
         live = store.get(iid, {})
         title = (f.get("title") or "").strip() or live.get("title") or (f"eBay item {iid}" if iid else "Untitled")
         # PostgREST returns numeric as a string, which _num already handles.
@@ -235,7 +238,7 @@ def build_items(store, rows):
             "condition": (f.get("condition") or "").strip() or live.get("condition", ""),
             "url": link(iid, src),
             "image": image,
-            "status": "sold" if status == "sold" else "active",
+            "status": status if status in ("sold", "hidden") else "active",
             "tag_source": (f.get("tag_source") or "").strip() or "eBay",
             "tag_type": (f.get("tag_type") or "").strip() or "Commission",
             "tag_location": (f.get("tag_location") or "").strip() or "External",
