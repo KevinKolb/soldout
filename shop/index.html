@@ -298,6 +298,13 @@
       transform-origin: left center;
       clip-path: polygon(0 34%, 15px 0, 100% 0, 100% 100%, 15px 100%, 0 66%);
       filter: drop-shadow(3px 3px 0 var(--ink));
+
+      /* A real hole rather than a dot the colour of the card: the mask removes the
+         alpha from both layers at once, so the card shows through and the drop-shadow
+         picks up the gap too. Applied here rather than on the face because the face
+         alone would leave the ink layer behind it filled in. */
+      -webkit-mask-image: radial-gradient(circle at 15px 50%, transparent 0 4px, #000 4.5px);
+      mask-image: radial-gradient(circle at 15px 50%, transparent 0 4px, #000 4.5px);
     }
 
     .price-face {
@@ -313,17 +320,20 @@
       clip-path: polygon(0 34%, 14px 0, 100% 0, 100% 100%, 14px 100%, 0 66%);
     }
 
-    /* The hole, punched through the blunt end. The one circle on the page. */
+    /* The eyelet round the hole. Its inner edge matches the mask, so the ring reads
+       as the rule following the punched edge like every other edge on the tag. */
     .price-face::before {
       content: '';
       position: absolute;
-      left: 11px;
+      box-sizing: border-box;
+      left: 7px;
       top: 50%;
-      width: 8px;
-      height: 8px;
-      margin-top: -4px;
+      width: 14px;
+      height: 14px;
+      margin-top: -7px;
+      border: 3px solid var(--ink);
       border-radius: 50%;
-      background: var(--ink);
+      background: transparent;
     }
 
     .meta {
@@ -424,7 +434,7 @@
       color: #777;
       text-decoration: line-through;
     }
-    .item-card.sold .price-face::before { background: #777; }
+    .item-card.sold .price-face::before { border-color: #777; }
 
     .footer-bottom a { text-decoration: none; }
 
