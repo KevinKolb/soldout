@@ -31,6 +31,23 @@ function keyOf(url) {
 let rows = new Map();     // key -> the row in Supabase
 let user = null;
 
+/* The card is an <a>. In edit mode its href is taken off and kept here, because a
+   textarea or an input inside an anchor is invalid HTML and browsers do what they
+   like with it - clicking into the caption was activating the link and opening the
+   listing. Nothing nested inside a link can be typed into reliably, so in edit mode
+   the card stops being a link and the editor carries an explicit way out to eBay. */
+function cardUrl(card) {
+    return card.dataset.href || card.getAttribute('href') || '';
+}
+
+function unlink(card) {
+    if (card.dataset.href) return;
+    const href = card.getAttribute('href');
+    if (!href) return;
+    card.dataset.href = href;
+    card.removeAttribute('href');
+}
+
 /* ---------- styles, injected so the public page never carries them ---------- */
 function injectStyles() {
     const css = `
@@ -150,6 +167,14 @@ function injectStyles() {
     .editbox .states .state[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
     .editbox .states .state.danger { color: var(--red); border-color: var(--red); }
     .editbox .states .state.danger[aria-pressed="true"] { background: var(--red); color: var(--paper); }
+    .editbox .visit {
+      font-family: var(--mono); font-size: 0.55rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--ink);
+      align-self: flex-start; padding-bottom: 1px;
+    }
+    .editbox .visit:hover { background: var(--acid); }
+
     .editbox .note { font-family: var(--sans); font-size: 0.62rem; color: #555; }
     .editbox .note.bad { color: var(--red); font-weight: 700; }
 
@@ -159,6 +184,11 @@ function injectStyles() {
     .tag-edit { cursor: pointer; }
     .tag-edit:hover { background: var(--acid); }
     .item-badge.tag-edit:hover { background: var(--paper); }
+
+    /* No href in edit mode, so it should stop offering a pointer and stop lifting as
+       though a click went somewhere. */
+    .item-card:not([href]) { cursor: default; }
+    .item-card:not([href]):hover { transform: none; box-shadow: none; }
 
     /* The tab, opposite the source sticker. Paper rather than acid so the two corners
        read as different kinds of label, and admin-only: this element is built here, so
@@ -562,7 +592,7 @@ function showPending() {
     const el = document.getElementById('pendingNote');
     if (!el) return;
 
-    const onPage = new Set([...document.querySelectorAll('.item-card')].map(c => keyOf(c.href)));
+    const onPage = new Set([...document.querySelectorAll('.item-card')].map(c => keyOf(cardUrl(c))));
     const waiting = [...rows.values()].filter(r => !onPage.has(keyOf(r.item_url)));
 
     const tabs = [...new Set([...rows.values()].map(r => r.tab_tag).filter(Boolean))];
@@ -735,10 +765,10 @@ function decorate() {
         /* An adopted prop has no row. Rather than leaving it uneditable - which would
            make the commonest way of adding a prop the one you cannot touch - it gets a
            stub that the first save turns into a real row. */
-        const key = keyOf(card.href);
+        const key = keyOf(cardUrl(card));
         let row = rows.get(key);
         if (!row) {
-            row = { id: null, item_url: String(card.href).split('?')[0], status: 'Active' };
+            row = { id: null, item_url: cardUrl(card).split('?')[0], status: 'Active' };
             rows.set(key, row);
         }
 
@@ -767,6 +797,9 @@ function decorate() {
         }
 
         card._row = row;
+        /* Not while previewing the public page: there the card should behave exactly
+           as a visitor's does, link and all. */
+        if (!document.body.classList.contains('viewing-public')) unlink(card);
 
         const box = document.createElement('div');
         box.className = 'editbox';
@@ -846,7 +879,14 @@ function decorate() {
            stamped rather than vanishing: that is how you find it again to put it back. */
         /* The three buttons go last and unlabelled: ACTIVE, SOLD and HIDDEN say what
            they are, and a heading over them only repeated it. */
-        box.append(original, states, note);
+        const out = document.createElement('a');
+        out.className = 'visit';
+        out.href = cardUrl(card);
+        out.target = '_blank';
+        out.rel = 'noopener';
+        out.textContent = 'Open the listing';
+
+        box.append(original, out, states, note);
         card.querySelector('.body').appendChild(box);
     }
 }
