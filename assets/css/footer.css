@@ -356,11 +356,12 @@ footer::before {
    ========================================================================== */
 
 .footer-minimal {
-  /* A shallow band - just the icons. Nothing below them: they sit straight on
-     the white bar, and the 0.5rem is only clearance for the random rotation the
-     footer script gives each icon, which footer's overflow: hidden would
-     otherwise clip at exactly 0. */
-  padding: 1rem 2rem 0.5rem;
+  /* A shallow band - just the icons, evenly inset. The footer script rotates
+     each icon up to 15deg, which pushes its corners about 6px past the 50px
+     line box, so the visible space reads roughly 6px smaller than the padding
+     on both sides. Keep the two values equal: splitting them looks like a
+     mistake, and anything under 0.5rem lets overflow: hidden clip the corners. */
+  padding: 0.75rem 2rem;
 }
 
 .footer-minimal::before { display: none; }
