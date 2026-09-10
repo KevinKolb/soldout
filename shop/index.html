@@ -166,6 +166,7 @@
     }
 
     .ticker-track span { padding: 0 1.5rem; }
+    .ticker-track .sep { padding: 0; opacity: 0.45; }
 
     @keyframes ticker { to { transform: translateX(-50%); } }
     @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
@@ -353,7 +354,7 @@
     <p class="sub">We know. It's confusing.</p>
   </header>
 
-  <div class="ticker" aria-hidden="true"><div class="ticker-track"><span>Everything must go</span><span>Nothing here is sold out</span><span>The name is a bit misleading</span><span>Buy our beautiful junk</span><span>Everything must go</span><span>Nothing here is sold out</span><span>The name is a bit misleading</span><span>Buy our beautiful junk</span></div></div>
+  <div class="ticker" aria-hidden="true" hidden><div class="ticker-track"></div></div>
 
   <section id="listings">
     <div class="section-head">
@@ -443,6 +444,58 @@
 
 <script>
 const text = (node, tag) => (node.querySelector(tag)?.textContent || '').trim();
+
+/* The ticker runs on the tagline bank in assets/data/taglines.xml. The strip
+   is written out twice so the -50% slide loops without a seam, and the
+   duration is derived from the finished width so the speed stays the same
+   however many taglines the file holds. */
+async function loadTaglines() {
+  const ticker = document.querySelector('.ticker');
+  const track = document.querySelector('.ticker-track');
+  if (!ticker || !track) return;
+
+  let lines;
+  try {
+    const res = await fetch('../assets/data/taglines.xml', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const doc = new DOMParser().parseFromString(await res.text(), 'text/xml');
+    if (doc.querySelector('parsererror')) throw new Error('taglines.xml is not valid XML');
+    lines = [...doc.querySelectorAll('tagline')]
+      .map(t => t.textContent.trim())
+      .filter(Boolean);
+  } catch (err) {
+    console.warn('[shop] taglines load failed:', err);
+    return;                        /* stays hidden - a blank black bar is worse */
+  }
+
+  if (!lines.length) return;
+
+  /* Shuffled: most people see only the first few before they scroll past, and
+     in file order that would be the same jokes on every visit. */
+  for (let i = lines.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [lines[i], lines[j]] = [lines[j], lines[i]];
+  }
+
+  const pass = () => lines.flatMap(line => {
+    const item = document.createElement('span');
+    item.textContent = line;
+    const sep = document.createElement('span');
+    sep.className = 'sep';
+    sep.textContent = '\u2022';
+    return [item, sep];
+  });
+
+  track.replaceChildren(...pass(), ...pass());
+  ticker.hidden = false;
+
+  /* Measure after the webfont lands, or the width - and so the speed - is
+     taken from the fallback face. */
+  if (document.fonts && document.fonts.ready) await document.fonts.ready;
+  const PIXELS_PER_SECOND = 70;
+  const distance = track.getBoundingClientRect().width / 2;
+  track.style.animationDuration = Math.round(distance / PIXELS_PER_SECOND) + 's';
+}
 
 /* Today, in the reader's own timezone and date format. Hidden in the markup
    so it is an empty box for nobody: without scripts there are no listings
@@ -560,6 +613,7 @@ async function loadInventory() {
 }
 
 stampToday(document.getElementById('todayStamp'));
+loadTaglines();
 loadInventory();
 </script>
 
