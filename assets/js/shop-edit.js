@@ -107,6 +107,7 @@ function injectStyles() {
       text-transform: uppercase; background: var(--ink); color: var(--paper);
       border: 2px solid var(--ink); padding: 8px 12px; cursor: pointer;
     }
+    .add-panel button.ghost { background: var(--paper); color: var(--ink); }
 
     .editbox {
       border-top: 2px dashed var(--ink); margin-top: 0.6rem; padding-top: 0.6rem;
@@ -205,10 +206,6 @@ function buildBar() {
     const spacer = document.createElement('span');
     spacer.className = 'spacer';
 
-    const add = document.createElement('button');
-    add.type = 'button';
-    add.textContent = '+ Add prop';
-
     const toggle = buildViewToggle(said);
 
     const out = document.createElement('button');
@@ -217,10 +214,9 @@ function buildBar() {
     out.textContent = 'Sign out';
     out.onclick = async () => { await signOut(); location.reload(); };
 
-    bar.append(who, said, spacer, add, toggle, out);
+    bar.append(who, said, spacer, toggle, out);
 
     const panel = buildAddPanel();
-    add.onclick = () => { panel.hidden = !panel.hidden; };
 
     const pending = document.createElement('div');
     pending.className = 'pending';
@@ -313,10 +309,16 @@ function buildAddPanel() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = 'Add to the shop';
+    const shut = document.createElement('button');
+    shut.type = 'button';
+    shut.className = 'ghost';
+    shut.textContent = 'Close';
+    shut.onclick = () => { panel.hidden = true; };
+
     const note = document.createElement('span');
     note.className = 'note';
     note.style.font = '0.72rem/1.5 Inter, system-ui, sans-serif';
-    go.append(btn, note);
+    go.append(btn, shut, note);
 
     btn.onclick = async () => {
         const clean = url.value.trim().split('?')[0];
