@@ -249,6 +249,7 @@ function injectStyles() {
     /* No href in edit mode, so it should stop offering a pointer and stop lifting as
        though a click went somewhere. */
     .item-card:not([href]) { cursor: default; }
+    .price-link { cursor: pointer; }
     .item-card:not([href]):hover { transform: none; box-shadow: none; }
 
     /* The tab, opposite the source sticker. Paper rather than acid so the two corners
@@ -924,6 +925,23 @@ function decorate() {
         /* Not while previewing the public page: there the card should behave exactly
            as a visitor's does, link and all. */
         if (!document.body.classList.contains('viewing-public')) unlink(card);
+
+        /* With the card unlinked there is nothing left to click through to the
+           listing, so the price tag becomes the way there - it is the part of a card
+           anyone would try anyway. Skipped in the preview, where the card is still a
+           link and would open it the visitor's way. */
+        const priceTag = card.querySelector('.price');
+        if (priceTag && !editingOff() && !priceTag.dataset.linked) {
+            priceTag.dataset.linked = '1';
+            priceTag.classList.add('price-link');
+            priceTag.title = 'Open the listing';
+            priceTag.addEventListener('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                const url = cardUrl(card);
+                if (url) window.open(url, '_blank', 'noopener');
+            });
+        }
 
         const box = document.createElement('div');
         box.className = 'editbox';
