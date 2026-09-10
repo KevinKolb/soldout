@@ -492,9 +492,20 @@ function buildBar() {
        would then live in the bookmarks bar forever. */
     mark.textContent = 'FUNNY PRODUCT';
     mark.title = 'Drag to your bookmarks bar, then press it on any listing';
+    /* The live site, not location.origin. A bookmarklet built from wherever the page
+       happened to be served would point at 127.0.0.1 forever once dragged from a local
+       session - and a bookmark that only works on the machine it was made on is not a
+       bookmark.
+
+       A new tab rather than navigating: it is pressed while looking at a listing, and
+       taking that listing off the screen to file it is the wrong trade. It falls back
+       to navigating if the tab is refused. */
     mark.setAttribute('href',
-        "javascript:(function(){location.href='" + location.origin
-        + "/shop/?add='+encodeURIComponent(location.href)})()");
+        "javascript:(function(){"
+        + "var u='https://www.soldoutcomedy.com/shop/?add='+encodeURIComponent(location.href);"
+        + "var w=window.open(u,'_blank');"
+        + "if(!w)location.href=u;"
+        + "})()");
     mark.addEventListener('click', e => {
         e.preventDefault();
         panelSay('Drag it to your bookmarks bar. Then press it on any eBay listing.');
