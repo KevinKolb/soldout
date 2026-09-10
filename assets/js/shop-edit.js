@@ -135,6 +135,15 @@ function injectStyles() {
     .item-badge.tag-edit:hover { background: var(--paper); }
     .tag-edit.saving { opacity: 0.45; }
     .tag-edit.failed { background: var(--red); color: var(--paper); }
+    .item-title.cap-edit { cursor: text; }
+    .item-title.cap-edit:hover { background: var(--acid); }
+    .title-input {
+      width: 100%; font: inherit; font-weight: 700; line-height: 1.3;
+      border: 0; outline: 2px solid var(--ink); padding: 2px 4px;
+      background: var(--paper); color: var(--ink);
+      resize: vertical; min-height: 3.4em;
+    }
+
     .tag-input {
       font: inherit; letter-spacing: inherit; text-transform: inherit;
       width: 7em; padding: 0 2px; border: 0; outline: 2px solid var(--ink);
@@ -468,6 +477,56 @@ function textTag(el, row, field) {
     });
 }
 
+/* The headline is the caption when there is one, so it is also where the caption is
+   written. Clicking it opens a box in the card rather than sending the eye to a field
+   below the fold of the tile. Clearing it and saving hands the headline back to the
+   marketplace's own title. */
+function inlineCaption(el, row, pulled) {
+    el.classList.add('cap-edit');
+    el.title = 'Click to write what we call it';
+
+    el.addEventListener('click', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (el.dataset.editing) return;
+        el.dataset.editing = '1';
+
+        const was = row.blurb || '';
+        const box = document.createElement('textarea');
+        box.className = 'title-input';
+        box.value = was;
+        box.placeholder = pulled;
+        el.textContent = '';
+        el.appendChild(box);
+        box.focus();
+        box.setSelectionRange(box.value.length, box.value.length);
+
+        let done = false;
+        const finish = async commit => {
+            if (done) return;
+            done = true;
+            delete el.dataset.editing;
+            const value = box.value.trim();
+
+            if (!commit || value === was) {
+                el.textContent = was || pulled;
+                return;
+            }
+            el.textContent = value || pulled;
+            if (!await saveTag(el, row, 'blurb', value)) el.textContent = was || pulled;
+        };
+
+        box.addEventListener('blur', () => finish(true));
+        box.addEventListener('keydown', ev => {
+            /* Enter commits, shift+Enter breaks the line - the caption is short enough
+               that committing is the far commoner intent. */
+            if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); box.blur(); }
+            if (ev.key === 'Escape') { ev.preventDefault(); finish(false); }
+        });
+        box.addEventListener('click', ev => ev.stopPropagation());
+    });
+}
+
 /* ---------- the editor on each card ---------- */
 function decorate() {
     for (const card of document.querySelectorAll('.item-card')) {
@@ -494,11 +553,6 @@ function decorate() {
            navigate away on the first click. */
         box.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
 
-        const caption = document.createElement('textarea');
-        caption.value = row.blurb || '';
-        caption.rows = 3;
-        caption.placeholder = "What we call it. Replaces eBay's title on the card.";
-
         const tab = document.createElement('input');
         tab.type = 'text';
         tab.value = row.tab_tag || '';
@@ -522,17 +576,12 @@ function decorate() {
         btn.onclick = async () => {
             btn.disabled = true;
             const saved = await save(row, {
-                blurb: caption.value.trim(),
                 tab_tag: tab.value.trim(),
                 status: status.value
             }, note);
             btn.disabled = false;
             if (!saved) return;
 
-            /* Show the change on the card straight away rather than waiting six hours
-               to find out whether it took. */
-            const title = card.querySelector('.item-title');
-            if (title && saved.blurb) title.textContent = saved.blurb;
             card.classList.toggle('sold', saved.status === 'Sold');
             showPending();
         };
@@ -546,17 +595,29 @@ function decorate() {
            caption instead, so the pulled title is read here at decorate time and kept
            on the card - otherwise the second edit would have nothing to compare against. */
         const titleEl = card.querySelector('.item-title');
-        const pulled = titleEl
+        let pulled = titleEl
             ? (card.getAttribute('title') || titleEl.dataset.pulled || titleEl.textContent)
             : '';
-        if (titleEl) titleEl.dataset.pulled = pulled;
 
+        /* The headline shows the caption once there is one, so reading it back off the
+           card would eventually record our own words as the marketplace's. If they match,
+           the headline is the caption and the original is not there to be read. */
+        if (pulled.trim() && pulled.trim() === String(row.blurb || '').trim()) {
+            pulled = titleEl && titleEl.dataset.pulled ? titleEl.dataset.pulled : '';
+        }
+        if (titleEl) {
+            titleEl.dataset.pulled = pulled;
+            inlineCaption(titleEl, row, pulled);
+        }
+
+        /* Always rendered, caption or no caption: it is the one thing on the card
+           that is not ours, and knowing what the marketplace calls something is useful
+           whether or not it has been overridden. */
         const original = document.createElement('div');
         original.className = 'original';
-        original.textContent = pulled;
+        original.textContent = pulled || 'Nothing came from the marketplace for this one.';
 
         box.append(
-            lab('Override name and caption'), caption,
             lab('Tab and status'), row2,
             lab('Original text'), original,
             btn, note
