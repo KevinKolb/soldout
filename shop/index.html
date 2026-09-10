@@ -425,8 +425,10 @@
        the rest of the chrome, and the gear change happens at the paragraph. */
 
     .serious {
-      max-width: 62ch;
-      margin: 2.5rem auto 0;
+      /* Full width, like the hero above it. The short measure made it look like a
+         pull-quote dropped into the middle of the page rather than the page's own
+         closing word. */
+      margin: 2.5rem 0 0;
       background: var(--paper);
       border: var(--rule) solid var(--ink);
       box-shadow: var(--drop);
@@ -435,7 +437,7 @@
 
     .serious-lead {
       font-family: var(--mono);
-      font-size: 0.66rem;
+      font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.18em;
       text-transform: uppercase;
@@ -990,9 +992,27 @@ function itemCard(it) {
 
    If nothing turns up - no inventory, every prop hidden - the line keeps the wording
    that is in the markup. */
+const NOTE_BAG = 'shop.noteBag';
+const NOTE_LAST = 'shop.noteLast';
+let noteNamed = false;
+
+/* Drawing at random from six props repeats about one load in six, and clusters on top
+   of that, which is why it reads as broken rather than random. This draws from a bag
+   instead: shuffle every prop, take one per load, and only reshuffle once they have all
+   had a turn. Equal shake, no repeats until the round is over, and the refill will not
+   hand back the one just shown. */
+function shuffled(list) {
+  const out = [...list];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 function nameAProp() {
   const el = document.getElementById('seriousProp');
-  if (!el || !allItems.length) return;
+  if (!el || noteNamed || !allItems.length) return;
 
   const usable = [];
   for (const it of allItems) {
@@ -1002,7 +1022,31 @@ function nameAProp() {
   }
   if (!usable.length) return;
 
-  el.textContent = usable[Math.floor(Math.random() * usable.length)];
+  let bag = [];
+  let last = '';
+  try {
+    bag = JSON.parse(localStorage.getItem(NOTE_BAG) || '[]');
+    last = localStorage.getItem(NOTE_LAST) || '';
+  } catch { /* private mode, or something else wrote nonsense there */ }
+  if (!Array.isArray(bag)) bag = [];
+
+  /* Props sell and props get hidden, so anything no longer on the shop leaves the bag. */
+  bag = bag.filter(n => usable.includes(n));
+
+  if (!bag.length) {
+    bag = shuffled(usable);
+    /* A fresh bag that opens on the one just shown would look like the old behaviour. */
+    if (bag.length > 1 && bag[0] === last) bag.push(bag.shift());
+  }
+
+  const pick = bag.shift();
+  el.textContent = pick;
+  noteNamed = true;
+
+  try {
+    localStorage.setItem(NOTE_BAG, JSON.stringify(bag));
+    localStorage.setItem(NOTE_LAST, pick);
+  } catch { /* private mode - the draw is just random again, which is no worse */ }
 }
 
 stampToday(document.getElementById('todayStamp'));
