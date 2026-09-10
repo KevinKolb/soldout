@@ -107,6 +107,16 @@ function injectStyles() {
     }
     .edit-panel .linkbtn:hover { background: var(--paper); border-color: var(--paper); }
 
+    /* Dashed, like the ghost tab: something to pick up and put somewhere, rather than
+       something to press. */
+    .edit-panel .bookmarklet {
+      display: block; text-align: center; cursor: grab;
+      font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.09em; text-transform: uppercase; text-decoration: none;
+      color: var(--paper); border: 2px dashed var(--paper); padding: 7px 10px;
+    }
+    .edit-panel .bookmarklet:hover { background: var(--paper); color: var(--ink); }
+
     .edit-panel .said {
       text-transform: none; letter-spacing: 0; font-family: var(--sans);
       font-size: 0.82rem; line-height: 1.45;
@@ -411,6 +421,30 @@ async function save(row, patch, note) {
     return data;
 }
 
+/* A listing sent here by the bookmarklet. The dialog opens with the URL already in
+   it rather than filing the prop outright: a caption is worth writing while the listing
+   is still in front of you, and a URL arriving from a bookmark is not the same as a
+   decision to publish. The parameter is then wiped from the address bar, so a refresh
+   does not open the dialog all over again. */
+function openFromBookmarklet() {
+    const asked = new URLSearchParams(location.search).get('add');
+    if (!asked) return;
+
+    const url = new URL(location.href);
+    url.searchParams.delete('add');
+    history.replaceState(null, '', url);
+
+    const panel = document.getElementById('addPanel');
+    if (!panel) return;
+
+    const field = panel.querySelector('input');
+    if (field) field.value = asked.split('?')[0];
+    panel.showModal();
+
+    const caption = panel.querySelectorAll('input')[1];
+    if (caption) caption.focus();
+}
+
 /* ---------- the panel down the right ---------- */
 /* It was a bar across the top of the listings, which put page-wide controls inside the
    grid's own header and scrolled them away as soon as you looked at anything. As a
@@ -442,6 +476,25 @@ function buildBar() {
     add.type = 'button';
     add.textContent = '+ Add prop';
 
+    /* A bookmarklet, so a listing can be sent here from eBay without copying its URL
+       back and forth. It cannot write to Supabase itself: it runs on ebay.com, and the
+       session that is allowed to write lives in this origin's storage, where a script
+       on another domain cannot reach it - which is the point of it being there. So it
+       carries the URL to this page and lets the page, already signed in, do the work.
+
+       Dragged to the bookmarks bar, not clicked: pressed here it would file the shop. */
+    const mark = document.createElement('a');
+    mark.className = 'bookmarklet';
+    mark.textContent = 'Drag me to bookmarks';
+    mark.title = 'Drag to your bookmarks bar, then press it on any listing';
+    mark.setAttribute('href',
+        "javascript:(function(){location.href='" + location.origin
+        + "/shop/?add='+encodeURIComponent(location.href)})()");
+    mark.addEventListener('click', e => {
+        e.preventDefault();
+        panelSay('Drag it to your bookmarks bar. Then press it on any eBay listing.');
+    });
+
     /* Straight out to the routine, where its runs, its logs and its schedule are.
        Its orders live in tools/prop-bot.md; this is where you watch it work. */
     const bot = document.createElement('a');
@@ -463,7 +516,7 @@ function buildBar() {
        everything below it only makes sense in one of them. The message sits directly
        under Build, because that is the only thing that writes to it - a report belongs
        against the button that caused it, not at the top of the panel. */
-    bar.append(buildViewToggle(said), add, bot, saveAll, said, out, who);
+    bar.append(buildViewToggle(said), add, mark, bot, saveAll, said, out, who);
     document.body.appendChild(bar);
     trackHeaderHeight();
 
@@ -1067,6 +1120,7 @@ async function start(u) {
     publishExtraTabs();
     if (typeof buildTabs === 'function') buildTabs();
     buildBar();
+    openFromBookmarklet();
     decorate();
     makeCardsDraggable();
     ghostTab();
