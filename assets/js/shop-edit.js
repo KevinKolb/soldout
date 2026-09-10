@@ -150,7 +150,6 @@ function injectStyles() {
     /* Previewing the public page. The editors are hidden rather than torn down, so
        flipping back does not have to rebuild anything. */
     body.viewing-public .editbox,
-    body.viewing-public .pending,
     body.viewing-public .add-tile,
     body.viewing-public .add-panel { display: none; }
 
@@ -304,12 +303,6 @@ function injectStyles() {
       user-select: text; -webkit-user-select: text;
     }
 
-    .pending {
-      border: var(--rule) dashed var(--ink); padding: 12px 14px; margin-bottom: var(--gap);
-      font-family: var(--sans); font-size: 0.78rem; line-height: 1.6;
-    }
-    .pending[hidden] { display: none; }
-    .pending b { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; }
     `;
     const el = document.createElement('style');
     el.textContent = css;
@@ -409,13 +402,8 @@ function buildBar() {
 
     const panel = buildAddPanel();
 
-    const pending = document.createElement('div');
-    pending.className = 'pending';
-    pending.id = 'pendingNote';
-    pending.hidden = true;
-
-    listings.prepend(panel, pending);
-    showPending();
+    listings.prepend(panel);
+    refreshTabList();
 }
 
 /* Build. There is nothing left to save all of - every control on a card commits the
@@ -595,36 +583,19 @@ function buildAddPanel() {
         url.value = caption.value = '';
         note.textContent = 'Added. It appears on the page after the next build picks up its title and price from eBay.';
         await loadRows();
-        showPending();
+        refreshTabList();
     };
 
     panel.append(field('Listing URL', url), field('Tab tag', tab), field('Caption', caption), list, go);
     return panel;
 }
 
-/* Rows added since the last build have no card to attach to, so they are named here
-   rather than silently missing. */
-function showPending() {
-    const el = document.getElementById('pendingNote');
-    if (!el) return;
-
-    const onPage = new Set([...document.querySelectorAll('.item-card')].map(c => keyOf(cardUrl(c))));
-    const waiting = [...rows.values()].filter(r => !onPage.has(keyOf(r.item_url)));
-
-    const tabs = [...new Set([...rows.values()].map(r => r.tab_tag).filter(Boolean))];
+/* Suggestions for the tab field, from the tabs already in use. */
+function refreshTabList() {
     const list = document.getElementById('tabList');
-    if (list) list.innerHTML = tabs.map(t => `<option value="${t}"></option>`).join('');
-
-    if (!waiting.length) { el.hidden = true; return; }
-    el.innerHTML = '';
-    const b = document.createElement('b');
-    b.textContent = waiting.length + ' waiting for the next build';
-    const p = document.createElement('div');
-    p.textContent = waiting.map(r => r.item_url).join(', ')
-        + ' - in the table but not on the page yet, because the title, price and photo '
-        + 'are read from the eBay storefront at build time.';
-    el.append(b, p);
-    el.hidden = false;
+    if (!list) return;
+    const tabs = [...new Set([...rows.values()].map(r => r.tab_tag).filter(Boolean))];
+    list.innerHTML = tabs.map(t => `<option value="${t}"></option>`).join('');
 }
 
 /* ---------- tags, edited where they sit ---------- */
@@ -858,7 +829,7 @@ function decorate() {
                 const saved = await save(row, { status: state }, note);
                 for (const x of Object.values(buttons)) x.disabled = false;
                 paint(saved ? saved.status : was);
-                if (saved) showPending();
+                if (saved) refreshTabList();
             };
             buttons[state] = b;
             states.appendChild(b);
@@ -961,7 +932,7 @@ function addTile() {
 
 /* The grid re-renders on every tab click, which throws the editors away with it. */
 document.addEventListener('shop:rendered', () => {
-    if (isOwner(user)) { decorate(); addTile(); showPending(); }
+    if (isOwner(user)) { decorate(); addTile(); refreshTabList(); }
 });
 
 start(await currentUser());
