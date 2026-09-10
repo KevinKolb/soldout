@@ -276,15 +276,42 @@
 
     .item-title { font-weight: 700; font-size: 0.9rem; line-height: 1.3; }
 
+    /* An actual price tag: acid card, hard rule, hard shadow, and a punched hole
+       where the string would go. Tilted a degree and a half so it reads as an object
+       stuck onto the card rather than another line of type.
+
+       align-self keeps it shrink-to-fit - the body is a flex column, so without it
+       the tag would stretch the full width and stop looking like a tag. margin-top
+       still pins it to the foot, so tags line up across the row. */
     .price {
-      /* Pinned to the foot of the card so prices line up across the grid however
-         long a title or blurb runs. The slack collects above it instead. */
       margin-top: auto;
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      max-width: 100%;
+      padding: 0.12rem 0.7rem 0.18rem 0.5rem;
+      background: var(--acid);
+      color: var(--ink);
+      border: 3px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      transform: rotate(-1.5deg);
+      transform-origin: left center;
       font-family: 'Bangers', cursive;
-      font-size: 1.9rem;
-      line-height: 1;
+      font-size: 1.6rem;
+      line-height: 1.15;
       letter-spacing: 1px;
-      color: var(--red);
+    }
+
+    /* The hole. The one circle on the page, and it earns it. */
+    .price::before {
+      content: '';
+      flex: none;
+      width: 9px;
+      height: 9px;
+      border: 3px solid var(--ink);
+      border-radius: 50%;
+      background: var(--paper);
     }
 
     .meta {
@@ -378,7 +405,15 @@
     /* Sold stock stays legible - drained of colour rather than faded out. */
     .item-card.sold .shot img { filter: grayscale(1) contrast(1.05); }
     .item-card.sold .item-badge { background: var(--ink); color: var(--paper); }
-    .item-card.sold .price { color: #777; text-decoration: line-through; }
+    /* A sold tag drains rather than disappears - still a tag, just spent. */
+    .item-card.sold .price {
+      background: #e4e4e4;
+      color: #777;
+      border-color: #777;
+      box-shadow: 3px 3px 0 #777;
+      text-decoration: line-through;
+    }
+    .item-card.sold .price::before { border-color: #777; }
 
     .footer-bottom a { text-decoration: none; }
 
