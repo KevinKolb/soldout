@@ -133,6 +133,33 @@ function injectStyles() {
     .tag-edit { cursor: pointer; }
     .tag-edit:hover { background: var(--acid); }
     .item-badge.tag-edit:hover { background: var(--paper); }
+
+    /* The tab, opposite the source sticker. Paper rather than acid so the two corners
+       read as different kinds of label, and admin-only: this element is built here, so
+       a visitor is never sent one. */
+    .tab-badge {
+      position: absolute;
+      top: 0;
+      right: 0;
+      max-width: 70%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      background: var(--paper);
+      color: var(--ink);
+      border-left: var(--rule) solid var(--ink);
+      border-bottom: var(--rule) solid var(--ink);
+      padding: 4px 9px;
+      font-family: var(--mono);
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .tab-badge:hover { background: var(--acid); }
+    .tab-badge.is-empty { color: #999; }
+    body.viewing-public .tab-badge { display: none; }
     .tag-edit.saving { opacity: 0.45; }
     .tag-edit.failed { background: var(--red); color: var(--paper); }
     .item-title.cap-edit { cursor: text; }
@@ -437,9 +464,14 @@ function cyclingTag(el, row, field, values) {
 
 /* The marketplace can be anything, so this one opens a field. Enter or clicking
    away commits, Escape abandons. */
-function textTag(el, row, field) {
+function textTag(el, row, field, placeholder) {
     el.classList.add('tag-edit');
-    el.title = 'Click to rename';
+    el.title = placeholder ? 'Click to set' : 'Click to rename';
+
+    const show = value => {
+        el.textContent = value || placeholder || '';
+        if (placeholder) el.classList.toggle('is-empty', !value);
+    };
 
     el.addEventListener('click', e => {
         e.preventDefault();
@@ -447,7 +479,7 @@ function textTag(el, row, field) {
         if (el.dataset.editing) return;
         el.dataset.editing = '1';
 
-        const was = row[field] || el.textContent.trim();
+        const was = row[field] || '';
         const input = document.createElement('input');
         input.className = 'tag-input';
         input.value = was;
@@ -462,9 +494,10 @@ function textTag(el, row, field) {
             done = true;
             delete el.dataset.editing;
             const value = input.value.trim();
-            el.textContent = commit && value ? value : was;
-            if (commit && value && value !== was) {
-                if (!await saveTag(el, row, field, value)) el.textContent = was;
+            const next = commit ? value : was;
+            show(next);
+            if (commit && value !== was) {
+                if (!await saveTag(el, row, field, value)) show(was);
             }
         };
 
@@ -546,18 +579,24 @@ function decorate() {
             textTag(badge, row, 'tag_source');
         }
 
+        /* The tab, in the opposite corner. Built here rather than in the page's own
+           renderer, so it exists only while someone is signed in. */
+        const shot = card.querySelector('.shot');
+        if (shot && !shot.querySelector('.tab-badge')) {
+            const tabBadge = document.createElement('span');
+            tabBadge.className = 'tab-badge';
+            tabBadge.textContent = row.tab_tag || '+ tab';
+            if (!row.tab_tag) tabBadge.classList.add('is-empty');
+            textTag(tabBadge, row, 'tab_tag', '+ tab');
+            shot.appendChild(tabBadge);
+        }
+
         const box = document.createElement('div');
         box.className = 'editbox';
 
         /* The card is a link to the listing. Anything typed inside it would otherwise
            navigate away on the first click. */
         box.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
-
-        const tab = document.createElement('input');
-        tab.type = 'text';
-        tab.value = row.tab_tag || '';
-        tab.placeholder = 'Tab tag';
-        tab.setAttribute('list', 'tabList');
 
         const status = document.createElement('select');
         for (const s of ['Active', 'Sold', 'Hidden']) {
@@ -575,10 +614,7 @@ function decorate() {
         btn.textContent = 'Save';
         btn.onclick = async () => {
             btn.disabled = true;
-            const saved = await save(row, {
-                tab_tag: tab.value.trim(),
-                status: status.value
-            }, note);
+            const saved = await save(row, { status: status.value }, note);
             btn.disabled = false;
             if (!saved) return;
 
@@ -587,9 +623,6 @@ function decorate() {
         };
 
         const lab = t => { const l = document.createElement('label'); l.textContent = t; return l; };
-        const row2 = document.createElement('div');
-        row2.className = 'row';
-        row2.append(tab, status);
 
         /* Whatever eBay called it. Once a caption is saved the headline shows the
            caption instead, so the pulled title is read here at decorate time and kept
@@ -618,7 +651,7 @@ function decorate() {
         original.textContent = pulled || 'Nothing came from the marketplace for this one.';
 
         box.append(
-            lab('Tab and status'), row2,
+            lab('Status'), status,
             lab('Original text'), original,
             btn, note
         );

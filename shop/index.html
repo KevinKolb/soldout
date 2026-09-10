@@ -58,7 +58,7 @@
     }
 
     /* Label voice: mono, caps, wide tracking. Every piece of chrome uses it. */
-    .kicker, .sub, .hero-tag, .topbar, .section-head h2, .count, .meta,
+    .kicker, .sub, .hero-tag, .topbar, .meta,
     .item-badge, .section-note {
       font-family: var(--mono);
       letter-spacing: 0.18em;
@@ -170,30 +170,6 @@
 
     @keyframes ticker { to { transform: translateX(-50%); } }
     @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
-
-    /* --- Section header --------------------------------------------------- */
-
-    .section-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 1rem;
-      background: var(--ink);
-      color: var(--paper);
-      padding: 0.55rem 0.9rem;
-      margin-bottom: var(--gap);
-    }
-
-    .section-head h2 { margin: 0; font-size: 0.75rem; font-weight: 700; }
-
-    .count {
-      background: var(--acid);
-      color: var(--ink);
-      padding: 3px 8px;
-      font-size: 0.64rem;
-      font-weight: 700;
-      white-space: nowrap;
-    }
 
     /* --- Item grid -------------------------------------------------------- */
 
@@ -515,10 +491,6 @@
   <div class="ticker" aria-hidden="true" hidden><div class="ticker-track"></div></div>
 
   <section id="listings">
-    <div class="section-head">
-      <h2>Items for sale</h2>
-      <span class="count" id="itemCount">Loading</span>
-    </div>
     <div class="tabs" id="tabBar" role="tablist"></div>
     <div class="item-grid" id="itemGrid">
       <p class="section-note" id="itemsStatus">Loading items...</p>
@@ -680,11 +652,9 @@ function stampToday(el) {
 async function loadInventory() {
   const grid = document.getElementById('itemGrid');
   const note = document.getElementById('itemsStatus');
-  const count = document.getElementById('itemCount');
 
   if (location.protocol === 'file:') {
     note.textContent = 'Item list needs a web server; open this page over http rather than from disk.';
-    count.textContent = 'Offline';
     return;
   }
 
@@ -697,14 +667,12 @@ async function loadInventory() {
     items = [...doc.querySelectorAll('item')];
   } catch (err) {
     note.textContent = 'Could not load the item list right now.';
-    count.textContent = 'Unavailable';
     console.warn('[shop] inventory load failed:', err);
     return;
   }
 
   if (!items.length) {
     note.textContent = 'Nothing listed at the moment.';
-    count.textContent = 'None';
     return;
   }
 
@@ -842,12 +810,10 @@ function syncUrl() {
 
 function renderGrid() {
   const grid = document.getElementById('itemGrid');
-  const count = document.getElementById('itemCount');
   const list = activeTab === ALL_TAB
     ? allItems
     : allItems.filter(it => text(it, 'tab_tag') === activeTab);
 
-  count.textContent = list.length + (list.length === 1 ? ' prop' : ' props');
   grid.innerHTML = '';
   for (const it of list) grid.appendChild(itemCard(it));
 
