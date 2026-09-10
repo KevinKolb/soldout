@@ -628,8 +628,13 @@ function buildAddPanel() {
         /* No tab here. The prop has no card to file yet, and once it has one the
            picker in its corner is a better place to choose from than a text field
            that would let a typo become a second tab. */
+        /* Hidden to begin with. A prop added here has no title, price or photo until
+           a build reads them from the storefront, so publishing it straight away would
+           put a blank card in front of a visitor. It arrives stamped HIDDEN in
+           backstage, and you press ACTIVE when it looks right. */
         const { error } = await supabase.from(TABLE).insert({
             item_url: clean,
+            status: 'Hidden',
             blurb: caption.value.trim(),
             position: (Math.max(0, ...[...rows.values()].map(r => r.position || 0)) + 10)
         });
@@ -642,7 +647,7 @@ function buildAddPanel() {
             return;
         }
         url.value = caption.value = '';
-        note.textContent = 'Added. It appears on the page after the next build picks up its title and price from eBay.';
+        note.textContent = 'Added, hidden. Build to pull its title and price from eBay, then press ACTIVE on the card.';
         await loadRows();
     };
 
