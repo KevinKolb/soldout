@@ -76,11 +76,23 @@ function injectStyles() {
     .edit-bar button.ghost { background: transparent; color: var(--paper); border-color: var(--paper); }
     .edit-bar .said { text-transform: none; letter-spacing: 0; font-family: var(--sans); }
 
-    /* Backstage / public. A hard-edged switch rather than a rounded one, because
-       nothing else on this page is rounded. */
+    /* Backstage / public, floating under the thin header rather than sitting in the
+       edit bar. It applies to the whole page rather than to the listings, and in the bar
+       it scrolled away exactly when you wanted it - after reading down the grid in
+       preview. --topbar-h is measured from the header itself, so it stays tucked under
+       it when the header wraps on a narrow screen.
+
+       Hard-edged, because nothing else on this page is rounded. */
     .view-toggle {
+      position: fixed;
+      top: calc(var(--topbar-h, 40px) + 10px);
+      right: 12px;
+      z-index: 30;
       display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
-      border: 2px solid var(--paper); padding: 5px 9px;
+      background: var(--ink); color: var(--paper);
+      border: 2px solid var(--paper);
+      box-shadow: 3px 3px 0 var(--ink);
+      padding: 6px 10px;
       font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.1em;
       text-transform: uppercase; user-select: none;
     }
@@ -347,7 +359,11 @@ function buildBar() {
     const spacer = document.createElement('span');
     spacer.className = 'spacer';
 
-    const toggle = buildViewToggle(said);
+    /* On the body, not in the bar: position:fixed measures against the viewport, and
+       an ancestor with a transform would quietly make it position against that instead. */
+    document.body.appendChild(buildViewToggle(said));
+    trackHeaderHeight();
+
     const bot = document.createElement('button');
     bot.type = 'button';
     bot.textContent = 'SOC PROP BOT';
@@ -359,7 +375,7 @@ function buildBar() {
     out.textContent = 'Sign out';
     out.onclick = async () => { await signOut(); location.reload(); };
 
-    bar.append(who, said, spacer, toggle, bot, saveAll, out);
+    bar.append(who, said, spacer, bot, saveAll, out);
 
     const botPanel = document.createElement('div');
     botPanel.className = 'bot-panel';
@@ -426,6 +442,17 @@ function buildSaveAll(said) {
    remembered, because checking your own shop as a stranger sees it is something you
    do repeatedly, and having it reset on every load would make that tedious. */
 const LS_VIEW = 'shop.view';
+
+/* The header is sticky and its height changes when it wraps, so the toggle is told
+   where the bottom of it actually is rather than guessing at a number. */
+function trackHeaderHeight() {
+    const bar = document.querySelector('.topbar');
+    if (!bar) return;
+    const set = () => document.documentElement.style
+        .setProperty('--topbar-h', bar.offsetHeight + 'px');
+    set();
+    addEventListener('resize', set);
+}
 
 function buildViewToggle(said) {
     const wrap = document.createElement('label');
