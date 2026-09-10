@@ -228,14 +228,6 @@ function injectStyles() {
     .editbox .states .state[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
     .editbox .states .state.danger { color: var(--red); border-color: var(--red); }
     .editbox .states .state.danger[aria-pressed="true"] { background: var(--red); color: var(--paper); }
-    .editbox .visit {
-      font-family: var(--mono); font-size: 0.55rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--ink); text-decoration: none; border-bottom: 2px solid var(--ink);
-      align-self: flex-start; padding-bottom: 1px;
-    }
-    .editbox .visit:hover { background: var(--acid); }
-
     .editbox .note { font-family: var(--sans); font-size: 0.62rem; color: #555; }
     .editbox .note.bad { color: var(--red); font-weight: 700; }
 
@@ -1021,14 +1013,7 @@ function decorate() {
            stamped rather than vanishing: that is how you find it again to put it back. */
         /* The three buttons go last and unlabelled: ACTIVE, SOLD and HIDDEN say what
            they are, and a heading over them only repeated it. */
-        const out = document.createElement('a');
-        out.className = 'visit';
-        out.href = cardUrl(card);
-        out.target = '_blank';
-        out.rel = 'noopener';
-        out.textContent = 'Open the listing';
-
-        box.append(original, out, states, note);
+        box.append(original, states, note);
         card.querySelector('.body').appendChild(box);
     }
 }
