@@ -82,6 +82,16 @@ function injectStyles() {
     }
     .edit-panel button.ghost { background: transparent; color: var(--paper); border-color: var(--paper); }
 
+    /* A link that has to sit in a row of buttons without looking like the odd one. */
+    .edit-panel .linkbtn {
+      display: block; width: 100%; box-sizing: border-box; text-align: center;
+      font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
+      background: var(--acid); color: var(--ink);
+      border: 2px solid var(--acid); padding: 7px 10px;
+    }
+    .edit-panel .linkbtn:hover { background: var(--paper); border-color: var(--paper); }
+
     .edit-panel .said {
       text-transform: none; letter-spacing: 0; font-family: var(--sans);
       font-size: 0.72rem; line-height: 1.4;
@@ -107,7 +117,7 @@ function injectStyles() {
         left: 8px; right: 8px; width: auto;
         flex-direction: row; flex-wrap: wrap; align-items: center;
       }
-      .edit-panel button { width: auto; flex: 1 1 auto; }
+      .edit-panel button, .edit-panel .linkbtn { width: auto; flex: 1 1 auto; }
       .edit-panel .who { border-top: 0; padding-top: 0; width: 100%; }
     }
 
@@ -291,27 +301,6 @@ function injectStyles() {
       user-select: text; -webkit-user-select: text;
     }
 
-    /* What the bot found. Nominations, so they read as a list to work down rather
-       than as anything already on the shop. */
-    .bot-panel {
-      border: var(--rule) solid var(--ink); background: var(--paper);
-      padding: 14px; margin-bottom: var(--gap);
-    }
-    .bot-panel[hidden] { display: none; }
-    .bot-panel h3 {
-      margin: 0 0 10px; font-family: var(--mono); font-size: 0.6rem;
-      letter-spacing: 0.14em; text-transform: uppercase;
-    }
-    .bot-panel ul { list-style: none; margin: 0; padding: 0; }
-    .bot-panel li {
-      display: flex; gap: 10px; align-items: baseline;
-      padding: 8px 0; border-top: 2px solid var(--ink);
-      font-family: var(--sans); font-size: 0.78rem; line-height: 1.5;
-    }
-    .bot-panel li .why { color: #555; }
-    .bot-panel a { color: var(--ink); font-weight: 700; }
-    .bot-panel .empty { font-family: var(--sans); font-size: 0.78rem; color: #555; }
-
     .pending {
       border: var(--rule) dashed var(--ink); padding: 12px 14px; margin-bottom: var(--gap);
       font-family: var(--sans); font-size: 0.78rem; line-height: 1.6;
@@ -390,9 +379,15 @@ function buildBar() {
     who.className = 'who';
     who.textContent = user.email;
 
-    const bot = document.createElement('button');
-    bot.type = 'button';
+    /* Straight out to the routine, where its runs, its logs and its schedule are.
+       Its orders live in tools/prop-bot.md; this is where you watch it work. */
+    const bot = document.createElement('a');
+    bot.className = 'linkbtn';
+    bot.href = 'https://claude.ai/code/routines/trig_01HzNErWquYbDdYY7eqRKXS2';
+    bot.target = '_blank';
+    bot.rel = 'noopener';
     bot.textContent = 'SOC PROP BOT';
+
     const saveAll = buildSaveAll(said);
 
     const out = document.createElement('button');
@@ -407,15 +402,6 @@ function buildBar() {
     document.body.appendChild(bar);
     trackHeaderHeight();
 
-    const botPanel = document.createElement('div');
-    botPanel.className = 'bot-panel';
-    botPanel.id = 'botPanel';
-    botPanel.hidden = true;
-    bot.onclick = () => {
-        botPanel.hidden = !botPanel.hidden;
-        if (!botPanel.hidden) loadCandidates(botPanel);
-    };
-
     const panel = buildAddPanel();
 
     const pending = document.createElement('div');
@@ -423,7 +409,7 @@ function buildBar() {
     pending.id = 'pendingNote';
     pending.hidden = true;
 
-    listings.prepend(botPanel, panel, pending);
+    listings.prepend(panel, pending);
     showPending();
 }
 
@@ -533,58 +519,6 @@ function buildViewToggle(said) {
     wrap.append(back, cb, track, pub);
     apply();
     return wrap;
-}
-
-/* The bot nominates into its own table; this is the reading end of that. It is a list
-   of links out to eBay on purpose - keeping one means putting it on the influencer
-   storefront, which is the only thing that gives a listing a photo, a price and a
-   commission, and that happens on eBay rather than here. */
-async function loadCandidates(panel) {
-    panel.innerHTML = '';
-    const head = document.createElement('h3');
-    head.textContent = 'What the bot found';
-    panel.appendChild(head);
-
-    const { data, error } = await supabase
-        .from('prop_candidates').select('*')
-        .eq('status', 'NEW').order('found_at', { ascending: false }).limit(40);
-
-    const say = text => {
-        const p = document.createElement('p');
-        p.className = 'empty';
-        p.textContent = text;
-        panel.appendChild(p);
-    };
-
-    if (error) {
-        say(error.message.includes('does not exist')
-            ? 'No candidates table yet. Run tools/prop-bot-schema.sql in Supabase.'
-            : error.message);
-        return;
-    }
-    if (!data.length) {
-        say('Nothing waiting. The bot writes here when it runs.');
-        return;
-    }
-
-    const list = document.createElement('ul');
-    for (const c of data) {
-        const li = document.createElement('li');
-
-        const a = document.createElement('a');
-        a.href = c.item_url;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        a.textContent = c.title || c.item_url;
-
-        const why = document.createElement('span');
-        why.className = 'why';
-        why.textContent = (c.price != null ? '$' + Number(c.price).toFixed(2) + ' - ' : '') + (c.why || '');
-
-        li.append(a, why);
-        list.appendChild(li);
-    }
-    panel.appendChild(list);
 }
 
 function buildAddPanel() {
