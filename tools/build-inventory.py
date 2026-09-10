@@ -30,7 +30,7 @@ which is what every row is today, so a row that sets none of them still
 publishes correctly.
 
 Needs no secret. Reading the shop table is a public select policy and the
-publishable key below is the same one committed in admin/socializer.html, so a
+publishable key below is the same one committed in backstage/socializer.html, so a
 local run and the deploy run see exactly the same rows. SUPABASE_URL and
 SUPABASE_KEY override it if the project ever moves.
 
@@ -59,7 +59,7 @@ STOREFRONT = "https://www.ebay.com/inf/soldoutcomedy"
 OUT = Path(__file__).parent.parent / "assets" / "data" / "inventory.xml"
 
 # The publishable key is the public half of the pair and is already committed in
-# admin/socializer.html. What it may do lives in the RLS policies in
+# backstage/socializer.html. What it may do lives in the RLS policies in
 # tools/shop-schema.sql, which for this table is select and nothing else.
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://tjteeqofqozmncfoiofy.supabase.co").rstrip("/")
 SUPABASE_KEY = os.environ.get("SUPABASE_KEY", "sb_publishable_AHzqW00erP1wModfz3mzVA_dxM6RtPr")

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <title>Privacy - SOLD OUT! Comedy</title>
+  <link rel="icon" type="image/png" href="/assets/images/soldoutlogo.png">
+  <link rel="apple-touch-icon" href="/assets/images/soldoutlogo.png">
+
+  <meta name="description" content="What SOLD OUT! Comedy collects, what it does not, and who else your browser talks to.">
+  <meta property="og:title" content="Privacy - SOLD OUT! Comedy">
+  <meta property="og:description" content="What SOLD OUT! Comedy collects, what it does not, and who else your browser talks to.">
+  <meta property="og:url" content="https://www.soldoutcomedy.com/privacy/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="SOLD OUT! Comedy">
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap">
+  <link rel="stylesheet" href="/assets/css/footer.css">
+
+  <style>
+    /* ==========================================================================
+       Privacy - the shop's brutalist treatment, turned down.
+       Same tokens and the same hard rules, but the page is mostly prose, so Inter
+       carries it and Bangers only shouts once.
+       ========================================================================== */
+
+    :root {
+      --ink: #111111;
+      --paper: #FFFFFF;
+      --acid: #FFD93D;
+      --red: #FF3B3B;
+
+      --rule: 4px;
+      --drop: 8px 8px 0 var(--ink);
+      --gap: 1.25rem;
+
+      --mono: 'Space Mono', ui-monospace, Consolas, 'Courier New', monospace;
+      --sans: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--ink);
+      background-color: var(--acid);
+      background-image: radial-gradient(circle, rgba(0,0,0,0.18) 1px, transparent 1px);
+      background-size: 6px 6px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.6rem 1.1rem;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .topbar span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .topbar a { color: var(--acid); text-decoration: none; white-space: nowrap; padding: 3px 5px; }
+    .topbar a:hover, .topbar a:focus-visible { background: var(--acid); color: var(--ink); outline: none; }
+
+    .wrap { max-width: 780px; margin: 0 auto; padding: 1.75rem 1.25rem 2.25rem; }
+
+    .hero {
+      background: var(--paper);
+      border: var(--rule) solid var(--ink);
+      box-shadow: var(--drop);
+      padding: 1.9rem 1.5rem 1.6rem;
+      text-align: center;
+      margin-bottom: 1.75rem;
+    }
+
+    .kicker, .stamp {
+      margin: 0;
+      font-family: var(--mono);
+      font-size: 0.66rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(2.8rem, 11vw, 5.5rem);
+      line-height: 0.9;
+      letter-spacing: 2px;
+      color: var(--red);
+      text-shadow: 5px 5px 0 var(--ink);
+      margin: 0.5rem 0 0.6rem;
+    }
+
+    .card {
+      background: var(--paper);
+      border: var(--rule) solid var(--ink);
+      box-shadow: var(--drop);
+      padding: 1.5rem 1.6rem 1.7rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin: 0 0 0.9rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .card p, .card li { font-size: 0.95rem; line-height: 1.7; margin: 0 0 0.9rem; }
+    .card p:last-child, .card li:last-child { margin-bottom: 0; }
+    .card ul { margin: 0 0 0.9rem; padding-left: 1.1rem; }
+    .card li { margin-bottom: 0.5rem; }
+    .card a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+    .card a:hover { background: var(--acid); }
+
+    .lede { font-size: 1.05rem; font-weight: 600; line-height: 1.6; }
+
+    .flag {
+      background: var(--acid);
+      border: var(--rule) solid var(--ink);
+      box-shadow: var(--drop);
+      padding: 1.3rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .flag h2 {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin: 0 0 0.7rem;
+    }
+
+    .flag p { margin: 0; font-size: 0.95rem; line-height: 1.7; }
+
+    .stamp { text-align: center; margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <span>Sold Out! Comedy // Privacy</span>
+  <a href="/">&larr; Back to the show</a>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <p class="kicker">The unfunny page</p>
+    <h1>Privacy</h1>
+    <p class="kicker">What we collect. What we don't.</p>
+  </header>
+
+  <section class="card">
+    <p class="lede">This site does not track you. There is no analytics, no advertising
+      pixel, no session recorder, and no cookie set by us. Nobody here is building a
+      profile of you, mostly because nobody here has the time.</p>
+    <p>What follows is the honest detail: the handful of moments where information does
+      change hands, and who it goes to.</p>
+  </section>
+
+  <section class="card">
+    <h2>Just reading the site</h2>
+    <p>Nothing is collected by us. The pages are static files.</p>
+    <p>Your browser does fetch a few things from other companies to render them, and any
+      request tells that company your IP address and roughly what you are looking at:</p>
+    <ul>
+      <li><strong>Google Fonts</strong> serves the three typefaces the site is set in.</li>
+      <li><strong>jsDelivr</strong> serves the code behind the staff sign-in.</li>
+      <li><strong>eBay</strong> serves the product photos on the shop, straight from their
+        image servers.</li>
+      <li><strong>YouTube</strong>, where a page has a video embedded in it. YouTube sets
+        its own cookies once a video is there, which we do not control.</li>
+    </ul>
+    <p>Our own hosts, GitHub Pages and Cloudflare, keep standard server logs of requests
+      the way every web host does.</p>
+  </section>
+
+  <section class="flag">
+    <h2>Affiliate disclosure</h2>
+    <p>Links from our shop to eBay carry an affiliate code, and we earn a commission when
+      something sells through one. It costs you nothing extra, and it does not change the
+      price. We are telling you because the FTC asks us to, and because you should know
+      when someone recommending an item gets paid for it. We do.</p>
+  </section>
+
+  <section class="card">
+    <h2>If you bring a prop to sell</h2>
+    <p>Checking a prop in at a show collects what a consignment needs: your name, your
+      email address, your Venmo handle so we can pay you, the price you set, whether you
+      want to go on stage, and a signature agreeing to the terms.</p>
+    <p>That goes into our private Airtable base and is emailed to us. It is used to run
+      the show, sell your item and pay you. It is not sold, rented, or handed to anyone
+      who is not helping do those things.</p>
+    <p>If your prop sells, the buyer's marketplace handles the money and the shipping
+      address. We never see a card number.</p>
+  </section>
+
+  <section class="card">
+    <h2>If you buy something</h2>
+    <p>You do not buy from this site. Every item links out to eBay, Whatnot, Poshmark or
+      wherever it is listed, and the sale happens entirely over there under that
+      company's terms and privacy policy. We receive what the seller dashboard shows us,
+      which is enough to ship your item and no more.</p>
+  </section>
+
+  <section class="card">
+    <h2>On stage and on camera</h2>
+    <p>Shows are filmed and streamed. Coming to one means you may end up in a recording,
+      a clip, or a post. Bringing a prop means we may photograph it and talk about it
+      publicly, which is rather the point of the exercise.</p>
+  </section>
+
+  <section class="card">
+    <h2>Staff sign-in</h2>
+    <p>The backstage tools sit behind a Google sign-in that only works for our own
+      account. It stores an email address and a session, and nothing about you unless
+      you are us.</p>
+  </section>
+
+  <section class="card">
+    <h2>Children</h2>
+    <p>This site is not aimed at children under 13, and we do not knowingly collect
+      anything from them. A young person selling a prop should have a grown-up check
+      them in.</p>
+  </section>
+
+  <section class="card">
+    <h2>Getting your information back, or gone</h2>
+    <p>Ask. Email <a href="mailto:privacy@soldoutcomedy.com">privacy@soldoutcomedy.com</a>
+      and we will tell you what we hold about you, correct it, or delete it. There is no
+      form and no process, because there is not enough of it to need one.</p>
+    <p>Prop check-in records are kept while the item is unsold and for as long afterwards
+      as the tax year needs. Records of a completed sale stay with the marketplace it
+      sold on.</p>
+  </section>
+
+  <section class="card">
+    <h2>Changes</h2>
+    <p>If this changes, the date below changes with it. If it changes in a way that
+      matters, we will say so out loud rather than quietly reissuing the page.</p>
+  </section>
+
+  <p class="stamp">Last updated 10 September 2026</p>
+</div>
+
+<div id="site-footer" data-footer="minimal">
+<!-- footer:start -->
+<!-- generated from assets/footer.html - do not edit here -->
+<footer id="contact" class="footer-minimal">
+  <div class="social-links">
+        <a href="https://www.instagram.com/soldout.comedy" class="social-link" title="Instagram" target="_blank" rel="noopener">
+          <img src="/assets/images/instagram_logo.svg" alt="Instagram" style="width: 70%; height: 70%; object-fit: contain;">
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Facebook" target="_blank" rel="noopener">
+          <img src="/assets/images/facebook_logo.png" alt="Facebook" style="width: 70%; height: 70%; object-fit: contain;">
+        </a>
+        <a href="https://x.com/soldoutcomedy" class="social-link" title="X" target="_blank" rel="noopener">
+          <img src="/assets/images/x_logo.png" alt="X" style="width: 60%; height: 60%; object-fit: contain; filter: invert(1);">
+        </a>
+        <a href="https://www.youtube.com/@SOLDOUTComedy" class="social-link" title="YouTube" target="_blank" rel="noopener">
+          <img src="/assets/images/yt_logo.png" alt="YouTube" style="width: 60%; height: 60%; object-fit: contain;">
+        </a>
+        <a href="https://www.tiktok.com/@sold.out.comedy" class="social-link" title="TikTok" target="_blank" rel="noopener">
+          <img src="/assets/images/tiktok_logo.png" alt="TikTok" style="width: 60%; height: 60%; object-fit: contain;">
+        </a>
+        <a href="https://soldoutcomedy.bsky.social" class="social-link" title="Blue Sky" target="_blank" rel="noopener">
+          <img src="/assets/images/Bluesky_Logo.svg" alt="Blue Sky" style="width: 70%; height: 70%; object-fit: contain;">
+        </a>
+        <a href="https://www.threads.com/@soldout.comedy?hl=en" class="social-link" title="Threads" target="_blank" rel="noopener">
+          <img src="/assets/images/threads_logo.png" alt="Threads" style="width: 70%; height: 70%; object-fit: contain;">
+        </a>
+        <a href="https://www.reddit.com/user/SOLDOUTComedy/submitted/" class="social-link" title="Reddit" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" style="width: 70%; height: 70%;" fill="#FF4500">
+            <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
+          </svg>
+        </a>
+        <a href="https://www.pretzels.com/collections/all" class="social-link" title="Pretzels" target="_blank" rel="noopener">
+          <img src="/assets/images/pretzels_logo.png" alt="Pretzels" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+        </a>
+      </div>
+</footer>
+
+<div class="footer-bottom">
+  <a href="https://backstage.soldoutcomedy.com" class="backstage-link-bottom">BACKSTAGE ACCESS</a>
+  <span class="footer-separator">•</span>
+  <a href="/privacy/" class="backstage-link-bottom">PRIVACY</a>
+  <span class="footer-separator">•</span>
+  <span class="footer-copyright">&copy; <span class="footer-year">2025</span> SOLD OUT! COMEDY</span>
+</div>
+
+<script>
+/* Footer behaviour. Inlined into each page with the markup above by
+   tools/build-footer.py, so it needs no separate request and cannot go stale
+   against the markup it drives. */
+(function () {
+  var toggle = document.getElementById('shopToggle');
+  var list = document.getElementById('shopList');
+  if (toggle && list) {
+    toggle.addEventListener('click', function () {
+      var open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      list.hidden = open;
+    });
+  }
+  /* The year is in the markup as a fallback and refreshed here, so a page that
+     has not been rebuilt since New Year is still right in the browser. */
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.footer-year'),
+    function (el) { el.textContent = new Date().getFullYear(); }
+  );
+  /* Comic-book wobble on the social icons. */
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.social-link'),
+    function (link) {
+      link.style.transform = 'rotate(' + ((Math.random() - 0.5) * 30) + 'deg)';
+    }
+  );
+})();
+</script>
+<!-- footer:end -->
+</div>
+
+</body>
+</html>

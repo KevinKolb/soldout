@@ -37,8 +37,9 @@ on them.
 - **Site:** this repo, deployed to GitHub Pages by
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
   `main`, every 6 hours on a schedule, and on manual runs.
-- **Notion:** show materials and the backstage workspace (backstage.soldoutcomedy.com
-  redirects there). Connected to Claude Code through the Notion MCP.
+- **Notion:** show materials and the backstage workspace. Connected to Claude Code
+  through the Notion MCP. Reached from the Notion card in the Booth: the
+  backstage.soldoutcomedy.com subdomain now forwards to `/backstage` instead.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the Socializer queue, and the `shop` table that curates the shop.
 
@@ -84,16 +85,37 @@ How it works now:
    never edit it by hand.
 3. [shop/index.html](shop/index.html) renders `inventory.xml` and ends the grid with a tile
    linking to the storefront.
+4. Signed in as the owner, that same page becomes editable in place:
+   [assets/js/shop-edit.js](assets/js/shop-edit.js) attaches a caption/tab/status editor to
+   each card and an Add prop panel, writing straight to Supabase. It edits the published
+   card rather than re-rendering from the table, because the title, price, photo and
+   remaining count only exist in the built XML. A save is live in the table at once and on
+   the public page at the next build.
 
 ### Observed gaps (noted, nothing decided yet)
 
 - `/shop` has no FTC affiliate disclosure.
 - There is no admin page for adding a shop item, and no written roadmap for the other
-  sales channels. Both lived in `admin/crosslist.html` and `admin/addprops.html`, deleted
+  sales channels. Both lived in `backstage/crosslist.html` and `backstage/addprops.html`, deleted
   2026-09-10; `crosslist.html` is recoverable from git history.
 - A `shop` row whose listing has dropped off the storefront still publishes, and its
   link is dead.
 - `assets/storefronts.html` looks like an older copy of the shop page.
+
+## Backstage and login
+
+`/backstage` is the Booth: the browser tools, behind a Google sign-in. Auth is Supabase,
+shared across the site by [assets/js/auth.js](assets/js/auth.js), so signing in there also
+unlocks editing on `/shop`. Only `kevinmkolb@gmail.com` can write; the policies in
+[tools/shop-migration-01-auth.sql](tools/shop-migration-01-auth.sql) enforce that in the
+database, so the page's own checks are manners rather than security.
+
+There is no service-role key in this repo and there must never be one. Any key in a static
+page is readable by every visitor, and a service key bypasses row-level security entirely.
+The committed publishable key is powerless until someone proves who they are.
+
+`backstage.soldoutcomedy.com` forwards to `/backstage`. Notion is reached from the Notion
+card in the Booth.
 
 ## Working with Kevin
 

@@ -1,0 +1,354 @@
+/* The Prop Shop, editable in place.
+ *
+ * Loaded by every visitor but inert for all of them: nothing below runs until Supabase
+ * says the person looking at the page is the owner, and even then the database decides
+ * what a save is allowed to do. Signed out, the page is exactly the static grid it has
+ * always been.
+ *
+ * WHY THIS EDITS THE PAGE RATHER THAN REPLACING IT
+ * The card you see is built from assets/data/inventory.xml, and that file is the only
+ * place the enriched facts live - title, price, photo and remaining count are scraped
+ * from the eBay storefront at deploy time, because eBay serves its item pages a 403 to
+ * anything that is not a browser. A browser cannot reproduce any of that. So edit mode
+ * keeps the published card as the thing on screen and attaches an editor to it, rather
+ * than re-rendering from the table and losing everything eBay knows.
+ *
+ * The consequence, which the bar says out loud: a save lands in Supabase immediately
+ * and reaches the public page at the next build, within six hours.
+ */
+
+import { currentUser, isOwner, signOut, supabase, OWNER } from '/assets/js/auth.js';
+
+const TABLE = 'shop';
+
+/* Cards carry the full tracking URL and rows carry the clean one, so neither matches
+   the other as a string. The eBay item id is the part that is actually the same. */
+function keyOf(url) {
+    const m = String(url || '').match(/\/itm\/(?:[^/?]+\/)?(\d{9,15})/);
+    return m ? m[1] : String(url || '').split('?')[0].replace(/\/+$/, '');
+}
+
+let rows = new Map();     // key -> the row in Supabase
+let user = null;
+
+/* ---------- styles, injected so the public page never carries them ---------- */
+function injectStyles() {
+    const css = `
+    .edit-bar {
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      background: var(--ink); color: var(--paper);
+      border: var(--rule) solid var(--ink);
+      padding: 10px 14px; margin-bottom: var(--gap);
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .edit-bar .spacer { flex: 1; }
+    .edit-bar button {
+      font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--acid); color: var(--ink);
+      border: 2px solid var(--acid); padding: 6px 10px; cursor: pointer;
+    }
+    .edit-bar button.ghost { background: transparent; color: var(--paper); border-color: var(--paper); }
+    .edit-bar .said { text-transform: none; letter-spacing: 0; font-family: var(--sans); }
+
+    .add-panel {
+      border: var(--rule) solid var(--ink); background: var(--paper);
+      padding: 14px; margin-bottom: var(--gap);
+      display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    }
+    .add-panel[hidden] { display: none; }
+    .add-panel label {
+      font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.14em;
+      text-transform: uppercase; display: block; margin-bottom: 4px;
+    }
+    .add-panel input, .add-panel select, .editbox input, .editbox select {
+      width: 100%; padding: 7px 8px; border: 2px solid var(--ink);
+      font-family: var(--sans); font-size: 0.8rem; background: var(--paper); color: var(--ink);
+    }
+    .add-panel .go { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; }
+    .add-panel button {
+      font-family: var(--mono); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; background: var(--ink); color: var(--paper);
+      border: 2px solid var(--ink); padding: 8px 12px; cursor: pointer;
+    }
+
+    .editbox {
+      border-top: 2px dashed var(--ink); margin-top: 0.6rem; padding-top: 0.6rem;
+      display: grid; gap: 6px;
+    }
+    .editbox label {
+      font-family: var(--mono); font-size: 0.5rem; letter-spacing: 0.12em;
+      text-transform: uppercase; color: #555;
+    }
+    .editbox .row { display: flex; gap: 6px; }
+    .editbox .row > * { flex: 1; min-width: 0; }
+    .editbox button {
+      font-family: var(--mono); font-size: 0.55rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; background: var(--ink); color: var(--paper);
+      border: 2px solid var(--ink); padding: 6px 8px; cursor: pointer;
+    }
+    .editbox .note { font-family: var(--sans); font-size: 0.62rem; color: #555; }
+    .editbox .note.bad { color: var(--red); font-weight: 700; }
+
+    .pending {
+      border: var(--rule) dashed var(--ink); padding: 12px 14px; margin-bottom: var(--gap);
+      font-family: var(--sans); font-size: 0.78rem; line-height: 1.6;
+    }
+    .pending[hidden] { display: none; }
+    .pending b { font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    `;
+    const el = document.createElement('style');
+    el.textContent = css;
+    document.head.appendChild(el);
+}
+
+/* ---------- data ---------- */
+async function loadRows() {
+    const { data, error } = await supabase.from(TABLE).select('*').order('position', { ascending: true });
+    if (error) {
+        console.warn('[shop-edit] could not read the table:', error.message);
+        return false;
+    }
+    rows = new Map(data.map(r => [keyOf(r.item_url), r]));
+    return true;
+}
+
+async function save(row, patch, note) {
+    note.textContent = 'Saving...';
+    note.classList.remove('bad');
+    const { data, error } = await supabase.from(TABLE).update(patch).eq('id', row.id).select().single();
+    if (error) {
+        note.textContent = error.message.includes('row-level security')
+            ? 'The database refused that. Signed in as the wrong account?'
+            : error.message;
+        note.classList.add('bad');
+        return null;
+    }
+    rows.set(keyOf(data.item_url), data);
+    note.textContent = 'Saved. Live on the public page at the next build.';
+    return data;
+}
+
+/* ---------- the bar across the top ---------- */
+function buildBar() {
+    const listings = document.getElementById('listings');
+    if (document.getElementById('editBar')) return;
+
+    const bar = document.createElement('div');
+    bar.className = 'edit-bar';
+    bar.id = 'editBar';
+
+    const who = document.createElement('span');
+    who.textContent = 'Editing as ' + user.email;
+
+    const said = document.createElement('span');
+    said.className = 'said';
+    said.textContent = 'Saves reach the public page at the next build.';
+
+    const spacer = document.createElement('span');
+    spacer.className = 'spacer';
+
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.textContent = '+ Add prop';
+
+    const out = document.createElement('button');
+    out.type = 'button';
+    out.className = 'ghost';
+    out.textContent = 'Sign out';
+    out.onclick = async () => { await signOut(); location.reload(); };
+
+    bar.append(who, said, spacer, add, out);
+
+    const panel = buildAddPanel();
+    add.onclick = () => { panel.hidden = !panel.hidden; };
+
+    const pending = document.createElement('div');
+    pending.className = 'pending';
+    pending.id = 'pendingNote';
+    pending.hidden = true;
+
+    listings.prepend(bar, panel, pending);
+    showPending();
+}
+
+function buildAddPanel() {
+    const panel = document.createElement('div');
+    panel.className = 'add-panel';
+    panel.id = 'addPanel';
+    panel.hidden = true;
+
+    const field = (labelText, el) => {
+        const wrap = document.createElement('div');
+        const l = document.createElement('label');
+        l.textContent = labelText;
+        wrap.append(l, el);
+        return wrap;
+    };
+
+    const url = document.createElement('input');
+    url.type = 'text';
+    url.placeholder = 'https://www.ebay.com/itm/...';
+
+    const tab = document.createElement('input');
+    tab.type = 'text';
+    tab.placeholder = 'PUMPKIN SPICE';
+    tab.setAttribute('list', 'tabList');
+
+    const list = document.createElement('datalist');
+    list.id = 'tabList';
+
+    const caption = document.createElement('input');
+    caption.type = 'text';
+    caption.placeholder = 'Our own line about it';
+
+    const go = document.createElement('div');
+    go.className = 'go';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = 'Add to the shop';
+    const note = document.createElement('span');
+    note.className = 'note';
+    note.style.font = '0.72rem/1.5 Inter, system-ui, sans-serif';
+    go.append(btn, note);
+
+    btn.onclick = async () => {
+        const clean = url.value.trim().split('?')[0];
+        if (!clean) { note.textContent = 'Paste the listing URL first.'; return; }
+        note.textContent = 'Adding...';
+        btn.disabled = true;
+
+        const { error } = await supabase.from(TABLE).insert({
+            item_url: clean,
+            tab_tag: tab.value.trim(),
+            blurb: caption.value.trim(),
+            position: (Math.max(0, ...[...rows.values()].map(r => r.position || 0)) + 10)
+        });
+        btn.disabled = false;
+
+        if (error) {
+            note.textContent = error.message.includes('duplicate')
+                ? 'That listing is already in the shop.'
+                : error.message;
+            return;
+        }
+        url.value = caption.value = '';
+        note.textContent = 'Added. It appears on the page after the next build picks up its title and price from eBay.';
+        await loadRows();
+        showPending();
+    };
+
+    panel.append(field('Listing URL', url), field('Tab tag', tab), field('Caption', caption), list, go);
+    return panel;
+}
+
+/* Rows added since the last build have no card to attach to, so they are named here
+   rather than silently missing. */
+function showPending() {
+    const el = document.getElementById('pendingNote');
+    if (!el) return;
+
+    const onPage = new Set([...document.querySelectorAll('.item-card')].map(c => keyOf(c.href)));
+    const waiting = [...rows.values()].filter(r => !onPage.has(keyOf(r.item_url)));
+
+    const tabs = [...new Set([...rows.values()].map(r => r.tab_tag).filter(Boolean))];
+    const list = document.getElementById('tabList');
+    if (list) list.innerHTML = tabs.map(t => `<option value="${t}"></option>`).join('');
+
+    if (!waiting.length) { el.hidden = true; return; }
+    el.innerHTML = '';
+    const b = document.createElement('b');
+    b.textContent = waiting.length + ' waiting for the next build';
+    const p = document.createElement('div');
+    p.textContent = waiting.map(r => r.item_url).join(', ')
+        + ' - in the table but not on the page yet, because the title, price and photo '
+        + 'are read from the eBay storefront at build time.';
+    el.append(b, p);
+    el.hidden = false;
+}
+
+/* ---------- the editor on each card ---------- */
+function decorate() {
+    for (const card of document.querySelectorAll('.item-card')) {
+        if (card.querySelector('.editbox')) continue;
+        const row = rows.get(keyOf(card.href));
+        if (!row) continue;
+
+        const box = document.createElement('div');
+        box.className = 'editbox';
+
+        /* The card is a link to the listing. Anything typed inside it would otherwise
+           navigate away on the first click. */
+        box.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
+
+        const caption = document.createElement('input');
+        caption.type = 'text';
+        caption.value = row.blurb || '';
+        caption.placeholder = "Our own line - replaces eBay's title";
+
+        const tab = document.createElement('input');
+        tab.type = 'text';
+        tab.value = row.tab_tag || '';
+        tab.placeholder = 'Tab tag';
+        tab.setAttribute('list', 'tabList');
+
+        const status = document.createElement('select');
+        for (const s of ['Active', 'Sold', 'Hidden']) {
+            const o = document.createElement('option');
+            o.value = o.textContent = s;
+            if ((row.status || 'Active') === s) o.selected = true;
+            status.appendChild(o);
+        }
+
+        const note = document.createElement('div');
+        note.className = 'note';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = 'Save';
+        btn.onclick = async () => {
+            btn.disabled = true;
+            const saved = await save(row, {
+                blurb: caption.value.trim(),
+                tab_tag: tab.value.trim(),
+                status: status.value
+            }, note);
+            btn.disabled = false;
+            if (!saved) return;
+
+            /* Show the change on the card straight away rather than waiting six hours
+               to find out whether it took. */
+            const title = card.querySelector('.item-title');
+            if (title && saved.blurb) title.textContent = saved.blurb;
+            card.classList.toggle('sold', saved.status === 'Sold');
+            showPending();
+        };
+
+        const lab = t => { const l = document.createElement('label'); l.textContent = t; return l; };
+        const row2 = document.createElement('div');
+        row2.className = 'row';
+        row2.append(tab, status);
+
+        box.append(lab('Caption'), caption, lab('Tab and status'), row2, btn, note);
+        card.querySelector('.body').appendChild(box);
+    }
+}
+
+/* ---------- wiring ---------- */
+async function start(u) {
+    user = u;
+    if (!isOwner(user)) return;
+
+    injectStyles();
+    if (!await loadRows()) return;
+    buildBar();
+    decorate();
+}
+
+/* The grid re-renders on every tab click, which throws the editors away with it. */
+document.addEventListener('shop:rendered', () => {
+    if (isOwner(user)) { decorate(); showPending(); }
+});
+
+start(await currentUser());

@@ -18,8 +18,7 @@ assets/               All static assets
   data/               Site content as XML (shows, taglines, videos, musicvids)
 
 live/                 Show-day pages: prop check-in form, prop display, QR codes
-admin/                Browser tools for editing the XML content in assets/data
-backstage/            Redirect to the Notion backstage workspace
+backstage/            The Booth: login, and the browser tools for editing site content
 tools/                Local development helpers (not used by the deployed site)
 archive/              Previous homepage and its alternate themes
 ```
@@ -30,12 +29,12 @@ Site content lives in `assets/data/*.xml` rather than in the HTML. Asset paths i
 those XML files are root-relative (`/assets/images/...`) so they resolve correctly from
 any page, whatever folder it sits in.
 
-Edit the XML by hand, or use the browser tools in `admin/`, which generate an updated
+Edit the XML by hand, or use the browser tools in `backstage/`, which generate an updated
 file for you to download and commit.
 
 ## The Socializer
 
-`admin/socializer.html` is the repost desk. It holds a queue of other people's posts that
+`backstage/socializer.html` is the repost desk. It holds a queue of other people's posts that
 are funny and either selling-related or a found object, and you work the queue down one
 article at a time: **Skip** marks it SKIPPED and it never comes back, **Copy & open X**
 puts the words on your clipboard and opens the composer.
@@ -107,7 +106,7 @@ To use the admin tools with save-to-disk support, run the helper server instead:
 python tools/dev-server.py
 ```
 
-Then open <http://localhost:8080/admin/addshows.html>.
+Then open <http://localhost:8080/backstage/addshows.html>.
 
 ## Deployment secrets
 
@@ -127,3 +126,14 @@ Required secrets:
 These are for prop check-in (`live/`) only. The shop build needs no secret: it reads the
 `shop` table in Supabase through a public select policy, with the publishable key
 committed in `tools/build-inventory.py`.
+
+## Logging in
+
+`/backstage` sits behind Google sign-in through Supabase Auth. The session is shared
+across the site by `assets/js/auth.js`, so signing in there also turns `/shop` editable in
+place for the owner. Write access is granted in the database to one email address by
+`tools/shop-migration-01-auth.sql`, not by holding a key, which is why the publishable key
+can be committed and no service-role key exists anywhere in this repo.
+
+First-time setup lives in the comments at the end of that migration: enable the Google
+provider in Supabase, create a Google OAuth client, and register the redirect URLs.

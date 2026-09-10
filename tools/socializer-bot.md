@@ -10,7 +10,7 @@ Manage the routine itself at <https://claude.ai/code/routines>.
 ## What the job is
 
 Fill the repost queue that a human works down by hand in
-[admin/socializer.html](../admin/socializer.html).
+[backstage/socializer.html](../backstage/socializer.html).
 
 You **nominate candidates**. You do not post. Nothing in this job touches X, and nothing in
 this job speaks for the account. A human reads every candidate and presses Post themselves.
@@ -26,7 +26,7 @@ You make **no git commits**. Nothing in this job edits a file in the repo.
 ## Getting into Supabase
 
 The project URL and the publishable key are committed in the `SUPABASE` block near the top
-of the script in [admin/socializer.html](../admin/socializer.html). Read them out of that
+of the script in [backstage/socializer.html](../backstage/socializer.html). Read them out of that
 file — do not ask for them and do not hardcode them here, so rotating the key stays a
 one-file change.
 

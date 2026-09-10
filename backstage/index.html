@@ -1,16 +1,318 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="refresh" content="0; url=https://backstage.soldoutcomedy.com">
-  <title>Redirecting to SOLD OUT! Comedy Backstage...</title>
-  <script>
-    window.location.href = "https://backstage.soldoutcomedy.com";
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Booth - SOLD OUT! Comedy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #000;
+            background: #fff;
+            padding: 40px 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 60px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            border: 2px solid #000;
+            padding: 32px 24px;
+            text-decoration: none;
+            color: #000;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card:hover {
+            background: #000;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .card-icon {
+            font-size: 32px;
+            line-height: 1;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: -0.25px;
+        }
+
+        .card-description {
+            font-size: 13px;
+            opacity: 0.7;
+        }
+
+        .uplink {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #666;
+            text-decoration: none;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 2px;
+        }
+
+        .uplink:hover {
+            color: #000;
+            border-bottom-color: #000;
+        }
+
+        /* display:grid would otherwise win over the hidden attribute. */
+        .grid[hidden] { display: none; }
+
+        /* The door. Visible in the markup rather than hidden, so a failure to load the
+           auth module leaves a page that explains itself instead of a blank one. */
+        .gate {
+            border: 2px solid #000;
+            padding: 40px 32px;
+            text-align: center;
+            max-width: 460px;
+            margin: 0 auto;
+        }
+
+        .gate h2 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+        .gate p { font-size: 13px; color: #666; margin-bottom: 24px; }
+
+        .gate button {
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px 22px;
+            border: 2px solid #000;
+            background: #000;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .gate button:hover:not(:disabled) { background: #fff; color: #000; }
+        .gate button:disabled { opacity: 0.4; cursor: not-allowed; }
+        .gate .err { color: #c0392b; font-size: 12px; margin-top: 18px; line-height: 1.5; }
+
+        .whoami {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            border: 2px solid #000;
+            padding: 10px 14px;
+            margin-bottom: 32px;
+            font-size: 12px;
+        }
+
+        .whoami[hidden] { display: none; }
+
+        .whoami button {
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 5px 10px;
+            border: 2px solid #000;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        .whoami button:hover { background: #000; color: #fff; }
+
+        .footer {
+            margin-top: 60px;
+            text-align: center;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .footer a {
+            color: #666;
+            text-decoration: none;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .footer a:hover {
+            color: #000;
+            border-bottom-color: #000;
+        }
+    </style>
 </head>
 <body>
-  <p>Redirecting to SOLD OUT! Comedy Backstage...</p>
-  <p>If you are not redirected automatically, <a href="https://backstage.soldoutcomedy.com">click here</a>.</p>
+    <div class="container">
+        <a href="../index.html" class="uplink">&larr; The show</a>
+
+        <h1>The Booth</h1>
+        <div class="subtitle">The tools that change what the live site shows</div>
+
+        <div class="whoami" id="whoami" hidden></div>
+
+        <div class="gate" id="gate">
+            <h2>Staff only</h2>
+            <p>The Booth changes what the live site shows.</p>
+            <button id="signin" type="button">Sign in with Google</button>
+            <div class="err" id="gateErr" hidden></div>
+        </div>
+
+        <div class="grid" id="tools" hidden>
+            <a href="addshows.html" class="card">
+                <div class="card-icon">🎭</div>
+                <div class="card-title">Shows Manager</div>
+                <div class="card-description">Add, edit, and manage upcoming and past shows</div>
+            </a>
+
+            <a href="addtaglines.html" class="card">
+                <div class="card-icon">💬</div>
+                <div class="card-title">Taglines Manager</div>
+                <div class="card-description">Manage witty taglines for the hero section</div>
+            </a>
+
+            <a href="addvideos.html" class="card">
+                <div class="card-icon">🎬</div>
+                <div class="card-title">Videos Manager</div>
+                <div class="card-description">Manage video paths for the comic frame section</div>
+            </a>
+
+            <a href="socializer.html" class="card">
+                <div class="card-icon">📣</div>
+                <div class="card-title">The Socializer</div>
+                <div class="card-description">Work the queue of funny posts and repost them as @soldoutcomedy</div>
+            </a>
+
+            <a href="test-playlist.html" class="card">
+                <div class="card-icon">📺</div>
+                <div class="card-title">Playlist Tester</div>
+                <div class="card-description">Check which music videos in musicvids.xml allow embedding</div>
+            </a>
+
+            <a href="https://airtable.com/appryObcmJdPmk9ls" class="card" target="_blank" rel="noopener">
+                <div class="card-icon">🗄️</div>
+                <div class="card-title">Airtable</div>
+                <div class="card-description">Prop check-in for show day</div>
+            </a>
+
+            <a href="https://supabase.com/dashboard/project/tjteeqofqozmncfoiofy" class="card" target="_blank" rel="noopener">
+                <div class="card-icon">⚡</div>
+                <div class="card-title">Supabase</div>
+                <div class="card-description">The Socializer's queue and the shop table</div>
+            </a>
+
+            <a href="../shop/index.html" class="card">
+                <div class="card-icon">🛍️</div>
+                <div class="card-title">Prop Shop</div>
+                <div class="card-description">The public shop page, built from the Ambassador table</div>
+            </a>
+
+            <a href="../index.html" class="card">
+                <div class="card-icon">🏠</div>
+                <div class="card-title">View Site</div>
+                <div class="card-description">Return to the main website</div>
+            </a>
+
+            <a href="https://app.notion.com/p/d350ecaf50bc4f1893ba5ab53590ef3e" class="card" target="_blank" rel="noopener">
+                <div class="card-icon">🚪</div>
+                <div class="card-title">Notion</div>
+                <div class="card-description">Scripts, scenes, krewe, tech - the whole operation</div>
+            </a>
+        </div>
+
+        <div class="footer">
+            <p>&copy; <span id="year">2025</span> SOLD OUT! Comedy | <a href="https://soldoutcomedy.com">soldoutcomedy.com</a></p>
+        </div>
+    </div>
+    <script>
+        /* Year is in the markup as a fallback and refreshed here, so the page
+           is still right after New Year without a redeploy. */
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+
+    <script type="module">
+    /* The Booth is behind a real login now. Hiding the cards is only manners - none of
+       the tools can change anything without a session the database also believes, so
+       this decides what is worth showing rather than what is allowed. */
+    import { currentUser, isOwner, signIn, signOut, OWNER, onAuthChange } from '/assets/js/auth.js';
+
+    const gate = document.getElementById('gate');
+    const tools = document.getElementById('tools');
+    const who = document.getElementById('whoami');
+    const err = document.getElementById('gateErr');
+
+    function render(user) {
+        const ok = isOwner(user);
+
+        tools.hidden = !ok;
+        gate.hidden = ok;
+        who.hidden = !user;
+        if (!user) return;
+
+        who.innerHTML = '';
+        const label = document.createElement('span');
+        label.textContent = ok
+            ? 'Signed in as ' + user.email
+            : 'Signed in as ' + user.email + '. That is not ' + OWNER + ', so nothing here is yours to change.';
+
+        const out = document.createElement('button');
+        out.type = 'button';
+        out.textContent = 'Sign out';
+        out.onclick = async () => { await signOut(); location.reload(); };
+
+        who.append(label, out);
+    }
+
+    document.getElementById('signin').onclick = async (e) => {
+        err.hidden = true;
+        e.target.disabled = true;
+        try {
+            await signIn(location.origin + '/backstage/');
+        } catch (ex) {
+            e.target.disabled = false;
+            err.textContent = ex.message
+                + ' - if that says the provider is disabled, turn Google on under'
+                + ' Authentication > Providers in Supabase.';
+            err.hidden = false;
+        }
+    };
+
+    onAuthChange(render);
+    render(await currentUser());
+    </script>
 </body>
 </html>

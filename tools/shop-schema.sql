@@ -12,8 +12,8 @@
 -- here becomes a link on a public page that we are asking an audience to click, so an
 -- anon insert policy would let anyone who finds the publishable key put an arbitrary
 -- URL on the shop under our name. Read is public because the build needs it and the
--- rows are public anyway. Everything else is left to the dashboard or to a key that
--- is not committed.
+-- rows are public anyway. Writes arrive later, in tools/shop-migration-01-auth.sql,
+-- bound to a signed-in owner rather than to a key.
 
 create table if not exists public.shop (
     id            bigint generated always as identity primary key,
@@ -63,8 +63,10 @@ alter table public.shop enable row level security;
 
 drop policy if exists "read the shop" on public.shop;
 
+-- anon and authenticated are different roles, so a signed-in owner needs naming here
+-- too or the shop reads empty the moment anyone logs in.
 create policy "read the shop"
-    on public.shop for select to anon
+    on public.shop for select to anon, authenticated
     using (true);
 
 comment on table public.shop is

@@ -498,6 +498,8 @@
 <div class="footer-bottom">
   <a href="https://backstage.soldoutcomedy.com" class="backstage-link-bottom">BACKSTAGE ACCESS</a>
   <span class="footer-separator">•</span>
+  <a href="/privacy/" class="backstage-link-bottom">PRIVACY</a>
+  <span class="footer-separator">•</span>
   <span class="footer-copyright">&copy; <span class="footer-year">2025</span> SOLD OUT! COMEDY</span>
 </div>
 
@@ -709,6 +711,10 @@ function renderGrid() {
   grid.innerHTML = '';
   for (const it of list) grid.appendChild(itemCard(it));
   grid.appendChild(storefrontTile());
+
+  /* assets/js/shop-edit.js listens for this and attaches its editors. Nothing else
+     uses it, and it fires whether or not anyone is signed in. */
+  document.dispatchEvent(new CustomEvent('shop:rendered'));
 }
 
 /* Tabs come from the feed rather than a list kept here, so setting tab_tag on a
@@ -810,5 +816,6 @@ loadTaglines();
 loadInventory();
 </script>
 
+<script type="module" src="/assets/js/shop-edit.js"></script>
 </body>
 </html>
