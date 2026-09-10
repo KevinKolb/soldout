@@ -297,7 +297,16 @@ function injectStyles() {
       color: inherit; background: transparent; border: 0; padding: 0;
       cursor: pointer; max-width: 100%;
     }
-    .src-pick:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .src-pick:focus, .chip-pick:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+    /* The chips get the same treatment: the select is the chip, so a card does not
+       sprout three boxes the moment you sign in. */
+    .chip-pick {
+      font: inherit; letter-spacing: inherit; text-transform: inherit;
+      color: inherit; background: transparent; border: 0; padding: 0;
+      cursor: pointer; max-width: 100%;
+    }
+    .tag.failed { background: var(--red); color: var(--paper); border-color: var(--red); }
     .item-badge.failed { background: var(--red); color: var(--paper); }
 
     /* Small, and hung off the tab's corner so it never crowds the label. */
@@ -689,13 +698,64 @@ function publishExtraTabs() {
         : extraTabs.filter(t => !used.has(t));
 }
 
-/* Every marketplace a prop has actually come from, plus eBay, which is where they all
-   come from today. It grows on its own: the moment a prop arrives from somewhere else -
-   found by the bot, or added by hand - that name is a row value, and every other prop's
-   picker offers it from then on. No list to maintain here. */
-function knownSources() {
-    const used = [...rows.values()].map(r => (r.tag_source || '').trim()).filter(Boolean);
-    return [...new Set(['eBay', ...used])].sort((a, b) => a.localeCompare(b));
+/* Everything any prop actually carries in this field, plus the names we started with.
+   The list grows on its own: the moment one prop is set to something new, every other
+   prop's picker offers it. No list to maintain here as the shop expands past eBay and
+   past commission. */
+function valuesInUse(field, baseline) {
+    const used = [...rows.values()].map(r => (r[field] || '').trim()).filter(Boolean);
+    return [...new Set([...baseline, ...used])].sort((a, b) => a.localeCompare(b));
+}
+
+/* The three tags on a card are all the same problem: a small set of names that has to
+   stay a small set. Typed by hand they drift - eBay and Ebay and ebay, Commission and
+   commission - and each drift is a new value nothing else matches. So each one is a
+   picker over what is already in use, with one way to add a name deliberately. */
+function pickerTag(el, row, field, baseline, cls) {
+    if (el.querySelector('select')) return;
+
+    const sel = document.createElement('select');
+    sel.className = cls;
+
+    const current = (row[field] || baseline[0] || '').trim();
+    for (const name of valuesInUse(field, baseline)) {
+        const o = document.createElement('option');
+        o.value = o.textContent = name;
+        if (name === current) o.selected = true;
+        sel.appendChild(o);
+    }
+
+    /* Without this the list could never gain an entry: a name only becomes an option
+       once a prop already carries it. */
+    const other = document.createElement('option');
+    other.value = '__other';
+    other.textContent = 'Something else...';
+    sel.appendChild(other);
+
+    sel.addEventListener('click', e => e.stopPropagation());
+    sel.addEventListener('change', async () => {
+        let wanted = sel.value;
+        if (wanted === '__other') {
+            wanted = (prompt('What should this say?', '') || '').trim();
+            if (!wanted) { sel.value = row[field] || baseline[0]; return; }
+        }
+
+        sel.disabled = true;
+        const { error } = await commit(row, field, wanted);
+        sel.disabled = false;
+
+        if (error) {
+            sel.value = row[field] || baseline[0];
+            el.classList.add('failed');
+            setTimeout(() => el.classList.remove('failed'), 2000);
+            return;
+        }
+        /* A name just invented is now in use, so every other card should offer it. */
+        if (typeof renderGrid === 'function') renderGrid();
+    });
+
+    el.textContent = '';
+    el.appendChild(sel);
 }
 
 function knownTabs() {
@@ -733,32 +793,6 @@ async function saveTag(el, row, field, value) {
     rows.set(keyOf(data.item_url), data);
     Object.assign(row, data);
     return true;
-}
-
-/* Two values, so the chip is the switch. The tooltip names what a click will do,
-   which is the whole of the affordance. */
-function cyclingTag(el, row, field, values) {
-    el.classList.add('tag-edit');
-
-    const paint = () => {
-        const current = row[field] || values[0];
-        el.textContent = current;
-        const next = values[(values.indexOf(current) + 1) % values.length];
-        el.title = 'Click to make this ' + next;
-    };
-
-    el.addEventListener('click', async e => {
-        if (editingOff()) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const current = row[field] || values[0];
-        const i = values.indexOf(current);
-        const next = values[(i + 1) % values.length];
-        el.textContent = next;
-        if (await saveTag(el, row, field, next)) paint();
-    });
-
-    paint();
 }
 
 /* The headline is the caption when there is one, so it is also where the caption is
@@ -848,58 +882,15 @@ function decorateCard(card) {
            alone on a sold prop, where it reads "Sold" rather than the marketplace -
            editing it there would write the word Sold into tag_source. */
         const chips = card.querySelectorAll('.tag');
-        if (chips[0]) cyclingTag(chips[0], row, 'tag_type', ['Commission', 'Owned']);
-        if (chips[1]) cyclingTag(chips[1], row, 'tag_location', ['External', 'First-party']);
+        if (chips[0]) pickerTag(chips[0], row, 'tag_type', ['Commission', 'Owned'], 'chip-pick');
+        if (chips[1]) pickerTag(chips[1], row, 'tag_location', ['External', 'First-party'], 'chip-pick');
 
-        /* The source, on the photo. A picker like the tab, and for the same reason:
-           typed by hand it would be eBay and Ebay and ebay before long. Left alone on a
-           sold prop, where the sticker reads "Sold" rather than the marketplace. */
+        /* The source, on the photo. Left alone on a sold prop, where the sticker
+           reads "Sold" rather than the marketplace - a picker there would write the
+           word Sold into tag_source. */
         const badge = card.querySelector('.item-badge');
-        if (badge && String(row.status || 'Active').toLowerCase() !== 'sold'
-            && !badge.querySelector('.src-pick')) {
-            const src = document.createElement('select');
-            src.className = 'src-pick';
-
-            const current = (row.tag_source || 'eBay').trim();
-            for (const name of knownSources()) {
-                const o = document.createElement('option');
-                o.value = o.textContent = name;
-                if (name === current) o.selected = true;
-                src.appendChild(o);
-            }
-
-            /* Without this the list could never gain its second entry: a source only
-               becomes an option once a prop already carries it. */
-            const other = document.createElement('option');
-            other.value = '__other';
-            other.textContent = 'Somewhere else...';
-            src.appendChild(other);
-
-            src.addEventListener('click', e => e.stopPropagation());
-            src.addEventListener('change', async () => {
-                let wanted = src.value;
-                if (wanted === '__other') {
-                    wanted = (prompt('Which marketplace?', '') || '').trim();
-                    if (!wanted) { src.value = row.tag_source || 'eBay'; return; }
-                }
-
-                src.disabled = true;
-                const { error } = await commit(row, 'tag_source', wanted);
-                src.disabled = false;
-
-                if (error) {
-                    src.value = row.tag_source || 'eBay';
-                    badge.classList.add('failed');
-                    setTimeout(() => badge.classList.remove('failed'), 2000);
-                    return;
-                }
-                /* A name that was just invented is now in use, so every other card
-                   should be offering it. */
-                if (typeof renderGrid === 'function') renderGrid();
-            });
-
-            badge.textContent = '';
-            badge.appendChild(src);
+        if (badge && String(row.status || 'Active').toLowerCase() !== 'sold') {
+            pickerTag(badge, row, 'tag_source', ['eBay'], 'src-pick');
         }
 
         /* The tab, in the opposite corner. Built here rather than in the page's own
