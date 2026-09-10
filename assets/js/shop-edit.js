@@ -31,6 +31,21 @@ function keyOf(url) {
 let rows = new Map();     // key -> the row in Supabase
 let user = null;
 
+/* The panel's one line of feedback, shared so anything can report into it. */
+let saidEl = null;
+
+function panelSay(text, ms = 5000) {
+    if (!saidEl) return;
+    saidEl.textContent = text;
+    saidEl.hidden = !text;
+    if (!text) return;
+    setTimeout(() => {
+        if (saidEl.textContent !== text) return;   // something newer has been said
+        saidEl.textContent = '';
+        saidEl.hidden = true;
+    }, ms);
+}
+
 /* The card is an <a>. In edit mode its href is taken off and kept here, because a
    textarea or an input inside an anchor is invalid HTML and browsers do what they
    like with it - clicking into the caption was activating the link and opening the
@@ -388,6 +403,7 @@ function buildBar() {
     const said = document.createElement('span');
     said.className = 'said';
     said.hidden = true;
+    saidEl = said;
 
     const who = document.createElement('span');
     who.className = 'who';
@@ -861,6 +877,10 @@ function decorate() {
                 }
                 tabBadge.classList.toggle('is-empty', !wanted);
                 refreshTabList();
+                /* The tab bar is built from the feed, not from the table, so writing
+                   tab_tag to Supabase is not enough to make a tab appear up there.
+                   applyLive re-reads the rows over the feed and rebuilds the bar. */
+                if (typeof applyLive === 'function') applyLive();
             });
 
             tabBadge.appendChild(pick);
@@ -992,12 +1012,21 @@ function ghostTab() {
     b.onclick = () => {
         const name = (prompt('Name the new tab') || '').trim();
         if (!name) return;
-        if (!knownTabs().some(t => t.toLowerCase() === name.toLowerCase())) {
+        const already = knownTabs().some(t => t.toLowerCase() === name.toLowerCase());
+        if (!already) {
             extraTabs.push(name);
             saveExtraTabs();
         }
+
         /* Re-rendering rebuilds every card, and every picker with it. */
         if (typeof renderGrid === 'function') renderGrid();
+
+        /* No tab appears up here yet, and that is correct: a tab is a value on a row,
+           so one with nothing filed under it has nothing to show. Saying so beats
+           leaving the button looking broken. */
+        panelSay(already
+            ? name + ' already exists. Pick it on a prop.'
+            : name + ' added. Pick it on a prop to file it there.');
     };
 
     bar.appendChild(b);
