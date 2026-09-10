@@ -164,8 +164,7 @@ function injectStyles() {
 
     /* Previewing the public page. The editors are hidden rather than torn down, so
        flipping back does not have to rebuild anything. */
-    body.viewing-public .editbox,
-    body.viewing-public .add-panel { display: none; }
+    body.viewing-public .editbox { display: none; }
 
     /* Nothing offers itself for editing in the preview either - a hover that lights up
        is a promise, and in that mode it would be a false one. */
@@ -175,29 +174,41 @@ function injectStyles() {
     body.viewing-public .tag-edit:hover,
     body.viewing-public .item-badge.tag-edit:hover { background: inherit; box-shadow: none; }
 
-    .add-panel {
-      border: var(--rule) solid var(--ink); background: var(--paper);
-      padding: 14px; margin-bottom: var(--gap);
+    .add-modal {
+      width: min(520px, calc(100vw - 2rem));
+      border: var(--rule) solid var(--ink);
+      background: var(--paper);
+      color: var(--ink);
+      box-shadow: 10px 10px 0 var(--ink);
+      padding: 18px;
+    }
+    .add-modal::backdrop { background: rgba(17, 17, 17, 0.6); }
+    .add-modal h3 {
+      margin: 0 0 14px;
+      font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      border-bottom: 2px solid var(--ink); padding-bottom: 8px;
+    }
+    .add-fields {
       display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
     }
-    .add-panel[hidden] { display: none; }
-    .add-panel label {
+    .add-modal label {
       font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.14em;
       text-transform: uppercase; display: block; margin-bottom: 4px;
     }
-    .add-panel input, .add-panel select,
+    .add-modal input, .add-modal select,
     .editbox input, .editbox select, .editbox textarea {
       width: 100%; padding: 7px 8px; border: 2px solid var(--ink);
       font-family: var(--sans); font-size: 0.8rem; background: var(--paper); color: var(--ink);
     }
     .editbox textarea { min-height: 4.5em; resize: vertical; line-height: 1.45; }
-    .add-panel .go { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; }
-    .add-panel button {
+    .add-modal .go { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .add-modal button {
       font-family: var(--mono); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
       text-transform: uppercase; background: var(--ink); color: var(--paper);
       border: 2px solid var(--ink); padding: 8px 12px; cursor: pointer;
     }
-    .add-panel button.ghost { background: var(--paper); color: var(--ink); }
+    .add-modal button.ghost { background: var(--paper); color: var(--ink); }
 
     .editbox {
       border-top: 2px dashed var(--ink); margin-top: 0.6rem; padding-top: 0.6rem;
@@ -398,7 +409,6 @@ async function save(row, patch, note) {
    viewport, and an ancestor with a transform would quietly make it measure against
    that instead. */
 function buildBar() {
-    const listings = document.getElementById('listings');
     if (document.getElementById('editBar')) return;
 
     const bar = document.createElement('div');
@@ -447,14 +457,12 @@ function buildBar() {
 
     const panel = buildAddPanel();
     add.onclick = () => {
-        panel.hidden = !panel.hidden;
-        if (panel.hidden) return;
-        panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        panel.showModal();
         const first = panel.querySelector('input');
         if (first) first.focus();
     };
 
-    listings.prepend(panel);
+    document.body.appendChild(panel);
     refreshTabList();
 }
 
@@ -568,11 +576,17 @@ function buildViewToggle(said) {
     return wrap;
 }
 
+/* A real dialog rather than a panel above the grid. Inline, it pushed every prop
+   down the moment it opened, and the form you were filling in and the grid you were
+   filling it from were competing for the same screen. <dialog> also brings Escape,
+   focus containment and a backdrop without any of it being written here. */
 function buildAddPanel() {
-    const panel = document.createElement('div');
-    panel.className = 'add-panel';
+    const panel = document.createElement('dialog');
+    panel.className = 'add-modal';
     panel.id = 'addPanel';
-    panel.hidden = true;
+
+    const head = document.createElement('h3');
+    head.textContent = 'Add a prop';
 
     const field = (labelText, el) => {
         const wrap = document.createElement('div');
@@ -607,7 +621,7 @@ function buildAddPanel() {
     shut.type = 'button';
     shut.className = 'ghost';
     shut.textContent = 'Close';
-    shut.onclick = () => { panel.hidden = true; };
+    shut.onclick = () => panel.close();
 
     const note = document.createElement('span');
     note.className = 'note';
@@ -640,7 +654,16 @@ function buildAddPanel() {
         refreshTabList();
     };
 
-    panel.append(field('Listing URL', url), field('Tab tag', tab), field('Caption', caption), list, go);
+    /* Clicking the backdrop is the other way people close these. The dialog element
+       itself fills the viewport, so a click that lands on it rather than on the form
+       inside is a click outside the form. */
+    panel.addEventListener('click', e => { if (e.target === panel) panel.close(); });
+
+    const form = document.createElement('div');
+    form.className = 'add-fields';
+    form.append(field('Listing URL', url), field('Tab tag', tab), field('Caption', caption), list, go);
+
+    panel.append(head, form);
     return panel;
 }
 
