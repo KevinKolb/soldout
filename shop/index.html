@@ -20,173 +20,342 @@
   <meta name="twitter:description" content="Every place you can buy the props, the merch and the beautiful junk we could not stop ourselves from selling.">
   <meta name="twitter:image" content="https://soldoutcomedy.com/assets/images/soldoutlogo.png">
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap">
   <link rel="stylesheet" href="../assets/css/footer.css">
 
   <style>
+    /* ==========================================================================
+       Shop - brutalist treatment
+       Flat colour, hard rules, hard shadows, nothing rounded or blurred. Three
+       type roles and no more: Bangers shouts, Inter reads, Space Mono labels.
+       One spacing scale, so the blocks stack on a grid you can see instead of
+       drifting apart.
+       ========================================================================== */
+
     :root {
-      --comic-red: #FF3B3B;
-      --comic-blue: #4A90E2;
-      --comic-yellow: #FFD93D;
-      --comic-black: #2C2C2C;
-      --comic-white: #FFFFFF;
+      --ink: #111111;
+      --paper: #FFFFFF;
+      --acid: #FFD93D;
+      --red: #FF3B3B;
+
+      --rule: 4px;                        /* every border on the page */
+      --drop: 8px 8px 0 var(--ink);       /* hard shadow, never blurred */
+      --gap: 1.25rem;
+
+      --mono: 'Space Mono', ui-monospace, Consolas, 'Courier New', monospace;
+      --sans: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
-      color: var(--comic-black);
-      background-color: var(--comic-yellow);
-      background-image: radial-gradient(circle, rgba(0,0,0,0.15) 1px, transparent 1px);
-      background-size: 4px 4px;
+      font-family: var(--sans);
+      color: var(--ink);
+      background-color: var(--acid);
+      background-image: radial-gradient(circle, rgba(0,0,0,0.18) 1px, transparent 1px);
+      background-size: 6px 6px;
     }
 
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
-
-    .back-link {
-      position: absolute;
-      top: 1.4rem;
-      right: 1.5rem;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 2px;
+    /* Label voice: mono, caps, wide tracking. Every piece of chrome uses it. */
+    .kicker, .sub, .hero-tag, .topbar, .section-head h2, .count, .meta,
+    .item-badge, .section-note {
+      font-family: var(--mono);
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--comic-black);
-      text-decoration: none;
-      border-bottom: 2px solid var(--comic-black);
-      padding-bottom: 2px;
     }
-    .back-link:hover { color: var(--comic-red); border-bottom-color: var(--comic-red); }
+
+    /* --- Utility bar ------------------------------------------------------ */
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.6rem 1.1rem;
+      background: var(--ink);
+      color: var(--paper);
+      font-size: 0.66rem;
+      font-weight: 700;
+    }
+
+    .topbar span {
+      min-width: 0;                     /* else nowrap text widens the page */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .topbar a {
+      color: var(--acid);
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 3px 5px;
+    }
+
+    .topbar a:hover, .topbar a:focus-visible {
+      background: var(--acid);
+      color: var(--ink);
+      outline: none;
+    }
+
+    /* --- Shell ------------------------------------------------------------ */
+
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 1.75rem 1.25rem 2.25rem; }
+
+    /* --- Hero ------------------------------------------------------------- */
 
     .hero {
       position: relative;
-      background: var(--comic-white);
-      border: 5px solid var(--comic-black);
-      box-shadow: 10px 10px 0 rgba(0,0,0,0.2);
-      padding: 3rem 2rem;
+      background: var(--paper);
+      border: var(--rule) solid var(--ink);
+      box-shadow: var(--drop);
+      padding: 2.25rem 1.5rem 1.75rem;
       text-align: center;
-      margin-bottom: 3.5rem;
     }
 
-    .hero-logo {
+    .hero-logo { position: absolute; top: 1rem; left: 1rem; line-height: 0; }
+    .hero-logo img { width: clamp(56px, 9vw, 92px); height: auto; display: block; }
+
+    .hero-tag {
       position: absolute;
       top: 1.1rem;
-      left: 1.25rem;
-      line-height: 0;
+      right: 1.1rem;
+      font-size: 0.6rem;
+      font-weight: 700;
+      border: 2px solid var(--ink);
+      padding: 3px 7px;
     }
 
-    .hero-logo img { width: clamp(64px, 11vw, 120px); height: auto; display: block; }
-
-    /* Below this the banner is too narrow for the logo to sit beside the
-       headline without colliding, so it goes back into the flow. */
-    @media (max-width: 620px) {
-      .hero { padding-top: 1.5rem; }
-      .hero-logo { position: static; margin: 0 auto 0.75rem; }
-      .hero-logo img { width: 96px; }
-      .back-link { position: static; display: block; margin: 0 auto 1.25rem; width: fit-content; }
-    }
-
+    .kicker, .sub { margin: 0; font-size: 0.7rem; font-weight: 700; }
 
     .hero h1 {
       font-family: 'Bangers', cursive;
-      font-size: clamp(3.6rem, 13vw, 7.5rem);
-      letter-spacing: 3px;
-      color: var(--comic-red);
-      text-shadow: 4px 4px 0 var(--comic-black);
-      margin: 0 0 1rem;
-      line-height: 1;
-    }
-
-    .hero p {
-      font-family: Inter, system-ui, sans-serif;
-      font-size: 1.05rem;
-      font-weight: 600;
+      font-size: clamp(3.4rem, 14vw, 8rem);
+      line-height: 0.88;
       letter-spacing: 2px;
-      color: var(--comic-black);
-      max-width: 620px;
-      margin: 0 auto;
-      line-height: 1.4;
+      color: var(--red);
+      text-shadow: 5px 5px 0 var(--ink);
+      margin: 0.55rem 0 0.7rem;
     }
 
-    .hero p.hero-kicker { margin-bottom: 0.2rem; }
+    /* --- Ticker ----------------------------------------------------------- */
+    /* Content is doubled and the track slides -50%, so the loop has no seam. */
 
-    .section-note { font-size: 0.9rem; margin: 0 0 1.5rem; max-width: 640px; }
+    .ticker {
+      margin: var(--gap) 0 1.75rem;
+      border: var(--rule) solid var(--ink);
+      background: var(--ink);
+      color: var(--acid);
+      overflow: hidden;
+    }
 
-    section { margin-bottom: 3.5rem; }
+    .ticker-track {
+      display: inline-block;
+      white-space: nowrap;
+      padding: 0.5rem 0;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      animation: ticker 26s linear infinite;
+    }
 
-    .footer-bottom a { text-decoration: none; }
+    .ticker-track span { padding: 0 1.5rem; }
+
+    @keyframes ticker { to { transform: translateX(-50%); } }
+    @media (prefers-reduced-motion: reduce) { .ticker-track { animation: none; } }
+
+    /* --- Section header --------------------------------------------------- */
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0.55rem 0.9rem;
+      margin-bottom: var(--gap);
+    }
+
+    .section-head h2 { margin: 0; font-size: 0.75rem; font-weight: 700; }
+
+    .count {
+      background: var(--acid);
+      color: var(--ink);
+      padding: 3px 8px;
+      font-size: 0.64rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    /* --- Item grid -------------------------------------------------------- */
 
     .item-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-      gap: 1.25rem;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: var(--gap);
+    }
+
+    /* The status line lives inside the grid so the loader clears it along with
+       the cards, but it reads as a statement rather than a card - so it spans
+       every column instead of sitting in the first cell. */
+    .section-note {
+      grid-column: 1 / -1;
+      margin: 0;
+      background: var(--paper);
+      border: var(--rule) solid var(--ink);
+      padding: 1rem 1.1rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      line-height: 1.6;
     }
 
     .item-card {
       display: flex;
       flex-direction: column;
-      background: var(--comic-white);
-      border: 4px solid var(--comic-black);
+      background: var(--paper);
+      border: var(--rule) solid var(--ink);
       text-decoration: none;
-      color: var(--comic-black);
-      transition: transform 0.15s, box-shadow 0.15s;
+      color: var(--ink);
+      transition: transform 0.1s linear, box-shadow 0.1s linear;
     }
 
-    .item-card:hover {
-      transform: translate(-3px, -3px);
-      box-shadow: 8px 8px 0 var(--comic-black);
+    .item-card:hover, .item-card:focus-visible {
+      transform: translate(-4px, -4px);
+      box-shadow: var(--drop);
+      outline: none;
     }
 
     .item-card .shot {
+      position: relative;
       aspect-ratio: 1 / 1;
-      border-bottom: 4px solid var(--comic-black);
-      background: #f6f6f6;
+      border-bottom: var(--rule) solid var(--ink);
+      background: #f2f2f2;
       overflow: hidden;
     }
+
     .item-card .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    .item-card .body { padding: 0.9rem 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.35rem; }
-    .item-card .item-title { font-weight: 700; font-size: 0.95rem; line-height: 1.35; }
-    .item-card .meta { font-size: 0.75rem; color: #666; }
-    .item-card .price {
-      font-family: 'Bangers', cursive;
-      font-size: 1.5rem;
-      letter-spacing: 1px;
-      color: var(--comic-red);
-    }
-
+    /* Stuck to the corner of the shot, like a price sticker. */
     .item-badge {
-      align-self: flex-start;
-      font-size: 0.62rem;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: var(--acid);
+      color: var(--ink);
+      border-right: var(--rule) solid var(--ink);
+      border-bottom: var(--rule) solid var(--ink);
+      padding: 4px 9px;
+      font-size: 0.58rem;
       font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      border: 2px solid var(--comic-black);
-      background: var(--comic-yellow);
-      padding: 2px 7px;
     }
 
-    .item-card.sold { opacity: 0.55; }
-    .item-card.sold .item-badge { background: var(--comic-black); color: #fff; }
-    .item-card.sold .price { color: #888; text-decoration: line-through; }
+    .item-card .body {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.85rem 0.9rem 0.95rem;
+    }
+
+    .item-title { font-weight: 700; font-size: 0.9rem; line-height: 1.3; }
+
+    .price {
+      font-family: 'Bangers', cursive;
+      font-size: 1.9rem;
+      line-height: 1;
+      letter-spacing: 1px;
+      color: var(--red);
+    }
+
+    .meta {
+      margin-top: auto;                 /* holds the rule to the card foot */
+      padding-top: 0.5rem;
+      border-top: 2px solid var(--ink);
+      font-size: 0.6rem;
+      font-weight: 400;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* Closing tile. Inverted against the cards so it reads as a way out of the
+       grid rather than another listing. */
+    .cta-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1.25rem;
+      min-height: 190px;
+      padding: 1rem;
+      background: var(--ink);
+      color: var(--acid);
+      border: var(--rule) solid var(--ink);
+      text-decoration: none;
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      transition: transform 0.1s linear, box-shadow 0.1s linear;
+    }
+
+    .cta-card:hover, .cta-card:focus-visible {
+      transform: translate(-4px, -4px);
+      box-shadow: 8px 8px 0 var(--paper);
+      outline: none;
+    }
+
+    .cta-kicker { font-size: 0.6rem; font-weight: 400; color: var(--paper); }
+    .cta-line { font-size: 0.86rem; font-weight: 700; line-height: 1.45; }
+    .cta-arrow { font-size: 1.6rem; line-height: 1; }
+
+    /* Sold stock stays legible - drained of colour rather than faded out. */
+    .item-card.sold .shot img { filter: grayscale(1) contrast(1.05); }
+    .item-card.sold .item-badge { background: var(--ink); color: var(--paper); }
+    .item-card.sold .price { color: #777; text-decoration: line-through; }
+
+    .footer-bottom a { text-decoration: none; }
+
+    /* Below this the banner is too narrow for the logo to sit beside the
+       headline without colliding, so it goes back into the flow. */
+    @media (max-width: 620px) {
+      .hero { padding-top: 1.25rem; }
+      .hero-logo { position: static; margin: 0 auto 0.6rem; }
+      .hero-logo img { width: 84px; }
+      .hero-tag { display: none; }
+      .item-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    }
   </style>
 </head>
 <body>
 
+<div class="topbar">
+  <span>Sold Out! Comedy // Shop</span>
+  <a href="../index.html">&larr; Back to the show</a>
+</div>
+
 <div class="wrap">
-  <div class="hero">
+  <header class="hero">
     <a href="../index.html" class="hero-logo">
       <img src="../assets/images/soldoutlogo.png" alt="SOLD OUT! Comedy">
     </a>
-    <a href="../index.html" class="back-link">Back to the show</a>
-    <p class="hero-kicker">Nothing on this page is</p>
+    <span class="hero-tag">Fig. 01</span>
+    <p class="kicker">Nothing on this page is</p>
     <h1>Sold Out!</h1>
-    <p>We know. It's confusing.</p>
-  </div>
+    <p class="sub">We know. It's confusing.</p>
+  </header>
+
+  <div class="ticker" aria-hidden="true"><div class="ticker-track"><span>Everything must go</span><span>Nothing here is sold out</span><span>The name is a bit misleading</span><span>Buy our beautiful junk</span><span>Everything must go</span><span>Nothing here is sold out</span><span>The name is a bit misleading</span><span>Buy our beautiful junk</span></div></div>
 
   <section id="listings">
+    <div class="section-head">
+      <h2>Items for sale</h2>
+      <span class="count" id="itemCount">Loading</span>
+    </div>
     <div class="item-grid" id="itemGrid">
       <p class="section-note" id="itemsStatus">Loading items...</p>
     </div>
@@ -198,31 +367,34 @@
 <!-- generated from assets/footer.html - do not edit here -->
 <footer id="contact" class="footer-minimal">
   <div class="social-links">
-        <a href="https://www.instagram.com/soldout.comedy" class="social-link" title="Instagram">
+        <a href="https://www.instagram.com/soldout.comedy" class="social-link" title="Instagram" target="_blank" rel="noopener">
           <img src="/assets/images/instagram_logo.svg" alt="Instagram" style="width: 70%; height: 70%; object-fit: contain;">
         </a>
-        <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Facebook">
+        <a href="https://www.facebook.com/profile.php?id=61578903020598" class="social-link" title="Facebook" target="_blank" rel="noopener">
           <img src="/assets/images/facebook_logo.png" alt="Facebook" style="width: 70%; height: 70%; object-fit: contain;">
         </a>
-        <a href="https://x.com/soldoutcomedy" class="social-link" title="X">
+        <a href="https://x.com/soldoutcomedy" class="social-link" title="X" target="_blank" rel="noopener">
           <img src="/assets/images/x_logo.png" alt="X" style="width: 60%; height: 60%; object-fit: contain; filter: invert(1);">
         </a>
-        <a href="https://www.youtube.com/@SOLDOUTComedy" class="social-link" title="YouTube">
+        <a href="https://www.youtube.com/@SOLDOUTComedy" class="social-link" title="YouTube" target="_blank" rel="noopener">
           <img src="/assets/images/yt_logo.png" alt="YouTube" style="width: 60%; height: 60%; object-fit: contain;">
         </a>
-        <a href="https://www.tiktok.com/@sold.out.comedy" class="social-link" title="TikTok">
+        <a href="https://www.tiktok.com/@sold.out.comedy" class="social-link" title="TikTok" target="_blank" rel="noopener">
           <img src="/assets/images/tiktok_logo.png" alt="TikTok" style="width: 60%; height: 60%; object-fit: contain;">
         </a>
-        <a href="https://soldoutcomedy.bsky.social" class="social-link" title="Blue Sky">
+        <a href="https://soldoutcomedy.bsky.social" class="social-link" title="Blue Sky" target="_blank" rel="noopener">
           <img src="/assets/images/Bluesky_Logo.svg" alt="Blue Sky" style="width: 70%; height: 70%; object-fit: contain;">
         </a>
-        <a href="https://www.threads.com/@soldout.comedy?hl=en" class="social-link" title="Threads">
+        <a href="https://www.threads.com/@soldout.comedy?hl=en" class="social-link" title="Threads" target="_blank" rel="noopener">
           <img src="/assets/images/threads_logo.png" alt="Threads" style="width: 70%; height: 70%; object-fit: contain;">
         </a>
-        <a href="https://www.reddit.com/user/SOLDOUTComedy/submitted/" class="social-link" title="Reddit">
+        <a href="https://www.reddit.com/user/SOLDOUTComedy/submitted/" class="social-link" title="Reddit" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24" style="width: 70%; height: 70%;" fill="#FF4500">
             <path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.01 1.614a3.111 3.111 0 0 1 .042.52c0 2.694-3.13 4.87-7.004 4.87-3.874 0-7.004-2.176-7.004-4.87 0-.183.015-.366.043-.534A1.748 1.748 0 0 1 4.028 12c0-.968.786-1.754 1.754-1.754.463 0 .898.196 1.207.49 1.207-.883 2.878-1.43 4.744-1.487l.885-4.182a.342.342 0 0 1 .14-.197.35.35 0 0 1 .238-.042l2.906.617a1.214 1.214 0 0 1 1.108-.701zM9.25 12C8.561 12 8 12.562 8 13.25c0 .687.561 1.248 1.25 1.248.687 0 1.248-.561 1.248-1.249 0-.688-.561-1.249-1.249-1.249zm5.5 0c-.687 0-1.248.561-1.248 1.25 0 .687.561 1.248 1.249 1.248.688 0 1.249-.561 1.249-1.249 0-.687-.562-1.249-1.25-1.249zm-5.466 3.99a.327.327 0 0 0-.231.094.33.33 0 0 0 0 .463c.842.842 2.484.913 2.961.913.477 0 2.105-.056 2.961-.913a.361.361 0 0 0 .029-.463.33.33 0 0 0-.464 0c-.547.533-1.684.73-2.512.73-.828 0-1.979-.196-2.512-.73a.326.326 0 0 0-.232-.095z"/>
           </svg>
+        </a>
+        <a href="https://www.pretzels.com/collections/all" class="social-link" title="Pretzels" target="_blank" rel="noopener">
+          <img src="/assets/images/pretzels_logo.png" alt="Pretzels" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
         </a>
       </div>
 </footer>
@@ -230,7 +402,7 @@
 <div class="footer-bottom">
   <a href="https://backstage.soldoutcomedy.com" class="backstage-link-bottom">BACKSTAGE ACCESS</a>
   <span class="footer-separator">•</span>
-  <span class="footer-copyright">&copy; 2025 SOLD OUT! COMEDY</span>
+  <span class="footer-copyright">&copy; <span class="footer-year">2025</span> SOLD OUT! COMEDY</span>
 </div>
 
 <script>
@@ -247,6 +419,12 @@
       list.hidden = open;
     });
   }
+  /* The year is in the markup as a fallback and refreshed here, so a page that
+     has not been rebuilt since New Year is still right in the browser. */
+  Array.prototype.forEach.call(
+    document.querySelectorAll('.footer-year'),
+    function (el) { el.textContent = new Date().getFullYear(); }
+  );
   /* Comic-book wobble on the social icons. */
   Array.prototype.forEach.call(
     document.querySelectorAll('.social-link'),
@@ -262,12 +440,39 @@
 <script>
 const text = (node, tag) => (node.querySelector(tag)?.textContent || '').trim();
 
+/* Appended after the cards, and on the empty state too, so the grid always
+   ends somewhere useful. */
+function storefrontTile() {
+  const a = document.createElement('a');
+  a.className = 'cta-card';
+  a.href = 'https://www.ebay.com/inf/soldoutcomedy';
+  a.target = '_blank';
+  a.rel = 'noopener';
+
+  const kicker = document.createElement('span');
+  kicker.className = 'cta-kicker';
+  kicker.textContent = 'Not enough junk?';
+
+  const line = document.createElement('span');
+  line.className = 'cta-line';
+  line.textContent = 'See the whole eBay storefront';
+
+  const arrow = document.createElement('span');
+  arrow.className = 'cta-arrow';
+  arrow.textContent = '\u2192';
+
+  a.append(kicker, line, arrow);
+  return a;
+}
+
 async function loadInventory() {
   const grid = document.getElementById('itemGrid');
   const note = document.getElementById('itemsStatus');
+  const count = document.getElementById('itemCount');
 
   if (location.protocol === 'file:') {
     note.textContent = 'Item list needs a web server; open this page over http rather than from disk.';
+    count.textContent = 'Offline';
     return;
   }
 
@@ -280,15 +485,19 @@ async function loadInventory() {
     items = [...doc.querySelectorAll('item')];
   } catch (err) {
     note.textContent = 'Could not load the item list right now.';
+    count.textContent = 'Unavailable';
     console.warn('[shop] inventory load failed:', err);
     return;
   }
 
   if (!items.length) {
-    note.textContent = 'Nothing listed at the moment. Check the storefronts above.';
+    note.textContent = 'Nothing listed at the moment.';
+    count.textContent = 'None';
+    grid.appendChild(storefrontTile());
     return;
   }
 
+  count.textContent = items.length + (items.length === 1 ? ' item' : ' items');
   grid.innerHTML = '';
   for (const it of items) {
     const sold = text(it, 'status').toLowerCase() === 'sold';
@@ -327,10 +536,13 @@ async function loadInventory() {
     meta.className = 'meta';
     meta.textContent = [text(it, 'condition'), text(it, 'platform')].filter(Boolean).join(' • ');
 
-    body.append(badge, title, priceEl, meta);
+    shot.appendChild(badge);
+    body.append(title, priceEl, meta);
     card.append(shot, body);
     grid.appendChild(card);
   }
+
+  grid.appendChild(storefrontTile());
 }
 
 loadInventory();
