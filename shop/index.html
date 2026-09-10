@@ -287,13 +287,14 @@
       clip-path: polygon(0 30%, 16px 0, 100% 0, 100% 100%, 16px 100%, 0 70%);
     }
 
-    /* Each responds to its own hover, not the card's. The tag grows from its left
-       edge, so the hole stays put and the price swings out. No shadow: a hard one at
-       +3/+3 sat exactly in the bottom-right corner and filled the radius in, which read
-       as a square corner and a thicker rule on that side. */
-    .price:hover { transform: rotate(-1.5deg) scale(1.07); }
+    /* The price tag is the only thing on a card that moves on hover. It is the one
+       you can click through to the listing, so the movement is telling you something;
+       on the classification chips it was just fidgeting.
 
-    .tag:hover { transform: scale(1.06); }
+       It grows from its left edge, so the hole stays put and the price swings out. No
+       shadow: a hard one at +3/+3 sat exactly in the bottom-right corner and filled the
+       radius in, which read as a square corner and a thicker rule on that side. */
+    .price:hover { transform: rotate(-1.5deg) scale(1.07); }
 
     .price-face {
       display: block;
@@ -368,8 +369,6 @@
     .tags { display: flex; flex-wrap: wrap; gap: 4px; }
 
     .tag {
-      transform-origin: left center;
-      transition: transform 0.1s linear;
       font-family: var(--mono);
       font-size: 0.5rem;
       font-weight: 700;
