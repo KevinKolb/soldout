@@ -759,6 +759,18 @@ function decorate() {
 
     for (const card of document.querySelectorAll('.item-card')) {
         if (card.querySelector('.editbox')) continue;
+        try {
+            decorateCard(card);
+        } catch (err) {
+            /* One card that cannot be decorated used to take the rest of the grid with
+               it - the loop stopped where it threw, so everything after the bad card
+               stayed plain and it looked as though only the first prop was editable. */
+            console.warn('[shop-edit] could not decorate a card:', cardUrl(card), err);
+        }
+    }
+}
+
+function decorateCard(card) {
         /* An adopted prop has no row. Rather than leaving it uneditable - which would
            make the commonest way of adding a prop the one you cannot touch - it gets a
            stub that the first save turns into a real row. */
@@ -982,8 +994,7 @@ function decorate() {
         /* The three buttons go last and unlabelled: ACTIVE, SOLD and HIDDEN say what
            they are, and a heading over them only repeated it. */
         box.append(original, states, note);
-        card.querySelector('.body').appendChild(box);
-    }
+    card.querySelector('.body').appendChild(box);
 }
 
 /* ---------- wiring ---------- */
