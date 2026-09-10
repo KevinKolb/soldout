@@ -280,6 +280,15 @@ function injectStyles() {
     }
     .tab-pick:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
 
+    /* The source sticker, same treatment: the select is the badge. */
+    .src-pick {
+      font: inherit; letter-spacing: inherit; text-transform: inherit;
+      color: inherit; background: transparent; border: 0; padding: 0;
+      cursor: pointer; max-width: 100%;
+    }
+    .src-pick:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
+    .item-badge.failed { background: var(--red); color: var(--paper); }
+
     /* Small, and hung off the tab's corner so it never crowds the label. */
     .tab { position: relative; }
     .tab[draggable="true"] { cursor: grab; }
@@ -326,11 +335,6 @@ function injectStyles() {
       resize: vertical; min-height: 3.4em;
     }
 
-    .tag-input {
-      font: inherit; letter-spacing: inherit; text-transform: inherit;
-      width: 7em; padding: 0 2px; border: 0; outline: 2px solid var(--ink);
-      background: var(--paper); color: var(--ink);
-    }
 
     /* What eBay called it, kept visible while writing the replacement. Selectable so
        a phrase can be lifted out of it, but never editable: it is not ours to change. */
@@ -665,6 +669,15 @@ function publishExtraTabs() {
         : extraTabs.filter(t => !used.has(t));
 }
 
+/* Every marketplace a prop has actually come from, plus eBay, which is where they all
+   come from today. It grows on its own: the moment a prop arrives from somewhere else -
+   found by the bot, or added by hand - that name is a row value, and every other prop's
+   picker offers it from then on. No list to maintain here. */
+function knownSources() {
+    const used = [...rows.values()].map(r => (r.tag_source || '').trim()).filter(Boolean);
+    return [...new Set(['eBay', ...used])].sort((a, b) => a.localeCompare(b));
+}
+
 function knownTabs() {
     const used = [...rows.values()].map(r => r.tab_tag).filter(Boolean);
     return [...new Set([...used, ...extraTabs])];
@@ -736,106 +749,6 @@ function cyclingTag(el, row, field, values) {
     paint();
 }
 
-/* The marketplace can be anything, so this one opens a field. Enter or clicking
-   away commits, Escape abandons. */
-function textTag(el, row, field, placeholder) {
-    el.classList.add('tag-edit');
-    el.title = placeholder ? 'Click to set' : 'Click to rename';
-
-    const show = value => {
-        el.textContent = value || placeholder || '';
-        if (placeholder) el.classList.toggle('is-empty', !value);
-    };
-
-    el.addEventListener('click', e => {
-        if (editingOff()) return;
-        e.preventDefault();
-        e.stopPropagation();
-        if (el.dataset.editing) return;
-        el.dataset.editing = '1';
-
-        const was = row[field] || '';
-        const input = document.createElement('input');
-        input.className = 'tag-input';
-        input.value = was;
-        el.textContent = '';
-        el.appendChild(input);
-        input.focus();
-        input.select();
-
-        let done = false;
-        const finish = async commit => {
-            if (done) return;
-            done = true;
-            delete el.dataset.editing;
-            const value = input.value.trim();
-            const next = commit ? value : was;
-            show(next);
-            if (commit && value !== was) {
-                if (!await saveTag(el, row, field, value)) show(was);
-            }
-        };
-
-        input.addEventListener('blur', () => finish(true));
-        input.addEventListener('keydown', ev => {
-            if (ev.key === 'Enter') { ev.preventDefault(); input.blur(); }
-            if (ev.key === 'Escape') { ev.preventDefault(); finish(false); }
-        });
-        input.addEventListener('click', ev => ev.stopPropagation());
-    });
-}
-
-/* The headline is the caption when there is one, so it is also where the caption is
-   written. Clicking it opens a box in the card rather than sending the eye to a field
-   below the fold of the tile. Clearing it and saving hands the headline back to the
-   marketplace's own title. */
-function inlineCaption(el, row, pulled) {
-    el.classList.add('cap-edit');
-    el.title = 'Click to write what we call it';
-
-    el.addEventListener('click', e => {
-        if (editingOff()) return;
-        e.preventDefault();
-        e.stopPropagation();
-        if (el.dataset.editing) return;
-        el.dataset.editing = '1';
-
-        const was = row.blurb || '';
-        const box = document.createElement('textarea');
-        box.className = 'title-input';
-        box.value = was;
-        box.placeholder = pulled;
-        el.textContent = '';
-        el.appendChild(box);
-        box.focus();
-        box.setSelectionRange(box.value.length, box.value.length);
-
-        let done = false;
-        const finish = async commit => {
-            if (done) return;
-            done = true;
-            delete el.dataset.editing;
-            const value = box.value.trim();
-
-            if (!commit || value === was) {
-                el.textContent = was || pulled;
-                return;
-            }
-            el.textContent = value || pulled;
-            if (!await saveTag(el, row, 'blurb', value)) el.textContent = was || pulled;
-        };
-
-        box.addEventListener('blur', () => finish(true));
-        box.addEventListener('keydown', ev => {
-            /* Enter commits, shift+Enter breaks the line - the caption is short enough
-               that committing is the far commoner intent. */
-            if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); box.blur(); }
-            if (ev.key === 'Escape') { ev.preventDefault(); finish(false); }
-        });
-        box.addEventListener('click', ev => ev.stopPropagation());
-    });
-}
-
 /* ---------- the editor on each card ---------- */
 function decorate() {
     /* Nothing at all in the public preview. Guarding each editor individually left the
@@ -863,9 +776,55 @@ function decorate() {
         if (chips[0]) cyclingTag(chips[0], row, 'tag_type', ['Commission', 'Owned']);
         if (chips[1]) cyclingTag(chips[1], row, 'tag_location', ['External', 'First-party']);
 
+        /* The source, on the photo. A picker like the tab, and for the same reason:
+           typed by hand it would be eBay and Ebay and ebay before long. Left alone on a
+           sold prop, where the sticker reads "Sold" rather than the marketplace. */
         const badge = card.querySelector('.item-badge');
-        if (badge && String(row.status || 'Active').toLowerCase() !== 'sold') {
-            textTag(badge, row, 'tag_source');
+        if (badge && String(row.status || 'Active').toLowerCase() !== 'sold'
+            && !badge.querySelector('.src-pick')) {
+            const src = document.createElement('select');
+            src.className = 'src-pick';
+
+            const current = (row.tag_source || 'eBay').trim();
+            for (const name of knownSources()) {
+                const o = document.createElement('option');
+                o.value = o.textContent = name;
+                if (name === current) o.selected = true;
+                src.appendChild(o);
+            }
+
+            /* Without this the list could never gain its second entry: a source only
+               becomes an option once a prop already carries it. */
+            const other = document.createElement('option');
+            other.value = '__other';
+            other.textContent = 'Somewhere else...';
+            src.appendChild(other);
+
+            src.addEventListener('click', e => e.stopPropagation());
+            src.addEventListener('change', async () => {
+                let wanted = src.value;
+                if (wanted === '__other') {
+                    wanted = (prompt('Which marketplace?', '') || '').trim();
+                    if (!wanted) { src.value = row.tag_source || 'eBay'; return; }
+                }
+
+                src.disabled = true;
+                const { error } = await commit(row, 'tag_source', wanted);
+                src.disabled = false;
+
+                if (error) {
+                    src.value = row.tag_source || 'eBay';
+                    badge.classList.add('failed');
+                    setTimeout(() => badge.classList.remove('failed'), 2000);
+                    return;
+                }
+                /* A name that was just invented is now in use, so every other card
+                   should be offering it. */
+                if (typeof renderGrid === 'function') renderGrid();
+            });
+
+            badge.textContent = '';
+            badge.appendChild(src);
         }
 
         /* The tab, in the opposite corner. Built here rather than in the page's own
