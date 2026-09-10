@@ -467,12 +467,42 @@ if(mm)handle='@'+mm[1];
 }
 }
 
-/* Everywhere else on the planet: whatever the page says about itself, plus
-   anything you highlighted before clicking. */
+/* Meta's sites hand a crawler nothing: og:title on a reel is the word "Facebook",
+   there is no author tag, and document.title is no better. Storing that is worse
+   than storing nothing, because "Facebook" in the queue looks like a real capture
+   that went wrong. So anything that is only the platform's own name is thrown away. */
+function junk(v){
+if(!v)return true;
+var s=String(v).trim().toLowerCase();
+if(s.length<3)return true;
+if(s===host||s===host.split('.')[0])return true;
+return ['facebook','instagram','twitter','x','youtube','threads','tiktok','reddit',
+'watch','reels','reel','video','videos','photo','photos','post','home',
+'log in or sign up','log in','sign up'].indexOf(s)>=0;
+}
+
 if(!url)url=canonical();
-if(!handle)handle=meta('author')||meta('og:site_name')||host;
+
+/* one honest attempt at the caption before falling back to metadata */
+if(!text){
+var story=document.querySelector('[data-ad-rendering-role="story_message"]')||
+document.querySelector('[data-testid="post_message"]');
+if(story&&story.innerText)text=story.innerText.trim();
+}
+
 if(!text)text=sel()||meta('og:description')||meta('description')||meta('og:title')||document.title||'';
+if(junk(text))text='';
+if(!handle)handle=meta('author')||meta('og:site_name')||'';
+if(junk(handle))handle='';
 if(!when)when=meta('article:published_time')||meta('og:updated_time')||'';
+
+/* Nothing readable. You are standing on the page and can see it, so say what it is
+   rather than let a blank row into the queue. Blank is still allowed - the link alone
+   is a fine capture. */
+if(!text){
+var g=prompt("That's Funny! cannot read "+host+" - it hands out no text.\n\nWhat is this? (leave blank to just save the link)",'');
+if(g)text=g.trim();
+}
 if(text.length>1200)text=text.slice(0,1200)+'...';
 
 var media=!!(meta('og:image')||meta('og:video')||meta('twitter:image')||document.querySelector('video'));
