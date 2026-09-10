@@ -942,7 +942,11 @@ function itemCard(it) {
   const title = document.createElement('div');
   title.className = 'item-title';
   title.textContent = ours || pulled;
-  if (ours && pulled) card.title = pulled;
+
+  /* Kept where the editor can find it again, but not as a title attribute: that would
+     hang a tooltip full of eBay's keyword soup off every card a visitor hovers. The
+     photo's alt text still carries the real name for anyone who needs it read out. */
+  if (ours && pulled) card.dataset.pulled = pulled;
 
   /* tab_tag is deliberately absent from the card: it groups items into tabs, it
      is not a label anyone needs to read on the item itself. */
@@ -971,6 +975,13 @@ function itemCard(it) {
     chip.textContent = t;
     tags.appendChild(chip);
   }
+
+  /* The tags are dead ground. The whole card is a link, so without this a click on
+     the eBay sticker or on either chip would fire it - and a label is not a thing you
+     expect to be taking you anywhere. */
+    for (const el of [badge, ...tags.children]) {
+      el.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
+    }
 
   shot.appendChild(badge);
   if (tags.children.length) body.appendChild(tags);

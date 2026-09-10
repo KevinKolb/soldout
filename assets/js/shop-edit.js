@@ -838,6 +838,12 @@ function inlineCaption(el, row, pulled) {
 
 /* ---------- the editor on each card ---------- */
 function decorate() {
+    /* Nothing at all in the public preview. Guarding each editor individually left the
+       classes and the tooltips on the card, which is most of what makes something look
+       clickable - the preview is supposed to be a visitor's page, not a disabled copy
+       of this one. */
+    if (editingOff()) return;
+
     for (const card of document.querySelectorAll('.item-card')) {
         if (card.querySelector('.editbox')) continue;
         /* An adopted prop has no row. Rather than leaving it uneditable - which would
@@ -985,7 +991,7 @@ function decorate() {
            on the card - otherwise the second edit would have nothing to compare against. */
         const titleEl = card.querySelector('.item-title');
         let pulled = titleEl
-            ? (card.getAttribute('title') || titleEl.dataset.pulled || titleEl.textContent)
+            ? (card.dataset.pulled || titleEl.dataset.pulled || titleEl.textContent)
             : '';
 
         /* The headline shows the caption once there is one, so reading it back off the
