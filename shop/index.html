@@ -668,10 +668,99 @@ async function loadInventory() {
   });
 
   allItems = items;
-  /* Tab order follows the feed, not the price sort, so it does not reshuffle
-     when something is repriced. */
-  allTabs = [...new Set(items.map(it => text(it, 'tab_tag')).filter(Boolean))];
+  allTabs = tabsFrom(items);
   activeTab = tabFromUrl();
+  buildTabs();
+  renderGrid();
+
+  /* Deliberately not awaited. The built file is already on screen by now; the live
+     rows only correct it. A slow or unreachable Supabase costs nothing but the
+     correction. */
+  applyLive();
+}
+
+/* Tab order follows the feed, not the price sort, so it does not reshuffle when
+   something is repriced. */
+function tabsFrom(items) {
+  return [...new Set(items.map(it => text(it, 'tab_tag')).filter(Boolean))];
+}
+
+/* ---- the live overlay ----------------------------------------------------
+   inventory.xml is only as fresh as the last build, up to six hours old. The
+   editable half of a prop - what we call it, which tab it sits in, whether it is
+   still for sale - lives in Supabase and can change any minute, so it is read
+   here and allowed to win.
+
+   The other half cannot work this way: title, price, photo and remaining count
+   are scraped from the eBay storefront at build time, because eBay serves its
+   item pages a 403 to anything that is not a browser. Those stay as built, which
+   is also why a prop added since the last build has no card here at all - there
+   is nothing to draw yet.
+
+   Reading the table needs no login: the select policy is public, and the key
+   below is the same publishable one committed elsewhere in the repo. */
+const LIVE = {
+  url: 'https://tjteeqofqozmncfoiofy.supabase.co',
+  key: 'sb_publishable_AHzqW00erP1wModfz3mzVA_dxM6RtPr'
+};
+
+/* Cards carry eBay's tracking parameters and rows carry the clean URL, so the item
+   id is the only part that matches. */
+function itemKey(url) {
+  const m = String(url || '').match(/\/itm\/(?:[^/?]+\/)?(\d{9,15})/);
+  return m ? m[1] : String(url || '').split('?')[0].replace(/\/+$/, '');
+}
+
+function setField(item, tag, value) {
+  let el = item.querySelector(tag);
+  if (!el) {
+    el = item.ownerDocument.createElement(tag);
+    item.appendChild(el);
+  }
+  el.textContent = value;
+}
+
+async function applyLive() {
+  let rows;
+  try {
+    const res = await fetch(
+      LIVE.url + '/rest/v1/shop?select=item_url,blurb,tab_tag,status',
+      { headers: { apikey: LIVE.key, Authorization: 'Bearer ' + LIVE.key }, cache: 'no-store' }
+    );
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    rows = await res.json();
+  } catch (err) {
+    /* The built file is already rendered and correct as of the last build. Losing
+       the overlay costs freshness, not the page. */
+    console.warn('[shop] live rows unavailable, showing the built file:', err);
+    return;
+  }
+
+  const byKey = new Map(rows.map(r => [itemKey(r.item_url), r]));
+  let changed = false;
+
+  for (const it of allItems) {
+    const row = byKey.get(itemKey(text(it, 'url')));
+    if (!row) continue;
+    const next = {
+      blurb: row.blurb || '',
+      tab_tag: row.tab_tag || '',
+      status: String(row.status || 'Active').toLowerCase()
+    };
+    for (const [tag, value] of Object.entries(next)) {
+      if (text(it, tag) !== value) { setField(it, tag, value); changed = true; }
+    }
+  }
+
+  /* Hiding a prop takes effect at once rather than at the next build, which is the
+     point of hiding one. */
+  const visible = allItems.filter(it => text(it, 'status') !== 'hidden');
+  if (visible.length !== allItems.length) changed = true;
+  if (!changed) return;
+
+  allItems = visible;
+  allTabs = tabsFrom(allItems);
+  if (activeTab !== ALL_TAB && !allTabs.includes(activeTab)) activeTab = ALL_TAB;
   buildTabs();
   renderGrid();
 }
