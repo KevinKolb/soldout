@@ -6,411 +6,415 @@
     <title>The Socializer - SOLD OUT! Admin</title>
     <link rel="icon" type="image/png" href="../assets/images/soldoutlogo.png">
     <style>
+        /* ==========================================================================
+           The Socializer
+           One job: read somebody's post, decide, move on. So the queue is the page,
+           the tools sit in one bar above it, and everything explanatory is folded
+           away at the bottom where it can be read once and forgotten.
+           Weight is the hierarchy: the post itself is the only large type, black is
+           reserved for things you click, and hairlines do the dividing that heavy
+           borders used to.
+           ========================================================================== */
+
+        :root {
+            --ink:    #14140f;
+            --paper:  #ffffff;
+            --muted:  #6b6b66;
+            --faint:  #9a9a94;
+            --rule:   #e6e4dd;
+            --wash:   #faf9f5;
+            --acid:   #ffd93d;
+            --green:  #1a7f4b;
+            --red:    #c0392b;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             font-size: 14px;
             line-height: 1.5;
-            color: #000;
-            background: #fff;
-            padding: 40px 20px;
+            color: var(--ink);
+            background: var(--paper);
+            padding: 32px 20px 80px;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container { max-width: 1100px; margin: 0 auto; }
+        .wrap { max-width: 760px; margin: 0 auto; }
 
-        h1 { font-size: 40px; font-weight: 700; letter-spacing: -1px; margin-bottom: 8px; }
-        .subtitle { font-size: 16px; color: #666; margin-bottom: 40px; }
-
-        h2 {
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #000;
-            margin-bottom: 20px;
-        }
-
-        section { margin-bottom: 48px; }
-
-        .uplink {
+        /* ---------- header ---------- */
+        .back {
             display: inline-block;
-            margin-bottom: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            color: #666;
-            text-decoration: none;
-            border-bottom: 2px solid #ccc;
-            padding-bottom: 2px;
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--faint); text-decoration: none;
+            margin-bottom: 22px;
         }
-        .uplink:hover { color: #000; border-bottom-color: #000; }
+        .back:hover { color: var(--ink); }
 
-        .field { margin-bottom: 18px; }
-        .field label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
+        .top { margin-bottom: 28px; }
+        h1 {
+            font-size: 34px; font-weight: 700;
+            letter-spacing: -0.02em; line-height: 1.1;
+        }
+        .sub { font-size: 15px; color: var(--muted); margin-top: 6px; max-width: 46ch; }
+
+        .conn {
+            font-size: 11px; color: var(--faint);
+            margin-top: 12px; display: flex; align-items: center; gap: 6px;
+        }
+        .conn .dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--green); flex: none;
+        }
+        .conn.off .dot { background: var(--red); }
+
+        /* ---------- the tool bar ---------- */
+        .toolbar {
+            display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+            padding: 16px; margin-bottom: 10px;
+            background: var(--wash); border: 1px solid var(--rule);
         }
 
-        input[type="text"], input[type="password"], textarea, select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 2px solid #000;
-            font-family: inherit;
-            font-size: 14px;
-            background: #fff;
-            color: #000;
-        }
-        input:focus, textarea:focus, select:focus { outline: 3px solid #ffd93d; outline-offset: -1px; }
-        textarea { resize: vertical; min-height: 80px; }
-
-        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 18px; }
-
-        button {
-            font-family: inherit;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 10px 18px;
-            border: 2px solid #000;
-            background: #fff;
-            color: #000;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        button:hover:not(:disabled) { background: #000; color: #fff; }
-        button:disabled { opacity: 0.35; cursor: not-allowed; }
-        button.primary { background: #000; color: #fff; }
-        button.primary:hover:not(:disabled) { background: #fff; color: #000; }
-        button.small { font-size: 11px; padding: 6px 10px; }
-
-        .actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-
-        .note { font-size: 11px; color: #999; }
-        .warn { color: #c0392b; font-size: 11px; }
-
-        .pill {
+        .bm {
             display: inline-block;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            padding: 2px 7px;
-            border: 1px solid #000;
+            background: var(--acid);
+            border: 2px solid var(--ink);
+            box-shadow: 3px 3px 0 var(--ink);
+            padding: 9px 18px;
+            font-size: 15px; font-weight: 700; letter-spacing: -0.01em;
+            color: var(--ink); text-decoration: none;
+            cursor: grab; user-select: none; flex: none;
         }
-        .pill.new { background: #ffd93d; }
-        .pill.skipped { background: #eee; color: #666; border-color: #ccc; }
-        .pill.posted { background: #2ecc71; border-color: #24a25b; }
-        .pill.src { background: #fff; color: #666; border-color: #ccc; }
-        .pill.plat { background: #000; color: #fff; }
+        .bm:active { cursor: grabbing; transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 
-        #status {
-            padding: 12px 16px;
-            border: 2px solid #000;
-            margin-bottom: 20px;
-            display: none;
-            font-size: 13px;
+        .bm-note { font-size: 11px; color: var(--faint); flex: 1; min-width: 140px; line-height: 1.35; }
+
+        .botbtn {
+            font-size: 11px; font-weight: 600;
+            letter-spacing: 0.06em; text-transform: uppercase;
+            padding: 8px 12px; border: 1px solid var(--ink);
+            color: var(--ink); text-decoration: none; background: var(--paper);
+            white-space: nowrap; flex: none;
         }
-        #status.show { display: block; }
-        #status.err { background: #ffe5e5; border-color: #c0392b; }
-        #status.good { background: #e8f5e9; border-color: #24a25b; }
-        #status.busy { background: #ffd93d; }
+        .botbtn:hover { background: var(--ink); color: var(--paper); }
 
-        details { border: 2px solid #000; padding: 14px; margin-bottom: 32px; }
-        summary { cursor: pointer; font-weight: 600; font-size: 13px; }
-        details ol, details ul { margin: 14px 0 0 20px; }
-        details li { margin-bottom: 8px; font-size: 13px; }
-        code { background: #f4f4f4; padding: 1px 5px; font-size: 12px; border: 1px solid #e0e0e0; }
-        pre {
-            background: #f4f4f4; border: 1px solid #e0e0e0; padding: 12px;
-            font-size: 11px; overflow-x: auto; white-space: pre-wrap; word-break: break-all;
+        /* ---------- add by hand ---------- */
+        .addbar { display: flex; gap: 8px; margin-bottom: 26px; flex-wrap: wrap; }
+        .addbar input {
+            font-family: inherit; font-size: 13px;
+            padding: 9px 11px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink);
+        }
+        .addbar input:focus { outline: 2px solid var(--acid); outline-offset: -1px; border-color: var(--ink); }
+        .addbar #addUrl { flex: 2 1 260px; }
+        .addbar #addWhy { flex: 1 1 160px; }
+
+        button, .btn {
+            font-family: inherit; font-size: 13px; font-weight: 600;
+            padding: 9px 14px; border: 1px solid var(--ink);
+            background: var(--paper); color: var(--ink);
+            cursor: pointer; transition: background 0.12s, color 0.12s;
+        }
+        button:hover:not(:disabled) { background: var(--ink); color: var(--paper); }
+        button:disabled { opacity: 0.4; cursor: not-allowed; }
+        button.solid { background: var(--ink); color: var(--paper); }
+        button.solid:hover:not(:disabled) { background: var(--paper); color: var(--ink); }
+        button.quiet { border-color: var(--rule); color: var(--muted); font-weight: 500; }
+        button.quiet:hover:not(:disabled) { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+
+        /* ---------- filters ---------- */
+        .filters {
+            display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+            border-bottom: 1px solid var(--rule);
+            padding-bottom: 10px; margin-bottom: 4px;
+        }
+        .filters button {
+            border: 0; background: none; color: var(--muted);
+            padding: 6px 10px; font-size: 13px; font-weight: 600;
+        }
+        .filters button:hover:not(:disabled) { background: none; color: var(--ink); }
+        .filters button.on { color: var(--ink); box-shadow: inset 0 -2px 0 var(--ink); }
+        .filters button b { font-weight: 700; color: var(--faint); margin-left: 3px; }
+        .filters button.on b { color: var(--ink); }
+        .filters .spacer { flex: 1; }
+
+        /* ---------- an article ---------- */
+        .article {
+            border-bottom: 1px solid var(--rule);
+            border-left: 3px solid transparent;
+            padding: 22px 0 20px 17px;
+            transition: border-left-color 0.12s;
+        }
+        .article.is-new     { border-left-color: var(--acid); }
+        .article.is-posted  { border-left-color: var(--green); }
+        .article.is-skipped { border-left-color: var(--rule); }
+        .article.is-skipped .body { color: var(--faint); }
+
+        .byline {
+            display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .byline .who { font-size: 14px; font-weight: 700; }
+        .byline .meta { font-size: 11px; color: var(--faint); }
+        .byline .meta span + span::before { content: ' · '; }
+
+        .body {
+            font-size: 16.5px; line-height: 1.55;
+            white-space: pre-wrap; overflow-wrap: anywhere;
+            margin-bottom: 12px;
+        }
+        .body.empty { color: var(--faint); font-size: 14px; font-style: italic; }
+
+        .why {
+            font-size: 12.5px; color: var(--muted);
+            border-left: 2px solid var(--rule); padding-left: 10px;
+            margin-bottom: 14px;
+        }
+
+        .lineIn {
+            width: 100%; font-family: inherit; font-size: 13.5px;
+            padding: 9px 11px; margin-bottom: 12px;
+            border: 1px solid var(--rule); background: var(--wash); color: var(--ink);
+        }
+        .lineIn:focus { outline: 2px solid var(--acid); outline-offset: -1px; background: var(--paper); }
+
+        .acts { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .acts .spacer { flex: 1; min-width: 8px; }
+        .acts button { font-size: 12px; padding: 7px 11px; }
+        .acts a.open {
+            font-size: 11px; color: var(--faint); text-decoration: none;
+            border-bottom: 1px solid var(--rule); padding-bottom: 1px; white-space: nowrap;
+        }
+        .acts a.open:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+        .posted {
+            display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
             margin-top: 12px;
         }
-
-        /* ---- connection ---- */
-        #setup { border: 2px solid #c0392b; background: #ffe5e5; padding: 20px 24px; margin-bottom: 32px; }
-        #setup h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-        #setup ol { margin: 0 0 18px 20px; }
-        #setup li { margin-bottom: 8px; }
-        #setup input { background: #fff; }
-        .conn-line { font-size: 11px; color: #999; margin-bottom: 32px; }
-        .conn-line b { color: #24a25b; }
-
-        /* ---- criteria ---- */
-        .criteria { border: 2px solid #000; padding: 20px 24px; }
-        .criteria ol { margin-left: 20px; }
-        .criteria li { margin-bottom: 8px; }
-        .criteria .more { margin-top: 14px; font-size: 12px; color: #999; }
-
-        /* ---- queue ---- */
-        .tabs { display: flex; gap: 0; flex-wrap: wrap; margin-bottom: 20px; }
-        .tabs button { border-right-width: 0; }
-        .tabs button:last-child { border-right-width: 2px; }
-        .tabs button.on { background: #000; color: #fff; }
-
-        .queue-head {
-            display: flex; justify-content: space-between; align-items: center;
-            flex-wrap: wrap; gap: 12px; margin-bottom: 20px;
-        }
-        .counts { font-size: 12px; color: #666; }
-        .counts strong { color: #000; }
-
-        a.linkbtn {
-            font-family: inherit; font-size: 11px; font-weight: 600;
-            padding: 6px 10px; border: 2px solid #000;
-            background: #fff; color: #000;
-            text-decoration: none; display: inline-block;
-            transition: all 0.15s;
-        }
-        a.linkbtn:hover { background: #000; color: #fff; }
-
-        .article {
-            border: 2px solid #000;
-            padding: 18px 20px;
-            margin-bottom: 16px;
-        }
-        .article.is-skipped { border-color: #ccc; color: #888; background: #fbfbfb; }
-        .article.is-posted { border-color: #24a25b; }
-
-        .article-top {
-            display: flex; justify-content: space-between; align-items: baseline;
-            gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
-        }
-        .article-who { font-weight: 700; font-size: 14px; }
-        .article-meta { font-size: 11px; color: #999; margin-bottom: 12px; }
-        .article-tags { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-
-        .article-text {
-            white-space: pre-wrap;
-            font-size: 15px;
-            line-height: 1.5;
-            margin-bottom: 8px;
-            border-left: 3px solid #ffd93d;
-            padding-left: 12px;
-        }
-        .article.is-skipped .article-text { border-left-color: #ddd; }
-
-        .article-why { font-size: 12px; color: #666; margin-bottom: 14px; }
-        .article-why b { text-transform: uppercase; letter-spacing: 0.5px; font-size: 10px; color: #999; }
-
-        .article-line { margin-bottom: 12px; }
-        .article-line input { font-size: 13px; padding: 8px 10px; }
-
-        .article-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
-        .article-actions button:disabled { text-decoration: line-through; }
-
-        .posted-row {
-            display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
-            margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ddd;
-        }
-        .posted-row .lbl {
-            font-size: 10px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.5px; color: #999;
+        .posted .lbl {
+            font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+            text-transform: uppercase; color: var(--faint); margin-right: 2px;
         }
         .chip {
             font-family: inherit; font-size: 11px; font-weight: 600;
-            padding: 4px 10px; border: 2px solid #ccc; background: #fff; color: #999;
-            cursor: pointer; transition: all 0.15s;
+            padding: 4px 10px; border: 1px solid var(--rule);
+            background: var(--paper); color: var(--faint); cursor: pointer;
         }
-        .chip:hover:not(:disabled) { border-color: #000; color: #000; }
-        .chip.on { background: #2ecc71; border-color: #24a25b; color: #000; }
+        .chip:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); background: var(--paper); }
+        .chip.on {
+            background: var(--green); border-color: var(--green); color: #fff;
+        }
+        .chip.on:hover:not(:disabled) { background: var(--green); color: #fff; }
         .chip:disabled { opacity: 0.4; cursor: not-allowed; }
-        .article-actions a {
-            font-size: 11px; color: #666; text-decoration: none;
-            border-bottom: 1px solid #ccc; padding-bottom: 1px;
-        }
-        .article-actions a:hover { color: #000; border-bottom-color: #000; }
 
-        .empty { border: 2px dashed #ccc; padding: 40px 20px; text-align: center; color: #999; font-size: 13px; }
-
-        /* ---- capture card ---- */
-        .capture { border: 2px solid #000; background: #ffd93d; padding: 18px 20px; margin-bottom: 32px; }
-        .capture h3 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-
-        /* ---- bookmarklet ---- */
-        .bm-wrap { border: 2px solid #000; padding: 24px; text-align: center; margin-bottom: 20px; }
-        .bm {
-            display: inline-block;
-            background: #ffd93d;
-            border: 3px solid #000;
-            box-shadow: 5px 5px 0 #000;
-            padding: 14px 28px;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            color: #000;
-            text-decoration: none;
-            cursor: grab;
-            user-select: none;
-        }
-        .bm:active { cursor: grabbing; transform: translate(2px, 2px); box-shadow: 3px 3px 0 #000; }
-        .bm-hint { margin-top: 16px; font-size: 12px; color: #666; }
-
-        /* ---- X container ---- */
-        .x-box { border: 3px solid #000; }
-        .x-box-head {
-            background: #000; color: #fff;
-            padding: 16px 24px;
-            display: flex; align-items: center; gap: 14px;
-        }
-        .x-box-head img { width: 26px; height: 26px; display: block; object-fit: contain; }
-        .x-box-head img.mono { filter: invert(1); }   /* the X mark is black on transparent */
-        .x-box + .x-box { margin-top: 20px; }
-        .x-box-body .why-not { font-size: 13px; color: #c0392b; margin-bottom: 14px; }
-        .x-box-head .t { font-size: 16px; font-weight: 700; letter-spacing: -0.25px; }
-        .x-box-head .h { margin-left: auto; font-size: 12px; opacity: 0.7; }
-        .x-box-body { padding: 24px; }
-        .x-box-body p { margin-bottom: 14px; font-size: 14px; }
-        .x-box-body ol { margin: 0 0 18px 20px; }
-        .x-box-body li { margin-bottom: 8px; }
-        .x-box-body .compose {
-            display: inline-block;
-            background: #000; color: #fff;
-            padding: 12px 22px;
-            font-weight: 700; font-size: 14px;
-            text-decoration: none;
-            border: 2px solid #000;
-        }
-        .x-box-body .compose:hover { background: #fff; color: #000; }
-        .x-note {
-            margin-top: 18px; padding-top: 16px; border-top: 2px solid #000;
-            font-size: 12px; color: #666;
+        .empty-state {
+            padding: 56px 20px; text-align: center;
+            color: var(--faint); font-size: 14px;
         }
 
-        .footer { margin-top: 60px; text-align: center; font-size: 12px; color: #999; }
-        .footer a { color: #666; }
+        /* ---------- status + setup ---------- */
+        #status {
+            padding: 10px 14px; margin-bottom: 16px;
+            font-size: 13px; display: none;
+            border-left: 3px solid var(--ink); background: var(--wash);
+        }
+        #status.show { display: block; }
+        #status.err  { border-left-color: var(--red);   background: #fdf0ee; }
+        #status.good { border-left-color: var(--green); background: #eef7f1; }
+        #status.busy { border-left-color: var(--acid);  background: #fffae6; }
+
+        #setup {
+            border: 1px solid var(--red); background: #fdf0ee;
+            padding: 20px; margin-bottom: 24px;
+        }
+        #setup h3 { font-size: 13px; margin-bottom: 8px; }
+        #setup p { font-size: 13px; margin-bottom: 14px; }
+        #setup .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        #setup input {
+            flex: 1 1 220px; font-family: inherit; font-size: 13px;
+            padding: 9px 11px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink);
+        }
+        #setup .acts { gap: 8px; }
+
+        .capture {
+            border: 1px solid var(--ink); border-left: 3px solid var(--acid);
+            background: var(--wash); padding: 18px; margin-bottom: 24px;
+        }
+        .capture h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+        .capture .who { font-weight: 700; margin-top: 6px; }
+        .capture .txt { white-space: pre-wrap; margin: 6px 0 14px; font-size: 14px; }
+        .capture .acts { gap: 8px; }
+
+        /* ---------- reference, folded away ---------- */
+        .reference { margin-top: 44px; }
+        .reference > details {
+            border-top: 1px solid var(--rule);
+        }
+        .reference > details:last-child { border-bottom: 1px solid var(--rule); }
+        .reference > details > summary {
+            cursor: pointer; list-style: none;
+            padding: 15px 2px; font-size: 12px; font-weight: 700;
+            letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .reference > details > summary::-webkit-details-marker { display: none; }
+        .reference > details > summary::before {
+            content: '+'; font-size: 14px; color: var(--faint); width: 10px;
+        }
+        .reference > details[open] > summary::before { content: '\2013'; }
+        .reference > details > summary:hover { color: var(--ink); }
+        .reference .inner { padding: 0 2px 24px 18px; }
+
+        .criteria { margin: 0 0 0 16px; font-size: 14px; }
+        .criteria li { margin-bottom: 9px; }
+        .criteria + .more { font-size: 12px; color: var(--faint); margin-top: 14px; }
+
+        /* ---------- destination reference ---------- */
+        .dest { padding: 18px 0; border-top: 1px dashed var(--rule); }
+        .dest:first-child { border-top: 0; padding-top: 4px; }
+        .dest-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .dest-head img { width: 20px; height: 20px; object-fit: contain; display: block; }
+        .dest-head .n { font-size: 15px; font-weight: 700; }
+        .dest-head .h { font-size: 11px; color: var(--faint); margin-left: auto; }
+        .dest ol { margin: 0 0 12px 18px; font-size: 13px; }
+        .dest li { margin-bottom: 6px; }
+        .dest .note { font-size: 12px; color: var(--muted); }
+        .dest .compose {
+            display: inline-block; margin-top: 10px;
+            font-size: 11px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+            padding: 7px 11px; border: 1px solid var(--ink); color: var(--ink); text-decoration: none;
+        }
+        .dest .compose:hover { background: var(--ink); color: var(--paper); }
+
+        code {
+            background: var(--wash); border: 1px solid var(--rule);
+            padding: 1px 5px; font-size: 12px;
+        }
+        pre {
+            background: var(--wash); border: 1px solid var(--rule); padding: 12px;
+            font-size: 11px; overflow-x: auto; white-space: pre-wrap; word-break: break-all;
+            margin-top: 12px;
+        }
+        .reference ol.plain { margin-left: 18px; font-size: 13px; }
+        .reference ol.plain li { margin-bottom: 7px; }
+
+        footer {
+            margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--rule);
+            text-align: center; font-size: 11px; color: var(--faint);
+        }
+        footer a { color: var(--muted); }
+
+        @media (max-width: 560px) {
+            body { padding: 22px 14px 60px; }
+            h1 { font-size: 27px; }
+            .body { font-size: 15.5px; }
+        }
     </style>
 </head>
 <body>
-<div class="container">
-    <a href="index.html" class="uplink">&larr; The Booth</a>
+<div class="wrap">
 
-    <h1>The Socializer</h1>
-    <div class="subtitle">Somebody else already made the joke. We just have to notice it and pass it on.</div>
+    <a href="index.html" class="back">&larr; The Booth</a>
+
+    <header class="top">
+        <h1>The Socializer</h1>
+        <p class="sub">Somebody else already made the joke. We just have to notice it and pass it on.</p>
+        <div class="conn" id="connLine"></div>
+    </header>
 
     <div id="status"></div>
 
-    <div id="setup" style="display:none">
+    <div id="setup" hidden>
         <h3>Not connected yet</h3>
-        <p style="margin-bottom:16px">Paste the project's <b>publishable key</b>: Supabase &rarr;
-            Project Settings &rarr; API Keys, the one starting <code>sb_publishable_</code>.
-            (Older projects call it the <b>anon</b> key and it starts <code>eyJ</code> &mdash; either works.)
-            Then put it in the <code>SUPABASE</code> block at the top of this file's script and commit,
-            so nobody has to do this again.</p>
+        <p>Paste the project's <b>publishable key</b>: Supabase &rarr; Project Settings &rarr; API Keys,
+            the one starting <code>sb_publishable_</code>. (Older projects call it the <b>anon</b> key
+            and it starts <code>eyJ</code> &mdash; either works.) Then put it in the <code>SUPABASE</code>
+            block at the top of this file's script and commit, so nobody has to do this again.</p>
         <div class="row">
-            <div class="field">
-                <label for="connUrl">Project URL</label>
-                <input type="text" id="connUrl" placeholder="https://xxxxxxxx.supabase.co">
-            </div>
-            <div class="field">
-                <label for="connKey">Publishable key</label>
-                <input type="text" id="connKey" placeholder="sb_publishable_...">
-            </div>
+            <input type="text" id="connUrl" placeholder="https://xxxxxxxx.supabase.co">
+            <input type="text" id="connKey" placeholder="sb_publishable_...">
         </div>
-        <div class="actions">
-            <button class="primary" id="connSave">Connect</button>
-            <button class="small" id="connClear">Clear</button>
+        <div class="acts">
+            <button class="solid" id="connSave">Connect</button>
+            <button class="quiet" id="connClear">Clear</button>
         </div>
     </div>
-
-    <div class="conn-line" id="connLine"></div>
 
     <div id="captureSlot"></div>
 
-    <section>
-        <h2>What qualifies</h2>
-        <div class="criteria">
-            <ol>
-                <li>It is <b>funny</b>. Not relatable, not interesting. Funny.</li>
-                <li>It is about <b>selling</b> something &mdash; a listing, a price, a haggle, a flip, a marketplace
-                    message, a thing somebody is trying to move.</li>
-                <li>Or it is a <b>found object</b> &mdash; the beautiful junk somebody photographed in the wild.</li>
-                <li>It stands on its own. No thread, no context, no inside joke required.</li>
-                <li>Reposting it would not embarrass us tomorrow.</li>
-            </ol>
-            <div class="more">More criteria to come. This list is the whole spec for now, and it is the same
-                list SOC SOCIALIZER BOT is handed when it goes looking.</div>
-        </div>
-    </section>
-
-    <section>
-        <h2>The queue</h2>
-
-        <div class="tabs" id="tabs">
-            <button data-filter="NEW" class="on">New</button>
-            <button data-filter="SKIPPED">Skipped</button>
-            <button data-filter="POSTED">Posted</button>
-            <button data-filter="ALL">All</button>
-        </div>
-
-        <div class="queue-head">
-            <div class="counts" id="counts">Not loaded.</div>
-            <div class="actions">
-                <button class="small" id="refresh">Refresh</button>
-                <a class="linkbtn" href="https://claude.ai/code/routines/trig_01TwjWSP2bjnhptQgtg7DcQa"
-                   target="_blank" rel="noopener"
-                   title="SOC SOCIALIZER BOT - runs daily at 7:12am and fills this queue">SOC SOCIALIZER BOT &#8599;</a>
-            </div>
-        </div>
-
-        <div id="queue"></div>
-    </section>
-
-    <section>
-        <h2>Add one by hand</h2>
-        <div class="field">
-            <label for="addUrl">Link <span class="note">(any platform)</span></label>
-            <input type="text" id="addUrl" placeholder="https://x.com/someone/status/1234567890">
-        </div>
-        <div class="field">
-            <label for="addWhy">Why it qualifies <span class="note">(optional, for future you)</span></label>
-            <input type="text" id="addWhy" placeholder="Guy trying to sell a haunted couch">
-        </div>
-        <div class="actions">
-            <button class="primary" id="addBtn">Add to queue</button>
-        </div>
-    </section>
-
-    <section>
-        <h2>That's Funny!</h2>
-        <div class="bm-wrap">
-            <a class="bm" id="bookmarklet" href="#">That's Funny!</a>
-            <div class="bm-hint">
-                Drag that button up to your bookmarks bar. Then, on any page anywhere that qualifies, click it.<br>
-                It grabs what it can and drops it into this queue as <b>NEW</b>.<br>
-                <span class="note">On X it reads the post itself. Everywhere else it takes the page's own
-                title and description, or whatever you highlighted before clicking.</span>
-            </div>
-        </div>
-        <details>
-            <summary>If dragging does not work</summary>
-            <ol>
-                <li>Right-click your bookmarks bar and choose <b>Add page</b> (Chrome) or <b>Add bookmark</b> (Firefox, Safari).</li>
-                <li>Name it <code>That's Funny!</code></li>
-                <li>Paste the whole block below into the URL field and save.</li>
-            </ol>
-            <pre id="bmSource"></pre>
-        </details>
-        <div class="note" id="bmTarget"></div>
-    </section>
-
-    <section>
-        <h2>Where it goes</h2>
-        <p class="note" style="margin-bottom:20px">
-            Every one of these is a cut and paste method. Nothing on this page talks to any
-            platform: it holds the words, you press Post.
-        </p>
-        <div id="destinations"></div>
-    </section>
-
-    <div class="footer">
-        <p>&copy; <span id="year">2026</span> SOLD OUT! Comedy | <a href="https://soldoutcomedy.com">soldoutcomedy.com</a></p>
+    <div class="toolbar">
+        <a class="bm" id="bookmarklet" href="#">That's Funny!</a>
+        <span class="bm-note" id="bmTarget"></span>
+        <a class="botbtn" href="https://claude.ai/code/routines/trig_01TwjWSP2bjnhptQgtg7DcQa"
+           target="_blank" rel="noopener"
+           title="SOC SOCIALIZER BOT - runs daily at 7:12am and fills this queue">SOC SOCIALIZER BOT &#8599;</a>
     </div>
+
+    <div class="addbar">
+        <input type="text" id="addUrl" placeholder="&hellip;or paste any link">
+        <input type="text" id="addWhy" placeholder="why it qualifies (optional)">
+        <button id="addBtn">Add</button>
+    </div>
+
+    <nav class="filters" id="tabs">
+        <button data-filter="NEW" class="on">New <b data-count="NEW">0</b></button>
+        <button data-filter="SKIPPED">Skipped <b data-count="SKIPPED">0</b></button>
+        <button data-filter="POSTED">Posted <b data-count="POSTED">0</b></button>
+        <button data-filter="ALL">All</button>
+        <span class="spacer"></span>
+        <button id="refresh" title="Reload from Supabase">Refresh</button>
+    </nav>
+
+    <div id="queue"></div>
+
+    <section class="reference">
+        <details>
+            <summary>What qualifies</summary>
+            <div class="inner">
+                <ol class="criteria">
+                    <li>It is <b>funny</b>. Not relatable, not interesting. Funny.</li>
+                    <li>It is about <b>selling</b> something &mdash; a listing, a price, a haggle, a flip,
+                        a marketplace message, a thing somebody is trying to move.</li>
+                    <li>Or it is a <b>found object</b> &mdash; the beautiful junk somebody photographed in the wild.</li>
+                    <li>It stands on its own. No thread, no context, no inside joke required.</li>
+                    <li>Reposting it would not embarrass us tomorrow.</li>
+                </ol>
+                <p class="more">More criteria to come. This list is the whole spec for now, and it is the
+                    same list SOC SOCIALIZER BOT is handed when it goes looking.</p>
+            </div>
+        </details>
+
+        <details>
+            <summary>Where it goes</summary>
+            <div class="inner">
+                <p class="more" style="margin:0 0 4px">Every one of these is a cut and paste method.
+                    Nothing on this page talks to any platform: it holds the words, you press Post.</p>
+                <div id="destinations"></div>
+            </div>
+        </details>
+
+        <details>
+            <summary>The bookmarklet</summary>
+            <div class="inner">
+                <p style="font-size:13px;margin-bottom:12px">Drag <b>That's Funny!</b> to your bookmarks bar,
+                    then click it on any page worth keeping. On X it reads the post itself; everywhere else it
+                    takes the page's own title and description, or whatever you highlighted first.</p>
+                <p style="font-size:13px;font-weight:600;margin-bottom:6px">If dragging does not work</p>
+                <ol class="plain">
+                    <li>Right-click the bookmarks bar and choose <b>Add page</b> (Chrome) or <b>Add bookmark</b>
+                        (Firefox, Safari).</li>
+                    <li>Name it <code>That's Funny!</code></li>
+                    <li>Paste the block below into the URL field and save.</li>
+                </ol>
+                <pre id="bmSource"></pre>
+            </div>
+        </details>
+    </section>
+
+    <footer>
+        &copy; <span id="year">2026</span> SOLD OUT! Comedy &middot;
+        <a href="https://soldoutcomedy.com">soldoutcomedy.com</a>
+    </footer>
 </div>
 
 <!-- The bookmarklet lives here as inert text rather than as a JS string literal,
@@ -582,19 +586,27 @@ function status(msg, kind) {
 /* ---------- setup panel ---------- */
 function paintConnection() {
     const c = connection();
-    document.getElementById('setup').style.display = c.ready ? 'none' : 'block';
+    document.getElementById('setup').hidden = c.ready;
+
     const line = document.getElementById('connLine');
+    line.innerHTML = '';
+    const dot = document.createElement('span');
+    dot.className = 'dot';
+
     if (!c.ready) {
         /* only ask for the half that is actually missing */
         const urlEl = document.getElementById('connUrl');
         const keyEl = document.getElementById('connKey');
         if (!urlEl.value && !/YOUR-/.test(c.url)) urlEl.value = c.url;
         if (!keyEl.value && !/YOUR-/.test(c.key)) keyEl.value = c.key;
-        line.textContent = '';
+        line.className = 'conn off';
+        line.append(dot, document.createTextNode('Not connected'));
         return;
     }
-    line.innerHTML = '<b>Connected</b> to ' + c.url.replace(/^https?:\/\//, '')
-        + (c.local ? ' (from this browser, not yet committed)' : '');
+
+    line.className = 'conn';
+    line.append(dot, document.createTextNode(
+        c.url.replace(/^https?:\/\//, '') + (c.local ? ' (this browser only, not committed)' : '')));
 }
 
 document.getElementById('connSave').onclick = () => {
@@ -730,9 +742,8 @@ async function loadQueue() {
     } catch (err) {
         ROWS = [];
         wrap.innerHTML = '';
-        document.getElementById('counts').textContent = 'Not loaded.';
         const d = document.createElement('div');
-        d.className = 'empty';
+        d.className = 'empty-state';
         d.textContent = err.message;
         wrap.appendChild(d);
         status(err.message, 'err');
@@ -745,19 +756,18 @@ function render() {
 
     const tally = { NEW: 0, SKIPPED: 0, POSTED: 0 };
     for (const r of ROWS) if (tally[r.status] !== undefined) tally[r.status]++;
-
-    document.getElementById('counts').innerHTML =
-        '<strong>' + tally.NEW + '</strong> new &middot; ' +
-        '<strong>' + tally.SKIPPED + '</strong> skipped &middot; ' +
-        '<strong>' + tally.POSTED + '</strong> posted';
+    for (const key of Object.keys(tally)) {
+        const el = document.querySelector('#tabs b[data-count="' + key + '"]');
+        if (el) el.textContent = tally[key];
+    }
 
     const shown = ROWS.filter(r => FILTER === 'ALL' || r.status === FILTER);
 
     if (!shown.length) {
         const d = document.createElement('div');
-        d.className = 'empty';
+        d.className = 'empty-state';
         d.textContent = FILTER === 'NEW'
-            ? 'Nothing waiting. Go read something and press That’s Funny! on it.'
+            ? 'Nothing waiting. Go read something and press That\u2019s Funny! on it.'
             : 'No ' + FILTER.toLowerCase() + ' articles.';
         wrap.appendChild(d);
         return 0;
@@ -767,140 +777,133 @@ function render() {
     return shown.length;
 }
 
+/* Rough is fine here - it only has to say "is this fresh or has it been sitting". */
+function ago(iso) {
+    const ms = Date.now() - new Date(iso || 0).getTime();
+    if (!isFinite(ms) || ms < 0) return '';
+    const min = ms / 60000;
+    if (min < 60)     return Math.max(1, Math.round(min)) + 'm ago';
+    if (min < 1440)   return Math.round(min / 60) + 'h ago';
+    if (min < 43200)  return Math.round(min / 1440) + 'd ago';
+    return new Date(iso).toLocaleDateString();
+}
+
 function card(row) {
     const st = row.status || 'NEW';
     const el = document.createElement('div');
     el.className = 'article is-' + st.toLowerCase();
 
-    /* top line */
-    const top = document.createElement('div');
-    top.className = 'article-top';
+    /* byline: who in bold, everything else small and grey */
+    const byline = document.createElement('div');
+    byline.className = 'byline';
 
-    const who = document.createElement('div');
-    who.className = 'article-who';
+    const who = document.createElement('span');
+    who.className = 'who';
     who.textContent = row.author || 'Unknown account';
 
-    const tags = document.createElement('div');
-    tags.className = 'article-tags';
+    const meta = document.createElement('span');
+    meta.className = 'meta';
+    [row.platform, row.source, ago(row.created_at)].filter(Boolean).forEach(bit => {
+        const s = document.createElement('span');
+        s.textContent = bit;
+        meta.appendChild(s);
+    });
+    byline.append(who, meta);
 
-    const stPill = document.createElement('span');
-    stPill.className = 'pill ' + st.toLowerCase();
-    stPill.textContent = st;
+    /* the post itself, the only large type on the page */
+    const body = document.createElement('div');
+    body.className = 'body' + (row.body ? '' : ' empty');
+    body.textContent = row.body || 'No text captured. Open the post to read it.';
 
-    const platPill = document.createElement('span');
-    platPill.className = 'pill plat';
-    platPill.textContent = row.platform || 'Web';
-
-    const srcPill = document.createElement('span');
-    srcPill.className = 'pill src';
-    srcPill.textContent = row.source || 'Manual';
-
-    tags.append(stPill, platPill, srcPill);
-    top.append(who, tags);
-
-    /* body */
-    const text = document.createElement('div');
-    text.className = 'article-text';
-    text.textContent = row.body || '(no text captured - open the post to read it)';
-
-    const meta = document.createElement('div');
-    meta.className = 'article-meta';
-    meta.textContent = [row.posted_at, row.post_key].filter(Boolean).join('  ·  ');
-
-    el.append(top, text, meta);
+    el.append(byline, body);
 
     if (row.why) {
         const why = document.createElement('div');
-        why.className = 'article-why';
-        const b = document.createElement('b');
-        b.textContent = 'Why  ';
-        why.append(b, document.createTextNode(row.why));
+        why.className = 'why';
+        why.textContent = row.why;
         el.appendChild(why);
     }
 
-    /* our line on top of the repost */
-    const lineWrap = document.createElement('div');
-    lineWrap.className = 'article-line';
     const line = document.createElement('input');
     line.type = 'text';
+    line.className = 'lineIn';
     line.placeholder = 'Our line on top (optional)';
     line.value = row.repost_text ? String(row.repost_text).split('\n')[0] : '';
-    lineWrap.appendChild(line);
-
-    const composed = () => {
-        const l = line.value.trim();
-        return l ? l + '\n\n' + row.post_url : row.post_url;
-    };
+    if (st !== 'SKIPPED') el.appendChild(line);
 
     /* actions */
     const acts = document.createElement('div');
-    acts.className = 'article-actions';
+    acts.className = 'acts';
 
     if (st !== 'SKIPPED') {
-        const skip = document.createElement('button');
-        skip.textContent = 'Skip';
-        skip.title = 'Mark this article SKIPPED so it never comes back';
-        skip.onclick = () => mark(row, 'SKIPPED', skip, line.value.trim());
-        acts.appendChild(skip);
-    } else {
-        const back = document.createElement('button');
-        back.className = 'small';
-        back.textContent = 'Put back';
-        back.onclick = () => mark(row, 'NEW', back, line.value.trim());
-        acts.appendChild(back);
-    }
+        for (const d of DESTINATIONS) {
+            const b = document.createElement('button');
+            if (d.id === 'X') b.className = 'solid';
+            b.textContent = d.id;
 
-    for (const d of DESTINATIONS) {
-        const b = document.createElement('button');
-        if (d.id === 'X') b.className = 'primary';
-        b.textContent = d.action;
-
-        /* Instagram cannot take a text-only post, so when we know the source had no
-           image or video there is nothing to upload and the button says so. */
-        const blocked = d.needsMedia && row.has_media === false;
-        if (blocked) {
-            b.disabled = true;
-            b.title = 'The source has no image or video, and Instagram will not take a '
-                    + 'text-only post. Screenshot it by hand if it is worth it.';
-        } else {
-            b.onclick = async () => {
-                await copyText(d.text(row, line.value.trim()));
-                window.open(d.compose, '_blank', 'noopener');
-            };
+            /* Instagram will not take a text-only post, so when the source carries no
+               image or video there is nothing to upload and the button says as much. */
+            const blocked = d.needsMedia && row.has_media === false;
+            if (blocked) {
+                b.disabled = true;
+                b.title = 'The source has no image or video, and Instagram will not take a '
+                        + 'text-only post. Screenshot it by hand if it is worth it.';
+            } else {
+                b.title = d.action;
+                b.onclick = async () => {
+                    await copyText(d.text(row, line.value.trim()));
+                    window.open(d.compose, '_blank', 'noopener');
+                };
+            }
+            acts.appendChild(b);
         }
-        acts.appendChild(b);
     }
+
+    const spacer = document.createElement('span');
+    spacer.className = 'spacer';
+    acts.appendChild(spacer);
+
+    const flip = document.createElement('button');
+    flip.className = 'quiet';
+    flip.textContent = st === 'SKIPPED' ? 'Put back' : 'Skip';
+    flip.title = st === 'SKIPPED'
+        ? 'Back into New'
+        : 'Mark this article SKIPPED so it never comes back';
+    flip.onclick = () => mark(row, st === 'SKIPPED' ? 'NEW' : 'SKIPPED', flip, line.value.trim());
+    acts.appendChild(flip);
 
     const open = document.createElement('a');
+    open.className = 'open';
     open.href = row.post_url || '#';
     open.target = '_blank';
     open.rel = 'noopener';
-    open.textContent = 'Open the post';
+    open.textContent = 'Open';
     acts.appendChild(open);
 
-    if (st !== 'SKIPPED') el.appendChild(lineWrap);
     el.appendChild(acts);
 
     /* which destinations actually have it */
-    const postedRow = document.createElement('div');
-    postedRow.className = 'posted-row';
-    const lbl = document.createElement('span');
-    lbl.className = 'lbl';
-    lbl.textContent = 'Posted';
-    postedRow.appendChild(lbl);
+    if (st !== 'SKIPPED') {
+        const posted = document.createElement('div');
+        posted.className = 'posted';
+        const lbl = document.createElement('span');
+        lbl.className = 'lbl';
+        lbl.textContent = 'Posted';
+        posted.appendChild(lbl);
 
-    const already = new Set(row.posted_to || []);
-    for (const d of DESTINATIONS) {
-        const chip = document.createElement('button');
-        chip.className = 'chip' + (already.has(d.id) ? ' on' : '');
-        chip.textContent = d.id;
-        chip.title = already.has(d.id)
-            ? 'Posted on ' + d.id + '. Click to take it back.'
-            : 'Tick once it is actually up on ' + d.id + '.';
-        chip.onclick = () => togglePosted(row, d.id, chip, line.value.trim());
-        postedRow.appendChild(chip);
+        const already = new Set(row.posted_to || []);
+        for (const d of DESTINATIONS) {
+            const chip = document.createElement('button');
+            chip.className = 'chip' + (already.has(d.id) ? ' on' : '');
+            chip.textContent = d.id;
+            chip.title = already.has(d.id)
+                ? 'Posted on ' + d.id + '. Click to take it back.'
+                : 'Tick once it is actually up on ' + d.id + '.';
+            chip.onclick = () => togglePosted(row, d.id, chip, line.value.trim());
+            posted.appendChild(chip);
+        }
+        el.appendChild(posted);
     }
-    el.appendChild(postedRow);
 
     return el;
 }
@@ -1047,19 +1050,18 @@ function showCapture(p) {
     h.textContent = 'Caught one';
 
     const who = document.createElement('div');
-    who.style.fontWeight = '700';
+    who.className = 'who';
     who.textContent = p.h || p.u;
 
     const tx = document.createElement('div');
-    tx.style.whiteSpace = 'pre-wrap';
-    tx.style.margin = '8px 0 14px';
+    tx.className = 'txt';
     tx.textContent = p.t || '(no text captured)';
 
     const acts = document.createElement('div');
-    acts.className = 'actions';
+    acts.className = 'acts';
 
     const save = document.createElement('button');
-    save.className = 'primary';
+    save.className = 'solid';
     save.textContent = 'Save to the queue';
     save.onclick = async () => {
         save.disabled = true;
@@ -1073,6 +1075,7 @@ function showCapture(p) {
     };
 
     const drop = document.createElement('button');
+    drop.className = 'quiet';
     drop.textContent = 'Never mind';
     drop.onclick = () => { slot.innerHTML = ''; };
 
@@ -1086,31 +1089,31 @@ function renderDestinations() {
     const wrap = document.getElementById('destinations');
     for (const d of DESTINATIONS) {
         const box = document.createElement('div');
-        box.className = 'x-box';
+        box.className = 'dest';
 
         const head = document.createElement('div');
-        head.className = 'x-box-head';
+        head.className = 'dest-head';
         const img = document.createElement('img');
         img.src = d.logo;
-        img.alt = d.id;
-        if (d.mono) img.className = 'mono';
-        const name = document.createElement('span');
-        name.className = 't';
-        name.textContent = d.id;
-        const who = document.createElement('span');
-        who.className = 'h';
-        who.textContent = d.handle;
-        head.append(img, name, who);
-
-        const body = document.createElement('div');
-        body.className = 'x-box-body';
+        img.alt = '';
+        const n = document.createElement('span');
+        n.className = 'n';
+        n.textContent = d.id;
+        const h = document.createElement('span');
+        h.className = 'h';
+        h.textContent = d.handle;
+        head.append(img, n, h);
 
         const ol = document.createElement('ol');
         for (const s of d.steps) {
             const li = document.createElement('li');
-            li.innerHTML = s;              /* steps are ours, and carry <b> */
+            li.innerHTML = s;              /* the steps are ours, and carry <b> */
             ol.appendChild(li);
         }
+
+        const note = document.createElement('div');
+        note.className = 'note';
+        note.textContent = d.note;
 
         const link = document.createElement('a');
         link.className = 'compose';
@@ -1119,12 +1122,7 @@ function renderDestinations() {
         link.rel = 'noopener';
         link.textContent = 'Open ' + d.composeLabel;
 
-        const note = document.createElement('div');
-        note.className = 'x-note';
-        note.textContent = d.note;
-
-        body.append(ol, link, note);
-        box.append(head, body);
+        box.append(head, ol, note, link);
         wrap.appendChild(box);
     }
 }
@@ -1139,14 +1137,14 @@ function buildBookmarklet() {
     a.href = href;
     a.onclick = e => {
         e.preventDefault();
-        status('Do not click it here - drag it up to your bookmarks bar, then use it out on the web.', 'busy');
+        status('Do not click it here - drag it to your bookmarks bar, then use it out on the web.', 'busy');
     };
 
     document.getElementById('bmSource').textContent = href;
     document.getElementById('bmTarget').textContent =
         location.protocol === 'file:'
-            ? 'Heads up: this page is open over file://, so the bookmarklet would point at a file path. Serve the site over HTTP, or open the deployed page, before you drag it.'
-            : 'Captures will be sent to ' + target;
+            ? 'Open this over http rather than file:// before dragging - it would point at a file path.'
+            : 'Drag me to the bookmarks bar, then click me on anything funny.';
 }
 
 /* ---------- boot ---------- */
