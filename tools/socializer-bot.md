@@ -38,13 +38,10 @@ curl -s "$SUPABASE_URL/rest/v1/socializer?select=post_key" \
   -H "Authorization: Bearer $SUPABASE_KEY"
 ```
 
-## Step 1 — read the criteria from the repo, not from memory
+## Step 1 — what qualifies
 
-Open [admin/socializer.html](../admin/socializer.html) and find the section headed **What
-qualifies**. That numbered list is the spec, and it is expected to grow. Follow the list you
-find there today.
-
-At the time of writing it reads:
+This list is the spec. It lives here and nowhere else, so this file is the one place to
+change it.
 
 1. It is **funny**. Not relatable, not interesting. Funny.
 2. It is about **selling** something — a listing, a price, a haggle, a flip, a marketplace
@@ -53,7 +50,7 @@ At the time of writing it reads:
 4. It stands on its own. No thread, no context, no inside joke required.
 5. Reposting it would not embarrass us tomorrow.
 
-If the list on the page differs from what is printed above, **the page wins**.
+More criteria to come. Add them here, commit, and the next run follows the new list.
 
 ## Step 2 — look at what already got posted
 

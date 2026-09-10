@@ -86,9 +86,8 @@ can never resurrect something already marked SKIPPED.
 
 Standing orders are [tools/socializer-bot.md](tools/socializer-bot.md), not the routine's
 prompt — the prompt is one line and points at that file, so the orders can be edited by
-committing. Accounts worth watching go in that file's **Popular sources** list. The judging
-criteria stay on the page, under `What qualifies` in `admin/socializer.html`, which the bot
-reads at the start of every run. Manage the routine itself at
+committing. That file holds all of it: what qualifies, the **Popular sources** worth
+watching, and how to write a row. Manage the routine itself at
 <https://claude.ai/code/routines>.
 
 ## Local development
