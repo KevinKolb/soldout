@@ -197,10 +197,19 @@
 
     /* --- Item grid -------------------------------------------------------- */
 
+    /* Three across, fixed rather than auto-filled: the count is the composition,
+       and letting it drift to four on a wide screen made the props look like stock
+       rather than a curated handful. */
     .item-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: var(--gap);
+    }
+
+    /* Three would squeeze below roughly 760px, so it steps down rather than
+       shrinking the photos into thumbnails. */
+    @media (max-width: 760px) {
+      .item-grid { grid-template-columns: repeat(2, 1fr); }
     }
 
     /* The status line lives inside the grid so the loader clears it along with
@@ -415,7 +424,7 @@
         display: inline-block;
         margin: 0 auto 0.75rem;
       }
-      .item-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      .item-grid { grid-template-columns: repeat(2, 1fr); }
       .serious { padding: 1.25rem 1.15rem 1.35rem; }
     }
   </style>
