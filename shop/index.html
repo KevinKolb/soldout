@@ -494,7 +494,8 @@
   <aside class="serious">
     <p class="serious-lead">and on a semi-serious note</p>
     <p class="serious-body">Everything here really is for sale. We realize trying to be funny
-      while you're just trying to buy your Dumpkin Spice Dude Wipes can be annoying, but we're
+      while you're just trying to buy your <span id="seriousProp">Dumpkin Spice Dude Wipes</span>
+      can be annoying, but we're
       just over here biting the hand that feeds us. Thanks for being part of the show.</p>
   </aside>
 </div>
@@ -688,6 +689,8 @@ async function loadInventory() {
   buildTabs();
   renderGrid();
 
+  nameAProp();
+
   /* Deliberately not awaited. The built file is already on screen by now; the live
      rows only correct it. A slow or unreachable Supabase costs nothing but the
      correction. */
@@ -812,6 +815,7 @@ async function applyLive() {
   if (activeTab !== ALL_TAB && !allTabs.includes(activeTab)) activeTab = ALL_TAB;
   buildTabs();
   renderGrid();
+  nameAProp();
 }
 
 /* Everything the feed loaded, the tab_tags found in it, and which tab is open.
@@ -972,6 +976,37 @@ function itemCard(it) {
   if (meta.textContent) body.appendChild(meta);
   card.append(shot, body);
   return card;
+}
+
+/* The joke needs a real thing in it, and the funniest real thing is whatever is
+   actually on the shop right now. A different prop each load, picked from what the
+   grid is showing - so it is never naming something a visitor cannot see.
+
+   The marketplace title, never the caption. A caption is a joke about the thing, so
+   the sentence would come out as "trying to buy your You know, because you've lost
+   your mind." The title is the name of the thing, which is what the sentence wants.
+
+   eBay titles are written for a search engine: keyword runs, a pipe, then the keywords
+   again. Everything from the first comma or pipe onwards is cut, and what is left is
+   trimmed back to a word boundary if it is still long. If nothing usable turns up, the
+   line keeps the wording that is in the markup. */
+function nameAProp() {
+  const el = document.getElementById('seriousProp');
+  if (!el || !allItems.length) return;
+
+  const usable = [];
+  for (const it of allItems) {
+    if (text(it, 'status').toLowerCase() === 'hidden') continue;
+    let name = text(it, 'title').split('|')[0].split(',')[0].trim();
+    if (name.length > 46) {
+      const cut = name.slice(0, 46);
+      name = cut.slice(0, cut.lastIndexOf(' ')).trim();
+    }
+    if (name.length >= 6) usable.push(name);
+  }
+  if (!usable.length) return;
+
+  el.textContent = usable[Math.floor(Math.random() * usable.length)];
 }
 
 stampToday(document.getElementById('todayStamp'));
