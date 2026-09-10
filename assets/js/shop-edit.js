@@ -287,6 +287,30 @@ function injectStyles() {
     }
     .tab-pick:focus { outline: 2px solid var(--ink); outline-offset: 2px; }
 
+    /* Small, and hung off the tab's corner so it never crowds the label. */
+    .tab { position: relative; }
+
+    .tab-x {
+      position: absolute;
+      top: -7px;
+      right: -7px;
+      width: 15px;
+      height: 15px;
+      line-height: 11px;
+      text-align: center;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0;
+      background: var(--paper);
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      cursor: pointer;
+    }
+
+    .tab-x:hover { background: var(--red); color: var(--paper); border-color: var(--red); }
+    body.viewing-public .tab-x { display: none; }
+
     /* Dashed, so it reads as a slot rather than a tab with nothing in it. */
     .tab-new {
       border-style: dashed !important;
@@ -1005,6 +1029,71 @@ async function start(u) {
     buildBar();
     decorate();
     ghostTab();
+    tabDeleters();
+}
+
+/* Deleting a tab unfiles it. Every prop wearing it keeps its listing, its caption,
+   its price and its place on the shop - it just stops being in that tab, which is the
+   only thing the tab ever was. Nothing is hidden and nothing is removed.
+
+   The x is a span rather than a button because it lives inside one, and a button
+   inside a button is invalid HTML - the same trap the caption fell into inside the
+   card's link. */
+async function deleteTab(name) {
+    const wearing = [...rows.values()].filter(r => (r.tab_tag || '') === name).length;
+    const count = wearing === 1 ? '1 prop' : wearing + ' props';
+    if (!confirm('Delete the tab ' + name + '?\n\n'
+        + (wearing ? count + ' will stop being filed under it. Nothing is hidden or removed.'
+                   : 'Nothing is filed under it.'))) return;
+
+    if (wearing) {
+        const { error } = await supabase.from(TABLE).update({ tab_tag: '' }).eq('tab_tag', name);
+        if (error) {
+            panelSay('Could not delete that tab: ' + error.message);
+            return;
+        }
+    }
+
+    extraTabs = extraTabs.filter(t => t !== name);
+    saveExtraTabs();
+    await loadRows();
+    publishExtraTabs();
+
+    if (typeof applyLive === 'function') await applyLive();
+    if (typeof buildTabs === 'function') buildTabs();
+    if (typeof renderGrid === 'function') renderGrid();
+
+    panelSay(wearing
+        ? name + ' deleted. Its ' + count + ' are still on the shop, just untagged.'
+        : name + ' deleted.');
+}
+
+/* One x per real tab. Not on E'RYTHING, which is every prop rather than a tab, and not
+   on + New, which is not one yet. */
+function tabDeleters() {
+    const bar = document.getElementById('tabBar');
+    if (!bar) return;
+
+    const allTab = typeof ALL_TAB === 'string' ? ALL_TAB : "E'RYTHING";
+
+    for (const b of bar.querySelectorAll('.tab')) {
+        if (b.classList.contains('tab-new')) continue;
+        /* Read the name before the x is inside it, or the x becomes part of the name. */
+        if (b.dataset.name === undefined) b.dataset.name = b.textContent.trim();
+        const name = b.dataset.name;
+        if (!name || name === allTab || b.querySelector('.tab-x')) continue;
+
+        const x = document.createElement('span');
+        x.className = 'tab-x';
+        x.textContent = '\u00d7';
+        x.title = 'Delete the tab ' + name;
+        x.addEventListener('click', async e => {
+            e.preventDefault();
+            e.stopPropagation();
+            await deleteTab(name);
+        });
+        b.appendChild(x);
+    }
 }
 
 /* A tab that is not a tab yet. Clicking it names one, which then shows up in every
@@ -1045,7 +1134,7 @@ function ghostTab() {
 
 /* The grid re-renders on every tab click, which throws the editors away with it. */
 document.addEventListener('shop:rendered', () => {
-    if (isOwner(user)) { decorate(); ghostTab(); refreshTabList(); }
+    if (isOwner(user)) { decorate(); ghostTab(); tabDeleters(); refreshTabList(); }
 });
 
 start(await currentUser());
