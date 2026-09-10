@@ -91,6 +91,11 @@ function injectStyles() {
     .editbox .note { font-family: var(--sans); font-size: 0.62rem; color: #555; }
     .editbox .note.bad { color: var(--red); font-weight: 700; }
 
+    /* In edit mode the card's headline is a starting point for a caption rather than
+       just a label, so it advertises itself as one. */
+    .item-card .grab-title { cursor: text; }
+    .item-card .grab-title:hover { background: var(--acid); box-shadow: 0 0 0 3px var(--acid); }
+
     .pending {
       border: var(--rule) dashed var(--ink); padding: 12px 14px; margin-bottom: var(--gap);
       font-family: var(--sans); font-size: 0.78rem; line-height: 1.6;
@@ -329,6 +334,25 @@ function decorate() {
         const row2 = document.createElement('div');
         row2.className = 'row';
         row2.append(tab, status);
+
+        /* Clicking the headline drops it into the caption field to edit down. The
+           eBay title is nearly always the right raw material - it is the real name of
+           the thing plus the keyword soup - so retyping it from scratch is wasted
+           work. Stashed in a dataset because a save overwrites the visible text with
+           the caption, and the original still needs to be recoverable after that. */
+        const titleEl = card.querySelector('.item-title');
+        if (titleEl) {
+            titleEl.dataset.pulled = card.getAttribute('title') || titleEl.textContent;
+            titleEl.classList.add('grab-title');
+            titleEl.title = 'Click to start a caption from this text';
+            titleEl.addEventListener('click', e => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (!caption.value.trim()) caption.value = (titleEl.dataset.pulled || '').trim();
+                caption.focus();
+                caption.setSelectionRange(caption.value.length, caption.value.length);
+            });
+        }
 
         box.append(lab('Caption'), caption, lab('Tab and status'), row2, btn, note);
         card.querySelector('.body').appendChild(box);
