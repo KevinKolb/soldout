@@ -400,8 +400,10 @@ function buildBar() {
     out.onclick = async () => { await signOut(); location.reload(); };
 
     /* The switch first: it decides which of the two pages you are looking at, and
-       everything below it only makes sense in one of them. */
-    bar.append(buildViewToggle(said), said, bot, saveAll, out, who);
+       everything below it only makes sense in one of them. The message sits directly
+       under Build, because that is the only thing that writes to it - a report belongs
+       against the button that caused it, not at the top of the panel. */
+    bar.append(buildViewToggle(said), bot, saveAll, said, out, who);
     document.body.appendChild(bar);
     trackHeaderHeight();
 
