@@ -695,7 +695,13 @@ async function loadInventory() {
    the editor ever sets it, so a visitor's tab bar is still exactly the tabs their
    props are in. */
 function tabsFrom(items) {
-  const fromFeed = items.map(it => text(it, 'tab_tag')).filter(Boolean);
+  /* A tab is only real if something you can actually see is filed under it. Hidden
+     props still carry their tab_tag, so counting them would leave a visitor a tab that
+     opens on nothing - and the same tab, in backstage, is exactly how you find those
+     hidden props again. So the tabs follow whatever the grid is currently showing. */
+  const showHidden = document.body.classList.contains('show-hidden');
+  const visible = items.filter(it => showHidden || text(it, 'status') !== 'hidden');
+  const fromFeed = visible.map(it => text(it, 'tab_tag')).filter(Boolean);
   return [...new Set([...fromFeed, ...(window.extraShopTabs || [])])];
 }
 
@@ -837,6 +843,11 @@ function renderGrid() {
 function buildTabs() {
   const bar = document.getElementById('tabBar');
   bar.innerHTML = '';
+
+  /* Worked out here rather than by the caller, so switching between the two views
+     cannot leave the bar listing tabs from the other one. */
+  allTabs = tabsFrom(allItems);
+  if (activeTab !== ALL_TAB && !allTabs.includes(activeTab)) activeTab = ALL_TAB;
 
   for (const label of [ALL_TAB, ...allTabs]) {
     const b = document.createElement('button');
