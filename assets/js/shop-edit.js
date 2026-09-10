@@ -136,7 +136,15 @@ function injectStyles() {
       text-transform: uppercase; background: var(--ink); color: var(--paper);
       border: 2px solid var(--ink); padding: 6px 8px; cursor: pointer;
     }
-    .editbox .states { display: flex; gap: 4px; }
+    /* The same dashed rule the box opens with, so the original text sits bracketed
+       between the two and the buttons read as their own business. */
+    .editbox .states {
+      display: flex;
+      gap: 4px;
+      border-top: 2px dashed var(--ink);
+      padding-top: 0.6rem;
+      margin-top: 0.2rem;
+    }
     .editbox .states .state { flex: 1; background: var(--paper); color: var(--ink); }
     .editbox .states .state:hover:not(:disabled) { background: var(--acid); }
     .editbox .states .state[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
