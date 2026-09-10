@@ -356,11 +356,20 @@ footer::before {
    ========================================================================== */
 
 .footer-minimal {
-  padding: 2.5rem 2rem 2rem;
+  /* A shallow band - just the icons. Nothing below them: they sit straight on
+     the white bar, and the 0.5rem is only clearance for the random rotation the
+     footer script gives each icon, which footer's overflow: hidden would
+     otherwise clip at exactly 0. */
+  padding: 1rem 2rem 0.5rem;
 }
 
 .footer-minimal::before { display: none; }
 
 .footer-minimal .social-links {
   margin-bottom: 0;
+}
+
+/* The full footer wants space above the bar; this one is meant to close on it. */
+.footer-minimal + .footer-bottom {
+  margin-top: 0;
 }
