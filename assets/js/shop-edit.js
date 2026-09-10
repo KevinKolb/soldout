@@ -62,10 +62,12 @@ function injectStyles() {
       font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.14em;
       text-transform: uppercase; display: block; margin-bottom: 4px;
     }
-    .add-panel input, .add-panel select, .editbox input, .editbox select {
+    .add-panel input, .add-panel select,
+    .editbox input, .editbox select, .editbox textarea {
       width: 100%; padding: 7px 8px; border: 2px solid var(--ink);
       font-family: var(--sans); font-size: 0.8rem; background: var(--paper); color: var(--ink);
     }
+    .editbox textarea { min-height: 4.5em; resize: vertical; line-height: 1.45; }
     .add-panel .go { grid-column: 1 / -1; display: flex; gap: 8px; align-items: center; }
     .add-panel button {
       font-family: var(--mono); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.1em;
@@ -91,10 +93,12 @@ function injectStyles() {
     .editbox .note { font-family: var(--sans); font-size: 0.62rem; color: #555; }
     .editbox .note.bad { color: var(--red); font-weight: 700; }
 
-    /* In edit mode the card's headline is a starting point for a caption rather than
-       just a label, so it advertises itself as one. */
-    .item-card .grab-title { cursor: text; }
-    .item-card .grab-title:hover { background: var(--acid); box-shadow: 0 0 0 3px var(--acid); }
+    /* What eBay called it, kept visible while writing the replacement. Selectable so
+       a phrase can be lifted out of it, but never editable: it is not ours to change. */
+    .editbox .original {
+      font-family: var(--sans); font-size: 0.7rem; line-height: 1.5; color: #555;
+      user-select: text; -webkit-user-select: text;
+    }
 
     .pending {
       border: var(--rule) dashed var(--ink); padding: 12px 14px; margin-bottom: var(--gap);
@@ -287,10 +291,10 @@ function decorate() {
            navigate away on the first click. */
         box.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
 
-        const caption = document.createElement('input');
-        caption.type = 'text';
+        const caption = document.createElement('textarea');
         caption.value = row.blurb || '';
-        caption.placeholder = "Our own line - replaces eBay's title";
+        caption.rows = 3;
+        caption.placeholder = "What we call it. Replaces eBay's title on the card.";
 
         const tab = document.createElement('input');
         tab.type = 'text';
@@ -335,26 +339,25 @@ function decorate() {
         row2.className = 'row';
         row2.append(tab, status);
 
-        /* Clicking the headline drops it into the caption field to edit down. The
-           eBay title is nearly always the right raw material - it is the real name of
-           the thing plus the keyword soup - so retyping it from scratch is wasted
-           work. Stashed in a dataset because a save overwrites the visible text with
-           the caption, and the original still needs to be recoverable after that. */
+        /* Whatever eBay called it. Once a caption is saved the headline shows the
+           caption instead, so the pulled title is read here at decorate time and kept
+           on the card - otherwise the second edit would have nothing to compare against. */
         const titleEl = card.querySelector('.item-title');
-        if (titleEl) {
-            titleEl.dataset.pulled = card.getAttribute('title') || titleEl.textContent;
-            titleEl.classList.add('grab-title');
-            titleEl.title = 'Click to start a caption from this text';
-            titleEl.addEventListener('click', e => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (!caption.value.trim()) caption.value = (titleEl.dataset.pulled || '').trim();
-                caption.focus();
-                caption.setSelectionRange(caption.value.length, caption.value.length);
-            });
-        }
+        const pulled = titleEl
+            ? (card.getAttribute('title') || titleEl.dataset.pulled || titleEl.textContent)
+            : '';
+        if (titleEl) titleEl.dataset.pulled = pulled;
 
-        box.append(lab('Caption'), caption, lab('Tab and status'), row2, btn, note);
+        const original = document.createElement('div');
+        original.className = 'original';
+        original.textContent = pulled;
+
+        box.append(
+            lab('Override name and caption'), caption,
+            lab('Tab and status'), row2,
+            lab('Original text'), original,
+            btn, note
+        );
         card.querySelector('.body').appendChild(box);
     }
 }
