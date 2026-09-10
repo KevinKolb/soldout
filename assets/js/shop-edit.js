@@ -58,42 +58,66 @@ function unlink(card) {
 /* ---------- styles, injected so the public page never carries them ---------- */
 function injectStyles() {
     const css = `
-    .edit-bar {
-      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-      background: var(--ink); color: var(--paper);
-      border: var(--rule) solid var(--ink);
-      padding: 10px 14px; margin-bottom: var(--gap);
-      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-    .edit-bar .spacer { flex: 1; }
-    .edit-bar button {
-      font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: var(--acid); color: var(--ink);
-      border: 2px solid var(--acid); padding: 6px 10px; cursor: pointer;
-    }
-    .edit-bar button.ghost { background: transparent; color: var(--paper); border-color: var(--paper); }
-    .edit-bar .said { text-transform: none; letter-spacing: 0; font-family: var(--sans); }
-
-    /* Backstage / public, floating under the thin header rather than sitting in the
-       edit bar. It applies to the whole page rather than to the listings, and in the bar
-       it scrolled away exactly when you wanted it - after reading down the grid in
-       preview. --topbar-h is measured from the header itself, so it stays tucked under
-       it when the header wraps on a narrow screen.
-
-       Hard-edged, because nothing else on this page is rounded. */
-    .view-toggle {
+    .edit-panel {
       position: fixed;
       top: calc(var(--topbar-h, 40px) + 10px);
       right: 12px;
       z-index: 30;
-      display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+      width: 186px;
+      display: flex; flex-direction: column; gap: 8px;
       background: var(--ink); color: var(--paper);
-      border: 2px solid var(--paper);
-      box-shadow: 3px 3px 0 var(--ink);
-      padding: 6px 10px;
-      font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.1em;
+      border: var(--rule) solid var(--ink);
+      box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.25);
+      padding: 10px;
+      font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .edit-panel button {
+      width: 100%;
+      font-family: var(--mono); font-size: 0.6rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: var(--acid); color: var(--ink);
+      border: 2px solid var(--acid); padding: 7px 10px; cursor: pointer;
+    }
+    .edit-panel button.ghost { background: transparent; color: var(--paper); border-color: var(--paper); }
+
+    .edit-panel .said {
+      text-transform: none; letter-spacing: 0; font-family: var(--sans);
+      font-size: 0.72rem; line-height: 1.4;
+    }
+    .edit-panel .said[hidden] { display: none; }
+
+    /* Last, and quiet: useful to confirm once, not worth the top of the panel. */
+    .edit-panel .who {
+      text-transform: none; letter-spacing: 0; font-family: var(--sans);
+      font-size: 0.66rem; opacity: 0.6; word-break: break-all;
+      border-top: 2px solid rgba(255, 255, 255, 0.25); padding-top: 7px;
+    }
+
+    /* In the public preview the panel is only a way back: everything in it acts on a
+       page you are not currently looking at, so it collapses to the switch alone and
+       stops hanging a black slab of controls over a visitor's view of the shop. */
+    body.viewing-public .edit-panel { width: auto; }
+    body.viewing-public .edit-panel > *:not(.view-toggle) { display: none; }
+
+    /* Too narrow for a column beside the grid, so it lies down under the header. */
+    @media (max-width: 900px) {
+      .edit-panel {
+        left: 8px; right: 8px; width: auto;
+        flex-direction: row; flex-wrap: wrap; align-items: center;
+      }
+      .edit-panel button { width: auto; flex: 1 1 auto; }
+      .edit-panel .who { border-top: 0; padding-top: 0; width: 100%; }
+    }
+
+    /* Backstage / public, the first item in the panel. Hard-edged, because nothing
+       else on this page is rounded. */
+    .view-toggle {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      cursor: pointer;
+      border: 2px solid var(--paper); padding: 7px 9px;
+      font-family: var(--mono); font-size: 0.55rem; letter-spacing: 0.1em;
       text-transform: uppercase; user-select: none;
     }
     .view-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
@@ -339,30 +363,32 @@ async function save(row, patch, note) {
     return data;
 }
 
-/* ---------- the bar across the top ---------- */
+/* ---------- the panel down the right ---------- */
+/* It was a bar across the top of the listings, which put page-wide controls inside the
+   grid's own header and scrolled them away as soon as you looked at anything. As a
+   fixed panel it stays put, and the switch that changes what the whole page is sits at
+   the top of it where it reads as the first decision rather than one more button.
+
+   It hangs off the body, not the listings: position:fixed measures against the
+   viewport, and an ancestor with a transform would quietly make it measure against
+   that instead. */
 function buildBar() {
     const listings = document.getElementById('listings');
     if (document.getElementById('editBar')) return;
 
     const bar = document.createElement('div');
-    bar.className = 'edit-bar';
+    bar.className = 'edit-panel';
     bar.id = 'editBar';
-
-    const who = document.createElement('span');
-    who.textContent = 'Editing as ' + user.email;
 
     /* Empty in backstage mode - the per-card note already says what a save did, and
        edits are live now anyway. It still carries the public-preview message. */
     const said = document.createElement('span');
     said.className = 'said';
+    said.hidden = true;
 
-    const spacer = document.createElement('span');
-    spacer.className = 'spacer';
-
-    /* On the body, not in the bar: position:fixed measures against the viewport, and
-       an ancestor with a transform would quietly make it position against that instead. */
-    document.body.appendChild(buildViewToggle(said));
-    trackHeaderHeight();
+    const who = document.createElement('span');
+    who.className = 'who';
+    who.textContent = user.email;
 
     const bot = document.createElement('button');
     bot.type = 'button';
@@ -375,7 +401,11 @@ function buildBar() {
     out.textContent = 'Sign out';
     out.onclick = async () => { await signOut(); location.reload(); };
 
-    bar.append(who, said, spacer, bot, saveAll, out);
+    /* The switch first: it decides which of the two pages you are looking at, and
+       everything below it only makes sense in one of them. */
+    bar.append(buildViewToggle(said), said, bot, saveAll, out, who);
+    document.body.appendChild(bar);
+    trackHeaderHeight();
 
     const botPanel = document.createElement('div');
     botPanel.className = 'bot-panel';
@@ -393,7 +423,7 @@ function buildBar() {
     pending.id = 'pendingNote';
     pending.hidden = true;
 
-    listings.prepend(bar, botPanel, panel, pending);
+    listings.prepend(botPanel, panel, pending);
     showPending();
 }
 
@@ -407,6 +437,10 @@ function buildBar() {
    token with actions:write, and a token in a static page is readable by everyone who
    loads the page. See supabase/functions/build-shop/index.ts. */
 function buildSaveAll(said) {
+    /* The message hides itself when empty, so writing to it has to say so - otherwise
+       the build reports into an element nobody can see. */
+    const say = text => { said.textContent = text; said.hidden = !text; };
+
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.textContent = 'Build';
@@ -420,19 +454,19 @@ function buildSaveAll(said) {
         btn.disabled = true;
         const note = '';
 
-        said.textContent = 'Starting a build...';
+        say('Starting a build...');
         const { data: built, error: buildError } = await supabase.functions.invoke('build-shop');
 
         btn.disabled = false;
         if (buildError || (built && built.error)) {
             const why = (built && built.error) || buildError.message || 'it did not say why';
-            said.textContent = note + 'Build did not start: ' + why;
-            setTimeout(() => { said.textContent = ''; }, 8000);
+            say(note + 'Build did not start: ' + why);
+            setTimeout(() => say(''), 8000);
             return;
         }
 
-        said.textContent = note + 'Build started. New props appear in a couple of minutes.';
-        setTimeout(() => { said.textContent = ''; }, 8000);
+        say(note + 'Build started. New props appear in a couple of minutes.');
+        setTimeout(() => say(''), 8000);
     };
 
     return btn;
@@ -443,7 +477,7 @@ function buildSaveAll(said) {
    do repeatedly, and having it reset on every load would make that tedious. */
 const LS_VIEW = 'shop.view';
 
-/* The header is sticky and its height changes when it wraps, so the toggle is told
+/* The header is sticky and its height changes when it wraps, so the panel is told
    where the bottom of it actually is rather than guessing at a number. */
 function trackHeaderHeight() {
     const bar = document.querySelector('.topbar');
@@ -486,9 +520,10 @@ function buildViewToggle(said) {
         if (typeof renderGrid === 'function') renderGrid();
         back.classList.toggle('active', !publicView);
         pub.classList.toggle('active', publicView);
-        said.textContent = publicView
-            ? 'Previewing the public page. Nothing here is editable.'
-            : '';
+        /* Nothing to say in the preview - the lit half of the switch says which page
+           this is, and the panel has collapsed to that switch anyway. */
+        said.textContent = '';
+        said.hidden = true;
         try { localStorage.setItem(LS_VIEW, publicView ? 'public' : 'backstage'); } catch { /* private mode */ }
     };
 
