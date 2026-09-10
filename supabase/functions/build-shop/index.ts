@@ -16,7 +16,7 @@
  *      - Repository access: only KevinKolb/soldout
  *      - Repository permissions: Actions -> Read and write
  *      Nothing else. It cannot read code or write to the repo with that scope.
-   2. Give it to the function, never to the repo:
+ *   2. Give it to the function, never to the repo:
  *        supabase secrets set GITHUB_TOKEN_SOC=github_pat_...
  *      or Dashboard -> Edge Functions -> Secrets.
  *   3. supabase functions deploy build-shop
