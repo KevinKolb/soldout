@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SOLD OUT! Admin</title>
+    <title>The Booth - SOLD OUT! Comedy</title>
     <style>
         * {
             margin: 0;
@@ -82,6 +82,24 @@
             opacity: 0.7;
         }
 
+        .uplink {
+            display: inline-block;
+            margin-bottom: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #666;
+            text-decoration: none;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 2px;
+        }
+
+        .uplink:hover {
+            color: #000;
+            border-bottom-color: #000;
+        }
+
         .footer {
             margin-top: 60px;
             text-align: center;
@@ -103,8 +121,10 @@
 </head>
 <body>
     <div class="container">
-        <h1>SOLD OUT! Admin</h1>
-        <div class="subtitle">Content Management System</div>
+        <a href="https://backstage.soldoutcomedy.com" class="uplink">&larr; Backstage</a>
+
+        <h1>The Booth</h1>
+        <div class="subtitle">The tools that change what the live site shows</div>
 
         <div class="grid">
             <a href="addshows.html" class="card">
@@ -154,11 +174,22 @@
                 <div class="card-title">View Site</div>
                 <div class="card-description">Return to the main website</div>
             </a>
+
+            <a href="https://backstage.soldoutcomedy.com" class="card">
+                <div class="card-icon">🚪</div>
+                <div class="card-title">Backstage</div>
+                <div class="card-description">Scripts, scenes, krewe, tech - the whole operation</div>
+            </a>
         </div>
 
         <div class="footer">
-            <p>&copy; 2025 SOLD OUT! Comedy | <a href="https://soldoutcomedy.com">soldoutcomedy.com</a></p>
+            <p>&copy; <span id="year">2025</span> SOLD OUT! Comedy | <a href="https://soldoutcomedy.com">soldoutcomedy.com</a></p>
         </div>
     </div>
+    <script>
+        /* Year is in the markup as a fallback and refreshed here, so the page
+           is still right after New Year without a redeploy. */
+        document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
