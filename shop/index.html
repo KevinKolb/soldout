@@ -666,6 +666,8 @@ async function loadInventory() {
     return;
   }
 
+  rankTabs(items.map(it => text(it, 'tab_tag')).filter(Boolean));
+
   /* Cheapest first. A missing price sorts last rather than as zero, so an item
      the build could not put a price on does not lead the grid. */
   items.sort((a, b) => {
@@ -694,6 +696,21 @@ async function loadInventory() {
    window.extraShopTabs is how the editor adds a tab nothing is filed under yet. Only
    the editor ever sets it, so a visitor's tab bar is still exactly the tabs their
    props are in. */
+/* Where each tab sits in the bar. The grid is sorted by price, so the order of
+   allItems says nothing about tabs - without this, the bar would be ordered by whichever
+   tab happened to hold the cheapest prop.
+
+   Ranks come from the feed's own order at load, which the build writes in position
+   order, and are replaced by the live positions as soon as those are read. Dragging a
+   tab writes those positions, which is what makes the arrangement survive a reload and
+   show up for visitors too. */
+let tabRank = new Map();
+
+function rankTabs(names) {
+  tabRank = new Map();
+  names.forEach((name, i) => { if (!tabRank.has(name)) tabRank.set(name, i); });
+}
+
 function tabsFrom(items) {
   /* A tab is only real if something you can actually see is filed under it. Hidden
      props still carry their tab_tag, so counting them would leave a visitor a tab that
@@ -702,7 +719,10 @@ function tabsFrom(items) {
   const showHidden = document.body.classList.contains('show-hidden');
   const visible = items.filter(it => showHidden || text(it, 'status') !== 'hidden');
   const fromFeed = visible.map(it => text(it, 'tab_tag')).filter(Boolean);
-  return [...new Set([...fromFeed, ...(window.extraShopTabs || [])])];
+  const names = [...new Set([...fromFeed, ...(window.extraShopTabs || [])])];
+
+  const rank = n => (tabRank.has(n) ? tabRank.get(n) : Number.MAX_SAFE_INTEGER);
+  return names.sort((a, b) => rank(a) - rank(b));
 }
 
 /* ---- the live overlay ----------------------------------------------------
@@ -744,7 +764,7 @@ async function applyLive() {
   let rows;
   try {
     const res = await fetch(
-      LIVE.url + '/rest/v1/shop?select=item_url,blurb,tab_tag,status',
+      LIVE.url + '/rest/v1/shop?select=item_url,blurb,tab_tag,status,position&order=position.asc',
       { headers: { apikey: LIVE.key, Authorization: 'Bearer ' + LIVE.key }, cache: 'no-store' }
     );
     if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -758,6 +778,13 @@ async function applyLive() {
 
   const byKey = new Map(rows.map(r => [itemKey(r.item_url), r]));
   let changed = false;
+
+  /* The rows arrive in position order, so their tab_tags in that order are the tab
+     order - including a drag saved a moment ago, with no build in between. */
+  const ranked = rows.map(r => (r.tab_tag || '')).filter(Boolean);
+  const before = [...tabRank.keys()].join('\u0000');
+  rankTabs(ranked);
+  if ([...tabRank.keys()].join('\u0000') !== before) changed = true;
 
   for (const it of allItems) {
     const row = byKey.get(itemKey(text(it, 'url')));

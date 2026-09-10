@@ -289,6 +289,9 @@ function injectStyles() {
 
     /* Small, and hung off the tab's corner so it never crowds the label. */
     .tab { position: relative; }
+    .tab[draggable="true"] { cursor: grab; }
+    .tab[draggable="true"]:active { cursor: grabbing; }
+    .tab.dragging { opacity: 0.4; }
 
     .tab-x {
       position: absolute;
@@ -1030,6 +1033,111 @@ async function start(u) {
     decorate();
     ghostTab();
     tabDeleters();
+    makeTabsDraggable();
+}
+
+/* ---------- dragging tabs into order ----------
+   The bar follows the feed, and the feed is ordered by each row's position - so tab
+   order is already stored, in the props themselves. Dragging writes those positions
+   rather than keeping a private list, which means the order a visitor sees is the
+   order you arranged, not just the order in this browser.
+
+   Props in the same tab end up sharing a position. Nothing is lost by that: the grid
+   sorts by price, so position decides nothing except which tab comes first.
+
+   A tab invented with + New has no props to carry its position, so its place is kept
+   in this browser until something is filed under it. */
+let draggingTab = null;
+let justDragged = false;
+
+function tabName(b) {
+    return b.dataset.name !== undefined ? b.dataset.name : b.textContent.trim();
+}
+
+function orderedTabs(bar) {
+    const allTab = typeof ALL_TAB === 'string' ? ALL_TAB : "E'RYTHING";
+    return [...bar.querySelectorAll('.tab')]
+        .filter(b => !b.classList.contains('tab-new') && tabName(b) !== allTab);
+}
+
+async function persistTabOrder() {
+    const bar = document.getElementById('tabBar');
+    if (!bar) return;
+
+    const names = orderedTabs(bar).map(tabName);
+
+    /* Invented tabs keep their place here, in the order they now appear. */
+    extraTabs = names.filter(n => extraTabs.includes(n))
+        .concat(extraTabs.filter(n => !names.includes(n)));
+    saveExtraTabs();
+
+    const used = new Set([...rows.values()].map(r => r.tab_tag).filter(Boolean));
+    let slot = 1;
+    for (const name of names) {
+        if (!used.has(name)) continue;
+        const { error } = await supabase.from(TABLE)
+            .update({ position: slot * 10 }).eq('tab_tag', name);
+        if (error) {
+            panelSay('Could not save the tab order: ' + error.message);
+            return;
+        }
+        slot++;
+    }
+
+    await loadRows();
+    panelSay('Tab order saved.');
+}
+
+function makeTabsDraggable() {
+    const bar = document.getElementById('tabBar');
+    if (!bar || document.body.classList.contains('viewing-public')) return;
+
+    for (const b of orderedTabs(bar)) {
+        if (b.dataset.drag) continue;
+        b.dataset.drag = '1';
+        b.draggable = true;
+
+        b.addEventListener('dragstart', e => {
+            draggingTab = b;
+            b.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            /* Firefox will not start a drag without something on the transfer. */
+            e.dataTransfer.setData('text/plain', tabName(b));
+        });
+
+        b.addEventListener('dragend', async () => {
+            b.classList.remove('dragging');
+            draggingTab = null;
+            /* The click that follows a drop would otherwise change the open tab. */
+            justDragged = true;
+            setTimeout(() => { justDragged = false; }, 0);
+            await persistTabOrder();
+        });
+
+        b.addEventListener('dragover', e => {
+            if (!draggingTab || draggingTab === b) return;
+            e.preventDefault();
+            const box = b.getBoundingClientRect();
+            const before = e.clientX < box.left + box.width / 2;
+            bar.insertBefore(draggingTab, before ? b : b.nextSibling);
+
+            /* E'RYTHING stays first and + New stays last however far a tab is dragged. */
+            const first = bar.firstElementChild;
+            const allTab = typeof ALL_TAB === 'string' ? ALL_TAB : "E'RYTHING";
+            if (first && tabName(first) !== allTab) {
+                const home = [...bar.children].find(c => tabName(c) === allTab);
+                if (home) bar.insertBefore(home, first);
+            }
+            const ghost = bar.querySelector('.tab-new');
+            if (ghost) bar.appendChild(ghost);
+        });
+
+        b.addEventListener('click', e => {
+            if (!justDragged) return;
+            e.preventDefault();
+            e.stopPropagation();
+        }, true);
+    }
 }
 
 /* Deleting a tab unfiles it. Every prop wearing it keeps its listing, its caption,
@@ -1134,7 +1242,13 @@ function ghostTab() {
 
 /* The grid re-renders on every tab click, which throws the editors away with it. */
 document.addEventListener('shop:rendered', () => {
-    if (isOwner(user)) { decorate(); ghostTab(); tabDeleters(); refreshTabList(); }
+    if (isOwner(user)) {
+        decorate();
+        ghostTab();
+        tabDeleters();
+        makeTabsDraggable();
+        refreshTabList();
+    }
 });
 
 start(await currentUser());
