@@ -47,6 +47,7 @@ an article can start life on any link on the planet, and go out to any of three 
 | Destination | How it works |
 | --- | --- |
 | **X** | Paste into the composer; the link unfurls into the original post |
+| **Bluesky** | The only one with a real compose intent, so the post arrives already written &mdash; no clipboard |
 | **Facebook** | Same, into the Page composer. No prefill exists — its old sharer link lands text locked and uneditable |
 | **Instagram** | The odd one out: needs an image or video, has no composer to open, and a caption URL is not clickable. The button copies a caption and credits the author; you bring the screenshot. It greys out when the source has no media at all |
 

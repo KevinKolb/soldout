@@ -20,7 +20,7 @@ create table if not exists public.socializer (
 
     -- Where the post came FROM. Where it goes is always X, for now.
     platform    text        not null default 'Web'
-                            check (platform in ('X', 'Facebook', 'Instagram', 'YouTube', 'Web')),
+                            check (platform in ('X', 'Bluesky', 'Facebook', 'Instagram', 'YouTube', 'Web')),
 
     author      text        not null default '',
     body        text        not null default '',

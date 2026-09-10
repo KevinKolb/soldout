@@ -150,6 +150,7 @@ post lands twice:
 | YouTube | `yt:<id>` | the `v=` param, or the id after `/shorts/` |
 | Instagram | `ig:<code>` | the code after `/p/` or `/reel/` |
 | Facebook | `fb:<digits>` | the longest run of 6+ digits in the URL |
+| Bluesky | `bsky:<rkey>` | the id after `/post/` |
 | anything else | `url:<host><path>` | lowercased, no scheme, no query, no trailing slash |
 
 Strip `www.` from the host, and strip tracking params (`utm_*`, `fbclid`, `igshid`, `si`,
@@ -176,7 +177,7 @@ Send all of a run's candidates as one array. Each row:
 | --- | --- |
 | `post_key` | as above |
 | `post_url` | the confirmed permalink, cleaned of tracking params |
-| `platform` | `X`, `Facebook`, `Instagram`, `YouTube` or `Web` |
+| `platform` | `X`, `Bluesky`, `Facebook`, `Instagram`, `YouTube` or `Web` |
 | `author` | the handle as `@name` where there is one, else the creator's name |
 | `body` | the post's own words. Could not read them? Empty string. |
 | `posted_at` | the original post's timestamp if you have it, else empty string |
@@ -213,6 +214,6 @@ outcome, not a failure.
 ## What the human sees
 
 Everything you insert shows up in The Socializer as a **NEW** article, newest first. From
-there a human presses Skip, or copies it into a composer and ticks off the destinations it
-went out on — X, Facebook or Instagram. Those are the only things that change `status` and
+there a human presses Skip, or sends it to a composer and ticks off the destinations it
+went out on — X, Bluesky, Facebook or Instagram. Those are the only things that change `status` and
 `posted_to`, and you never touch either.
