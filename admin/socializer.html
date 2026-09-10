@@ -164,6 +164,16 @@
             margin-bottom: 12px;
         }
         .body.empty { color: var(--faint); font-size: 14px; font-style: italic; }
+        .body.editable { cursor: text; border-radius: 2px; }
+        .body.editable:hover { box-shadow: 0 0 0 7px var(--wash); background: var(--wash); }
+
+        /* when there is no author, the link itself is the most useful label going */
+        .who.urlish {
+            font-weight: 600; font-size: 12.5px; color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        textarea.lineIn { resize: vertical; min-height: 58px; line-height: 1.45; }
 
         .why {
             font-size: 12.5px; color: var(--muted);
@@ -789,6 +799,48 @@ function render() {
     return shown.length;
 }
 
+/* host + path, which is short enough to read and still says what the thing is */
+function shortUrl(u) {
+    const s = String(u || '').replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/+$/, '');
+    return s.length > 52 ? s.slice(0, 34) + '\u2026' + s.slice(-15) : s;
+}
+
+/* Facebook and Instagram hand out no text, so a capture from either arrives blank.
+   Rather than send you back to re-capture it, the body is editable in place: you
+   are looking at the post anyway, so write the one line that makes it findable. */
+async function describe(row, el) {
+    const ta = document.createElement('textarea');
+    ta.className = 'lineIn';
+    ta.placeholder = 'What is it? One line is plenty.';
+    ta.value = row.body || '';
+    el.replaceWith(ta);
+    ta.focus();
+    ta.setSelectionRange(ta.value.length, ta.value.length);
+
+    let done = false;
+    const finish = async (save) => {
+        if (done) return;
+        done = true;
+        const v = ta.value.trim();
+        if (!save || v === (row.body || '')) { render(); return; }
+        try {
+            status('Saving...', 'busy');
+            await sb('?id=eq.' + row.id, { method: 'PATCH', body: JSON.stringify({ body: v }) });
+            row.body = v;                 /* keep the row we already hold in step */
+            status('Saved.', 'good');
+        } catch (err) {
+            status(err.message, 'err');
+        }
+        render();
+    };
+
+    ta.onblur = () => finish(true);
+    ta.onkeydown = e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); finish(true); }
+        if (e.key === 'Escape') { e.preventDefault(); finish(false); }
+    };
+}
+
 /* Rough is fine here - it only has to say "is this fresh or has it been sitting". */
 function ago(iso) {
     const ms = Date.now() - new Date(iso || 0).getTime();
@@ -810,8 +862,10 @@ function card(row) {
     byline.className = 'byline';
 
     const who = document.createElement('span');
-    who.className = 'who';
-    who.textContent = row.author || 'Unknown account';
+    /* Some sites hand over no author at all. The link beats the words "Unknown
+       account", which say nothing and hide the one fact we do have. */
+    who.className = 'who' + (row.author ? '' : ' urlish');
+    who.textContent = row.author || shortUrl(row.post_url) || 'Unknown account';
 
     const meta = document.createElement('span');
     meta.className = 'meta';
@@ -824,8 +878,12 @@ function card(row) {
 
     /* the post itself, the only large type on the page */
     const body = document.createElement('div');
-    body.className = 'body' + (row.body ? '' : ' empty');
-    body.textContent = row.body || 'No text captured. Open the post to read it.';
+    body.className = 'body' + (row.body ? '' : ' empty') + (st === 'SKIPPED' ? '' : ' editable');
+    body.textContent = row.body || 'No text captured. Click here to say what it is.';
+    if (st !== 'SKIPPED') {
+        body.title = 'Click to write what this is';
+        body.onclick = () => describe(row, body);
+    }
 
     el.append(byline, body);
 
