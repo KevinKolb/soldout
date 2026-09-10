@@ -36,6 +36,13 @@ let user = null;
    like with it - clicking into the caption was activating the link and opening the
    listing. Nothing nested inside a link can be typed into reliably, so in edit mode
    the card stops being a link and the editor carries an explicit way out to eBay. */
+/* The in-place editors live on elements a visitor also sees - the headline, the two
+   chips, the source sticker - so hiding the edit box is not enough to make the public
+   preview honest. Every one of them asks this first. */
+function editingOff() {
+    return document.body.classList.contains('viewing-public');
+}
+
 function cardUrl(card) {
     return card.dataset.href || card.getAttribute('href') || '';
 }
@@ -97,6 +104,14 @@ function injectStyles() {
     body.viewing-public .pending,
     body.viewing-public .add-tile,
     body.viewing-public .add-panel { display: none; }
+
+    /* Nothing offers itself for editing in the preview either - a hover that lights up
+       is a promise, and in that mode it would be a false one. */
+    body.viewing-public .cap-edit,
+    body.viewing-public .tag-edit { cursor: inherit; }
+    body.viewing-public .cap-edit:hover,
+    body.viewing-public .tag-edit:hover,
+    body.viewing-public .item-badge.tag-edit:hover { background: inherit; box-shadow: none; }
 
     /* The add tile keeps the grid's inverted treatment but spans the full width, so
        it always lands on a row of its own however many props there are - as a bar under
@@ -648,6 +663,7 @@ function cyclingTag(el, row, field, values) {
     };
 
     el.addEventListener('click', async e => {
+        if (editingOff()) return;
         e.preventDefault();
         e.stopPropagation();
         const current = row[field] || values[0];
@@ -672,6 +688,7 @@ function textTag(el, row, field, placeholder) {
     };
 
     el.addEventListener('click', e => {
+        if (editingOff()) return;
         e.preventDefault();
         e.stopPropagation();
         if (el.dataset.editing) return;
@@ -717,6 +734,7 @@ function inlineCaption(el, row, pulled) {
     el.title = 'Click to write what we call it';
 
     el.addEventListener('click', e => {
+        if (editingOff()) return;
         e.preventDefault();
         e.stopPropagation();
         if (el.dataset.editing) return;
