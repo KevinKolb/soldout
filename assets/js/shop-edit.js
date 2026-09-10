@@ -838,10 +838,11 @@ function decorate() {
            at the next build - a Hidden row is what keeps it down, and it holds while
            the listing is still live on eBay. Which is also why the prop stays on screen
            stamped rather than vanishing: that is how you find it again to put it back. */
+        /* The three buttons go last and unlabelled: ACTIVE, SOLD and HIDDEN say what
+           they are, and a heading over them only repeated it. */
         box.append(
-            lab('Status'), states,
             lab('Original text'), original,
-            note
+            states, note
         );
         card.querySelector('.body').appendChild(box);
     }
