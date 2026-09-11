@@ -38,7 +38,7 @@ on them.
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
   `main`, every 6 hours on a schedule, and on manual runs.
 - **Notion:** show materials and the backstage workspace. Connected to Claude Code
-  through the Notion MCP. Reached from the Notion card in Backstage: the
+  through the Notion MCP. Reached from the Backstage Bible card in Backstage: the
   backstage.soldoutcomedy.com subdomain now forwards to `/backstage` instead.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the Socializer queue, and the `shop` table that curates the shop.
@@ -120,8 +120,8 @@ There is no service-role key in this repo and there must never be one. Any key i
 page is readable by every visitor, and a service key bypasses row-level security entirely.
 The committed publishable key is powerless until someone proves who they are.
 
-`backstage.soldoutcomedy.com` forwards to `/backstage`. Notion is reached from the Notion
-card in Backstage.
+`backstage.soldoutcomedy.com` forwards to `/backstage`. Notion is reached from the
+Backstage Bible card there.
 
 ## Working with Kevin
 
