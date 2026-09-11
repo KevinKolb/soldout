@@ -38,7 +38,7 @@ on them.
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
   `main`, every 6 hours on a schedule, and on manual runs.
 - **Notion:** show materials and the backstage workspace. Connected to Claude Code
-  through the Notion MCP. Reached from the Notion card in the Booth: the
+  through the Notion MCP. Reached from the Notion card in Backstage: the
   backstage.soldoutcomedy.com subdomain now forwards to `/backstage` instead.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the Socializer queue, and the `shop` table that curates the shop.
@@ -110,7 +110,7 @@ How it works now:
 
 ## Backstage and login
 
-`/backstage` is the Booth: the browser tools, behind a Google sign-in. Auth is Supabase,
+`/backstage` is Backstage: the browser tools, behind a Google sign-in. Auth is Supabase,
 shared across the site by [assets/js/auth.js](assets/js/auth.js), so signing in there also
 unlocks editing on `/shop`. Only `kevinmkolb@gmail.com` can write; the policies in
 [tools/shop-migration-01-auth.sql](tools/shop-migration-01-auth.sql) enforce that in the
@@ -121,7 +121,7 @@ page is readable by every visitor, and a service key bypasses row-level security
 The committed publishable key is powerless until someone proves who they are.
 
 `backstage.soldoutcomedy.com` forwards to `/backstage`. Notion is reached from the Notion
-card in the Booth.
+card in Backstage.
 
 ## Working with Kevin
 

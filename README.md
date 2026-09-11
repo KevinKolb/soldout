@@ -18,7 +18,7 @@ assets/               All static assets
   data/               Site content as XML (shows, taglines, videos, musicvids)
 
 live/                 Show-day pages: prop check-in form, prop display, QR codes
-backstage/            The Booth: login, and the browser tools for editing site content
+backstage/            Backstage: login, and the browser tools for editing site content
 tools/                Local development helpers (not used by the deployed site)
 archive/              Previous homepage and its alternate themes
 ```

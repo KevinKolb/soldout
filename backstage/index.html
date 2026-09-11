@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Booth - SOLD OUT! Comedy</title>
+    <title>Backstage - SOLD OUT! Comedy</title>
     <style>
         * {
             margin: 0;
@@ -180,14 +180,14 @@
     <div class="container">
         <a href="../index.html" class="uplink">&larr; The show</a>
 
-        <h1>The Booth</h1>
+        <h1>Backstage</h1>
         <div class="subtitle">The tools that change what the live site shows</div>
 
         <div class="whoami" id="whoami" hidden></div>
 
         <div class="gate" id="gate">
             <h2>Staff only</h2>
-            <p>The Booth changes what the live site shows.</p>
+            <p>Backstage changes what the live site shows.</p>
             <button id="signin" type="button">Sign in with Google</button>
             <div class="err" id="gateErr" hidden></div>
         </div>
@@ -265,7 +265,7 @@
     </script>
 
     <script type="module">
-    /* The Booth is behind a real login now. Hiding the cards is only manners - none of
+    /* Backstage is behind a real login now. Hiding the cards is only manners - none of
        the tools can change anything without a session the database also believes, so
        this decides what is worth showing rather than what is allowed. */
     import { currentUser, isOwner, signIn, signOut, OWNER, onAuthChange } from '/assets/js/auth.js';
