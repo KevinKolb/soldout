@@ -137,6 +137,10 @@ Skip anything that is: an ad or brand marketing, engagement bait, cruel at someb
 expense, political, sexual, or about a named private individual. Skip anything you would
 have to explain.
 
+A post with an image or a video is worth more than one without, because it can go to
+Instagram and Threads as well as X, Facebook and Bluesky. Not a rule - a funny line with
+no picture still beats a dull picture - but it is the tie-breaker.
+
 ## Step 6 — write the rows to Supabase
 
 ### The dedupe key
@@ -177,12 +181,13 @@ Send all of a run's candidates as one array. Each row:
 | --- | --- |
 | `post_key` | as above |
 | `post_url` | the confirmed permalink, cleaned of tracking params |
-| `platform` | `X`, `Bluesky`, `Facebook`, `Instagram`, `YouTube` or `Web` |
+| `platform` | `X`, `Bluesky`, `Threads`, `Facebook`, `Instagram`, `YouTube` or `Web` |
 | `author` | the handle as `@name` where there is one, else the creator's name |
 | `body` | the post's own words. Could not read them? Empty string. |
 | `posted_at` | the original post's timestamp if you have it, else empty string |
 | `why` | one sentence: which criterion it hits, and why it is funny |
 | `has_media` | `true` if the source carries an image or video, `false` if it plainly does not, omit if you could not tell |
+| `media_url` | the image or video itself, as a URL. Omit if there is none or you could not read one |
 | `source` | always `Bot` |
 | `status` | always `NEW` |
 
@@ -192,6 +197,15 @@ description of the post there — `why` is where your own words go.
 `has_media` decides whether the Instagram button is available on the card. Instagram will
 not take a text-only post, so an article whose source has no image or video cannot go there.
 Set it honestly: guessing `true` puts a dead button in front of somebody.
+
+`media_url` is the file itself, and it is the difference between an Instagram post costing
+one click and costing a trip back to the original. Take it from `og:image`, `og:video`,
+`twitter:image`, or a video's poster frame - whichever the page actually gives you. It has
+to be a direct link to the file, not to the page it sits on: something ending in `.jpg`,
+`.png`, `.webp` or `.mp4`, that would show the image on its own if pasted into a browser.
+A link to the post again is worse than nothing, because it looks like a file and is not
+one. Leave it out when you are unsure, and set `has_media` on what you saw rather than on
+whether you managed to get a URL for it.
 
 Never write `posted_to`. That column records where an article actually went out, and only a
 human ticking a box puts anything in it.

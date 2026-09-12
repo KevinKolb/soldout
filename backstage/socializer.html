@@ -239,6 +239,26 @@
         .lineIn:focus::placeholder { color: var(--ink); }
         textarea.lineIn { resize: vertical; min-height: 62px; line-height: 1.45; }
 
+        /* What the bot found on the source. A thumbnail rather than a link on its own,
+           because the question it answers - is this worth an Instagram post - is one you
+           answer by looking. */
+        .media {
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+            margin: 10px 0 2px; padding: 8px;
+            border: 2px dashed var(--grey);
+        }
+        .media img {
+            width: 84px; height: 84px; object-fit: cover;
+            border: 2px solid var(--ink); display: block; flex: none;
+        }
+        .media .mlink {
+            font-family: var(--mono); font-size: 10px; font-weight: 700;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--ink); text-decoration: none;
+            border-bottom: 2px solid var(--acid); padding-bottom: 2px;
+        }
+        .media .mlink:hover { background: var(--acid); }
+
         .acts { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
         .acts .spacer { flex: 1; min-width: 6px; }
         .acts button { font-size: 12.5px; padding: 9px 13px; }
@@ -568,8 +588,9 @@ caption=caption?caption.trim():'';
 if(!text&&caption)text=caption;
 if(text.length>1200)text=text.slice(0,1200)+'...';
 
-var media=!!(meta('og:image')||meta('og:video')||meta('twitter:image')||document.querySelector('video'));
-var payload={u:url,h:handle,t:text,d:when,s:'Bookmarklet',m:media,c:caption};
+var mUrl=meta('og:image')||meta('og:video')||meta('twitter:image')||(document.querySelector('video')&&document.querySelector('video').poster)||'';
+var media=!!mUrl;
+var payload={u:url,h:handle,t:text,d:when,s:'Bookmarklet',m:media,c:caption,i:mUrl};
 window.open(BASE+'#capture='+encodeURIComponent(JSON.stringify(payload)),'_blank');
 })();
 </script>
@@ -597,7 +618,7 @@ const SUPABASE = {
 
 /* The table may be older than this page. Rather than 400 on every write and look
    broken, the page asks the database what it actually has and works with that. */
-const SCHEMA = { posted_to: true, has_media: true };
+const SCHEMA = { posted_to: true, has_media: true, media_url: true };
 
 const LS_CONN = 'soldout_socializer_conn';   /* local override, for trying it before committing */
 /* Where an article can go. Source platform and destination are different things:
@@ -664,6 +685,32 @@ const DESTINATIONS = [
             + 'is the least work of the lot. It still will not post for you.'
     },
     {
+        id: 'Threads',
+        handle: '@soldout.comedy',
+        logo: '../assets/images/threads_logo.png',
+        mono: true,
+        compose: 'https://www.threads.com/',
+        composeLabel: 'threads.com',
+        action: 'Open Threads with the post already written',
+        text: (row, line) => line ? line + '\n\n' + row.post_url : row.post_url,
+        /* Threads takes an intent the same way Bluesky does, so this one needs no
+           clipboard either. 500 characters is the cap. */
+        href: (row, line) => {
+            const body = line ? line + '\n\n' + row.post_url : row.post_url;
+            const cut = [...body].slice(0, 500).join('');
+            return 'https://www.threads.net/intent/post?text=' + encodeURIComponent(cut);
+        },
+        steps: [
+            'The composer opens with the text already in it. Nothing to paste.',
+            'Threads posts as whichever Instagram account you are signed in as - check it is '
+            + '<b>@soldout.comedy</b>.',
+            'The link unfurls into a card, the same as X.',
+            'Post, then come back and tick <b>Threads</b> under Posted.'
+        ],
+        note: 'Takes an intent link like Bluesky, so it fills itself in. It is tied to the '
+            + 'Instagram login rather than a separate one, which is the only thing to watch.'
+    },
+    {
         id: 'Instagram',
         handle: '@soldoutcomedy',
         logo: '../assets/images/instagram_logo.svg',
@@ -681,8 +728,24 @@ const DESTINATIONS = [
         ],
         note: 'Instagram is the odd one out. There is no composer to open, no way to prefill it, '
             + 'and a URL in a caption is not clickable. Every post needs an image or a video, so '
-            + 'this one always costs you a screenshot. When the source has no image or video at '
-            + 'all, the button is greyed out.'
+            + 'this one costs you a file. When the bot found one it is on the card above, ready '
+            + 'to save; when the source has no image or video at all, the button is greyed out.'
+    },
+    {
+        id: 'Copy',
+        label: 'Cut & paste',
+        handle: 'anywhere else',
+        noTick: true,          /* not a place, so there is nothing to tick it off against */
+        action: 'Copy the text and nothing else',
+        text: (row, line) => line ? line + '\n\n' + row.post_url : row.post_url,
+        steps: [
+            'The line and the link land on your clipboard. No tab opens.',
+            'Paste it wherever you are going - a Discord, a group chat, a newsletter, '
+            + 'somewhere that has not been invented yet.',
+            'Nothing to tick afterwards: this one does not claim to know where it went.'
+        ],
+        note: 'The escape hatch. Every other button here is a guess about where we post; '
+            + 'this one makes no guess and just hands you the words.'
     }
 ];
 
@@ -885,6 +948,9 @@ function paintSchemaNotice() {
     p1.textContent = missing.includes('posted_to')
         ? 'The queue still works. Until this runs, an article can only be marked posted, '
         + 'not posted-to-a-particular-place, and the per-destination ticks are hidden.'
+        : missing.includes('media_url')
+        ? 'The queue still works. Until this runs, the bot has nowhere to put the image it '
+        + 'found, so every Instagram post costs a trip back to the original.'
         : 'The queue still works. Until this runs, we cannot record whether a source had '
         + 'an image, so the Instagram button never greys itself out.';
 
@@ -909,7 +975,15 @@ function paintSchemaNotice() {
 const MIGRATION_SQL = [
     'alter table public.socializer',
     "    add column if not exists posted_to text[]  not null default '{}',",
-    '    add column if not exists has_media boolean;',
+    '    add column if not exists has_media boolean,',
+    "    add column if not exists media_url text not null default '';",
+    '',
+    'alter table public.socializer',
+    '    drop constraint if exists socializer_platform_check;',
+    '',
+    'alter table public.socializer',
+    '    add constraint socializer_platform_check',
+    "    check (platform in ('X', 'Bluesky', 'Threads', 'Facebook', 'Instagram', 'YouTube', 'Web'));",
     '',
     'update public.socializer',
     "   set posted_to = array['X']",
@@ -1098,6 +1172,50 @@ function card(row) {
     line.value = row.repost_text ? String(row.repost_text).split('\n')[0] : '';
     if (st !== 'SKIPPED') pad.appendChild(line);
 
+    /* What the bot found attached to the source. Instagram will not take a text-only
+       post, and this is the difference between that costing a trip back to the original
+       and costing one click. */
+    const mediaUrl = SCHEMA.media_url ? String(row.media_url || '').trim() : '';
+    if (mediaUrl) {
+        const strip = document.createElement('div');
+        strip.className = 'media';
+
+        const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(mediaUrl);
+        if (!isVideo) {
+            const img = document.createElement('img');
+            img.src = mediaUrl;
+            img.alt = '';
+            img.loading = 'lazy';
+            /* A hotlinked image from someone else's server can 404 or be blocked at any
+               time. Better to drop the thumbnail than leave a broken frame on the card. */
+            img.onerror = () => img.remove();
+            strip.appendChild(img);
+        }
+
+        const openMedia = document.createElement('a');
+        openMedia.href = mediaUrl;
+        openMedia.target = '_blank';
+        openMedia.rel = 'noopener';
+        openMedia.className = 'mlink';
+        openMedia.textContent = isVideo ? 'Open the video' : 'Open the full image';
+        openMedia.title = 'Opens on the source server. Save it from there, then upload it.';
+
+        const copyMedia = document.createElement('button');
+        copyMedia.className = 'quiet';
+        copyMedia.textContent = 'Copy its URL';
+        copyMedia.onclick = async () => {
+            try {
+                await navigator.clipboard.writeText(mediaUrl);
+                status('Media URL copied.', 'good');
+            } catch {
+                status('Clipboard blocked. Open it and copy the address.', 'err');
+            }
+        };
+
+        strip.append(openMedia, copyMedia);
+        pad.appendChild(strip);
+    }
+
     /* actions */
     const acts = document.createElement('div');
     acts.className = 'acts';
@@ -1106,11 +1224,11 @@ function card(row) {
         for (const d of DESTINATIONS) {
             const b = document.createElement('button');
             if (d.id === 'X') b.className = 'solid';
-            b.textContent = d.id;
+            b.textContent = d.label || d.id;
 
             /* Instagram will not take a text-only post, so when the source carries no
                image or video there is nothing to upload and the button says as much. */
-            const blocked = d.needsMedia && row.has_media === false;
+            const blocked = d.needsMedia && row.has_media === false && !mediaUrl;
             if (blocked) {
                 b.disabled = true;
                 b.title = 'The source has no image or video, and Instagram will not take a '
@@ -1126,7 +1244,8 @@ function card(row) {
                         return;
                     }
                     await copyText(d.text(row, l));
-                    window.open(d.compose, '_blank', 'noopener');
+                    /* Cut & paste has nowhere to open. */
+                    if (d.compose) window.open(d.compose, '_blank', 'noopener');
                 };
             }
             acts.appendChild(b);
@@ -1168,6 +1287,7 @@ function card(row) {
 
         const already = new Set(row.posted_to || []);
         for (const d of DESTINATIONS) {
+            if (d.noTick) continue;
             const chip = document.createElement('button');
             chip.className = 'chip' + (already.has(d.id) ? ' on' : '');
             chip.textContent = d.id;
@@ -1282,6 +1402,7 @@ async function saveCapture(p) {
         status: 'NEW'
     };
     if (SCHEMA.has_media && typeof p.m === 'boolean') fields.has_media = p.m;
+    if (SCHEMA.media_url && p.i) fields.media_url = String(p.i);
 
     const inserted = await sb('?on_conflict=post_key&select=status', {
         method: 'POST',
