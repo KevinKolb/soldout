@@ -15,7 +15,7 @@
  * One row, with the same fields the SOC SOCIALIZER BOT fills, so a hand capture and a
  * bot find are the same kind of thing and sort together:
  *
- *     Why it's funny | Handle | Link | Platform | Media | Status
+ *     Witticism | Handle | Link | Platform | Media | Status
  *
  * A row from here and a row from the routine are indistinguishable, which is the point:
  * what matters is whether a candidate is funny, not who noticed it. Status starts at New -
@@ -128,7 +128,7 @@ Deno.serve(async (req) => {
     const title = why || (handle ? 'Captured from ' + handle : 'Captured by hand');
 
     const properties: Record<string, unknown> = {
-        "Why it's funny": { title: [{ text: { content: title.slice(0, 2000) } }] },
+        "Witticism": { title: [{ text: { content: title.slice(0, 2000) } }] },
         Link: { url },
         Platform: { select: { name: platform } },
         Media: { checkbox: body.media === true },

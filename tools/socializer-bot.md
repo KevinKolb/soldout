@@ -43,7 +43,7 @@ every candidate is a row with fields rather than a shape you have to get right.
 
 | Field | What goes in it |
 |---|---|
-| **Why it's funny** | The title. One sentence, your words. This is the column a human reads down. |
+| **Witticism** | The title. One sentence, your words. This is the column a human reads down. |
 | **Handle** | Who posted it, `@name`. Leave empty if the source has no handle. |
 | **Link** | The confirmed permalink. |
 | **Platform** | `X`, `Bluesky`, `Instagram`, `Threads`, `Facebook`, `TikTok`, `YouTube`, `Reddit`, or `Other`. |
@@ -143,7 +143,7 @@ One row per candidate, filled in as the table above describes.
 
 - Strip tracking parameters (`utm_*`, `fbclid`, `igshid`, `si`, `ref`, and the like) from
   every URL before it goes in **Link**.
-- **Why it's funny** is *your* sentence: what the joke is, and which criterion it hits. Do
+- **Witticism** is *your* sentence: what the joke is, and which criterion it hits. Do
   not paste the post's own text in place of it, and do not write a title.
 - **Status** is `New` on every row you create, without exception.
 - Add rows only. Never edit an existing row, never change anybody's Status, never delete.
