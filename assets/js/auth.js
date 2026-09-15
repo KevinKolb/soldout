@@ -41,10 +41,17 @@ export function isOwner(user) {
     return !!user && String(user.email || '').toLowerCase() === OWNER;
 }
 
+/* prompt=select_account makes Google show the account chooser every time. Without it
+   Google silently reuses whichever account the browser is already signed into, which on
+   a machine signed in as soldoutcomedy@gmail.com means you never get the chance to pick
+   the owner account, and the page just tells you the wrong person is at the door. */
 export async function signIn(redirectTo) {
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: redirectTo || location.href.split('#')[0] }
+        options: {
+            redirectTo: redirectTo || location.href.split('#')[0],
+            queryParams: { prompt: 'select_account' }
+        }
     });
     if (error) throw new Error(error.message);
 }

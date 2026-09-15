@@ -39,7 +39,7 @@ A routine that goes looking for funny posts once a day and writes what it finds 
 sentence on why it is funny, the permalink, and `[has media]` where the source carries an
 image or a video.
 
-The *clip to soc socials* bookmarklet on [backstage/clip](backstage/clip/index.html) writes
+The *FOUND FUNNY* bookmarklet on [backstage/clip](backstage/clip/index.html) writes
 to the same page in the same shape, so a hand-capture and a bot find are indistinguishable.
 It cannot reach Notion directly — Notion's API refuses cross-origin browser requests — so it
 hands the URL to that page, which asks the `clip-to-notion` edge function, which holds the
