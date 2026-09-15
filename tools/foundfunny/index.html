@@ -114,7 +114,7 @@
     <div id="status"></div>
 
     <div class="gate" id="gate">
-        <p>Sign in to clip.</p>
+        <p id="gateWhy">Sign in to clip.</p>
         <button id="signin" type="button">Sign in with Google</button>
     </div>
 
@@ -235,10 +235,19 @@ document.getElementById('mark').addEventListener('click', e => {
     status('Drag it to your bookmarks bar, then press it on a post.', 'busy');
 });
 
+/* Set when somebody is signed in, but not the owner. The gate is the only thing on
+   screen in that state - the form holding the Sign out button is hidden - so the way
+   out has to live on this button or there is no way out at all. */
+let wrongAccount = false;
+
 document.getElementById('signin').onclick = async (e) => {
     e.target.disabled = true;
     try {
-        await signIn(location.origin + '/tools/foundfunny/');
+        /* Drop the existing session first. Google will not replace a session that
+           Supabase still believes in, and the page would come back saying the same
+           thing it said before the press. */
+        if (wrongAccount) await signOut();
+        await signIn(location.origin + '/tools/foundfunny/', { chooseAccount: wrongAccount });
     } catch (ex) {
         e.target.disabled = false;
         status(ex.message, 'err');
@@ -297,7 +306,16 @@ function render(user) {
     const ok = isOwner(user);
     form.hidden = !ok;
     gate.hidden = ok;
-    if (user && !ok) status('Signed in as ' + user.email + '. That is not ' + OWNER + '.', 'err');
+
+    wrongAccount = !!user && !ok;
+    document.getElementById('gateWhy').textContent = wrongAccount
+        ? 'Signed in as ' + user.email + ', which cannot write to the table.'
+        : 'Sign in to clip.';
+    document.getElementById('signin').textContent = wrongAccount
+        ? 'Sign out and switch account'
+        : 'Sign in with Google';
+
+    if (wrongAccount) status('That is not ' + OWNER + '.', 'err');
     if (ok) prefill();
 }
 

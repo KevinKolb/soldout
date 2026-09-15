@@ -50,12 +50,19 @@ export function isOwner(user) {
  * sign-in. It solved the same problem by making you do the work every time. If the
  * hinted account is not signed in, Google shows the picker anyway, and "Use another
  * account" is still on the consent screen - so nothing is lost by not forcing it. */
-export async function signIn(redirectTo) {
+export async function signIn(redirectTo, { chooseAccount = false } = {}) {
+    /* Pass chooseAccount when somebody is already signed in as the wrong person.
+       Without prompt=select_account Google hands the existing account straight back,
+       the page says "that is not the owner" again, and the button looks broken. The
+       hint stays alongside it, so the owner is the highlighted choice. */
+    const queryParams = { login_hint: OWNER };
+    if (chooseAccount) queryParams.prompt = 'select_account';
+
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
             redirectTo: redirectTo || location.href.split('#')[0],
-            queryParams: { login_hint: OWNER }
+            queryParams
         }
     });
     if (error) throw new Error(error.message);
