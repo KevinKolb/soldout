@@ -1,4 +1,4 @@
-/* Appends one captured post to the SOCIALS page in Notion, on behalf of the owner.
+/* Appends one captured post to the POST CANDIDATES page in Notion, on behalf of the owner.
  *
  * WHY THIS EXISTS AT ALL
  * A browser cannot call Notion's API. It refuses cross-origin requests, so a page on
@@ -19,16 +19,16 @@
  *     **@handle** - why it is funny, in one sentence
  *     https://permalink  [has media]
  *
- * It appends and does nothing else. It cannot edit or delete a block, so it cannot
- * damage the account logins at the top of that page.
+ * It appends and does nothing else. It cannot edit or delete a block.
  *
  * DEPLOYING IT
  *   1. Make an internal integration at notion.so/profile/integrations
  *      - Capabilities: Insert content. Nothing else: it does not need to read or update.
  *      Copy the Internal Integration Secret (starts ntn_).
- *   2. Share the SOCIALS page with it: open the page, ... menu -> Connections ->
- *      add the integration. Without this it gets 404 on a page that plainly exists,
- *      which is Notion's way of saying "not shared with you".
+ *   2. Share POST CANDIDATES with it: open the page, ... menu -> Connections -> add
+ *      the integration. A child page normally inherits its parent's connections, so
+ *      sharing SOCIALS covers this one too. Without it, Notion answers 404 on a page
+ *      that plainly exists, which is its way of saying "not shared with you".
  *   3. supabase secrets set NOTION_TOKEN_SOC=ntn_...
  *      or Dashboard -> Edge Functions -> Secrets.
  *   4. supabase functions deploy clip-to-notion
@@ -38,7 +38,9 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const OWNER = 'kevinmkolb@gmail.com';
 
-/* SOCIALS, under BACKSTAGE BIBLE. The same page the bot appends to. */
+/* POST CANDIDATES, under SOCIALS, under BACKSTAGE BIBLE. The same page the bot appends
+   to. The id is unchanged from when this page was itself called SOCIALS - renaming and
+   moving a Notion page keeps its id, which is why nothing here had to move with it. */
 const PAGE = '9755d3fa-6f18-48aa-9831-ba93f501ae7b';
 const NOTION_VERSION = '2022-06-28';
 
@@ -126,8 +128,7 @@ Deno.serve(async (req) => {
             'Notion-Version': NOTION_VERSION,
             'Content-Type': 'application/json',
         },
-        /* A divider first, so each entry is fenced off from whatever came before it -
-           including, for the very first one, the account links the page is really for.
+        /* A divider first, so each entry is fenced off from the one before it.
            children appends to the end: there is no call here that could reorder or
            remove what is already on the page. */
         body: JSON.stringify({
@@ -142,7 +143,7 @@ Deno.serve(async (req) => {
     if (!res.ok) {
         const detail = (await res.text()).slice(0, 300);
         const hint = res.status === 404
-            ? ' The page is probably not shared with the integration: open SOCIALS, ... menu, Connections, add it.'
+            ? ' The page is probably not shared with the integration: open POST CANDIDATES, ... menu, Connections, add it.'
             : '';
         return json({ error: `Notion refused it (${res.status}).${hint} ${detail}` }, 502);
     }

@@ -9,7 +9,8 @@ Manage the routine itself at <https://claude.ai/code/routines>.
 
 ## What the job is
 
-Find funny posts worth reposting, and write them onto the **SOCIALS** page in Notion.
+Find funny posts worth reposting, and write them onto the **POST CANDIDATES** page in
+Notion.
 
 You **nominate candidates**. You do not post. Nothing in this job speaks for the account,
 and nothing you write reaches an audience. A human reads every candidate and decides.
@@ -20,17 +21,20 @@ of this job: if it is not written there, it did not happen.
 
 ## What you may change
 
-Blocks appended to the end of the SOCIALS page. Nothing else, anywhere.
+Blocks appended to the end of the POST CANDIDATES page. Nothing else, anywhere.
 
-You **append**. You never edit, reorder or delete anything already on that page — the
-account names and logins at the top of it are what the page is actually for, and they are
-none of your business. You make **no git commits**, and you write to no database.
+You **append**. You never edit, reorder or delete anything already on that page — what is
+there is either a candidate somebody has not read yet or one they have already ruled on,
+and neither is yours to touch. You make **no git commits**, and you write to no database.
+
+Its parent, SOCIALS, holds the account names and logins. Stay out of it entirely.
 
 ## The page
 
-**SOCIALS**, `9755d3fa6f1848aa9831ba93f501ae7b`, under BACKSTAGE BIBLE. You reach it through
-the Notion connector attached to this routine. If Notion is unreachable, say so plainly in
-your final message and stop — do not write the candidates somewhere else instead.
+**POST CANDIDATES**, `9755d3fa6f1848aa9831ba93f501ae7b`, under SOCIALS, under BACKSTAGE
+BIBLE. You reach it through the Notion connector attached to this routine. If Notion is
+unreachable, say so plainly in your final message and stop — do not write the candidates
+somewhere else instead.
 
 ## Step 1 — what qualifies
 
@@ -48,7 +52,7 @@ More criteria to come. Add them here, commit, and the next run follows the new l
 
 ## Step 2 — read the page before you add to it
 
-Fetch the SOCIALS page first, every run. It does two jobs at once.
+Fetch the POST CANDIDATES page first, every run. It does two jobs at once.
 
 **It is the dedupe list.** Every candidate already on it has been seen. If a permalink is
 already there, skip it and say nothing more about it — re-nominating something is arguing
@@ -115,7 +119,7 @@ A post carrying an image or a video is worth more than one without, because it c
 Instagram and Threads as well as to X, Facebook and Bluesky. Not a rule — a funny line with
 no picture still beats a dull picture — but it is the tie-breaker.
 
-## Step 6 — append them to SOCIALS
+## Step 6 — append them to POST CANDIDATES
 
 Each candidate is a divider and two lines, appended to the end of the page:
 
@@ -125,9 +129,8 @@ Each candidate is a divider and two lines, appended to the end of the page:
 https://the/confirmed/permalink
 ```
 
-The divider goes **first**, before the handle. It fences each entry off from whatever came
-before it, which for the first one of a run is either the previous day's last candidate or
-the account links the page is really for.
+The divider goes **first**, before the handle, so each entry is fenced off from the one
+before it.
 
 - Put `[has media]` at the end of the line when the source carries an image or a video.
   Whoever posts it needs to know that before they open it, because it decides whether

@@ -35,9 +35,15 @@ file for you to download and commit.
 ## The Socializer
 
 A routine that goes looking for funny posts once a day and writes what it finds onto the
-**SOCIALS** page in Notion, under BACKSTAGE BIBLE. One line per candidate: the handle, a
+**POST CANDIDATES** page in Notion, under SOCIALS. One entry per candidate: the handle, a
 sentence on why it is funny, the permalink, and `[has media]` where the source carries an
 image or a video.
+
+The *clip to soc socials* bookmarklet on [backstage/clip](backstage/clip/index.html) writes
+to the same page in the same shape, so a hand-capture and a bot find are indistinguishable.
+It cannot reach Notion directly — Notion's API refuses cross-origin browser requests — so it
+hands the URL to that page, which asks the `clip-to-notion` edge function, which holds the
+token.
 
 It nominates and nothing else. Nothing in the job speaks for the account and nothing it
 writes reaches an audience — a person reads the page and posts by hand, wherever it suits.
