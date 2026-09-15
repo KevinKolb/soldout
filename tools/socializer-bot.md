@@ -178,9 +178,14 @@ platform's own search, or its embed/syndication endpoint.
 
 ## Step 5 — judge hard
 
-Aim for **3 to 8** candidates a run. Returning one, or none, is a fine outcome and a much
-better one than padding. A thin queue of things that are actually funny beats a fat queue of
-things somebody has to skip.
+Aim for **3 to 8** candidates a run. A thin queue of things that are actually funny beats a
+fat queue of things somebody has to skip.
+
+Kevin wants **at least one candidate from every platform** on the SOCIALS account list (Step
+3) each run, even a thin one. That floor overrides "returning none is a fine outcome" —
+coverage across every platform matters more than a platform going to zero. Keep judging hard
+within each platform; it's the "skip the whole platform" instinct to resist, not the "skip
+this one post" instinct.
 
 Skip anything that is: an ad or brand marketing, engagement bait, cruel at somebody's
 expense, political, sexual, or about a named private individual. Skip anything you would
@@ -212,6 +217,12 @@ Strip `www.` from the host, and strip tracking params (`utm_*`, `fbclid`, `igshi
 Fetch the existing keys first and skip anything already there. That is not only about
 duplicates: a key already in the table may have been **SKIPPED** by a human, and
 re-nominating it would be arguing with them.
+
+Kevin deletes rows and Notion blocks by hand once he's read them — that's expected, not a
+bug to route around. Dedupe still runs off whatever keys currently exist; don't try to
+remember a run's candidates past this one, and don't treat a missing row as license to
+bring the same post back. If you happen to recognize something you already saw get deleted,
+leave it out.
 
 ### The insert
 
