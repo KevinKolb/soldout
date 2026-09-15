@@ -59,6 +59,14 @@
         button:disabled { opacity: 0.35; cursor: not-allowed; }
         button.ghost { background: #fff; color: #000; }
 
+        .btn-link {
+            display: inline-block;
+            font-family: inherit; font-size: 14px; font-weight: 600;
+            padding: 11px 20px; border: 2px solid #000;
+            background: #fff; color: #000; text-decoration: none;
+        }
+        .btn-link:hover { background: #000; color: #fff; }
+
         #status {
             padding: 12px 15px; border: 2px solid #000; margin-bottom: 22px;
             display: none; font-size: 14px;
@@ -67,6 +75,7 @@
         #status.err { background: #ffe5e5; border-color: #c0392b; }
         #status.good { background: #e8f5e9; border-color: #24a25b; }
         #status.busy { background: #ffd93d; }
+        #status a { color: inherit; font-weight: 700; }
 
         .gate { border: 2px solid #000; padding: 36px 30px; text-align: center; }
         .gate p { font-size: 14px; color: #666; margin-bottom: 22px; }
@@ -121,6 +130,7 @@
 
         <div class="actions">
             <button id="save" type="button">FOUND FUNNY</button>
+            <a class="btn-link" id="view" href="#" target="_blank" rel="noopener">VIEW POST CANDIDATES</a>
             <button id="out" class="ghost" type="button">Sign out</button>
         </div>
 
@@ -145,11 +155,15 @@
    function carries the token. */
 import { currentUser, isOwner, signIn, signOut, supabase, OWNER } from '/assets/js/auth.js';
 
+const CANDIDATES = 'https://app.notion.com/p/POST-CANDIDATES-9755d3fa6f1848aa9831ba93f501ae7b';
+document.getElementById('view').href = CANDIDATES;
+
 const statusEl = document.getElementById('status');
-function status(msg, kind) {
-    statusEl.textContent = msg;
+function status(msg, kind, html) {
+    statusEl[html ? 'innerHTML' : 'textContent'] = msg;
     statusEl.className = 'show ' + (kind || '');
-    if (kind === 'good') setTimeout(() => { statusEl.className = ''; }, 5000);
+    /* Long enough to read the confirmation and press the link in it. */
+    if (kind === 'good') setTimeout(() => { statusEl.className = ''; }, 20000);
 }
 
 const gate = document.getElementById('gate');
@@ -206,7 +220,7 @@ document.getElementById('save').onclick = async () => {
     if (!/^https?:\/\//i.test(link)) { status('Paste the link to the post first.', 'err'); return; }
 
     btn.disabled = true;
-    status('Adding to SOCIALS...', 'busy');
+    status('Adding to POST CANDIDATES...', 'busy');
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) { btn.disabled = false; status('Session expired. Sign in again.', 'err'); return; }
@@ -235,7 +249,8 @@ document.getElementById('save').onclick = async () => {
 
         url.value = handle.value = why.value = '';
         media.checked = false;
-        status('On the SOCIALS page.', 'good');
+        status('Added to <a href="' + CANDIDATES + '" target="_blank" rel="noopener">POST CANDIDATES</a>.',
+               'good', true);
     } catch (err) {
         btn.disabled = false;
         status('Could not reach the clipper: ' + err.message, 'err');
