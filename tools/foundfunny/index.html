@@ -67,6 +67,17 @@
         }
         .btn-link:hover { background: #000; color: #fff; }
 
+        /* Popup mode. Same page, less of it: in a 440px window the chrome that helps
+           on a full page (the way back, the instructions for installing the very
+           bookmarklet you just pressed) is only in the way. */
+        body.popup { padding: 18px 16px; }
+        body.popup .uplink, body.popup details { display: none; }
+        body.popup h1 { font-size: 24px; }
+        body.popup .subtitle { font-size: 13px; margin-bottom: 18px; }
+        body.popup .field { margin-bottom: 13px; }
+        body.popup textarea { min-height: 58px; }
+        body.popup .actions { margin-top: 18px; }
+
         #status {
             padding: 12px 15px; border: 2px solid #000; margin-bottom: 22px;
             display: none; font-size: 14px;
@@ -136,9 +147,10 @@
 
         <details>
             <summary>The bookmarklet</summary>
-            <p>Drag this to your bookmarks bar. Press it on any post and this page opens with
-               the link already filled in, and the page's own title as a starting point for
-               the sentence.</p>
+            <p>Drag this to your bookmarks bar. Press it on any post and this opens in a
+               small window with the link already filled in, and whatever you had selected
+               (or the page's own title) as a starting point for the sentence. Save and it
+               closes itself, leaving you where you were.</p>
             <a class="mark" id="mark" href="#">FOUND FUNNY</a>
             <p>It carries nothing secret: it only hands this page a URL. The Notion token
                lives on the server, which is the only way a browser can write to Notion at
@@ -157,6 +169,23 @@ import { currentUser, isOwner, signIn, signOut, supabase, OWNER } from '/assets/
 
 const CANDIDATES = 'https://app.notion.com/p/4870f03cf2f24bd8a51e1d4c9e89b0ca';
 document.getElementById('view').href = CANDIDATES;
+
+/* Opened as a little window by the bookmarklet, or loaded as an ordinary page?
+   sessionStorage rather than window.opener alone: the Google sign-in round trip can
+   drop the opener reference, and this window would otherwise forget halfway through
+   that it was ever a popup. sessionStorage is per-window, so it cannot leak the flag
+   into a tab you opened yourself. */
+const POPUP = (() => {
+    try {
+        if (window.opener || new URLSearchParams(location.search).has('p')) {
+            sessionStorage.setItem('ff_popup', '1');
+        }
+        return sessionStorage.getItem('ff_popup') === '1';
+    } catch {
+        return !!window.opener;
+    }
+})();
+if (POPUP) document.body.classList.add('popup');
 
 const statusEl = document.getElementById('status');
 function status(msg, kind, html) {
@@ -193,8 +222,12 @@ document.getElementById('mark').setAttribute('href',
     "javascript:(function(){"
     + "var s=String(window.getSelection()||'').trim();"
     + "var t=s||document.title||'';"
-    + "location.href='https://www.soldoutcomedy.com/tools/foundfunny/?u='"
+    + "var u='https://www.soldoutcomedy.com/tools/foundfunny/?p=1&u='"
     + "+encodeURIComponent(location.href)+'&t='+encodeURIComponent(t.slice(0,300));"
+    /* A blocked popup returns null rather than throwing, so fall back to the old
+       behaviour instead of leaving the press doing nothing at all. */
+    + "var w=window.open(u,'foundfunny','width=440,height=620,menubar=no,toolbar=no,location=no,status=no');"
+    + "if(w){w.focus();}else{location.href=u;}"
     + "})()");
 
 document.getElementById('mark').addEventListener('click', e => {
@@ -249,6 +282,9 @@ document.getElementById('save').onclick = async () => {
 
         url.value = handle.value = why.value = '';
         media.checked = false;
+        /* Long enough to read the confirmation, short enough that it gets out of the
+           way on its own and puts you back on the post you were reading. */
+        if (POPUP) setTimeout(() => window.close(), 1400);
         status('Added to <a href="' + CANDIDATES + '" target="_blank" rel="noopener">POST CANDIDATES</a>.',
                'good', true);
     } catch (err) {
