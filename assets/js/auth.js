@@ -41,32 +41,27 @@ export function isOwner(user) {
     return !!user && String(user.email || '').toLowerCase() === OWNER;
 }
 
-/* login_hint names the account Google should use, so the owner is picked for you
-   instead of being picked at random from whatever the browser is signed into. On a
-   machine also signed in as soldoutcomedy@gmail.com that guesswork is what put the
-   wrong person at the door.
+/* Always ask which Google account. Never hint, never assume.
  *
- * This replaced prompt=select_account, which forced the chooser on every single
- * sign-in. It solved the same problem by making you do the work every time. If the
- * hinted account is not signed in, Google shows the picker anyway, and "Use another
- * account" is still on the consent screen - so nothing is lost by not forcing it. */
-export async function signIn(redirectTo, { chooseAccount = false } = {}) {
-    /* Pass chooseAccount when somebody is already signed in as the wrong person.
-       Without prompt=select_account Google hands the existing account straight back,
-       the page says "that is not the owner" again, and the button looks broken. The
-       hint stays alongside it, so the owner is the highlighted choice. */
-    /* Only one of these at a time. Sent together, Google has been observed to honour
-       neither: it skips the chooser and hands back whatever session the browser
-       already has, which is exactly the state you are trying to escape. */
-    const queryParams = chooseAccount
-        ? { prompt: 'select_account' }
-        : { login_hint: OWNER };
-
+ * Google OAuth reads the browser profile's own Google session. This profile is signed
+ * into Chrome as soldoutcomedy@gmail.com on purpose - it is what makes the social
+ * passwords autofill - so without prompt=select_account Google silently reuses that
+ * account and there is no moment at which a different one can be picked. The page then
+ * says "that is not the owner" about a choice nobody was offered.
+ *
+ * login_hint was tried here and does not fix it: a hint only suggests an account, and
+ * an existing session outranks it. Sending both is worse still - Google honours
+ * neither and goes straight back to the session it already had.
+ *
+ * The cost is one extra click on every sign-in. The sessions persist, so that click is
+ * rare, and it is the only thing standing between you and being permanently logged in
+ * as the wrong person. */
+export async function signIn(redirectTo) {
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
             redirectTo: redirectTo || location.href.split('#')[0],
-            queryParams
+            queryParams: { prompt: 'select_account' }
         }
     });
     if (error) throw new Error(error.message);

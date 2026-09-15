@@ -257,7 +257,7 @@ document.getElementById('signin').onclick = async (e) => {
            Supabase still believes in, and the page would come back saying the same
            thing it said before the press. */
         if (wrongAccount) await signOut();
-        await signIn(location.origin + '/tools/foundfunny/', { chooseAccount: wrongAccount });
+        await signIn(location.origin + '/tools/foundfunny/');
     } catch (ex) {
         e.target.disabled = false;
         status(ex.message, 'err');
