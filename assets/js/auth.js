@@ -41,16 +41,21 @@ export function isOwner(user) {
     return !!user && String(user.email || '').toLowerCase() === OWNER;
 }
 
-/* prompt=select_account makes Google show the account chooser every time. Without it
-   Google silently reuses whichever account the browser is already signed into, which on
-   a machine signed in as soldoutcomedy@gmail.com means you never get the chance to pick
-   the owner account, and the page just tells you the wrong person is at the door. */
+/* login_hint names the account Google should use, so the owner is picked for you
+   instead of being picked at random from whatever the browser is signed into. On a
+   machine also signed in as soldoutcomedy@gmail.com that guesswork is what put the
+   wrong person at the door.
+ *
+ * This replaced prompt=select_account, which forced the chooser on every single
+ * sign-in. It solved the same problem by making you do the work every time. If the
+ * hinted account is not signed in, Google shows the picker anyway, and "Use another
+ * account" is still on the consent screen - so nothing is lost by not forcing it. */
 export async function signIn(redirectTo) {
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
             redirectTo: redirectTo || location.href.split('#')[0],
-            queryParams: { prompt: 'select_account' }
+            queryParams: { login_hint: OWNER }
         }
     });
     if (error) throw new Error(error.message);
