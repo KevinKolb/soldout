@@ -142,6 +142,32 @@ original.
 to a feed or a profile. No confirmed permalink, no candidate. Never invent a URL, a handle,
 or post text, and never guess at an id.
 
+### Fetching permalinks without login
+
+Instagram, Facebook and X all serve an empty JS shell to a plain fetch of the normal page —
+that's not the same as the post being unconfirmable. Each platform also has a public embed or
+syndication endpoint that still renders server-side, no login or token needed. Try these
+before writing a platform off:
+
+- **Instagram** — fetch `https://www.instagram.com/p/<code>/embed/captioned/` (or `/reel/<code>/embed/captioned/`).
+  The caption sits in `class="Caption"`, the author in `class="CaptionUsername"`, the image in
+  `class="EmbeddedMediaImage" src="..."`.
+- **Facebook** — fetch `https://www.facebook.com/plugins/post.php?href=<url-encoded permalink>&show_text=true`.
+  This only renders for an old-style permalink: `photo.php?fbid=...`, `story.php?story_fbid=...`,
+  or `<page>/posts/<numeric-id-only>` — strip any slug text Facebook appends after the page
+  name, keep just the digits. The caption sits in `data-testid="post_message"`, the photo in an
+  image `src` under `scontent...t1.6435-9...`.
+- **X** — fetch `https://publish.twitter.com/oembed?url=<tweet-url>` (follow redirects) for the
+  text, author and date, and `https://cdn.syndication.twimg.com/tweet-result?id=<digits>&token=a`
+  for the full post as JSON, including a `media_url_https` for any attached photo.
+
+Instagram's and Facebook's CDN image URLs are signed and expire in a few days (the `oe=` query
+param is a hex Unix timestamp) — that's normal, still use them for `media_url`. X's
+`pbs.twimg.com` URLs don't expire.
+
+Only treat a permalink as unconfirmable once it won't render through the normal page, the
+platform's own search, or its embed/syndication endpoint.
+
 ## Step 5 — judge hard
 
 Aim for **3 to 8** candidates a run. Returning one, or none, is a fine outcome and a much
