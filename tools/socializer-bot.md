@@ -48,7 +48,6 @@ every candidate is a row with fields rather than a shape you have to get right.
 | **Link** | The confirmed permalink. |
 | **Platform** | `X`, `Bluesky`, `Instagram`, `Threads`, `Facebook`, `TikTok`, `YouTube`, `Reddit`, or `Other`. |
 | **Media** | Checked when the post carries an image or a video. |
-| **Source** | Always `Bot`. Hand captures from FOUND FUNNY use `Found Funny`. |
 | **Status** | Always `New`. Never anything else. |
 
 `Added` fills itself in.

@@ -15,11 +15,11 @@
  * One row, with the same fields the SOC SOCIALIZER BOT fills, so a hand capture and a
  * bot find are the same kind of thing and sort together:
  *
- *     Why it's funny | Handle | Link | Platform | Source | Media | Status
+ *     Why it's funny | Handle | Link | Platform | Media | Status
  *
- * Source is always "Found Funny" here and "Bot" from the routine, which is the only
- * difference between them. Status starts at New: nothing in this function ever decides
- * that something has been posted.
+ * A row from here and a row from the routine are indistinguishable, which is the point:
+ * what matters is whether a candidate is funny, not who noticed it. Status starts at New -
+ * nothing in this function ever decides that something has been posted.
  *
  * It creates rows and does nothing else. It cannot edit or delete one, so it cannot
  * touch a candidate somebody has already ruled on.
@@ -131,7 +131,6 @@ Deno.serve(async (req) => {
         "Why it's funny": { title: [{ text: { content: title.slice(0, 2000) } }] },
         Link: { url },
         Platform: { select: { name: platform } },
-        Source: { select: { name: 'Found Funny' } },
         Media: { checkbox: body.media === true },
         Status: { select: { name: 'New' } },
     };
