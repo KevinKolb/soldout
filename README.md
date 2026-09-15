@@ -34,61 +34,29 @@ file for you to download and commit.
 
 ## The Socializer
 
-`backstage/socializer.html` is the repost desk. It holds a queue of other people's posts that
-are funny and either selling-related or a found object, and you work the queue down one
-article at a time: **Skip** marks it SKIPPED and it never comes back, **Copy & open X**
-puts the words on your clipboard and opens the composer.
+A routine that goes looking for funny posts once a day and writes what it finds onto the
+**SOCIALS** page in Notion, under BACKSTAGE BIBLE. One line per candidate: the handle, a
+sentence on why it is funny, the permalink, and `[has media]` where the source carries an
+image or a video.
 
-Posting is deliberately manual. Nothing on the page talks to any platform: it holds the
-words, you press Post. Where a post *came from* and where it *goes* are separate questions —
-an article can start life on any link on the planet, and go out to any of three destinations.
-
-| Destination | How it works |
-| --- | --- |
-| **X** | Paste into the composer; the link unfurls into the original post |
-| **Bluesky** | The only one with a real compose intent, so the post arrives already written &mdash; no clipboard |
-| **Facebook** | Same, into the Page composer. No prefill exists — its old sharer link lands text locked and uneditable |
-| **Instagram** | The odd one out: needs an image or video, has no composer to open, and a caption URL is not clickable. The button copies a caption and credits the author; you bring the screenshot. It greys out when the source has no media at all |
-
-`posted_to` records which destinations actually have it, so `POSTED` never has to mean
-"posted… somewhere". `has_media` is set at capture time from the source's `og:image` /
-`og:video`, and is what greys the Instagram button out.
-
-Three things fill the queue, and all three write to the same Supabase table:
-
-| Source | How |
-| --- | --- |
-| The **That's Funny!** bookmarklet, dragged to your bookmarks bar | Works on any page. On X it reads the post itself; elsewhere it takes the page's own metadata, or your selection |
-| Typing a link into *Add one by hand* | Straight into the table |
-| The **SOC SOCIALIZER BOT** routine | Inserts rows directly, so it makes no commits and triggers no deploys |
-
-### Storage
-
-The queue lives in Supabase, in the table created by
-[tools/socializer-schema.sql](tools/socializer-schema.sql). The project URL and publishable
-key go in the `SUPABASE` block at the top of the page's script.
-
-That publishable key is committed on purpose — that is what it is for. (Supabase renamed the
-old `anon` key to the publishable key; both still work and both map to the `anon` role the
-policies name.) What it may do is fixed by the row-level security policies in that SQL file:
-read the queue, add to the queue, change a row's status. It cannot delete anything and it cannot reach any other table.
-The page is on a public site, so treat those three abilities as available to anyone who finds
-it; for a repost queue that is the price of nobody having to set anything up. To tighten it,
-put a Supabase login in front of the page and narrow the policies from `anon` to
-`authenticated`.
-
-Every row is keyed by `post_key`, derived from the URL (`x:<digits>`, `yt:<id>`, `ig:<code>`,
-`fb:<digits>`, or `url:<host><path>`). The column is unique and every insert uses
-`resolution=ignore-duplicates`, so catching the same thing twice is a no-op and a re-capture
-can never resurrect something already marked SKIPPED.
-
-### The bot
+It nominates and nothing else. Nothing in the job speaks for the account and nothing it
+writes reaches an audience — a person reads the page and posts by hand, wherever it suits.
 
 Standing orders are [tools/socializer-bot.md](tools/socializer-bot.md), not the routine's
-prompt — the prompt is one line and points at that file, so the orders can be edited by
-committing. That file holds all of it: what qualifies, the **Popular sources** worth
-watching, and how to write a row. Manage the routine itself at
-<https://claude.ai/code/routines>.
+prompt: the prompt is one line and points at that file, so the orders can be changed by
+committing. That file holds what qualifies, the **Popular sources** worth watching, and the
+shape of a line on the page. Manage the routine at <https://claude.ai/code/routines>.
+
+### What this replaced
+
+There was a repost desk at `backstage/socializer.html` and a queue behind it in Supabase:
+a card per candidate, prefilled composers for X, Facebook, Bluesky, Threads and Instagram,
+a media thumbnail, and per-destination ticks. A bookmarklet captured posts into it from any
+page.
+
+It is gone, deliberately — everything lives in Notion now. The `socializer` table still
+exists with what it collected, and [tools/socializer-schema.sql](tools/socializer-schema.sql)
+and its migrations still describe it, but nothing reads or writes it any more.
 
 ## Local development
 

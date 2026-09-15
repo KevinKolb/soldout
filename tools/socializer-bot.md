@@ -9,49 +9,28 @@ Manage the routine itself at <https://claude.ai/code/routines>.
 
 ## What the job is
 
-Fill the repost queue that a human works down by hand in
-[backstage/socializer.html](../backstage/socializer.html), and write the same candidates
-onto the SOCIALS page in Notion.
+Find funny posts worth reposting, and write them onto the **SOCIALS** page in Notion.
 
-You **nominate candidates**. You do not post. Nothing in this job touches X, and nothing in
-this job speaks for the account. A human reads every candidate and presses Post themselves.
+You **nominate candidates**. You do not post. Nothing in this job speaks for the account,
+and nothing you write reaches an audience. A human reads every candidate and decides.
 
-### Two places, on purpose
-
-The Supabase row is what the posting page works from: it is what puts the composer buttons,
-the media thumbnail and the Posted ticks in front of somebody. The Notion line is where the
-rest of the show is written down, and it is where a candidate gets read when nobody is
-sitting at the posting page.
-
-Write both. If one of them fails, still do the other and say which failed - a candidate
-recorded in one place is worth more than a run that stopped halfway.
+There used to be a queue in Supabase and a page in this repo for working it down. Both are
+gone. Notion is the only place now, which means the page you append to is the whole output
+of this job: if it is not written there, it did not happen.
 
 ## What you may change
 
-Rows in the `socializer` table in Supabase, and blocks appended to the SOCIALS page in
-Notion. Nothing else, anywhere.
+Blocks appended to the end of the SOCIALS page. Nothing else, anywhere.
 
-You **insert** and you **append**. You never update or delete a Supabase row — `status`
-belongs to the human, and overwriting it would un-skip something they already threw out.
-You never edit or delete anything already on the SOCIALS page: the account logins and links
-at the top of it are what the page is actually for, and they are none of your business.
+You **append**. You never edit, reorder or delete anything already on that page — the
+account names and logins at the top of it are what the page is actually for, and they are
+none of your business. You make **no git commits**, and you write to no database.
 
-You make **no git commits**. Nothing in this job edits a file in the repo.
+## The page
 
-## Getting into Supabase
-
-The project URL and the publishable key are committed in the `SUPABASE` block near the top
-of the script in [backstage/socializer.html](../backstage/socializer.html). Read them out of that
-file — do not ask for them and do not hardcode them here, so rotating the key stays a
-one-file change.
-
-Every call needs both headers:
-
-```sh
-curl -s "$SUPABASE_URL/rest/v1/socializer?select=post_key" \
-  -H "apikey: $SUPABASE_KEY" \
-  -H "Authorization: Bearer $SUPABASE_KEY"
-```
+**SOCIALS**, `9755d3fa6f1848aa9831ba93f501ae7b`, under BACKSTAGE BIBLE. You reach it through
+the Notion connector attached to this routine. If Notion is unreachable, say so plainly in
+your final message and stop — do not write the candidates somewhere else instead.
 
 ## Step 1 — what qualifies
 
@@ -67,58 +46,30 @@ change it.
 
 More criteria to come. Add them here, commit, and the next run follows the new list.
 
-## Step 2 — look at what already got posted
+## Step 2 — read the page before you add to it
 
-The criteria tell you the rule. The queue tells you the taste. Before you go looking, read
-what has actually cleared the bar:
+Fetch the SOCIALS page first, every run. It does two jobs at once.
 
-```sh
-curl -s "$SUPABASE_URL/rest/v1/socializer?status=eq.POSTED&select=author,platform,body,why,repost_text,posted_to&order=handled_at.desc&limit=30" \
-  -H "apikey: $SUPABASE_KEY" \
-  -H "Authorization: Bearer $SUPABASE_KEY"
-```
+**It is the dedupe list.** Every candidate already on it has been seen. If a permalink is
+already there, skip it and say nothing more about it — re-nominating something is arguing
+with a person who has already looked.
 
-Those are the ones a human read and chose to put out under our name. Study them for the
-things the criteria cannot say out loud: how long a post tends to be, how broad or how dry
-the joke is, whether it leans more to selling or more to found objects, which platforms keep
-earning their place, and what `repost_text` shows about the line we like to put on top.
-`posted_to` tells you where each one went, which is worth noticing — something that made it
-onto all three destinations cleared a higher bar than something that only went to X.
+**It is the taste.** The candidates that have accumulated are what has been judged worth
+writing down. Read them for the things the criteria cannot say out loud: how broad or how
+dry the joke tends to be, whether it leans more to selling or more to found objects, which
+sources keep earning their place.
 
-Then read the other side, which is just as instructive:
-
-```sh
-curl -s "$SUPABASE_URL/rest/v1/socializer?status=eq.SKIPPED&select=author,platform,body,why&order=handled_at.desc&limit=30" \
-  -H "apikey: $SUPABASE_KEY" \
-  -H "Authorization: Bearer $SUPABASE_KEY"
-```
-
-Every one of those is a candidate somebody looked at and threw out. If your nominations keep
-resembling that pile, the problem is your judgement, not their patience.
-
-Both lists start empty and stay thin for a while. That is fine — fall back on the criteria
-and do not invent a pattern out of two rows. Once there are ten or more POSTED, treat them
-as the sharper spec.
-
-If either call fails, say so in your final message and carry on with the criteria alone.
-A calibration you could not fetch is not a reason to skip the run.
+The list starts thin. That is fine — fall back on the criteria and do not invent a pattern
+out of two entries.
 
 ## Step 3 — check the popular sources first
-
-Before anything else, check the **SOCIALS** page in Notion —
-[`9755d3fa6f1848aa9831ba93f501ae7b`](https://app.notion.com/p/SOCIALS-9755d3fa6f1848aa9831ba93f501ae7b),
-under BACKSTAGE BIBLE, the same page Step 7 writes to. Its top holds the current list of
-account logins — the platforms SOLD OUT! Comedy is actually on. Read it fresh each run
-rather than trusting an earlier one: it changes without notice, and it is what "socials"
-means for the rest of this file — the platforms worth searching, and the ones a human might
-eventually post a candidate to. Never touch that list; you're only reading it.
 
 These are people who reliably make the kind of thing we want. Check them before you go
 searching the open web, and take roughly half a run's candidates from here whenever they
 have posted anything good.
 
-A source can live on any platform. We repost to X, but what we repost does not have to have
-started there.
+A source can live on any platform. What we repost does not have to have started anywhere in
+particular.
 
 ### Blue Collar Corey
 
@@ -150,175 +101,40 @@ original.
 to a feed or a profile. No confirmed permalink, no candidate. Never invent a URL, a handle,
 or post text, and never guess at an id.
 
-### Fetching permalinks without login
-
-Instagram, Facebook and X all serve an empty JS shell to a plain fetch of the normal page —
-that's not the same as the post being unconfirmable. Each platform also has a public embed or
-syndication endpoint that still renders server-side, no login or token needed. Try these
-before writing a platform off:
-
-- **Instagram** — fetch `https://www.instagram.com/p/<code>/embed/captioned/` (or `/reel/<code>/embed/captioned/`).
-  The caption sits in `class="Caption"`, the author in `class="CaptionUsername"`, the image in
-  `class="EmbeddedMediaImage" src="..."`.
-- **Facebook** — fetch `https://www.facebook.com/plugins/post.php?href=<url-encoded permalink>&show_text=true`.
-  This only renders for an old-style permalink: `photo.php?fbid=...`, `story.php?story_fbid=...`,
-  or `<page>/posts/<numeric-id-only>` — strip any slug text Facebook appends after the page
-  name, keep just the digits. The caption sits in `data-testid="post_message"`, the photo in an
-  image `src` under `scontent...t1.6435-9...`.
-- **X** — fetch `https://publish.twitter.com/oembed?url=<tweet-url>` (follow redirects) for the
-  text, author and date, and `https://cdn.syndication.twimg.com/tweet-result?id=<digits>&token=a`
-  for the full post as JSON, including a `media_url_https` for any attached photo.
-
-Instagram's and Facebook's CDN image URLs are signed and expire in a few days (the `oe=` query
-param is a hex Unix timestamp) — that's normal, still use them for `media_url`. X's
-`pbs.twimg.com` URLs don't expire.
-
-Only treat a permalink as unconfirmable once it won't render through the normal page, the
-platform's own search, or its embed/syndication endpoint.
-
 ## Step 5 — judge hard
 
-Aim for **3 to 8** candidates a run. A thin queue of things that are actually funny beats a
-fat queue of things somebody has to skip.
-
-Kevin wants **at least one candidate from every platform** on the SOCIALS account list (Step
-3) each run, even a thin one. That floor overrides "returning none is a fine outcome" —
-coverage across every platform matters more than a platform going to zero. Keep judging hard
-within each platform; it's the "skip the whole platform" instinct to resist, not the "skip
-this one post" instinct.
+Aim for **3 to 8** candidates a run. Returning one, or none, is a fine outcome and a much
+better one than padding. A thin list of things that are actually funny beats a fat one of
+things somebody has to scroll past.
 
 Skip anything that is: an ad or brand marketing, engagement bait, cruel at somebody's
 expense, political, sexual, or about a named private individual. Skip anything you would
 have to explain.
 
-A post with an image or a video is worth more than one without, because it can go to
-Instagram and Threads as well as X, Facebook and Bluesky. Not a rule - a funny line with
-no picture still beats a dull picture - but it is the tie-breaker.
+A post carrying an image or a video is worth more than one without, because it can go to
+Instagram and Threads as well as to X, Facebook and Bluesky. Not a rule — a funny line with
+no picture still beats a dull picture — but it is the tie-breaker.
 
-## Step 6 — write the rows to Supabase (the posting page's copy)
+## Step 6 — append them to SOCIALS
 
-### The dedupe key
-
-`post_key` is unique, and it has to be built exactly the way the page builds it or the same
-post lands twice:
-
-| Platform | `post_key` | From |
-| --- | --- | --- |
-| X | `x:<digits>` | the number after `/status/` |
-| YouTube | `yt:<id>` | the `v=` param, or the id after `/shorts/` |
-| Instagram | `ig:<code>` | the code after `/p/` or `/reel/` |
-| Facebook | `fb:<digits>` | the longest run of 6+ digits in the URL |
-| Bluesky | `bsky:<rkey>` | the id after `/post/` |
-| anything else | `url:<host><path>` | lowercased, no scheme, no query, no trailing slash |
-
-Strip `www.` from the host, and strip tracking params (`utm_*`, `fbclid`, `igshid`, `si`,
-`ref`, …) from every URL you store.
-
-Fetch the existing keys first and skip anything already there. That is not only about
-duplicates: a key already in the table may have been **SKIPPED** by a human, and
-re-nominating it would be arguing with them.
-
-Kevin deletes rows and Notion blocks by hand once he's read them — that's expected, not a
-bug to route around. Dedupe still runs off whatever keys currently exist; don't try to
-remember a run's candidates past this one, and don't treat a missing row as license to
-bring the same post back. If you happen to recognize something you already saw get deleted,
-leave it out.
-
-### The insert
-
-```sh
-curl -s -X POST "$SUPABASE_URL/rest/v1/socializer?on_conflict=post_key" \
-  -H "apikey: $SUPABASE_KEY" \
-  -H "Authorization: Bearer $SUPABASE_KEY" \
-  -H "Content-Type: application/json" \
-  -H "Prefer: return=representation,resolution=ignore-duplicates" \
-  -d '[ ...rows... ]'
-```
-
-Send all of a run's candidates as one array. Each row:
-
-| Column | What goes in it |
-| --- | --- |
-| `post_key` | as above |
-| `post_url` | the confirmed permalink, cleaned of tracking params |
-| `platform` | `X`, `Bluesky`, `Threads`, `Facebook`, `Instagram`, `YouTube` or `Web` |
-| `author` | the handle as `@name` where there is one, else the creator's name |
-| `body` | the post's own words. Could not read them? Empty string. |
-| `posted_at` | the original post's timestamp if you have it, else empty string |
-| `why` | one sentence: which criterion it hits, and why it is funny |
-| `has_media` | `true` if the source carries an image or video, `false` if it plainly does not, omit if you could not tell |
-| `media_url` | the image or video itself, as a URL. Omit if there is none or you could not read one |
-| `source` | always `Bot` |
-| `status` | always `NEW` |
-
-`body` is the post's own words and nothing else. Do not paraphrase it, and do not put a
-description of the post there — `why` is where your own words go.
-
-`has_media` decides whether the Instagram button is available on the card. Instagram will
-not take a text-only post, so an article whose source has no image or video cannot go there.
-Set it honestly: guessing `true` puts a dead button in front of somebody.
-
-`media_url` is the file itself, and it is the difference between an Instagram post costing
-one click and costing a trip back to the original. Take it from `og:image`, `og:video`,
-`twitter:image`, or a video's poster frame - whichever the page actually gives you. It has
-to be a direct link to the file, not to the page it sits on: something ending in `.jpg`,
-`.png`, `.webp` or `.mp4`, that would show the image on its own if pasted into a browser.
-A link to the post again is worse than nothing, because it looks like a file and is not
-one. Leave it out when you are unsure, and set `has_media` on what you saw rather than on
-whether you managed to get a URL for it.
-
-Never write `posted_to`. That column records where an article actually went out, and only a
-human ticking a box puts anything in it.
-
-`ignore-duplicates` means a key that already exists is silently left alone, so a re-run
-cannot overwrite a human's decision. Rely on it, but still check first.
-
-## Step 7 — write the same candidates onto the SOCIALS page
-
-The page is **SOCIALS**, `9755d3fa6f1848aa9831ba93f501ae7b`, under BACKSTAGE BIBLE — the same
-page Step 3 reads. It has a **POST CANDIDATES** heading; write new candidates under it, after
-whatever is already there. Do not touch anything above that heading — that's the account
-logins Step 3 reads.
-
-One block per candidate, in this shape, so a person can scan a week of them:
+One block per candidate, appended to the end of the page, in this shape:
 
 ```
 **@handle** — why it is funny, in one sentence
 https://the/confirmed/permalink
 ```
 
-Rules for this half:
+- Put `[has media]` at the end of the line when the source carries an image or a video.
+  Whoever posts it needs to know that before they open it, because it decides whether
+  Instagram and Threads are available at all.
+- Strip tracking parameters (`utm_*`, `fbclid`, `igshid`, `si`, `ref`, …) from every URL.
+- The sentence is **your** words: what the joke is, and which criterion it hits. Do not
+  paste the post's own text in place of it.
+- No preamble, no summary block, no date heading unless the page already has one for today.
+- Append only. Never rewrite the page, never reorder it, never remove an empty block.
 
-- **Append only, under POST CANDIDATES.** Never rewrite the page, never reorder it, never
-  remove an empty block. The account logins live above that heading, and losing them would
-  be a genuinely bad day.
-- Write only the candidates that were **actually new** in this run. A key that already
-  existed was skipped as a duplicate, and writing it here anyway fills the page with
-  things somebody has already read and ruled on.
-- If a candidate has media, say so at the end of its line as `[has media]`. Somebody
-  reading in Notion cannot see the thumbnail the posting page shows.
-- Keep it to the run's candidates. No preamble, no summary block, no date heading unless
-  the page already has one for today.
+## Step 7 — say what you did
 
-If Notion is unreachable, or the page will not take an append, do not retry in a loop and
-do not write the candidates somewhere else instead. Say so plainly in your final message
-and leave the Supabase rows as the record of the run.
-
-## Step 8 — report
-
-There is no commit and nothing to push, so the run's only output is your final message. Say:
-
-- how many rows you inserted, and the handle behind each
-- roughly how many candidates you threw out at Step 5, and for what
-- anything that got in the way: searches that turned up nothing, permalinks you could not
-  confirm, a Supabase call that failed and what it said
-
-If you found nothing worth nominating, insert nothing and say so. An empty run is a normal
-outcome, not a failure.
-
-## What the human sees
-
-Everything you insert shows up in The Socializer as a **NEW** article, newest first. From
-there a human presses Skip, or sends it to a composer and ticks off the destinations it
-went out on — X, Bluesky, Facebook or Instagram. Those are the only things that change `status` and
-`posted_to`, and you never touch either.
+End with a short plain-language note: how many you added, what you passed on and why, and
+anything about the search that was unusually good or unusually barren. If the page could
+not be read or written, say that instead of reporting a run that did not happen.

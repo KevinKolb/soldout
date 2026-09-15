@@ -5,12 +5,12 @@
  * /shop, and it survives a refresh and a closed tab.
  *
  * The key below is the publishable one, the same key committed in
- * backstage/socializer.html and tools/build-inventory.py. It is public by design and
- * grants nothing on its own: every write policy on the shop table checks the signed-in
- * email against OWNER, so a stranger holding this key can read the shop and nothing
- * more. That is why there is no service-role key anywhere in this repo and must never
- * be one - a service key bypasses row-level security entirely, and any key in a static
- * page is readable by every visitor.
+ * tools/build-inventory.py, and the copy the bots are told to read it out of. It is
+ * public by design and grants nothing on its own: every write policy on the shop table
+ * checks the signed-in email against OWNER, so a stranger holding this key can read the
+ * shop and nothing more. That is why there is no service-role key anywhere in this repo
+ * and must never be one - a service key bypasses row-level security entirely, and any key
+ * in a static page is readable by every visitor.
  */
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
