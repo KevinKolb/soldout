@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post it - SOLD OUT! Comedy</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/png" href="/assets/images/soldoutlogo.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 15px; line-height: 1.55;
+            color: #000; background: #fff;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 680px; margin: 0 auto; }
+
+        h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .subtitle { font-size: 15px; color: #666; margin-bottom: 28px; }
+
+        .card { border: 2px solid #000; padding: 16px 18px; margin-bottom: 26px; }
+        .card .why { font-weight: 600; margin-bottom: 8px; overflow-wrap: break-word; }
+        .card .link { font-size: 13px; color: #666; word-break: break-all; }
+
+        button, .btn {
+            display: inline-block;
+            font-family: inherit; font-size: 14px; font-weight: 600;
+            padding: 11px 18px; border: 2px solid #000;
+            background: #fff; color: #000; text-decoration: none; cursor: pointer;
+        }
+        button:hover, .btn:hover { background: #000; color: #fff; }
+
+        .primary {
+            display: block; width: 100%;
+            font-size: 18px; padding: 18px;
+            background: #000; color: #fff;
+            margin-bottom: 10px;
+        }
+        .primary:hover { background: #ffd93d; color: #000; }
+
+        .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; }
+
+        h2 {
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: #666;
+            border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;
+        }
+
+        #note { padding: 12px 15px; border: 2px solid #000; margin-bottom: 22px; display: none; font-size: 14px; }
+        #note.show { display: block; }
+        #note.warn { background: #ffd93d; }
+        #note.good { background: #e8f5e9; border-color: #24a25b; }
+        #note.err { background: #ffe5e5; border-color: #c0392b; }
+
+        .manual { font-size: 13px; color: #666; margin-bottom: 10px; }
+
+        @media (max-width: 460px) {
+            body { padding: 24px 16px; }
+            h1 { font-size: 26px; }
+            .row { gap: 6px; }
+            button, .btn { padding: 10px 14px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Post it</h1>
+    <div class="subtitle" id="sub">Opens every composer at once, each one already filled in.</div>
+
+    <div id="note"></div>
+
+    <div class="card">
+        <div class="why" id="why"></div>
+        <div class="link" id="link"></div>
+    </div>
+
+    <button class="primary" id="all" type="button">OPEN ALL COMPOSERS</button>
+
+    <h2>Or one at a time</h2>
+    <div class="row" id="each"></div>
+
+    <h2>No web composer</h2>
+    <p class="manual">Instagram and TikTok only accept posts from their own apps. Copy the
+       text, then open the app on your phone.</p>
+    <div class="row">
+        <button id="copy" type="button">Copy the text</button>
+        <a class="btn" href="https://www.instagram.com/soldout.comedy" target="_blank" rel="noopener">Instagram</a>
+        <a class="btn" href="https://www.tiktok.com/@sold.out.comedy" target="_blank" rel="noopener">TikTok</a>
+    </div>
+</div>
+
+<script>
+/* One link in Notion, five tabs here.
+ *
+ * A link can only ever go to one place, so every row in POST CANDIDATES points at this
+ * page and this page does the fanning out. It holds nothing secret and writes nothing:
+ * everything it knows arrives in the query string.
+ *
+ * Why a button rather than opening them on load: browsers block window.open unless it
+ * happens inside a real click. Firing on load would be swallowed silently, which looks
+ * exactly like the page being broken. */
+
+var q = new URLSearchParams(location.search);
+var text = (q.get('t') || '').trim();
+var url = (q.get('u') || '').trim();
+
+var noteEl = document.getElementById('note');
+function note(msg, kind) {
+    noteEl.textContent = msg;
+    noteEl.className = 'show ' + (kind || '');
+}
+
+document.getElementById('why').textContent = text || '(no text passed in)';
+document.getElementById('link').textContent = url || '(no link passed in)';
+
+/* Re-encoded here rather than trusted from the query string. Notion formulas have no URL
+   encoder, so what arrives is only encoded well enough to survive one hop. This is where
+   it gets done properly. */
+function enc(s) { return encodeURIComponent(s); }
+
+var TARGETS = [
+    { name: 'X',        url: 'https://x.com/intent/post?text=' + enc(text) + '&url=' + enc(url) },
+    { name: 'Bluesky',  url: 'https://bsky.app/intent/compose?text=' + enc(text + ' ' + url) },
+    { name: 'Threads',  url: 'https://www.threads.net/intent/post?text=' + enc(text + ' ' + url) },
+    { name: 'Facebook', url: 'https://www.facebook.com/sharer/sharer.php?u=' + enc(url) },
+    { name: 'Reddit',   url: 'https://www.reddit.com/submit?url=' + enc(url) + '&title=' + enc(text) }
+];
+
+/* Every target gets its own link too, so a blocked popup is never a dead end. */
+var each = document.getElementById('each');
+TARGETS.forEach(function (t) {
+    var a = document.createElement('a');
+    a.className = 'btn';
+    a.href = t.url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = t.name;
+    each.appendChild(a);
+});
+
+document.getElementById('all').onclick = function () {
+    if (!url) { note('Nothing to post: this page was opened without a link.', 'err'); return; }
+
+    /* All of them inside the one click. A setTimeout between them would break the chain
+       the browser is trusting, and everything after the first would be blocked. */
+    var blocked = TARGETS.filter(function (t) {
+        return !window.open(t.url, '_blank', 'noopener');
+    });
+
+    if (!blocked.length) {
+        note('Opened ' + TARGETS.length + ' composers. Post the ones worth posting, close the rest.', 'good');
+    } else if (blocked.length === TARGETS.length) {
+        note('Your browser blocked all of them. Allow popups for this site, or use the buttons below.', 'warn');
+    } else {
+        note('Blocked: ' + blocked.map(function (t) { return t.name; }).join(', ') +
+             '. Open those from the buttons below.', 'warn');
+    }
+};
+
+document.getElementById('copy').onclick = function () {
+    var payload = text + '\n' + url;
+    navigator.clipboard.writeText(payload).then(function () {
+        note('Copied. Paste it into Instagram or TikTok on your phone.', 'good');
+    }).catch(function () {
+        window.prompt('Copy this:', payload);
+    });
+};
+
+if (!url) {
+    document.getElementById('sub').textContent =
+        'Open this from a row in POST CANDIDATES - it needs a link to work with.';
+    note('No link in the address. This page is meant to be opened from the table.', 'warn');
+}
+</script>
+</body>
+</html>
