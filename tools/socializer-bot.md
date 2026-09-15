@@ -117,12 +117,17 @@ no picture still beats a dull picture — but it is the tie-breaker.
 
 ## Step 6 — append them to SOCIALS
 
-One block per candidate, appended to the end of the page, in this shape:
+Each candidate is a divider and two lines, appended to the end of the page:
 
 ```
+---
 **@handle** — why it is funny, in one sentence
 https://the/confirmed/permalink
 ```
+
+The divider goes **first**, before the handle. It fences each entry off from whatever came
+before it, which for the first one of a run is either the previous day's last candidate or
+the account links the page is really for.
 
 - Put `[has media]` at the end of the line when the source carries an image or a video.
   Whoever posts it needs to know that before they open it, because it decides whether

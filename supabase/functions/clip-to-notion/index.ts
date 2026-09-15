@@ -15,6 +15,7 @@
  * The same two lines the SOC SOCIALIZER BOT appends, so a capture and a bot find read
  * identically on the page:
  *
+ *     ---------------------------------------------
  *     **@handle** - why it is funny, in one sentence
  *     https://permalink  [has media]
  *
@@ -125,9 +126,17 @@ Deno.serve(async (req) => {
             'Notion-Version': NOTION_VERSION,
             'Content-Type': 'application/json',
         },
-        /* children appends to the end. There is no call here that could reorder or
+        /* A divider first, so each entry is fenced off from whatever came before it -
+           including, for the very first one, the account links the page is really for.
+           children appends to the end: there is no call here that could reorder or
            remove what is already on the page. */
-        body: JSON.stringify({ children: [para(first), para(second)] }),
+        body: JSON.stringify({
+            children: [
+                { object: 'block', type: 'divider', divider: {} },
+                para(first),
+                para(second),
+            ],
+        }),
     });
 
     if (!res.ok) {
