@@ -1,4 +1,4 @@
-/* Appends one captured post to the POST CANDIDATES page in Notion, on behalf of the owner.
+/* Adds one captured post to the POST CANDIDATES database in Notion, on behalf of the owner.
  *
  * WHY THIS EXISTS AT ALL
  * A browser cannot call Notion's API. It refuses cross-origin requests, so a page on
@@ -12,23 +12,26 @@
  * kept in one shape.
  *
  * WHAT IT WRITES
- * The same two lines the SOC SOCIALIZER BOT appends, so a capture and a bot find read
- * identically on the page:
+ * One row, with the same fields the SOC SOCIALIZER BOT fills, so a hand capture and a
+ * bot find are the same kind of thing and sort together:
  *
- *     ---------------------------------------------
- *     **@handle** - why it is funny, in one sentence
- *     https://permalink  [has media]
+ *     Why it's funny | Handle | Link | Platform | Source | Media | Status
  *
- * It appends and does nothing else. It cannot edit or delete a block.
+ * Source is always "Found Funny" here and "Bot" from the routine, which is the only
+ * difference between them. Status starts at New: nothing in this function ever decides
+ * that something has been posted.
+ *
+ * It creates rows and does nothing else. It cannot edit or delete one, so it cannot
+ * touch a candidate somebody has already ruled on.
  *
  * DEPLOYING IT
  *   1. Make an internal integration at notion.so/profile/integrations
  *      - Capabilities: Insert content. Nothing else: it does not need to read or update.
  *      Copy the Internal Integration Secret (starts ntn_).
- *   2. Share POST CANDIDATES with it: open the page, ... menu -> Connections -> add
- *      the integration. A child page normally inherits its parent's connections, so
- *      sharing SOCIALS covers this one too. Without it, Notion answers 404 on a page
- *      that plainly exists, which is its way of saying "not shared with you".
+ *   2. Share the POST CANDIDATES database with it: open it, ... menu -> Connections ->
+ *      add the integration. A child normally inherits its parent's connections, so
+ *      sharing SOCIALS covers it. Without this, Notion answers 404 on a database that
+ *      plainly exists, which is its way of saying "not shared with you".
  *   3. supabase secrets set NOTION_TOKEN_SOC=ntn_...
  *      or Dashboard -> Edge Functions -> Secrets.
  *   4. supabase functions deploy clip-to-notion
@@ -38,11 +41,38 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const OWNER = 'kevinmkolb@gmail.com';
 
-/* POST CANDIDATES, under SOCIALS, under BACKSTAGE BIBLE. The same page the bot appends
-   to. The id is unchanged from when this page was itself called SOCIALS - renaming and
-   moving a Notion page keeps its id, which is why nothing here had to move with it. */
-const PAGE = '9755d3fa-6f18-48aa-9831-ba93f501ae7b';
+/* The POST CANDIDATES database, under SOCIALS, under BACKSTAGE BIBLE. This replaced the
+   page of the same name in September 2026: a page could only be appended to, so nothing
+   recorded whether a candidate had been posted, passed on, or never read. */
+const DATABASE = '4870f03c-f2f2-4bd8-a51e-1d4c9e89b0ca';
 const NOTION_VERSION = '2022-06-28';
+
+/* Which platform a permalink belongs to. Worked out from the URL rather than asked for
+   on the form, because the URL already knows and a dropdown is one more thing to get
+   wrong. Anything unrecognised lands on Other and can be corrected in Notion in a click. */
+const PLATFORMS: [RegExp, string][] = [
+    [/(^|\.)x\.com$|(^|\.)twitter\.com$/, 'X'],
+    [/(^|\.)bsky\.app$/, 'Bluesky'],
+    [/(^|\.)instagram\.com$/, 'Instagram'],
+    [/(^|\.)threads\.(com|net)$/, 'Threads'],
+    [/(^|\.)facebook\.com$|(^|\.)fb\.(com|watch)$/, 'Facebook'],
+    [/(^|\.)tiktok\.com$/, 'TikTok'],
+    [/(^|\.)youtube\.com$|(^|\.)youtu\.be$/, 'YouTube'],
+    [/(^|\.)reddit\.com$|(^|\.)redd\.it$/, 'Reddit'],
+];
+
+function platformOf(url: string): string {
+    let host: string;
+    try {
+        host = new URL(url).hostname.toLowerCase();
+    } catch {
+        return 'Other';
+    }
+    for (const [pattern, name] of PLATFORMS) {
+        if (pattern.test(host)) return name;
+    }
+    return 'Other';
+}
 
 const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -55,16 +85,6 @@ const json = (body: unknown, status = 200) =>
         status,
         headers: { ...cors, 'Content-Type': 'application/json' },
     });
-
-/* Notion takes rich text as spans, so the bold handle and the plain sentence are two
-   pieces of one paragraph rather than markdown in a string. */
-function span(content: string, bold = false, link: string | null = null) {
-    return {
-        type: 'text',
-        text: { content, link: link ? { url: link } : null },
-        annotations: { bold },
-    };
-}
 
 Deno.serve(async (req) => {
     if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -100,53 +120,40 @@ Deno.serve(async (req) => {
 
     const handle = String(body.handle ?? '').trim();
     const why = String(body.why ?? '').trim();
-    const media = body.media === true;
+    const platform = platformOf(url);
 
-    const first: unknown[] = [];
-    if (handle) {
-        first.push(span(handle, true));
-        if (why) first.push(span(' — ' + why));
-    } else if (why) {
-        first.push(span(why));
-    } else {
-        first.push(span('Captured by hand'));
-    }
+    /* The title carries the sentence, because that is the column you read down the page.
+       An entry saved without one would be a blank row, so it says where it came from
+       instead until somebody writes the real line. */
+    const title = why || (handle ? 'Captured from ' + handle : 'Captured by hand');
 
-    const second: unknown[] = [span(url, false, url)];
-    if (media) second.push(span('  [has media]'));
+    const properties: Record<string, unknown> = {
+        "Why it's funny": { title: [{ text: { content: title.slice(0, 2000) } }] },
+        Link: { url },
+        Platform: { select: { name: platform } },
+        Source: { select: { name: 'Found Funny' } },
+        Media: { checkbox: body.media === true },
+        Status: { select: { name: 'New' } },
+    };
+    if (handle) properties.Handle = { rich_text: [{ text: { content: handle.slice(0, 2000) } }] };
 
-    const para = (rich: unknown[]) => ({
-        object: 'block',
-        type: 'paragraph',
-        paragraph: { rich_text: rich },
-    });
-
-    const res = await fetch(`https://api.notion.com/v1/blocks/${PAGE}/children`, {
-        method: 'PATCH',
+    const res = await fetch('https://api.notion.com/v1/pages', {
+        method: 'POST',
         headers: {
             Authorization: `Bearer ${token}`,
             'Notion-Version': NOTION_VERSION,
             'Content-Type': 'application/json',
         },
-        /* A divider first, so each entry is fenced off from the one before it.
-           children appends to the end: there is no call here that could reorder or
-           remove what is already on the page. */
-        body: JSON.stringify({
-            children: [
-                { object: 'block', type: 'divider', divider: {} },
-                para(first),
-                para(second),
-            ],
-        }),
+        body: JSON.stringify({ parent: { database_id: DATABASE }, properties }),
     });
 
     if (!res.ok) {
         const detail = (await res.text()).slice(0, 300);
         const hint = res.status === 404
-            ? ' The page is probably not shared with the integration: open POST CANDIDATES, ... menu, Connections, add it.'
+            ? ' The database is probably not shared with the integration: open POST CANDIDATES, ... menu, Connections, add it.'
             : '';
         return json({ error: `Notion refused it (${res.status}).${hint} ${detail}` }, 502);
     }
 
-    return json({ ok: true, appended: new Date().toISOString() });
+    return json({ ok: true, platform, added: new Date().toISOString() });
 });

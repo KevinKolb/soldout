@@ -1,7 +1,7 @@
 # CLAUDE.md — SOLD OUT! Comedy
 
 Read [README.md](README.md) first. It documents the site structure, the XML content model,
-the Socializer routine, local development, and deployment secrets. This file adds what the README
+the SOC SOCIALIZER BOT, local development, and deployment secrets. This file adds what the README
 doesn't cover: the show itself, its voice, and how the other tools fit together.
 
 This file is shared. Claude Code reads it from this repo, and the claude.ai Project
@@ -42,7 +42,7 @@ on them.
   backstage.soldoutcomedy.com subdomain now forwards to `/backstage` instead.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the `shop` table that curates the shop, and `prop_candidates` for the
-  prop bot. The retired Socializer queue is still there but nothing reads it.
+  prop bot. The retired `socializer` queue table is still there but nothing reads it.
 
 Never commit real credentials. See "Deployment secrets" in [README.md](README.md).
 

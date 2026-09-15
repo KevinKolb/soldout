@@ -155,7 +155,7 @@
    function carries the token. */
 import { currentUser, isOwner, signIn, signOut, supabase, OWNER } from '/assets/js/auth.js';
 
-const CANDIDATES = 'https://app.notion.com/p/POST-CANDIDATES-9755d3fa6f1848aa9831ba93f501ae7b';
+const CANDIDATES = 'https://app.notion.com/p/4870f03cf2f24bd8a51e1d4c9e89b0ca';
 document.getElementById('view').href = CANDIDATES;
 
 const statusEl = document.getElementById('status');
@@ -193,7 +193,7 @@ document.getElementById('mark').setAttribute('href',
     "javascript:(function(){"
     + "var s=String(window.getSelection()||'').trim();"
     + "var t=s||document.title||'';"
-    + "location.href='https://www.soldoutcomedy.com/backstage/clip/?u='"
+    + "location.href='https://www.soldoutcomedy.com/backstage/foundfunny/?u='"
     + "+encodeURIComponent(location.href)+'&t='+encodeURIComponent(t.slice(0,300));"
     + "})()");
 
@@ -205,7 +205,7 @@ document.getElementById('mark').addEventListener('click', e => {
 document.getElementById('signin').onclick = async (e) => {
     e.target.disabled = true;
     try {
-        await signIn(location.origin + '/backstage/clip/');
+        await signIn(location.origin + '/backstage/foundfunny/');
     } catch (ex) {
         e.target.disabled = false;
         status(ex.message, 'err');

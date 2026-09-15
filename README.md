@@ -32,26 +32,29 @@ any page, whatever folder it sits in.
 Edit the XML by hand, or use the browser tools in `backstage/`, which generate an updated
 file for you to download and commit.
 
-## The Socializer
+## SOC SOCIALIZER BOT
 
-A routine that goes looking for funny posts once a day and writes what it finds onto the
-**POST CANDIDATES** page in Notion, under SOCIALS. One entry per candidate: the handle, a
-sentence on why it is funny, the permalink, and `[has media]` where the source carries an
-image or a video.
+A routine that goes looking for funny posts once a day and adds what it finds to the
+**POST CANDIDATES** database in Notion, under SOCIALS. One row per candidate: why it is
+funny, the handle, the permalink, the platform, and a Media tick where the source carries
+an image or a video.
 
-The *FOUND FUNNY* bookmarklet on [backstage/clip](backstage/clip/index.html) writes
-to the same page in the same shape, so a hand-capture and a bot find are indistinguishable.
-It cannot reach Notion directly — Notion's API refuses cross-origin browser requests — so it
-hands the URL to that page, which asks the `clip-to-notion` edge function, which holds the
-token.
+**Found Funny** at [backstage/foundfunny](backstage/foundfunny/index.html) is the same
+thing done by hand, and it writes the same row. Its bookmarklet only opens that page with
+the link filled in; the page itself asks the `clip-to-notion` edge function, which holds
+the Notion token. That detour is not a flourish. Notion's API refuses cross-origin browser
+requests, and a token pasted into a static page would be readable by every visitor, so the
+write has to happen somewhere with a secret.
 
-It nominates and nothing else. Nothing in the job speaks for the account and nothing it
-writes reaches an audience — a person reads the page and posts by hand, wherever it suits.
+Rows arrive with Status `New` and nothing changes that but a person. Nothing in either job
+speaks for the account and nothing they write reaches an audience: you read the New view,
+post what is worth posting, and mark it `Posted`. The **Socials** card in Backstage points
+at the page listing every account and how to get into it.
 
 Standing orders are [tools/socializer-bot.md](tools/socializer-bot.md), not the routine's
 prompt: the prompt is one line and points at that file, so the orders can be changed by
 committing. That file holds what qualifies, the **Popular sources** worth watching, and the
-shape of a line on the page. Manage the routine at <https://claude.ai/code/routines>.
+fields of a row. Manage the routine at <https://claude.ai/code/routines>.
 
 ### What this replaced
 
