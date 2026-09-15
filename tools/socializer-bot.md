@@ -264,8 +264,10 @@ cannot overwrite a human's decision. Rely on it, but still check first.
 
 ## Step 7 — write the same candidates onto the SOCIALS page
 
-The page is **SOCIALS**, `9755d3fa6f1848aa9831ba93f501ae7b`, under BACKSTAGE BIBLE. Append
-to the end of it. Do not touch what is already there.
+The page is **SOCIALS**, `9755d3fa6f1848aa9831ba93f501ae7b`, under BACKSTAGE BIBLE — the same
+page Step 3 reads. It has a **POST CANDIDATES** heading; write new candidates under it, after
+whatever is already there. Do not touch anything above that heading — that's the account
+logins Step 3 reads.
 
 One block per candidate, in this shape, so a person can scan a week of them:
 
@@ -276,9 +278,9 @@ https://the/confirmed/permalink
 
 Rules for this half:
 
-- **Append only.** Never rewrite the page, never reorder it, never remove an empty block.
-  The top of that page is the list of account logins, and losing it would be a genuinely
-  bad day.
+- **Append only, under POST CANDIDATES.** Never rewrite the page, never reorder it, never
+  remove an empty block. The account logins live above that heading, and losing them would
+  be a genuinely bad day.
 - Write only the candidates that were **actually new** in this run. A key that already
   existed was skipped as a duplicate, and writing it here anyway fills the page with
   things somebody has already read and ruled on.
