@@ -90,6 +90,11 @@
 
         .gate { border: 2px solid #000; padding: 36px 30px; text-align: center; }
         .gate p { font-size: 14px; color: #666; margin-bottom: 22px; }
+        .gate button + button { margin-left: 8px; }
+        /* .hint is otherwise only styled inside a .field, so the gate's own note needs
+           its own rule or it inherits nothing and shouts at the same size as the buttons. */
+        .gate .hint { font-size: 12px; color: #999; line-height: 1.5; margin: 18px 0 0; }
+        .gate .hint a { color: #666; }
 
         .mark {
             display: inline-block; margin-top: 8px;
@@ -116,6 +121,11 @@
     <div class="gate" id="gate">
         <p id="gateWhy">Sign in to clip.</p>
         <button id="signin" type="button">Sign in with Google</button>
+        <button id="gateOut" class="ghost" type="button" hidden>Just sign out</button>
+        <p class="hint" id="gateHelp" hidden>Still coming back as the same account? Google is
+           signed in as that account in this browser profile. Sign out at
+           <a href="https://accounts.google.com/Logout" target="_blank" rel="noopener">accounts.google.com</a>,
+           or open this in a different profile.</p>
     </div>
 
     <div id="form" hidden>
@@ -256,6 +266,11 @@ document.getElementById('signin').onclick = async (e) => {
 
 document.getElementById('out').onclick = async () => { await signOut(); location.reload(); };
 
+/* Sign out and stop there. The combined "sign out and switch" button depends on Google
+   offering a chooser, and when it does not you end up straight back where you started.
+   This one always works, because it asks Google for nothing. */
+document.getElementById('gateOut').onclick = async () => { await signOut(); location.reload(); };
+
 document.getElementById('save').onclick = async () => {
     const btn = document.getElementById('save');
     const link = url.value.trim();
@@ -315,6 +330,8 @@ function render(user) {
         ? 'Sign out and switch account'
         : 'Sign in with Google';
 
+    document.getElementById('gateOut').hidden = !wrongAccount;
+    document.getElementById('gateHelp').hidden = !wrongAccount;
     if (wrongAccount) status('That is not ' + OWNER + '.', 'err');
     if (ok) prefill();
 }

@@ -55,8 +55,12 @@ export async function signIn(redirectTo, { chooseAccount = false } = {}) {
        Without prompt=select_account Google hands the existing account straight back,
        the page says "that is not the owner" again, and the button looks broken. The
        hint stays alongside it, so the owner is the highlighted choice. */
-    const queryParams = { login_hint: OWNER };
-    if (chooseAccount) queryParams.prompt = 'select_account';
+    /* Only one of these at a time. Sent together, Google has been observed to honour
+       neither: it skips the chooser and hands back whatever session the browser
+       already has, which is exactly the state you are trying to escape. */
+    const queryParams = chooseAccount
+        ? { prompt: 'select_account' }
+        : { login_hint: OWNER };
 
     const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
