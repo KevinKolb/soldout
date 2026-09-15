@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Found Funny</title>
+    <meta name="robots" content="noindex">
+    <link rel="canonical" href="/backstage/foundfunny/">
+    <script>
+        /* The page moved to /backstage/foundfunny/ when "Clip" became FOUND FUNNY. Every
+           bookmarklet already dragged to somebody's bar still points here, and the whole
+           point of it is the query string it carries, so this forwards that on rather
+           than dropping it. replace() rather than assign() so Back does not bounce you
+           straight back here.
+
+           The meta refresh below is the fallback for a browser with JS off. It cannot
+           carry the query, so it lands on an empty form - still better than a 404. */
+        location.replace('/backstage/foundfunny/' + location.search + location.hash);
+    </script>
+    <meta http-equiv="refresh" content="0; url=/backstage/foundfunny/">
+</head>
+<body>
+    <p>Moved to <a href="/backstage/foundfunny/">/backstage/foundfunny/</a>.</p>
+</body>
+</html>
