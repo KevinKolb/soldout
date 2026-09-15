@@ -41,12 +41,23 @@
         }
         .primary:hover { background: #ffd93d; color: #000; }
 
-        .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 26px; }
+        /* The native repost is the one that matters, so it gets the acid treatment the
+           rest of the site reserves for the thing it wants you to press. */
+        .home {
+            display: block; width: 100%;
+            font-size: 17px; padding: 16px;
+            background: #ffd93d; border-width: 3px;
+            margin-bottom: 10px;
+        }
+        .home:hover { background: #000; color: #ffd93d; }
+
+        .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 
         h2 {
             font-size: 12px; font-weight: 700; text-transform: uppercase;
             letter-spacing: 1px; color: #666;
-            border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;
+            border-bottom: 2px solid #000; padding-bottom: 6px;
+            margin: 30px 0 12px;
         }
 
         #note { padding: 12px 15px; border: 2px solid #000; margin-bottom: 22px; display: none; font-size: 14px; }
@@ -68,7 +79,7 @@
 <body>
 <div class="container">
     <h1>Post it</h1>
-    <div class="subtitle" id="sub">Opens every composer at once, each one already filled in.</div>
+    <div class="subtitle" id="sub">Repost it where it lives, then share it everywhere else.</div>
 
     <div id="note"></div>
 
@@ -77,9 +88,17 @@
         <div class="link" id="link"></div>
     </div>
 
-    <button class="primary" id="all" type="button">OPEN ALL COMPOSERS</button>
+    <button class="primary" id="all" type="button">OPEN EVERYTHING</button>
 
-    <h2>Or one at a time</h2>
+    <div id="homeWrap" hidden>
+        <h2 id="homeHead">Repost where it lives</h2>
+        <p class="manual" id="homeNote"></p>
+        <button class="home" id="home" type="button"></button>
+    </div>
+
+    <h2>Share it elsewhere</h2>
+    <p class="manual">A new post of ours, carrying the link. Use these for the platforms the
+       post did not come from.</p>
     <div class="row" id="each"></div>
 
     <h2>No web composer</h2>
@@ -88,20 +107,32 @@
     <div class="row">
         <button id="copy" type="button">Copy the text</button>
         <a class="btn" href="https://www.instagram.com/soldout.comedy" target="_blank" rel="noopener">Instagram</a>
-        <a class="btn" href="https://www.tiktok.com/@sold.out.comedy" target="_blank" rel="noopener">TikTok</a>
+        <a class="btn" href="https://www.tiktok.com/@soldoutcomedy" target="_blank" rel="noopener">TikTok</a>
     </div>
 </div>
 
 <script>
-/* One link in Notion, five tabs here.
+/* One link in Notion, every destination here.
  *
- * A link can only ever go to one place, so every row in POST CANDIDATES points at this
- * page and this page does the fanning out. It holds nothing secret and writes nothing:
+ * A link can only go to one place, so every row in POST CANDIDATES points at this page
+ * and this page does the fanning out. It holds nothing secret and writes nothing:
  * everything it knows arrives in the query string.
  *
- * Why a button rather than opening them on load: browsers block window.open unless it
- * happens inside a real click. Firing on load would be swallowed silently, which looks
- * exactly like the page being broken. */
+ * REPOST BEATS POST
+ * When a candidate already lives on a platform we have an account on, the right move is
+ * that platform's own repost, not a fresh post of ours carrying a link. A repost keeps
+ * the original author's credit, inherits the post's existing engagement, and renders as
+ * the real thing rather than as a link preview. So the source platform is worked out
+ * from the permalink and offered first, and it is dropped from the compose list - there
+ * is no sense posting a link to Bluesky when the post is already on Bluesky.
+ *
+ * Only X can be reposted straight from a URL. Everywhere else the button opens the
+ * original post and you press their repost control, which is one click once the tab is
+ * open and in front of you.
+ *
+ * Why a button rather than opening on load: browsers block window.open unless it happens
+ * inside a real click. Firing on load would be swallowed silently, which looks exactly
+ * like the page being broken. */
 
 var q = new URLSearchParams(location.search);
 var text = (q.get('t') || '').trim();
@@ -121,7 +152,54 @@ document.getElementById('link').textContent = url || '(no link passed in)';
    it gets done properly. */
 function enc(s) { return encodeURIComponent(s); }
 
-var TARGETS = [
+/* Which platform the post already lives on. Same host matching the clip function uses,
+   kept in the same shape so the two cannot disagree about what counts as Bluesky. */
+var HOSTS = [
+    [/(^|\.)x\.com$|(^|\.)twitter\.com$/, 'X'],
+    [/(^|\.)bsky\.app$/, 'Bluesky'],
+    [/(^|\.)instagram\.com$/, 'Instagram'],
+    [/(^|\.)threads\.(com|net)$/, 'Threads'],
+    [/(^|\.)facebook\.com$|(^|\.)fb\.(com|watch)$/, 'Facebook'],
+    [/(^|\.)tiktok\.com$/, 'TikTok'],
+    [/(^|\.)youtube\.com$|(^|\.)youtu\.be$/, 'YouTube'],
+    [/(^|\.)reddit\.com$|(^|\.)redd\.it$/, 'Reddit']
+];
+
+function platformOf(u) {
+    var host;
+    try { host = new URL(u).hostname.toLowerCase(); } catch (e) { return null; }
+    for (var i = 0; i < HOSTS.length; i++) {
+        if (HOSTS[i][0].test(host)) return HOSTS[i][1];
+    }
+    return null;
+}
+
+/* What "repost" means on each platform, and whether it exists at all. YouTube has no
+   repost of any kind, so it is not claimed as one. */
+var NATIVE = {
+    X:         { verb: 'Retweet',   note: 'X can do this straight from a link, so this one is a single press.' },
+    Bluesky:   { verb: 'Repost',    note: 'Opens the post. Press the repost arrow underneath it.' },
+    Threads:   { verb: 'Repost',    note: 'Opens the post. Press repost underneath it.' },
+    Facebook:  { verb: 'Share',     note: 'Opens the post. Use Share, and post it as SOLD OUT! rather than as yourself.' },
+    Instagram: { verb: 'Open',      note: 'Opens the post. Instagram has no repost, so it is a story share or a screenshot.' },
+    TikTok:    { verb: 'Open',      note: 'Opens the video. TikTok reposts only from the app, not the web.' },
+    Reddit:    { verb: 'Crosspost', note: 'Opens the post. Use Share, then Crosspost.' }
+};
+
+var source = platformOf(url);
+var native = source ? NATIVE[source] : null;
+
+/* X is the only one with a repost URL. It needs the numeric status id out of the
+   permalink; anything unexpected falls back to just opening the post. */
+function nativeUrl() {
+    if (source === 'X') {
+        var m = url.match(/status(?:es)?\/(\d+)/);
+        if (m) return 'https://x.com/intent/retweet?tweet_id=' + m[1];
+    }
+    return url;
+}
+
+var COMPOSERS = [
     { name: 'X',        url: 'https://x.com/intent/post?text=' + enc(text) + '&url=' + enc(url) },
     { name: 'Bluesky',  url: 'https://bsky.app/intent/compose?text=' + enc(text + ' ' + url) },
     { name: 'Threads',  url: 'https://www.threads.net/intent/post?text=' + enc(text + ' ' + url) },
@@ -129,9 +207,23 @@ var TARGETS = [
     { name: 'Reddit',   url: 'https://www.reddit.com/submit?url=' + enc(url) + '&title=' + enc(text) }
 ];
 
-/* Every target gets its own link too, so a blocked popup is never a dead end. */
+/* Drop the platform it came from: reposting it there is the better move and is already
+   offered above, and a link post pointing at the same site reads as a bot. */
+var targets = COMPOSERS.filter(function (c) { return c.name !== source; });
+
+if (native && url) {
+    document.getElementById('homeWrap').hidden = false;
+    document.getElementById('homeHead').textContent = 'Repost it on ' + source;
+    document.getElementById('homeNote').textContent = native.note;
+    document.getElementById('home').textContent = native.verb.toUpperCase() + ' IT ON ' + source.toUpperCase();
+    document.getElementById('home').onclick = function () {
+        window.open(nativeUrl(), '_blank', 'noopener');
+    };
+}
+
+/* Every compose target gets its own button too, so a blocked popup is never a dead end. */
 var each = document.getElementById('each');
-TARGETS.forEach(function (t) {
+targets.forEach(function (t) {
     var a = document.createElement('a');
     a.className = 'btn';
     a.href = t.url;
@@ -146,13 +238,18 @@ document.getElementById('all').onclick = function () {
 
     /* All of them inside the one click. A setTimeout between them would break the chain
        the browser is trusting, and everything after the first would be blocked. */
-    var blocked = TARGETS.filter(function (t) {
+    var opening = targets.slice();
+    if (native) opening = [{ name: source, url: nativeUrl() }].concat(opening);
+
+    var blocked = opening.filter(function (t) {
         return !window.open(t.url, '_blank', 'noopener');
     });
 
     if (!blocked.length) {
-        note('Opened ' + TARGETS.length + ' composers. Post the ones worth posting, close the rest.', 'good');
-    } else if (blocked.length === TARGETS.length) {
+        note('Opened ' + opening.length + ' tabs' +
+             (native ? ', starting with the repost on ' + source : '') +
+             '. Post the ones worth posting, close the rest.', 'good');
+    } else if (blocked.length === opening.length) {
         note('Your browser blocked all of them. Allow popups for this site, or use the buttons below.', 'warn');
     } else {
         note('Blocked: ' + blocked.map(function (t) { return t.name; }).join(', ') +
@@ -173,6 +270,9 @@ if (!url) {
     document.getElementById('sub').textContent =
         'Open this from a row in POST CANDIDATES - it needs a link to work with.';
     note('No link in the address. This page is meant to be opened from the table.', 'warn');
+} else if (!source) {
+    document.getElementById('sub').textContent =
+        'This one is not on a platform we have an account on, so there is nothing to repost. Share it instead.';
 }
 </script>
 </body>
