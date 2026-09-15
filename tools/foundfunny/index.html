@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FOUND FUNNY</title>
+    <title>SAVE AS POST CANDIDATE</title>
     <meta name="robots" content="noindex">
     <link rel="icon" type="image/png" href="/assets/images/soldoutlogo.png">
     <style>
@@ -59,14 +59,6 @@
         button:disabled { opacity: 0.35; cursor: not-allowed; }
         button.ghost { background: #fff; color: #000; }
 
-        .btn-link {
-            display: inline-block;
-            font-family: inherit; font-size: 14px; font-weight: 600;
-            padding: 11px 20px; border: 2px solid #000;
-            background: #fff; color: #000; text-decoration: none;
-        }
-        .btn-link:hover { background: #000; color: #fff; }
-
         /* Popup mode. Same page, less of it: in a 440px window the chrome that helps
            on a full page (the way back, the instructions for installing the very
            bookmarklet you just pressed) is only in the way. */
@@ -113,8 +105,8 @@
 <div class="container">
     <a href="https://app.notion.com/p/d350ecaf50bc4f1893ba5ab53590ef3e" class="uplink">&larr; Backstage</a>
 
-    <h1>FOUND FUNNY</h1>
-    <div class="subtitle">Sends a post candidate for SOLD OUT! COMEDY to Backstage.</div>
+    <h1>SAVE AS POST CANDIDATE</h1>
+    <div class="subtitle">Sends a post candidate for SOLD OUT! COMEDY.</div>
 
     <div id="status"></div>
 
@@ -140,7 +132,7 @@
         </div>
 
         <div class="field">
-            <label for="why">Why it is funny <span class="hint">- one sentence, in your words</span></label>
+            <label for="why">Our two cents <span class="hint">- one sentence, in your words</span></label>
             <textarea id="why" placeholder="What the joke is."></textarea>
         </div>
 
@@ -150,8 +142,8 @@
         </div>
 
         <div class="actions">
-            <button id="save" type="button">FOUND FUNNY</button>
-            <a class="btn-link" id="view" href="#" target="_blank" rel="noopener">VIEW POST CANDIDATES</a>
+            <button id="save" type="button">Send</button>
+            <button id="clear" class="ghost" type="button">Clear</button>
             <button id="out" class="ghost" type="button">Sign out</button>
         </div>
 
@@ -178,7 +170,6 @@
 import { currentUser, isOwner, signIn, signOut, supabase, OWNER } from '/assets/js/auth.js';
 
 const CANDIDATES = 'https://app.notion.com/p/4870f03cf2f24bd8a51e1d4c9e89b0ca';
-document.getElementById('view').href = CANDIDATES;
 
 /* Opened as a little window by the bookmarklet, or loaded as an ordinary page?
    sessionStorage rather than window.opener alone: the Google sign-in round trip can
@@ -212,6 +203,48 @@ const handle = document.getElementById('handle');
 const why = document.getElementById('why');
 const media = document.getElementById('media');
 
+/* Who posted it, read out of the permalink.
+ *
+ * Most social URLs carry the author in the path, so the handle can be worked out without
+ * asking the page or the person. The ones that do not - an Instagram /p/ code, a YouTube
+ * watch id, a Reddit thread - are left blank rather than guessed at, because a wrong
+ * handle in a repost is worse than none.
+ *
+ * The bookmarklet also sends whatever the page declares about its author, which is better
+ * than this when it exists. This runs as the fallback, so an old bookmarklet still fills
+ * the field in. */
+function handleFromUrl(u) {
+    let p;
+    try { p = new URL(u); } catch (e) { return ''; }
+
+    const host = p.hostname.toLowerCase().replace(/^www\./, '');
+    const path = p.pathname;
+    let m;
+
+    if (/^(x|twitter)\.com$/.test(host)) {
+        m = path.match(/^\/([A-Za-z0-9_]{1,15})\/status/);
+        return m && m[1] !== 'i' ? '@' + m[1] : '';
+    }
+    if (host === 'bsky.app') {
+        m = path.match(/^\/profile\/([^/]+)/);
+        return m ? '@' + m[1] : '';
+    }
+    if (host === 'tiktok.com' || /^threads\.(com|net)$/.test(host) || host === 'youtube.com') {
+        m = path.match(/^\/@([^/]+)/);
+        return m ? '@' + m[1] : '';
+    }
+    if (host === 'instagram.com') {
+        /* Only the /<user>/p/<code> shape names the author. A bare /p/<code> does not. */
+        m = path.match(/^\/([^/]+)\/(?:p|reel)\//);
+        return m ? '@' + m[1] : '';
+    }
+    if (host === 'reddit.com') {
+        m = path.match(/^\/user\/([^/]+)/);
+        return m ? 'u/' + m[1] : '';
+    }
+    return '';
+}
+
 /* What the bookmarklet handed over. Cleared from the address bar afterwards so a
    refresh does not silently re-fill a form you have already emptied. */
 function prefill() {
@@ -223,6 +256,12 @@ function prefill() {
     const t = (q.get('t') || '').trim();
     if (t && !why.value) why.value = t;
 
+    let h = (q.get('h') || '').trim();
+    if (!h) h = handleFromUrl(url.value);
+    if (h && !handle.value) {
+        handle.value = /^[@ur]\/|^@/.test(h) ? h : '@' + h.replace(/^@+/, '');
+    }
+
     const clean = new URL(location.href);
     clean.search = '';
     history.replaceState(null, '', clean);
@@ -232,8 +271,14 @@ document.getElementById('mark').setAttribute('href',
     "javascript:(function(){"
     + "var s=String(window.getSelection()||'').trim();"
     + "var t=s||document.title||'';"
+    /* Pages that name their own author do it in one of these three tags. Better than
+       reading the handle out of the URL, so it is sent when it exists and the page falls
+       back to the URL when it does not. */
+    + "var a=document.querySelector('meta[name=\"twitter:creator\"],meta[name=\"author\"],meta[property=\"article:author\"]');"
+    + "var h=a?String(a.content||'').trim():'';"
     + "var u='https://www.soldoutcomedy.com/tools/foundfunny/?p=1&u='"
-    + "+encodeURIComponent(location.href)+'&t='+encodeURIComponent(t.slice(0,300));"
+    + "+encodeURIComponent(location.href)+'&t='+encodeURIComponent(t.slice(0,300))"
+    + "+'&h='+encodeURIComponent(h.slice(0,80));"
     /* A blocked popup returns null rather than throwing, so fall back to the old
        behaviour instead of leaving the press doing nothing at all. */
     + "var w=window.open(u,'foundfunny','width=440,height=620,menubar=no,toolbar=no,location=no,status=no');"
@@ -265,6 +310,15 @@ document.getElementById('signin').onclick = async (e) => {
 };
 
 document.getElementById('out').onclick = async () => { await signOut(); location.reload(); };
+
+/* Empties the form without reloading. A reload would re-read the query string and put
+   the same capture straight back, which is the opposite of what Clear means. */
+document.getElementById('clear').onclick = () => {
+    url.value = handle.value = why.value = '';
+    media.checked = false;
+    statusEl.className = '';
+    url.focus();
+};
 
 /* Sign out and stop there. The combined "sign out and switch" button depends on Google
    offering a chooser, and when it does not you end up straight back where you started.
