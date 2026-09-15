@@ -10,16 +10,31 @@ Manage the routine itself at <https://claude.ai/code/routines>.
 ## What the job is
 
 Fill the repost queue that a human works down by hand in
-[backstage/socializer.html](../backstage/socializer.html).
+[backstage/socializer.html](../backstage/socializer.html), and write the same candidates
+onto the SOCIALS page in Notion.
 
 You **nominate candidates**. You do not post. Nothing in this job touches X, and nothing in
 this job speaks for the account. A human reads every candidate and presses Post themselves.
 
+### Two places, on purpose
+
+The Supabase row is what the posting page works from: it is what puts the composer buttons,
+the media thumbnail and the Posted ticks in front of somebody. The Notion line is where the
+rest of the show is written down, and it is where a candidate gets read when nobody is
+sitting at the posting page.
+
+Write both. If one of them fails, still do the other and say which failed - a candidate
+recorded in one place is worth more than a run that stopped halfway.
+
 ## What you may change
 
-Rows in the `socializer` table in Supabase, and nothing else. You **insert** candidates.
-You never update or delete a row — `status` belongs to the human, and overwriting it would
-un-skip something they already threw out.
+Rows in the `socializer` table in Supabase, and blocks appended to the SOCIALS page in
+Notion. Nothing else, anywhere.
+
+You **insert** and you **append**. You never update or delete a Supabase row — `status`
+belongs to the human, and overwriting it would un-skip something they already threw out.
+You never edit or delete anything already on the SOCIALS page: the account logins and links
+at the top of it are what the page is actually for, and they are none of your business.
 
 You make **no git commits**. Nothing in this job edits a file in the repo.
 
@@ -141,7 +156,7 @@ A post with an image or a video is worth more than one without, because it can g
 Instagram and Threads as well as X, Facebook and Bluesky. Not a rule - a funny line with
 no picture still beats a dull picture - but it is the tie-breaker.
 
-## Step 6 — write the rows to Supabase
+## Step 6 — write the rows to Supabase (the posting page's copy)
 
 ### The dedupe key
 
@@ -213,7 +228,36 @@ human ticking a box puts anything in it.
 `ignore-duplicates` means a key that already exists is silently left alone, so a re-run
 cannot overwrite a human's decision. Rely on it, but still check first.
 
-## Step 7 — report
+## Step 7 — write the same candidates onto the SOCIALS page
+
+The page is **SOCIALS**, `9755d3fa6f1848aa9831ba93f501ae7b`, under BACKSTAGE BIBLE. Append
+to the end of it. Do not touch what is already there.
+
+One block per candidate, in this shape, so a person can scan a week of them:
+
+```
+**@handle** — why it is funny, in one sentence
+https://the/confirmed/permalink
+```
+
+Rules for this half:
+
+- **Append only.** Never rewrite the page, never reorder it, never remove an empty block.
+  The top of that page is the list of account logins, and losing it would be a genuinely
+  bad day.
+- Write only the candidates that were **actually new** in this run. A key that already
+  existed was skipped as a duplicate, and writing it here anyway fills the page with
+  things somebody has already read and ruled on.
+- If a candidate has media, say so at the end of its line as `[has media]`. Somebody
+  reading in Notion cannot see the thumbnail the posting page shows.
+- Keep it to the run's candidates. No preamble, no summary block, no date heading unless
+  the page already has one for today.
+
+If Notion is unreachable, or the page will not take an append, do not retry in a loop and
+do not write the candidates somewhere else instead. Say so plainly in your final message
+and leave the Supabase rows as the record of the run.
+
+## Step 8 — report
 
 There is no commit and nothing to push, so the run's only output is your final message. Say:
 
