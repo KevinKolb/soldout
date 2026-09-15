@@ -29,11 +29,11 @@ is yours to touch. In particular you never set a Status other than `New`: decidi
 something has been posted or passed on is the human's half of this job. You make **no git
 commits**, and you write to no database but this one.
 
-Its sibling page, SOCIALS, holds the account names and logins. Stay out of it entirely.
+Its parent page, SOCIALS, holds the account names and logins. Stay out of it entirely.
 
 ## The database
 
-**POST CANDIDATES**, `4870f03c-f2f2-4bd8-a51e-1d4c9e89b0ca`, directly under BACKSTAGE.
+**POST CANDIDATES**, `4870f03c-f2f2-4bd8-a51e-1d4c9e89b0ca`, under SOCIALS, under BACKSTAGE.
 You reach it through the Notion connector attached to this routine. If Notion is
 unreachable, say so plainly in your final message and stop. Do not write the candidates
 somewhere else instead.

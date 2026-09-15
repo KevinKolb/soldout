@@ -41,7 +41,7 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 
 const OWNER = 'kevinmkolb@gmail.com';
 
-/* The POST CANDIDATES database, directly under BACKSTAGE. This replaced the
+/* The POST CANDIDATES database, under SOCIALS, under BACKSTAGE. This replaced the
    page of the same name in September 2026: a page could only be appended to, so nothing
    recorded whether a candidate had been posted, passed on, or never read. */
 const DATABASE = '4870f03c-f2f2-4bd8-a51e-1d4c9e89b0ca';
