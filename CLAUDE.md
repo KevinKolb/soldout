@@ -37,9 +37,9 @@ on them.
 - **Site:** this repo, deployed to GitHub Pages by
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
   `main`, every 6 hours on a schedule, and on manual runs.
-- **Notion:** show materials and the backstage workspace. Connected to Claude Code
-  through the Notion MCP. Reached from the Bible card in Backstage: the
-  backstage.soldoutcomedy.com subdomain now forwards to `/backstage` instead.
+- **Notion:** Backstage itself, and all the show material. Connected to Claude Code
+  through the Notion MCP. Both `backstage.soldoutcomedy.com` and
+  `soldoutcomedy.com/backstage` land on it.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the `shop` table that curates the shop, and `prop_candidates` for the
   prop bot. The retired `socializer` queue table is still there but nothing reads it.
@@ -48,7 +48,7 @@ Never commit real credentials. See "Deployment secrets" in [README.md](README.md
 
 ## Notion
 
-The backstage workspace is the source of truth for show material. Its root page, **BIBLE**
+Notion is Backstage, and the source of truth for show material. Its root page, **BACKSTAGE**
 (`d350ecaf50bc4f1893ba5ab53590ef3e`), holds OVERVIEW, WEBSITE, EDITIONS,
 EMAIL, PROPS, SCRIPTS, SCENES, BITS/EFFECTS & GAGS, SHOW TIME!, KREWE, SOCIALS, TECH,
 PLAYLISTS, NOTES, and SHOP.
@@ -111,18 +111,21 @@ How it works now:
 
 ## Backstage and login
 
-`/backstage` is Backstage: the browser tools, behind a Google sign-in. Auth is Supabase,
-shared across the site by [assets/js/auth.js](assets/js/auth.js), so signing in there also
+**Backstage is the Notion workspace**, not a page in this repo. `backstage.soldoutcomedy.com`
+and `soldoutcomedy.com/backstage` both land on it; `backstage/index.html` is a redirect and
+nothing else. It must never redirect to the subdomain, because Cloudflare points that
+subdomain here and the two would bounce off each other.
+
+The browser tools that used to sit behind that card grid live in [tools/](tools/) and are
+reached from Notion. Each one that writes anything carries its own Google sign-in through
+[assets/js/auth.js](assets/js/auth.js), shared across the origin, so signing in on one also
 unlocks editing on `/shop`. Only `kevinmkolb@gmail.com` can write; the policies in
 [tools/shop-migration-01-auth.sql](tools/shop-migration-01-auth.sql) enforce that in the
-database, so the page's own checks are manners rather than security.
+database, so a page's own checks are manners rather than security.
 
 There is no service-role key in this repo and there must never be one. Any key in a static
 page is readable by every visitor, and a service key bypasses row-level security entirely.
 The committed publishable key is powerless until someone proves who they are.
-
-`backstage.soldoutcomedy.com` forwards to `/backstage`. Notion is reached from the
-Bible card there.
 
 ## Working with Kevin
 

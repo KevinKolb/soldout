@@ -33,7 +33,7 @@ The parent page, SOCIALS, holds the account names and logins. Stay out of it ent
 
 ## The database
 
-**POST CANDIDATES**, `4870f03c-f2f2-4bd8-a51e-1d4c9e89b0ca`, under SOCIALS, under BIBLE.
+**POST CANDIDATES**, `4870f03c-f2f2-4bd8-a51e-1d4c9e89b0ca`, under SOCIALS, under BACKSTAGE.
 You reach it through the Notion connector attached to this routine. If Notion is
 unreachable, say so plainly in your final message and stop. Do not write the candidates
 somewhere else instead.

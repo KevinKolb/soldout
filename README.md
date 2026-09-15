@@ -18,8 +18,8 @@ assets/               All static assets
   data/               Site content as XML (shows, taglines, videos, musicvids)
 
 live/                 Show-day pages: prop check-in form, prop display, QR codes
-backstage/            Backstage: login, and the browser tools for editing site content
-tools/                Local development helpers (not used by the deployed site)
+backstage/            Two redirects and nothing else: Backstage itself is in Notion
+tools/                The browser tools, the build scripts and the bots' orders
 archive/              Previous homepage and its alternate themes
 ```
 
@@ -29,7 +29,7 @@ Site content lives in `assets/data/*.xml` rather than in the HTML. Asset paths i
 those XML files are root-relative (`/assets/images/...`) so they resolve correctly from
 any page, whatever folder it sits in.
 
-Edit the XML by hand, or use the browser tools in `backstage/`, which generate an updated
+Edit the XML by hand, or use the browser tools in `tools/`, which generate an updated
 file for you to download and commit.
 
 ## SOC SOCIALIZER BOT
@@ -39,7 +39,7 @@ A routine that goes looking for funny posts once a day and adds what it finds to
 funny, the handle, the permalink, the platform, and a Media tick where the source carries
 an image or a video.
 
-**Found Funny** at [backstage/foundfunny](backstage/foundfunny/index.html) is the same
+**Found Funny** at [tools/foundfunny](tools/foundfunny/index.html) is the same
 thing done by hand, and it writes the same row. Its bookmarklet only opens that page with
 the link filled in; the page itself asks the `clip-to-notion` edge function, which holds
 the Notion token. That detour is not a flourish. Notion's API refuses cross-origin browser
@@ -83,7 +83,7 @@ To use the admin tools with save-to-disk support, run the helper server instead:
 python tools/dev-server.py
 ```
 
-Then open <http://localhost:8080/backstage/addshows.html>.
+Then open <http://localhost:8080/tools/addshows.html>.
 
 ## Deployment secrets
 
@@ -104,13 +104,31 @@ These are for prop check-in (`live/`) only. The shop build needs no secret: it r
 `shop` table in Supabase through a public select policy, with the publishable key
 committed in `tools/build-inventory.py`.
 
+## Backstage
+
+Backstage is the **Notion** workspace, not a page here. Both `backstage.soldoutcomedy.com`
+and `soldoutcomedy.com/backstage` land on it; `backstage/index.html` is a redirect and
+nothing else, and `backstage/clip/` is a second redirect keeping an older bookmarklet URL
+alive. Notion does its own auth, so nothing on this side gates it.
+
+`backstage/index.html` must never redirect to `backstage.soldoutcomedy.com`. Cloudflare
+forwards that subdomain to this path, so pointing it back would put the two in a loop. It
+did, once.
+
+The browser tools that used to live behind a card grid there are in `tools/` now, linked
+from Notion.
+
 ## Logging in
 
-`/backstage` sits behind Google sign-in through Supabase Auth. The session is shared
-across the site by `assets/js/auth.js`, so signing in there also turns `/shop` editable in
-place for the owner. Write access is granted in the database to one email address by
-`tools/shop-migration-01-auth.sql`, not by holding a key, which is why the publishable key
-can be committed and no service-role key exists anywhere in this repo.
+The tools that write anything sit behind Google sign-in through Supabase Auth. The session
+is shared across the origin by `assets/js/auth.js`, so signing in on one also turns `/shop`
+editable in place for the owner. Write access is granted in the database to one email
+address by `tools/shop-migration-01-auth.sql`, not by holding a key, which is why the
+publishable key can be committed and no service-role key exists anywhere in this repo.
+
+Moving a signed-in page to a new path means adding that path to the redirect allow-list in
+Supabase (Auth, URL Configuration). A path that is not on the list fails at the Google
+round trip, not at the button.
 
 First-time setup lives in the comments at the end of that migration: enable the Google
 provider in Supabase, create a Google OAuth client, and register the redirect URLs.

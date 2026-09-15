@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Simple development server for Shows Admin
-Run this script and visit http://localhost:8080/backstage/addshows.html
+Run this script and visit http://localhost:8080/tools/addshows.html
 """
 
 import http.server
@@ -74,7 +74,7 @@ def main():
         print("  SOLD OUT! Comedy - Shows Admin Server")
         print("=" * 60)
         print(f"\n  Server running at: http://localhost:{PORT}")
-        print(f"  Backstage:         http://localhost:{PORT}/backstage/addshows.html")
+        print(f"  Shows admin:       http://localhost:{PORT}/tools/addshows.html")
         print("\n  Press Ctrl+C to stop the server\n")
         print("=" * 60)
 
