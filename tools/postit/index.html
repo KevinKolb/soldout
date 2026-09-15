@@ -102,12 +102,13 @@
     <div class="row" id="each"></div>
 
     <h2>No web composer</h2>
-    <p class="manual">Instagram and TikTok only accept posts from their own apps. Copy the
-       text, then open the app on your phone.</p>
+    <p class="manual">Instagram and TikTok only accept posts from their own apps. These two
+       copy the text and open the account in one press, so it is already on the clipboard
+       when you get there.</p>
     <div class="row">
         <button id="copy" type="button">Copy the text</button>
-        <a class="btn" href="https://www.instagram.com/soldout.comedy" target="_blank" rel="noopener">Instagram</a>
-        <a class="btn" href="https://www.tiktok.com/@soldoutcomedy" target="_blank" rel="noopener">TikTok</a>
+        <button id="ig" type="button">Copy + Instagram</button>
+        <button id="tt" type="button">Copy + TikTok</button>
     </div>
 </div>
 
@@ -257,14 +258,45 @@ document.getElementById('all').onclick = function () {
     }
 };
 
-document.getElementById('copy').onclick = function () {
-    var payload = text + '\n' + url;
-    navigator.clipboard.writeText(payload).then(function () {
-        note('Copied. Paste it into Instagram or TikTok on your phone.', 'good');
+function payload() { return text + '\n' + url; }
+
+function copyText(onDone) {
+    var body = payload();
+    navigator.clipboard.writeText(body).then(function () {
+        if (onDone) onDone(true);
     }).catch(function () {
-        window.prompt('Copy this:', payload);
+        /* Blocked or unfocused clipboard. A prompt box is ugly, but it never fails
+           silently, which matters more here than how it looks. */
+        window.prompt('Copy this:', body);
+        if (onDone) onDone(false);
+    });
+}
+
+document.getElementById('copy').onclick = function () {
+    copyText(function (ok) {
+        if (ok) note('Copied. Paste it into Instagram or TikTok on your phone.', 'good');
     });
 };
+
+/* Copy, then open. The clipboard call goes first deliberately: opening a tab takes focus
+   away from this document, and the Clipboard API refuses to write from a document that is
+   not focused. Both still happen inside the one click, so neither is treated as something
+   the user did not ask for. */
+function copyThenOpen(target, label) {
+    return function () {
+        copyText(function (ok) {
+            if (ok) note('Copied. ' + label + ' is open - paste it there.', 'good');
+        });
+        if (!window.open(target, '_blank', 'noopener')) {
+            note('Copied, but the browser blocked the ' + label + ' tab. Allow popups for this site.', 'warn');
+        }
+    };
+}
+
+document.getElementById('ig').onclick =
+    copyThenOpen('https://www.instagram.com/soldout.comedy', 'Instagram');
+document.getElementById('tt').onclick =
+    copyThenOpen('https://www.tiktok.com/@soldoutcomedy', 'TikTok');
 
 if (!url) {
     document.getElementById('sub').textContent =
