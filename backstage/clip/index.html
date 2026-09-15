@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clip - SOLD OUT! Comedy</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/png" href="/assets/images/soldoutlogo.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 15px;
+            line-height: 1.55;
+            color: #000;
+            background: #fff;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 680px; margin: 0 auto; }
+
+        h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .subtitle { font-size: 15px; color: #666; margin-bottom: 32px; }
+
+        .uplink {
+            display: inline-block; margin-bottom: 18px;
+            font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+            color: #666; text-decoration: none;
+            border-bottom: 2px solid #ccc; padding-bottom: 2px;
+        }
+        .uplink:hover { color: #000; border-bottom-color: #000; }
+
+        .field { margin-bottom: 18px; }
+        .field label {
+            display: block; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+        .field .hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: #999; }
+
+        input[type="text"], textarea {
+            width: 100%; padding: 11px 12px; border: 2px solid #000;
+            font-family: inherit; font-size: 15px; background: #fff; color: #000;
+        }
+        input:focus, textarea:focus { outline: 3px solid #ffd93d; outline-offset: -1px; }
+        textarea { resize: vertical; min-height: 78px; }
+
+        .check { display: flex; align-items: center; gap: 9px; font-size: 14px; }
+        .check input { width: 18px; height: 18px; }
+
+        .actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 26px; }
+
+        button {
+            font-family: inherit; font-size: 14px; font-weight: 600;
+            padding: 11px 20px; border: 2px solid #000; background: #000; color: #fff;
+            cursor: pointer;
+        }
+        button:hover:not(:disabled) { background: #fff; color: #000; }
+        button:disabled { opacity: 0.35; cursor: not-allowed; }
+        button.ghost { background: #fff; color: #000; }
+
+        #status {
+            padding: 12px 15px; border: 2px solid #000; margin-bottom: 22px;
+            display: none; font-size: 14px;
+        }
+        #status.show { display: block; }
+        #status.err { background: #ffe5e5; border-color: #c0392b; }
+        #status.good { background: #e8f5e9; border-color: #24a25b; }
+        #status.busy { background: #ffd93d; }
+
+        .gate { border: 2px solid #000; padding: 36px 30px; text-align: center; }
+        .gate p { font-size: 14px; color: #666; margin-bottom: 22px; }
+
+        .mark {
+            display: inline-block; margin-top: 8px;
+            border: 2px dashed #000; padding: 10px 16px;
+            font-weight: 700; text-decoration: none; color: #000; cursor: grab;
+        }
+        .mark:hover { background: #ffd93d; }
+
+        details { border: 2px solid #000; padding: 14px; margin-top: 34px; }
+        summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+        details p { font-size: 14px; margin-top: 12px; }
+        code { background: #f4f4f4; padding: 1px 5px; font-size: 13px; border: 1px solid #e0e0e0; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/backstage/" class="uplink">&larr; Backstage</a>
+
+    <h1>Clip</h1>
+    <div class="subtitle">Send a post to the SOCIALS page in Notion, in the same shape the bot writes.</div>
+
+    <div id="status"></div>
+
+    <div class="gate" id="gate">
+        <p>Sign in to clip.</p>
+        <button id="signin" type="button">Sign in with Google</button>
+    </div>
+
+    <div id="form" hidden>
+        <div class="field">
+            <label for="url">Link <span class="hint">- the post itself, not a feed</span></label>
+            <input type="text" id="url" placeholder="https://...">
+        </div>
+
+        <div class="field">
+            <label for="handle">Who posted it <span class="hint">- @name, optional</span></label>
+            <input type="text" id="handle" placeholder="@someone">
+        </div>
+
+        <div class="field">
+            <label for="why">Why it is funny <span class="hint">- one sentence, in your words</span></label>
+            <textarea id="why" placeholder="What the joke is."></textarea>
+        </div>
+
+        <div class="field check">
+            <input type="checkbox" id="media">
+            <label for="media" style="margin:0">It carries an image or a video</label>
+        </div>
+
+        <div class="actions">
+            <button id="save" type="button">Add to SOCIALS</button>
+            <button id="out" class="ghost" type="button">Sign out</button>
+        </div>
+
+        <details>
+            <summary>The bookmarklet</summary>
+            <p>Drag this to your bookmarks bar. Press it on any post and this page opens with
+               the link already filled in, and the page's own title as a starting point for
+               the sentence.</p>
+            <a class="mark" id="mark" href="#">CLIP TO SOCIALS</a>
+            <p>It carries nothing secret: it only hands this page a URL. The Notion token
+               lives on the server, which is the only way a browser can write to Notion at
+               all &mdash; Notion's API refuses requests from a web page.</p>
+        </details>
+    </div>
+</div>
+
+<script type="module">
+/* The capture half of what the deleted Socializer page used to do, pointed at Notion.
+   The bookmarklet cannot write to Notion itself: Notion's API refuses cross-origin
+   browser requests, and the token would have to sit in the bookmark to try. So the
+   bookmarklet carries the URL here, this page carries the session, and a Supabase edge
+   function carries the token. */
+import { currentUser, isOwner, signIn, signOut, supabase, OWNER } from '/assets/js/auth.js';
+
+const statusEl = document.getElementById('status');
+function status(msg, kind) {
+    statusEl.textContent = msg;
+    statusEl.className = 'show ' + (kind || '');
+    if (kind === 'good') setTimeout(() => { statusEl.className = ''; }, 5000);
+}
+
+const gate = document.getElementById('gate');
+const form = document.getElementById('form');
+const url = document.getElementById('url');
+const handle = document.getElementById('handle');
+const why = document.getElementById('why');
+const media = document.getElementById('media');
+
+/* What the bookmarklet handed over. Cleared from the address bar afterwards so a
+   refresh does not silently re-fill a form you have already emptied. */
+function prefill() {
+    const q = new URLSearchParams(location.search);
+    const u = q.get('u');
+    if (!u) return;
+
+    url.value = u.trim();
+    const t = (q.get('t') || '').trim();
+    if (t && !why.value) why.value = t;
+
+    const clean = new URL(location.href);
+    clean.search = '';
+    history.replaceState(null, '', clean);
+}
+
+document.getElementById('mark').setAttribute('href',
+    "javascript:(function(){"
+    + "var s=String(window.getSelection()||'').trim();"
+    + "var t=s||document.title||'';"
+    + "location.href='https://www.soldoutcomedy.com/backstage/clip/?u='"
+    + "+encodeURIComponent(location.href)+'&t='+encodeURIComponent(t.slice(0,300));"
+    + "})()");
+
+document.getElementById('mark').addEventListener('click', e => {
+    e.preventDefault();
+    status('Drag it to your bookmarks bar, then press it on a post.', 'busy');
+});
+
+document.getElementById('signin').onclick = async (e) => {
+    e.target.disabled = true;
+    try {
+        await signIn(location.origin + '/backstage/clip/');
+    } catch (ex) {
+        e.target.disabled = false;
+        status(ex.message, 'err');
+    }
+};
+
+document.getElementById('out').onclick = async () => { await signOut(); location.reload(); };
+
+document.getElementById('save').onclick = async () => {
+    const btn = document.getElementById('save');
+    const link = url.value.trim();
+    if (!/^https?:\/\//i.test(link)) { status('Paste the link to the post first.', 'err'); return; }
+
+    btn.disabled = true;
+    status('Adding to SOCIALS...', 'busy');
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) { btn.disabled = false; status('Session expired. Sign in again.', 'err'); return; }
+
+    try {
+        const res = await fetch(
+            'https://tjteeqofqozmncfoiofy.supabase.co/functions/v1/clip-to-notion',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + session.access_token,
+                },
+                body: JSON.stringify({
+                    url: link,
+                    handle: handle.value.trim(),
+                    why: why.value.trim(),
+                    media: media.checked,
+                }),
+            },
+        );
+        const body = await res.json().catch(() => ({}));
+        btn.disabled = false;
+
+        if (!res.ok) { status(body.error || ('Failed (' + res.status + ').'), 'err'); return; }
+
+        url.value = handle.value = why.value = '';
+        media.checked = false;
+        status('On the SOCIALS page.', 'good');
+    } catch (err) {
+        btn.disabled = false;
+        status('Could not reach the clipper: ' + err.message, 'err');
+    }
+};
+
+function render(user) {
+    const ok = isOwner(user);
+    form.hidden = !ok;
+    gate.hidden = ok;
+    if (user && !ok) status('Signed in as ' + user.email + '. That is not ' + OWNER + '.', 'err');
+    if (ok) prefill();
+}
+
+render(await currentUser());
+</script>
+</body>
+</html>
