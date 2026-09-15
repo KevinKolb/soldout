@@ -38,7 +38,7 @@ on them.
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
   `main`, every 6 hours on a schedule, and on manual runs.
 - **Notion:** show materials and the backstage workspace. Connected to Claude Code
-  through the Notion MCP. Reached from the Backstage Bible card in Backstage: the
+  through the Notion MCP. Reached from the Bible card in Backstage: the
   backstage.soldoutcomedy.com subdomain now forwards to `/backstage` instead.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the `shop` table that curates the shop, and `prop_candidates` for the
@@ -48,8 +48,8 @@ Never commit real credentials. See "Deployment secrets" in [README.md](README.md
 
 ## Notion
 
-The backstage workspace is the source of truth for show material. Its root page, "SOLD OUT!
-Comedy BACKSTAGE" (`d350ecaf50bc4f1893ba5ab53590ef3e`), holds OVERVIEW, WEBSITE, EDITIONS,
+The backstage workspace is the source of truth for show material. Its root page, **BIBLE**
+(`d350ecaf50bc4f1893ba5ab53590ef3e`), holds OVERVIEW, WEBSITE, EDITIONS,
 EMAIL, PROPS, SCRIPTS, SCENES, BITS/EFFECTS & GAGS, SHOW TIME!, KREWE, SOCIALS, TECH,
 PLAYLISTS, NOTES, and SHOP.
 
@@ -122,7 +122,7 @@ page is readable by every visitor, and a service key bypasses row-level security
 The committed publishable key is powerless until someone proves who they are.
 
 `backstage.soldoutcomedy.com` forwards to `/backstage`. Notion is reached from the
-Backstage Bible card there.
+Bible card there.
 
 ## Working with Kevin
 
