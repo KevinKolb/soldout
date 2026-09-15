@@ -149,8 +149,29 @@ One row per candidate, filled in as the table above describes.
 - **Status** is `New` on every row you create, without exception.
 - Add rows only. Never edit an existing row, never change anybody's Status, never delete.
 
-## Step 7 - say what you did
+## Step 7 - send a notification
 
-End with a short plain-language note: how many you added, what you passed on and why, and
-anything about the search that was unusually good or unusually barren. If the database could
+This runs while nobody is watching, so finish by pushing a notification. Nobody should have
+to go and check whether it ran.
+
+One line, plus the link:
+
+```
+3 new post candidates
+https://app.notion.com/p/3dce1890fe6f80629e61f5ecfb4b3b97
+```
+
+That link is the SOCIALS page, where the table is, rather than the database on its own: it
+opens on the thing a person actually works from.
+
+Send it on **every** run, including the ones where you added nothing. "No candidates today"
+is worth knowing, because silence is indistinguishable from a run that crashed. If Notion
+could not be read or written, say that in the notification instead of a count, so the
+failure is the thing that arrives rather than nothing at all.
+
+## Step 8 - say what you did
+
+End your run with a short plain-language note: how many you added, what you passed on and
+why, and anything about the search that was unusually good or unusually barren. This is the
+longer version of the notification, for whoever opens the run itself. If the database could
 not be read or written, say that instead of reporting a run that did not happen.
