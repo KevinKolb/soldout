@@ -105,6 +105,14 @@ A calibration you could not fetch is not a reason to skip the run.
 
 ## Step 3 — check the popular sources first
 
+Before anything else, check the **SOCIALS** page in Notion —
+[`9755d3fa6f1848aa9831ba93f501ae7b`](https://app.notion.com/p/SOCIALS-9755d3fa6f1848aa9831ba93f501ae7b),
+under BACKSTAGE BIBLE, the same page Step 7 writes to. Its top holds the current list of
+account logins — the platforms SOLD OUT! Comedy is actually on. Read it fresh each run
+rather than trusting an earlier one: it changes without notice, and it is what "socials"
+means for the rest of this file — the platforms worth searching, and the ones a human might
+eventually post a candidate to. Never touch that list; you're only reading it.
+
 These are people who reliably make the kind of thing we want. Check them before you go
 searching the open web, and take roughly half a run's candidates from here whenever they
 have posted anything good.
