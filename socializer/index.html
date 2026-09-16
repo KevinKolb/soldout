@@ -92,7 +92,10 @@
         }
         .chip.acid { background: #ffd93d; }
 
-        .card .row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .card .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
+        /* margin-left:auto takes the gap between the destinations and the ruling, so
+           Post and Pass sit hard right - and stay together when the row wraps. */
+        .card .rules { display: flex; gap: 6px; margin-left: auto; }
         .card .row button, .card .row .btn { font-size: 13px; padding: 8px 12px; }
         .repost { background: #ffd93d; color: #000; }
         .repost:hover { background: #000; color: #ffd93d; }
@@ -140,18 +143,20 @@
             display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
             gap: 8px; margin-top: 12px;
         }
-        .social { border: 2px solid #000; padding: 10px 12px; background: #fff; }
+        /* The whole tile is the link, so every part of it has to carry through on
+           hover - muted greys on white go muddy on the yellow otherwise. */
+        .social {
+            display: block; border: 2px solid #000; padding: 10px 12px;
+            background: #fff; color: #000; text-decoration: none;
+        }
+        .social:hover { background: #ffd93d; }
         .social .plat {
             font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
             text-transform: uppercase; color: #666;
         }
         .social .at {
-            display: inline-block; font-size: 15px; font-weight: 600;
-            color: #000; text-decoration: none; overflow-wrap: anywhere;
-            border-bottom: 2px solid #ffd93d;
+            font-size: 15px; font-weight: 600; overflow-wrap: anywhere;
         }
-        .social .at:hover { background: #ffd93d; }
-        /* How you get in. Plain text, because there is nothing to press. */
         .social .how {
             font-size: 12px; line-height: 1.45; color: #444; margin-top: 7px;
         }
@@ -159,6 +164,9 @@
             display: block; font-size: 10px; letter-spacing: 0.5px;
             text-transform: uppercase; color: #999; font-weight: 700;
         }
+        .social:hover .plat,
+        .social:hover .how,
+        .social:hover .how b { color: #000; }
 
         /* Capture mode: the bookmarklet opens this in a 560x760 popup to file one post,
            so the page shows the form and nothing else. The queue, the bot and the
@@ -212,57 +220,57 @@
                password stuff. Contact Kevin for the <b>soldoutcomedy@gmail.com</b> password
                and/or to get set up with delegated access.</p>
             <div class="socials">
-                <div class="social">
+                <a class="social" href="https://facebook.com/soldoutcomedy" target="_blank" rel="noopener">
                     <div class="plat">Facebook</div>
-                    <a class="at" href="https://facebook.com/soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <div class="at">SOLDOUTcomedy</div>
                     <p class="how"><b>Login</b>Your own Facebook login, then switch to the SOLD OUT! profile. No password is shared.</p>
                     <p class="how"><b>Enable</b>Kevin adds you under Page settings &rarr; Page access. Facebook access is full or partial; Task access is post and message only.</p>
-                </div>
-                <div class="social">
+                </a>
+                <a class="social" href="https://www.instagram.com/soldout.comedy" target="_blank" rel="noopener">
                     <div class="plat">Instagram</div>
-                    <a class="at" href="https://www.instagram.com/soldout.comedy" target="_blank" rel="noopener">SOLDOUT.comedy</a>
+                    <div class="at">SOLDOUT.comedy</div>
                     <p class="how"><b>Login</b>The shared account, password in Google Password Manager.</p>
-                </div>
-                <div class="social">
+                </a>
+                <a class="social" href="https://www.threads.com/@soldout.comedy" target="_blank" rel="noopener">
                     <div class="plat">Threads</div>
-                    <a class="at" href="https://www.threads.com/@soldout.comedy" target="_blank" rel="noopener">SOLDOUT.comedy</a>
+                    <div class="at">SOLDOUT.comedy</div>
                     <p class="how"><b>Login</b>Uses the Instagram login.</p>
-                </div>
-                <div class="social">
+                </a>
+                <a class="social" href="https://x.com/soldoutcomedy" target="_blank" rel="noopener">
                     <div class="plat">X</div>
-                    <a class="at" href="https://x.com/soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <div class="at">SOLDOUTcomedy</div>
                     <p class="how"><b>Login</b>Native Google login with the shared account.</p>
-                </div>
-                <div class="social">
+                </a>
+                <a class="social" href="https://bsky.app/profile/soldoutcomedy.bsky.social" target="_blank" rel="noopener">
                     <div class="plat">Bluesky</div>
-                    <a class="at" href="https://bsky.app/profile/soldoutcomedy.bsky.social" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <div class="at">SOLDOUTcomedy</div>
                     <p class="how"><b>Login</b>A dedicated account, password in Google Password Manager.</p>
-                </div>
-                <div class="social">
+                </a>
+                <a class="social" href="https://www.tiktok.com/@soldoutcomedy" target="_blank" rel="noopener">
                     <div class="plat">TikTok</div>
-                    <a class="at" href="https://www.tiktok.com/@soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <div class="at">SOLDOUTcomedy</div>
                     <p class="how"><b>Login</b>Native Google login with the shared account.</p>
-                </div>
-                <div class="social">
+                </a>
+                <a class="social" href="https://www.youtube.com/@SOLDOUTComedy" target="_blank" rel="noopener">
                     <div class="plat">YouTube</div>
-                    <a class="at" href="https://www.youtube.com/@SOLDOUTComedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <div class="at">SOLDOUTcomedy</div>
                     <p class="how"><b>Login</b>The shared account, password in Google Password Manager.</p>
-                </div>
-                <div class="social">
+                </a>
+                <a class="social" href="https://www.reddit.com/user/SOLDOUTComedy" target="_blank" rel="noopener">
                     <div class="plat">Reddit</div>
-                    <a class="at" href="https://www.reddit.com/user/SOLDOUTComedy" target="_blank" rel="noopener">SOLDOUTComedy</a>
+                    <div class="at">SOLDOUTComedy</div>
                     <p class="how"><b>Login</b>The shared account, password in Google Password Manager. Not native Google login.</p>
-                </div>
-                <div class="social">
+                </a>
+                <a class="social" href="https://www.whatnot.com/user/soldoutcomedy" target="_blank" rel="noopener">
                     <div class="plat">Whatnot</div>
-                    <a class="at" href="https://www.whatnot.com/user/soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <div class="at">SOLDOUTcomedy</div>
                     <p class="how"><b>Login</b>Native Google login with the shared account.</p>
-                </div>
-                <div class="social">
+                </a>
+                <a class="social" href="https://poshmark.com/closet/soldoutcomedy" target="_blank" rel="noopener">
                     <div class="plat">Poshmark</div>
-                    <a class="at" href="https://poshmark.com/closet/soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <div class="at">SOLDOUTcomedy</div>
                     <p class="how"><b>Login</b>Native Google login with the shared account.</p>
-                </div>
+                </a>
             </div>
         </details>
 
@@ -594,12 +602,17 @@ function card(row) {
         bar.appendChild(b);
     });
 
+    /* Ruling on a candidate is a different act from sending it somewhere, so it sits
+       apart from the destinations rather than at the end of the same run of buttons. */
+    const rules = document.createElement('div');
+    rules.className = 'rules';
     if (row.status === 'NEW') {
-        bar.appendChild(btn('Posted', () => rule(row, 'POSTED')));
-        bar.appendChild(btn('Pass', () => rule(row, 'SKIPPED'), true));
+        rules.appendChild(btn('Post', () => rule(row, 'POSTED')));
+        rules.appendChild(btn('Pass', () => rule(row, 'SKIPPED'), true));
     } else {
-        bar.appendChild(btn('Back to new', () => rule(row, 'NEW'), true));
+        rules.appendChild(btn('Back to new', () => rule(row, 'NEW'), true));
     }
+    bar.appendChild(rules);
 
     el.appendChild(bar);
     return el;
