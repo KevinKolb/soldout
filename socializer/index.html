@@ -21,6 +21,15 @@
         h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
         .subtitle { font-size: 15px; color: #666; margin-bottom: 28px; }
 
+        /* Title on the left, the bot on the right. The bot fills this queue, so the way
+           to go and look at it belongs level with the name of the page, not buried. */
+        .masthead {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            gap: 16px; margin-bottom: 28px;
+        }
+        .masthead .subtitle { margin-bottom: 0; }
+        .botlink { flex: none; white-space: nowrap; }
+
         button, .btn {
             display: inline-block;
             font-family: inherit; font-size: 14px; font-weight: 600;
@@ -29,8 +38,8 @@
         }
         button:hover:not(:disabled), .btn:hover { background: #fff; color: #000; }
         button:disabled { opacity: 0.35; cursor: not-allowed; }
-        button.ghost { background: #fff; color: #000; }
-        button.ghost:hover:not(:disabled) { background: #000; color: #fff; }
+        button.ghost, .btn.ghost { background: #fff; color: #000; }
+        button.ghost:hover:not(:disabled), .btn.ghost:hover { background: #000; color: #fff; }
 
         /* --- the capture form -------------------------------------------------- */
         .panel { border: 2px solid #000; padding: 20px; margin-bottom: 30px; }
@@ -115,17 +124,37 @@
         }
         .mark:hover { background: #ffd93d; }
 
+        /* Capture mode: the bookmarklet opens this in a 560x760 popup to file one post,
+           so the page shows the form and nothing else. The queue, the bot and the
+           bookmarklet's own instructions are all the full page's business. */
+        body.capture .queue,
+        body.capture details,
+        body.capture .botlink,
+        body.capture .subtitle { display: none; }
+        body.capture { padding: 22px 18px; }
+        body.capture h1 { font-size: 22px; margin-bottom: 0; }
+        body.capture .masthead { margin-bottom: 18px; }
+        body.capture .panel { margin-bottom: 0; }
+
         @media (max-width: 560px) {
             body { padding: 24px 16px; }
             h1 { font-size: 26px; }
             .two { display: block; }
+            .masthead { display: block; }
+            .botlink { margin-top: 14px; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Socializer</h1>
-    <div class="subtitle">Everything worth reposting, and somewhere to send it.</div>
+    <div class="masthead">
+        <div>
+            <h1>Socializer</h1>
+            <div class="subtitle">Post or Skip Post Candidates Here</div>
+        </div>
+        <a class="btn ghost botlink" href="https://claude.ai/code/routines"
+           target="_blank" rel="noopener">🤖 SOC Socializer Bot</a>
+    </div>
 
     <div id="status"></div>
 
@@ -543,6 +572,7 @@ $('save').onclick = async () => {
 
     clearForm();
     status('In the queue.', 'good');
+    if (CAPTURE) return;
     tab = 'NEW';
     paintTabs();
     load();
@@ -574,6 +604,12 @@ $('signin').onclick = async (e) => {
 };
 
 $('gateOut').onclick = async () => { await signOut(); location.reload(); };
+
+/* A bookmarklet press is the only thing that arrives with ?u=, and it means "file this
+   one post". Read it now: prefill() strips the query string, so by the time anything
+   else asks, the evidence is gone. */
+const CAPTURE = new URLSearchParams(location.search).has('u');
+if (CAPTURE) document.body.classList.add('capture');
 
 /* What the bookmarklet handed over, cleared from the address bar afterwards so a refresh
    does not silently re-fill a form you have already emptied. */
@@ -625,7 +661,11 @@ function render(user) {
     $('gateOut').hidden = !wrongAccount;
     if (wrongAccount) status('That is not ' + OWNER + '.', 'err');
 
-    if (ok) { prefill(); paintTabs(); load(); }
+    if (!ok) return;
+    prefill();
+    if (CAPTURE) { $('url').focus(); return; }
+    paintTabs();
+    load();
 }
 
 render(await currentUser());
