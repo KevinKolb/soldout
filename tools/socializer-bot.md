@@ -170,7 +170,7 @@ One line, plus the link:
 
 ```
 3 new post candidates
-https://www.soldoutcomedy.com/backstage/socializer/
+https://www.soldoutcomedy.com/socializer/
 ```
 
 That link is the Socializer, which is where the queue is worked: the candidate, the repost

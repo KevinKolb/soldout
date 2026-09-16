@@ -39,7 +39,7 @@ A routine that goes looking for funny posts once a day and adds what it finds to
 funny, the handle, the permalink, the platform, and a Media tick where the source carries
 an image or a video.
 
-The **Socializer** at [backstage/socializer](backstage/socializer/index.html) is where
+The **Socializer** at [socializer](socializer/index.html) is where
 that queue is worked, and its bookmarklet is the same job done by hand: press it on any
 post and the page opens with the link, the author and the platform already filled in.
 

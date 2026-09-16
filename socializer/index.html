@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socializer - SOLD OUT! Comedy</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/png" href="/assets/images/soldoutlogo.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 15px; line-height: 1.55;
+            color: #000; background: #fff;
+            padding: 40px 20px;
+        }
+
+        .container { max-width: 860px; margin: 0 auto; }
+
+        h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
+        .subtitle { font-size: 15px; color: #666; margin-bottom: 28px; }
+
+        button, .btn {
+            display: inline-block;
+            font-family: inherit; font-size: 14px; font-weight: 600;
+            padding: 10px 16px; border: 2px solid #000;
+            background: #000; color: #fff; text-decoration: none; cursor: pointer;
+        }
+        button:hover:not(:disabled), .btn:hover { background: #fff; color: #000; }
+        button:disabled { opacity: 0.35; cursor: not-allowed; }
+        button.ghost { background: #fff; color: #000; }
+        button.ghost:hover:not(:disabled) { background: #000; color: #fff; }
+
+        /* --- the capture form -------------------------------------------------- */
+        .panel { border: 2px solid #000; padding: 20px; margin-bottom: 30px; }
+        .panel h2, .queue h2 {
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 1px; color: #666;
+            border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 16px;
+        }
+
+        .field { margin-bottom: 14px; }
+        .field label {
+            display: block; font-size: 12px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px;
+        }
+        .field .hint { font-weight: 400; text-transform: none; letter-spacing: 0; color: #999; }
+
+        input[type="text"], textarea {
+            width: 100%; padding: 10px 11px; border: 2px solid #000;
+            font-family: inherit; font-size: 15px; background: #fff; color: #000;
+        }
+        input:focus, textarea:focus { outline: 3px solid #ffd93d; outline-offset: -1px; }
+        textarea { resize: vertical; min-height: 64px; }
+
+        .two { display: flex; gap: 12px; }
+        .two .field { flex: 1; }
+
+        .check { display: flex; align-items: center; gap: 9px; font-size: 14px; }
+        .check input { width: 18px; height: 18px; }
+
+        .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
+
+        /* --- the queue --------------------------------------------------------- */
+        .tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+        .tab {
+            font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+            padding: 8px 14px; border: 2px solid #000; background: #fff; color: #000; cursor: pointer;
+        }
+        .tab.on { background: #000; color: #fff; }
+
+        .card { border: 2px solid #000; padding: 16px 18px; margin-bottom: 14px; }
+        .card.done { opacity: 0.55; }
+        .card .why { font-size: 16px; font-weight: 600; margin-bottom: 6px; overflow-wrap: break-word; }
+        .card .meta { font-size: 12px; color: #666; margin-bottom: 10px; }
+        .card .meta a { color: #666; word-break: break-all; }
+
+        .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+        .chip {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+            padding: 3px 8px; border: 2px solid #000; background: #fff;
+        }
+        .chip.acid { background: #ffd93d; }
+
+        .card .row { display: flex; gap: 6px; flex-wrap: wrap; }
+        .card .row button, .card .row .btn { font-size: 13px; padding: 8px 12px; }
+        .repost { background: #ffd93d; color: #000; }
+        .repost:hover { background: #000; color: #ffd93d; }
+
+        .sent { background: #000; color: #fff; }
+
+        .empty { border: 2px dashed #999; padding: 30px; text-align: center; color: #666; }
+
+        #status {
+            padding: 12px 15px; border: 2px solid #000; margin-bottom: 22px;
+            display: none; font-size: 14px;
+        }
+        #status.show { display: block; }
+        #status.err  { background: #ffe5e5; border-color: #c0392b; }
+        #status.good { background: #e8f5e9; border-color: #24a25b; }
+        #status.busy { background: #ffd93d; }
+
+        .gate { border: 2px solid #000; padding: 36px 30px; text-align: center; }
+        .gate p { font-size: 14px; color: #666; margin-bottom: 22px; }
+        .gate button + button { margin-left: 8px; }
+
+        details { border: 2px solid #000; padding: 14px; margin-top: 30px; }
+        summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+        details p { font-size: 14px; margin-top: 12px; }
+        .mark {
+            display: inline-block; margin-top: 8px;
+            border: 2px dashed #000; padding: 10px 16px;
+            font-weight: 700; text-decoration: none; color: #000; cursor: grab;
+        }
+        .mark:hover { background: #ffd93d; }
+
+        @media (max-width: 560px) {
+            body { padding: 24px 16px; }
+            h1 { font-size: 26px; }
+            .two { display: block; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Socializer</h1>
+    <div class="subtitle">Everything worth reposting, and somewhere to send it.</div>
+
+    <div id="status"></div>
+
+    <div class="gate" id="gate">
+        <p id="gateWhy">Sign in to use the Socializer.</p>
+        <button id="signin" type="button">Sign in with Google</button>
+        <button id="gateOut" class="ghost" type="button" hidden>Just sign out</button>
+    </div>
+
+    <div id="app" hidden>
+        <div class="panel">
+            <h2>Add a candidate</h2>
+
+            <div class="field">
+                <label for="url">Link <span class="hint">- the post itself, not a feed</span></label>
+                <input type="text" id="url" placeholder="https://...">
+            </div>
+
+            <div class="two">
+                <div class="field">
+                    <label for="who">Who posted it <span class="hint">- filled from the link</span></label>
+                    <input type="text" id="who" placeholder="@someone">
+                </div>
+                <div class="field">
+                    <label for="platform">Platform <span class="hint">- read from the link</span></label>
+                    <input type="text" id="platform" placeholder="Web" readonly>
+                </div>
+            </div>
+
+            <div class="field">
+                <label for="why">Our two cents <span class="hint">- one sentence, in your words</span></label>
+                <textarea id="why" placeholder="What the joke is."></textarea>
+            </div>
+
+            <div class="field check">
+                <input type="checkbox" id="media">
+                <label for="media" style="margin:0">It carries an image or a video</label>
+            </div>
+
+            <div class="actions">
+                <button id="save" type="button">Send</button>
+                <button id="clear" class="ghost" type="button">Clear</button>
+                <button id="out" class="ghost" type="button">Sign out</button>
+            </div>
+        </div>
+
+        <div class="queue">
+            <h2>The queue</h2>
+            <div class="tabs" id="tabs"></div>
+            <div id="list"></div>
+        </div>
+
+        <details>
+            <summary>The bookmarklet</summary>
+            <p>Drag this to your bookmarks bar. Press it on any post and this page opens in a
+               small window with the link, the author and the platform already filled in.</p>
+            <a class="mark" id="mark" href="#">SOC</a>
+            <p>It carries nothing secret. All it does is hand this page a URL.</p>
+        </details>
+    </div>
+</div>
+
+<script type="module">
+/* The Socializer, back where it started and pointed at Supabase again.
+ *
+ * It replaced a Notion database that replaced this page. The round trip was worth it for
+ * one reason: the Notion version taught us the queue needs state - New, Posted, Passed -
+ * which the original never had. That is the `status` column, and it is the only part of
+ * the old schema this leans on that the old page did not use well.
+ *
+ * WHY NOT NOTION
+ * Notion's API refuses cross-origin browser requests, so every write needed an edge
+ * function holding a token, and its formulas have no URL encoder, so the links it built
+ * had to be sanitised by hand. Supabase talks to a browser directly and enforces who may
+ * write in the database rather than in the page. One fewer service, one fewer secret.
+ *
+ * WHO MAY WRITE
+ * The policies in tools/socializer-migration-04-auth.sql check the signed-in email. The
+ * checks in this page are manners; the database is the actual door. Note that the queue
+ * is not readable signed out either - nothing public renders it, so anon gets nothing. */
+
+import { supabase, OWNER, currentUser, isOwner, signIn, signOut } from '/assets/js/auth.js';
+
+const $ = (id) => document.getElementById(id);
+const statusEl = $('status');
+
+function status(msg, kind) {
+    statusEl.textContent = msg;
+    statusEl.className = 'show ' + (kind || '');
+    if (kind === 'good') setTimeout(() => { statusEl.className = ''; }, 6000);
+}
+
+/* --- where a post lives ---------------------------------------------------------
+   One list, used for three things: the platform stamped on a new row, the author read
+   out of the permalink, and which composer to skip when sharing it onward. */
+const HOSTS = [
+    [/^(x|twitter)\.com$/,            'X'],
+    [/^bsky\.app$/,                   'Bluesky'],
+    [/^instagram\.com$/,              'Instagram'],
+    [/^threads\.(com|net)$/,          'Threads'],
+    [/^(facebook\.com|fb\.(com|watch))$/, 'Facebook'],
+    [/^tiktok\.com$/,                 'TikTok'],
+    [/^(youtube\.com|youtu\.be)$/,    'YouTube'],
+    [/^(reddit\.com|redd\.it)$/,      'Reddit'],
+];
+
+function hostOf(u) {
+    try { return new URL(u).hostname.toLowerCase().replace(/^www\./, ''); }
+    catch (e) { return ''; }
+}
+
+function platformOf(u) {
+    const host = hostOf(u);
+    for (const [re, name] of HOSTS) if (re.test(host)) return name;
+    return 'Web';
+}
+
+/* The author, where the URL shape names one. The shapes that do not - a bare Instagram
+   /p/ code, a YouTube watch id, a Reddit thread - stay empty rather than get guessed at,
+   because a wrong handle on a repost is worse than no handle. */
+function authorOf(u) {
+    let p;
+    try { p = new URL(u); } catch (e) { return ''; }
+    const host = hostOf(u);
+    const path = p.pathname;
+    let m;
+
+    if (/^(x|twitter)\.com$/.test(host)) {
+        m = path.match(/^\/([A-Za-z0-9_]{1,15})\/status/);
+        return m && m[1] !== 'i' ? '@' + m[1] : '';
+    }
+    if (host === 'bsky.app') {
+        m = path.match(/^\/profile\/([^/]+)/);
+        return m ? '@' + m[1] : '';
+    }
+    if (host === 'tiktok.com' || /^threads\.(com|net)$/.test(host) || host === 'youtube.com') {
+        m = path.match(/^\/@([^/]+)/);
+        return m ? '@' + m[1] : '';
+    }
+    if (host === 'instagram.com') {
+        m = path.match(/^\/([^/]+)\/(?:p|reel)\//);
+        return m ? '@' + m[1] : '';
+    }
+    if (host === 'reddit.com') {
+        m = path.match(/^\/user\/([^/]+)/);
+        return m ? 'u/' + m[1] : '';
+    }
+    return '';
+}
+
+/* The dedupe key. The same video reached through a share link and through the address bar
+   is one candidate, so the id is pulled out where the platform exposes one and the whole
+   host+path is used where it does not. Unique in the database, so a second attempt is a
+   conflict rather than a duplicate row. */
+function postKey(u) {
+    const host = hostOf(u);
+    let p;
+    try { p = new URL(u); } catch (e) { return 'url:' + u; }
+    let m;
+
+    if (/^(x|twitter)\.com$/.test(host) && (m = p.pathname.match(/status(?:es)?\/(\d+)/))) return 'x:' + m[1];
+    if (host === 'youtu.be') return 'yt:' + p.pathname.slice(1);
+    if (host === 'youtube.com') {
+        const v = p.searchParams.get('v');
+        if (v) return 'yt:' + v;
+        if ((m = p.pathname.match(/\/(?:shorts|live)\/([^/]+)/))) return 'yt:' + m[1];
+    }
+    if (host === 'instagram.com' && (m = p.pathname.match(/\/(?:p|reel)\/([^/]+)/))) return 'ig:' + m[1];
+    if (host === 'tiktok.com' && (m = p.pathname.match(/\/video\/(\d+)/))) return 'tt:' + m[1];
+    if (host === 'bsky.app' && (m = p.pathname.match(/\/post\/([^/]+)/))) return 'bs:' + m[1];
+    return 'url:' + host + p.pathname.replace(/\/$/, '');
+}
+
+/* --- sending it onward ------------------------------------------------------------
+   A repost on the platform it already lives on beats a new post of ours carrying a link:
+   it keeps the author's credit, inherits the engagement already on it, and renders as the
+   real thing instead of a preview card. Only X can do that from a URL; everywhere else
+   the button opens the post and you press their own control. */
+const NATIVE = {
+    X:         'Retweet it',
+    Bluesky:   'Repost it',
+    Threads:   'Repost it',
+    Facebook:  'Share it',
+    Reddit:    'Crosspost it',
+    Instagram: 'Open it',
+    TikTok:    'Open it',
+};
+
+function nativeUrl(row) {
+    if (row.platform === 'X') {
+        const m = row.post_url.match(/status(?:es)?\/(\d+)/);
+        if (m) return 'https://x.com/intent/retweet?tweet_id=' + m[1];
+    }
+    return row.post_url;
+}
+
+function composers(row) {
+    const t = row.why || '';
+    const u = row.post_url;
+    const e = encodeURIComponent;
+    return [
+        { id: 'X',        url: 'https://x.com/intent/post?text=' + e(t) + '&url=' + e(u) },
+        { id: 'Bluesky',  url: 'https://bsky.app/intent/compose?text=' + e(t + ' ' + u) },
+        { id: 'Threads',  url: 'https://www.threads.net/intent/post?text=' + e(t + ' ' + u) },
+        { id: 'Facebook', url: 'https://www.facebook.com/sharer/sharer.php?u=' + e(u) },
+        { id: 'Reddit',   url: 'https://www.reddit.com/submit?url=' + e(u) + '&title=' + e(t) },
+    /* Skip the one it came from. Posting a Bluesky link to Bluesky reads as a bot, and
+       the repost above is the better move anyway. */
+    ].filter((c) => c.id !== row.platform);
+}
+
+/* --- the queue --------------------------------------------------------------------- */
+const TABS = [
+    { key: 'NEW',     label: 'New' },
+    { key: 'POSTED',  label: 'Posted' },
+    { key: 'SKIPPED', label: 'Passed' },
+    { key: 'ALL',     label: 'Everything' },
+];
+let tab = 'NEW';
+let rows = [];
+
+async function load() {
+    let q = supabase.from('socializer').select('*').order('created_at', { ascending: false });
+    if (tab !== 'ALL') q = q.eq('status', tab);
+
+    const { data, error } = await q;
+    if (error) { status('Could not read the queue: ' + error.message, 'err'); return; }
+    rows = data || [];
+    paint();
+}
+
+function paintTabs() {
+    $('tabs').innerHTML = '';
+    TABS.forEach((t) => {
+        const b = document.createElement('button');
+        b.className = 'tab' + (t.key === tab ? ' on' : '');
+        b.textContent = t.label;
+        b.onclick = () => { tab = t.key; paintTabs(); load(); };
+        $('tabs').appendChild(b);
+    });
+}
+
+function ago(iso) {
+    const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+    if (s < 3600) return Math.max(1, Math.floor(s / 60)) + 'm ago';
+    if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+    return Math.floor(s / 86400) + 'd ago';
+}
+
+function paint() {
+    const list = $('list');
+    list.innerHTML = '';
+
+    if (!rows.length) {
+        const d = document.createElement('div');
+        d.className = 'empty';
+        d.textContent = tab === 'NEW'
+            ? 'Nothing waiting. The bot runs once a day, or add one above.'
+            : 'Nothing here.';
+        list.appendChild(d);
+        return;
+    }
+
+    rows.forEach((row) => list.appendChild(card(row)));
+}
+
+function card(row) {
+    const el = document.createElement('div');
+    el.className = 'card' + (row.status === 'NEW' ? '' : ' done');
+
+    const why = document.createElement('div');
+    why.className = 'why';
+    why.textContent = row.why || '(no two cents yet)';
+    el.appendChild(why);
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    const a = document.createElement('a');
+    a.href = row.post_url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = row.post_url;
+    meta.append(
+        document.createTextNode((row.author ? row.author + ' · ' : '') + ago(row.created_at) + ' · '),
+        a,
+    );
+    el.appendChild(meta);
+
+    const chips = document.createElement('div');
+    chips.className = 'chips';
+    [row.platform, row.has_media ? 'has media' : null, row.source, row.status]
+        .filter(Boolean)
+        .forEach((text, i) => {
+            const c = document.createElement('span');
+            c.className = 'chip' + (i === 0 ? ' acid' : '');
+            c.textContent = text;
+            chips.appendChild(c);
+        });
+    /* Where it has actually gone out, as opposed to whether it is still waiting. */
+    (row.posted_to || []).forEach((d) => {
+        const c = document.createElement('span');
+        c.className = 'chip';
+        c.textContent = 'sent: ' + d;
+        chips.appendChild(c);
+    });
+    el.appendChild(chips);
+
+    const bar = document.createElement('div');
+    bar.className = 'row';
+
+    const verb = NATIVE[row.platform];
+    if (verb) {
+        const rp = document.createElement('a');
+        rp.className = 'btn repost';
+        rp.href = nativeUrl(row);
+        rp.target = '_blank';
+        rp.rel = 'noopener';
+        rp.textContent = verb + ' on ' + row.platform;
+        rp.onclick = () => markSent(row, row.platform);
+        bar.appendChild(rp);
+    }
+
+    composers(row).forEach((c) => {
+        const b = document.createElement('a');
+        b.className = 'btn' + ((row.posted_to || []).includes(c.id) ? ' sent' : ' ghost');
+        b.href = c.url;
+        b.target = '_blank';
+        b.rel = 'noopener';
+        b.textContent = c.id;
+        b.onclick = () => markSent(row, c.id);
+        bar.appendChild(b);
+    });
+
+    if (row.status === 'NEW') {
+        bar.appendChild(btn('Posted', () => rule(row, 'POSTED')));
+        bar.appendChild(btn('Pass', () => rule(row, 'SKIPPED'), true));
+    } else {
+        bar.appendChild(btn('Back to new', () => rule(row, 'NEW'), true));
+    }
+
+    el.appendChild(bar);
+    return el;
+}
+
+function btn(label, fn, ghost) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    if (ghost) b.className = 'ghost';
+    b.textContent = label;
+    b.onclick = async () => { b.disabled = true; await fn(); };
+    return b;
+}
+
+async function rule(row, next) {
+    const { error } = await supabase
+        .from('socializer')
+        .update({ status: next, handled_at: new Date().toISOString() })
+        .eq('id', row.id);
+    if (error) { status('Could not save that: ' + error.message, 'err'); return; }
+    load();
+}
+
+/* Pressing a destination records that it went there. It does not mark the whole candidate
+   posted: a thing can go to Bluesky today and X tomorrow, and the two are different
+   questions. Fired on the link's own click, so the tab opens either way. */
+async function markSent(row, dest) {
+    const seen = row.posted_to || [];
+    if (seen.includes(dest)) return;
+    const { error } = await supabase
+        .from('socializer')
+        .update({ posted_to: seen.concat([dest]) })
+        .eq('id', row.id);
+    if (!error) load();
+}
+
+/* --- adding one -------------------------------------------------------------------- */
+function readPlatform() {
+    const u = $('url').value.trim();
+    $('platform').value = u ? platformOf(u) : '';
+    if (u && !$('who').value.trim()) $('who').value = authorOf(u);
+}
+
+$('url').addEventListener('input', readPlatform);
+$('url').addEventListener('paste', () => setTimeout(readPlatform, 0));
+
+$('save').onclick = async () => {
+    const link = $('url').value.trim();
+    if (!/^https?:\/\//i.test(link)) { status('Paste the link to the post first.', 'err'); return; }
+
+    $('save').disabled = true;
+    status('Saving...', 'busy');
+
+    const { error } = await supabase.from('socializer').insert({
+        post_key: postKey(link),
+        post_url: link,
+        platform: platformOf(link),
+        author: $('who').value.trim(),
+        why: $('why').value.trim(),
+        has_media: $('media').checked,
+        source: 'Manual',
+        status: 'NEW',
+    });
+
+    $('save').disabled = false;
+
+    if (error) {
+        /* 23505 is the unique index on post_key: this one is already in the queue. That is
+           worth saying plainly rather than as a database error, because it is a normal
+           thing to happen and not a fault. */
+        status(error.code === '23505'
+            ? 'That one is already in the queue.'
+            : 'Could not save it: ' + error.message, 'err');
+        return;
+    }
+
+    clearForm();
+    status('In the queue.', 'good');
+    tab = 'NEW';
+    paintTabs();
+    load();
+};
+
+function clearForm() {
+    $('url').value = $('who').value = $('why').value = $('platform').value = '';
+    $('media').checked = false;
+}
+
+$('clear').onclick = () => { clearForm(); statusEl.className = ''; $('url').focus(); };
+$('out').onclick = async () => { await signOut(); location.reload(); };
+
+/* --- the door ----------------------------------------------------------------------- */
+let wrongAccount = false;
+
+$('signin').onclick = async (e) => {
+    e.target.disabled = true;
+    try {
+        /* Drop the existing session first when somebody else is in. Google will not
+           replace a session Supabase still believes in, and the page would come back
+           saying exactly what it said before the press. */
+        if (wrongAccount) await signOut();
+        await signIn(location.origin + '/socializer/');
+    } catch (ex) {
+        e.target.disabled = false;
+        status(ex.message, 'err');
+    }
+};
+
+$('gateOut').onclick = async () => { await signOut(); location.reload(); };
+
+/* What the bookmarklet handed over, cleared from the address bar afterwards so a refresh
+   does not silently re-fill a form you have already emptied. */
+function prefill() {
+    const q = new URLSearchParams(location.search);
+    const u = q.get('u');
+    if (!u) return;
+
+    $('url').value = u.trim();
+    const t = (q.get('t') || '').trim();
+    if (t && !$('why').value) $('why').value = t;
+    const h = (q.get('h') || '').trim();
+    if (h) $('who').value = /^[@]|^[ur]\//.test(h) ? h : '@' + h.replace(/^@+/, '');
+    readPlatform();
+
+    const clean = new URL(location.href);
+    clean.search = '';
+    history.replaceState(null, '', clean);
+}
+
+$('mark').setAttribute('href',
+    "javascript:(function(){"
+    + "var s=String(window.getSelection()||'').trim();"
+    + "var t=s||document.title||'';"
+    + "var a=document.querySelector('meta[name=\"twitter:creator\"],meta[name=\"author\"],meta[property=\"article:author\"]');"
+    + "var h=a?String(a.content||'').trim():'';"
+    + "var u='https://www.soldoutcomedy.com/socializer/?u='"
+    + "+encodeURIComponent(location.href)+'&t='+encodeURIComponent(t.slice(0,300))"
+    + "+'&h='+encodeURIComponent(h.slice(0,80));"
+    + "var w=window.open(u,'socializer','width=560,height=760,menubar=no,toolbar=no,location=no,status=no');"
+    + "if(w){w.focus();}else{location.href=u;}"
+    + "})()");
+
+$('mark').addEventListener('click', (e) => {
+    e.preventDefault();
+    status('Drag it to your bookmarks bar, then press it on a post.', 'busy');
+});
+
+function render(user) {
+    const ok = isOwner(user);
+    $('app').hidden = !ok;
+    $('gate').hidden = ok;
+
+    wrongAccount = !!user && !ok;
+    $('gateWhy').textContent = wrongAccount
+        ? 'Signed in as ' + user.email + ', which cannot reach the queue.'
+        : 'Sign in to use the Socializer.';
+    $('signin').textContent = wrongAccount ? 'Sign out and switch account' : 'Sign in with Google';
+    $('gateOut').hidden = !wrongAccount;
+    if (wrongAccount) status('That is not ' + OWNER + '.', 'err');
+
+    if (ok) { prefill(); paintTabs(); load(); }
+}
+
+render(await currentUser());
+</script>
+</body>
+</html>

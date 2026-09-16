@@ -112,7 +112,7 @@ How it works now:
 ## Backstage and login
 
 `/backstage` is the card grid, behind a Google sign-in, with the **Socializer**
-([backstage/socializer/](backstage/socializer/index.html)) on it. The browser tools live in
+([socializer/](socializer/index.html)) on it. The browser tools live in
 [tools/](tools/). `backstage.soldoutcomedy.com` forwards to `/backstage`, so that page must
 never redirect to the subdomain or the two will loop.
 
