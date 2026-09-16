@@ -18,7 +18,7 @@ assets/               All static assets
   data/               Site content as XML (shows, taglines, videos, musicvids)
 
 live/                 Show-day pages: prop check-in form, prop display, QR codes
-backstage/            Two redirects and nothing else: Backstage itself is in Notion
+backstage/            Backstage: the card grid, and the Socializer
 tools/                The browser tools, the build scripts and the bots' orders
 archive/              Previous homepage and its alternate themes
 ```
@@ -39,17 +39,21 @@ A routine that goes looking for funny posts once a day and adds what it finds to
 funny, the handle, the permalink, the platform, and a Media tick where the source carries
 an image or a video.
 
-**Found Funny** at [tools/foundfunny](tools/foundfunny/index.html) is the same
-thing done by hand, and it writes the same row. Its bookmarklet only opens that page with
-the link filled in; the page itself asks the `clip-to-notion` edge function, which holds
-the Notion token. That detour is not a flourish. Notion's API refuses cross-origin browser
-requests, and a token pasted into a static page would be readable by every visitor, so the
-write has to happen somewhere with a secret.
+The **Socializer** at [backstage/socializer](backstage/socializer/index.html) is where
+that queue is worked, and its bookmarklet is the same job done by hand: press it on any
+post and the page opens with the link, the author and the platform already filled in.
 
-Rows arrive with Status `New` and nothing changes that but a person. Nothing in either job
-speaks for the account and nothing they write reaches an audience: you read the New view,
-post what is worth posting, and mark it `Posted`. The **Socials** card in Backstage points
-at the page listing every account and how to get into it.
+Rows arrive as `NEW` and nothing changes that but a person. Each card offers the native
+repost on the platform the post already lives on - which keeps the author's credit and
+inherits the engagement, where a fresh post carrying a link does neither - and composers
+for everywhere else, minus the platform it came from.
+
+For a day this queue lived in a Notion database. It came back because Notion's API refuses
+cross-origin browser requests, so every write needed an edge function holding a token, and
+its formulas have no URL encoder, so every link it built had to be hand-sanitised.
+Supabase talks to the browser directly and enforces who may write in the database rather
+than in the page. The round trip was not wasted: Notion is where the queue learned it
+needs `status`, which the original never had.
 
 Standing orders are [tools/socializer-bot.md](tools/socializer-bot.md), not the routine's
 prompt: the prompt is one line and points at that file, so the orders can be changed by
@@ -106,17 +110,14 @@ committed in `tools/build-inventory.py`.
 
 ## Backstage
 
-Backstage is the **Notion** workspace, not a page here. Both `backstage.soldoutcomedy.com`
-and `soldoutcomedy.com/backstage` land on it; `backstage/index.html` is a redirect and
-nothing else, and `backstage/clip/` is a second redirect keeping an older bookmarklet URL
-alive. Notion does its own auth, so nothing on this side gates it.
+`/backstage` is the card grid, behind a Google sign-in, and `backstage.soldoutcomedy.com`
+forwards to it. It must never redirect back to that subdomain: Cloudflare points the
+subdomain here, so the two would loop. It did, once.
 
-`backstage/index.html` must never redirect to `backstage.soldoutcomedy.com`. Cloudflare
-forwards that subdomain to this path, so pointing it back would put the two in a loop. It
-did, once.
+Notion is reached from the Bible and Socials cards. It holds show material and the social
+account list, and nothing the site depends on.
 
-The browser tools that used to live behind a card grid there are in `tools/` now, linked
-from Notion.
+The browser tools live in `tools/`, linked from the grid.
 
 ## Logging in
 

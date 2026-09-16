@@ -9,19 +9,17 @@ Manage the routine itself at <https://claude.ai/code/routines>.
 
 ## What the job is
 
-Find funny posts worth reposting, and add them to the **POST CANDIDATES** database in
-Notion.
+Find funny posts worth reposting, and add them to the **Socializer queue** in Supabase.
 
 You **nominate candidates**. You do not post. Nothing in this job speaks for the account,
 and nothing you write reaches an audience. A human reads every candidate and decides.
 
-There used to be a queue in Supabase and a page in this repo for working it down. Both are
-gone. Notion is the only place now, which means the database you add to is the whole output
-of this job: if it is not written there, it did not happen.
+The queue spent a day in Notion and has moved back to Supabase, where it started. The
+table is the whole output of this job: if it is not written there, it did not happen.
 
 ## What you may change
 
-New rows in POST CANDIDATES. Nothing else, anywhere.
+New rows in the `socializer` table. Nothing else, anywhere.
 
 You **add rows**. You never edit or delete an existing one. A row that is already there is
 either a candidate somebody has not read yet or one they have already ruled on, and neither
@@ -29,28 +27,43 @@ is yours to touch. In particular you never set a Status other than `New`: decidi
 something has been posted or passed on is the human's half of this job. You make **no git
 commits**, and you write to no database but this one.
 
-Its parent page, SOCIALS, holds the account names and logins. Stay out of it entirely.
+The Notion SOCIALS page holds the account names and logins. You have no business there.
 
-## The database
+## The table
 
-**POST CANDIDATES**, `4870f03c-f2f2-4bd8-a51e-1d4c9e89b0ca`, under SOCIALS, under BACKSTAGE.
-You reach it through the Notion connector attached to this routine. If Notion is
-unreachable, say so plainly in your final message and stop. Do not write the candidates
-somewhere else instead.
+`socializer`, in the SOLD OUT! Supabase project `tjteeqofqozmncfoiofy`. Reach it through
+PostgREST with the publishable key, the same key committed in
+[assets/js/auth.js](../assets/js/auth.js) and in build-inventory.py.
 
-Until September 2026 this was a page you appended paragraphs to. It is a database now, so
-every candidate is a row with fields rather than a shape you have to get right.
+If Supabase is unreachable, say so plainly in your final message and stop. Do not write the
+candidates somewhere else instead.
 
-| Field | What goes in it |
+| Column | What goes in it |
 |---|---|
-| **Witticism** | The title. One sentence, your words. This is the column a human reads down. |
-| **Handle** | Who posted it, `@name`. Leave empty if the source has no handle. |
-| **Link** | The confirmed permalink. |
-| **Platform** | `X`, `Bluesky`, `Instagram`, `Threads`, `Facebook`, `TikTok`, `YouTube`, `Reddit`, or `Other`. |
-| **Media** | Checked when the post carries an image or a video. |
-| **Status** | Always `New`. Never anything else. |
+| `why` | One sentence, your words. What the joke is. This is the line a human reads down. |
+| `post_url` | The confirmed permalink. |
+| `post_key` | The dedupe key, derived from the URL - see below. Unique, so a repeat is rejected by the database rather than by your judgement. |
+| `author` | Who posted it, `@name`. Empty if the source has no handle. |
+| `platform` | `X`, `Bluesky`, `Facebook`, `Instagram`, `YouTube`, `Threads`, `TikTok`, `Reddit`, or `Web`. |
+| `has_media` | `true` when the post carries an image or a video. |
+| `source` | Always `Bot`. |
+| `status` | Always `NEW`. Never anything else. |
 
-`Added` fills itself in.
+`created_at` fills itself in.
+
+### The dedupe key
+
+The same video reached through a share link and through the address bar is one candidate,
+so the key is the id where the platform exposes one and the host plus path where it does
+not:
+
+```
+x:1234567890        yt:dQw4w9WgXcQ        ig:C1a2b3
+tt:7385761743903    bs:3ltwozavfac2i      url:host/path
+```
+
+Build it the same way every time. It is a unique index, so an insert that collides is the
+database telling you this is already in the queue - not an error to work around.
 
 ## Step 1 - what qualifies
 
@@ -66,18 +79,18 @@ change it.
 
 More criteria to come. Add them here, commit, and the next run follows the new list.
 
-## Step 2 - read the database before you add to it
+## Step 2 - read the queue before you add to it
 
-Query POST CANDIDATES first, every run. It does two jobs at once.
+Select from `socializer` first, every run. It does two jobs at once.
 
-**It is the dedupe list.** Read the `Link` column across every row, whatever its Status. If
-a permalink is already there, skip it and say nothing more about it. Re-nominating
-something is arguing with a person who has already looked, and a `Posted` or `Passed` row
+**It is the dedupe list.** Read `post_key` and `post_url` across every row, whatever its
+status. If one is already there, skip it and say nothing more about it. Re-nominating
+something is arguing with a person who has already looked, and a `POSTED` or `SKIPPED` row
 is the strongest possible signal that they have.
 
 **It is the taste.** Read the rows for the things the criteria cannot say out loud: how
 broad or how dry the joke tends to be, whether it leans more to selling or more to found
-objects, which sources keep earning their place. Rows marked `Posted` are the clearest
+objects, which sources keep earning their place. Rows marked `POSTED` are the clearest
 signal of all, because somebody actually put their name to those.
 
 The list starts thin. That is fine. Fall back on the criteria and do not invent a pattern
@@ -137,15 +150,15 @@ Instagram and Threads as well as to X, Facebook and Bluesky. Not a rule, since a
 with no picture still beats a dull picture, but it is the tie-breaker. Tick **Media** on
 those rows so whoever posts it knows before they open it.
 
-## Step 6 - add them to POST CANDIDATES
+## Step 6 - add them to the queue
 
 One row per candidate, filled in as the table above describes.
 
 - Strip tracking parameters (`utm_*`, `fbclid`, `igshid`, `si`, `ref`, and the like) from
-  every URL before it goes in **Link**.
-- **Witticism** is *your* sentence: what the joke is, and which criterion it hits. Do
-  not paste the post's own text in place of it, and do not write a title.
-- **Status** is `New` on every row you create, without exception.
+  every URL before it goes in **post_url**, and before you derive **post_key** from it.
+- **why** is *your* sentence: what the joke is, and which criterion it hits. Do not paste
+  the post's own text in place of it, and do not write a title.
+- **status** is `NEW` on every row you create, without exception.
 - Add rows only. Never edit an existing row, never change anybody's Status, never delete.
 
 ## Step 7 - send a notification
@@ -157,20 +170,20 @@ One line, plus the link:
 
 ```
 3 new post candidates
-https://app.notion.com/p/3dce1890fe6f80629e61f5ecfb4b3b97
+https://www.soldoutcomedy.com/backstage/socializer/
 ```
 
-That link is the SOCIALS page, where the table is, rather than the database on its own: it
-opens on the thing a person actually works from.
+That link is the Socializer, which is where the queue is worked: the candidate, the repost
+button and the buttons for everywhere else are all on the card.
 
 Send it on **every** run, including the ones where you added nothing. "No candidates today"
-is worth knowing, because silence is indistinguishable from a run that crashed. If Notion
-could not be read or written, say that in the notification instead of a count, so the
+is worth knowing, because silence is indistinguishable from a run that crashed. If the
+table could not be read or written, say that in the notification instead of a count, so the
 failure is the thing that arrives rather than nothing at all.
 
 ## Step 8 - say what you did
 
 End your run with a short plain-language note: how many you added, what you passed on and
 why, and anything about the search that was unusually good or unusually barren. This is the
-longer version of the notification, for whoever opens the run itself. If the database could
+longer version of the notification, for whoever opens the run itself. If the table could
 not be read or written, say that instead of reporting a run that did not happen.

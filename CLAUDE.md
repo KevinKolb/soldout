@@ -37,12 +37,12 @@ on them.
 - **Site:** this repo, deployed to GitHub Pages by
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
   `main`, every 6 hours on a schedule, and on manual runs.
-- **Notion:** Backstage itself, and all the show material. Connected to Claude Code
-  through the Notion MCP. Both `backstage.soldoutcomedy.com` and
-  `soldoutcomedy.com/backstage` land on it.
+- **Notion:** show material, and the social account list. Connected to Claude Code
+  through the Notion MCP, reached from the Bible and Socials cards in Backstage. Nothing
+  the site runs on lives there.
 - **Airtable:** prop check-in (the `live/` pages).
-- **Supabase:** the `shop` table that curates the shop, and `prop_candidates` for the
-  prop bot. The retired `socializer` queue table is still there but nothing reads it.
+- **Supabase:** the `shop` table that curates the shop, `socializer` for the repost
+  queue, and `prop_candidates` for the prop bot.
 
 Never commit real credentials. See "Deployment secrets" in [README.md](README.md).
 
@@ -111,17 +111,16 @@ How it works now:
 
 ## Backstage and login
 
-**Backstage is the Notion workspace**, not a page in this repo. `backstage.soldoutcomedy.com`
-and `soldoutcomedy.com/backstage` both land on it; `backstage/index.html` is a redirect and
-nothing else. It must never redirect to the subdomain, because Cloudflare points that
-subdomain here and the two would bounce off each other.
+`/backstage` is the card grid, behind a Google sign-in, with the **Socializer**
+([backstage/socializer/](backstage/socializer/index.html)) on it. The browser tools live in
+[tools/](tools/). `backstage.soldoutcomedy.com` forwards to `/backstage`, so that page must
+never redirect to the subdomain or the two will loop.
 
-The browser tools that used to sit behind that card grid live in [tools/](tools/) and are
-reached from Notion. Each one that writes anything carries its own Google sign-in through
-[assets/js/auth.js](assets/js/auth.js), shared across the origin, so signing in on one also
-unlocks editing on `/shop`. Only `kevinmkolb@gmail.com` can write; the policies in
-[tools/shop-migration-01-auth.sql](tools/shop-migration-01-auth.sql) enforce that in the
-database, so a page's own checks are manners rather than security.
+Auth is Supabase, shared across the origin by [assets/js/auth.js](assets/js/auth.js), so
+signing in on one page also unlocks editing on `/shop`. Only `kevinmkolb@gmail.com` can
+write; the policies in [tools/shop-migration-01-auth.sql](tools/shop-migration-01-auth.sql)
+and [tools/socializer-migration-04-auth.sql](tools/socializer-migration-04-auth.sql)
+enforce that in the database, so a page's own checks are manners rather than security.
 
 There is no service-role key in this repo and there must never be one. Any key in a static
 page is readable by every visitor, and a service key bypasses row-level security entirely.
