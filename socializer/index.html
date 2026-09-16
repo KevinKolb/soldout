@@ -115,6 +115,7 @@
         .gate button + button { margin-left: 8px; }
 
         details { border: 2px solid #000; padding: 14px; margin-top: 30px; }
+        #app > details:first-child { margin-top: 0; margin-bottom: 30px; }
         summary { cursor: pointer; font-weight: 600; font-size: 14px; }
         details p { font-size: 14px; margin-top: 12px; }
         .mark {
@@ -123,6 +124,41 @@
             font-weight: 700; text-decoration: none; color: #000; cursor: grab;
         }
         .mark:hover { background: #ffd93d; }
+        /* The bookmarklet itself, for pasting. user-select:all so one press takes the
+           whole line and no part of it is left behind. */
+        .line {
+            display: block; margin-top: 12px; padding: 10px 12px;
+            border: 2px solid #000; background: #f4f4f4;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px; line-height: 1.5;
+            white-space: pre; overflow-x: auto; user-select: all;
+        }
+
+        /* The account list, mirrored from the SOCIALS page in Notion. Handles and
+           profile links only - see the note in the panel about what is not here. */
+        .socials {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
+            gap: 8px; margin-top: 12px;
+        }
+        .social { border: 2px solid #000; padding: 10px 12px; background: #fff; }
+        .social .plat {
+            font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+            text-transform: uppercase; color: #666;
+        }
+        .social .at {
+            display: inline-block; font-size: 15px; font-weight: 600;
+            color: #000; text-decoration: none; overflow-wrap: anywhere;
+            border-bottom: 2px solid #ffd93d;
+        }
+        .social .at:hover { background: #ffd93d; }
+        /* How you get in. Plain text, because there is nothing to press. */
+        .social .how {
+            font-size: 12px; line-height: 1.45; color: #444; margin-top: 7px;
+        }
+        .social .how b {
+            display: block; font-size: 10px; letter-spacing: 0.5px;
+            text-transform: uppercase; color: #999; font-weight: 700;
+        }
 
         /* Capture mode: the bookmarklet opens this in a 560x760 popup to file one post,
            so the page shows the form and nothing else. The queue, the bot and the
@@ -150,10 +186,12 @@
     <div class="masthead">
         <div>
             <h1>Socializer</h1>
-            <div class="subtitle">Post or Skip Post Candidates Here</div>
+            <div class="subtitle">Keep connected to the audience!</div>
         </div>
         <a class="btn ghost botlink" href="https://claude.ai/code/routines"
-           target="_blank" rel="noopener">🤖 SOC Socializer Bot</a>
+           target="_blank" rel="noopener"
+           title="A Claude Routine that runs once a day and fills the post candidate table below."
+           >🤖 SOC Socializer Bot</a>
     </div>
 
     <div id="status"></div>
@@ -165,8 +203,71 @@
     </div>
 
     <div id="app" hidden>
+        <details>
+            <summary>SOCIALS</summary>
+            <p>Sign into Chrome as
+               <b>soldoutcomedy@gmail.com</b> and passwords for social media sites will
+               automatically popup. Some platforms use delegated access, which lets you work
+               from your own login instead; use that where it's offered and skip the shared
+               password stuff. Contact Kevin for the <b>soldoutcomedy@gmail.com</b> password
+               and/or to get set up with delegated access.</p>
+            <div class="socials">
+                <div class="social">
+                    <div class="plat">Facebook</div>
+                    <a class="at" href="https://facebook.com/soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <p class="how"><b>Login</b>Your own Facebook login, then switch to the SOLD OUT! profile. No password is shared.</p>
+                    <p class="how"><b>Enable</b>Kevin adds you under Page settings &rarr; Page access. Facebook access is full or partial; Task access is post and message only.</p>
+                </div>
+                <div class="social">
+                    <div class="plat">Instagram</div>
+                    <a class="at" href="https://www.instagram.com/soldout.comedy" target="_blank" rel="noopener">SOLDOUT.comedy</a>
+                    <p class="how"><b>Login</b>The shared account, password in Google Password Manager.</p>
+                </div>
+                <div class="social">
+                    <div class="plat">Threads</div>
+                    <a class="at" href="https://www.threads.com/@soldout.comedy" target="_blank" rel="noopener">SOLDOUT.comedy</a>
+                    <p class="how"><b>Login</b>Uses the Instagram login.</p>
+                </div>
+                <div class="social">
+                    <div class="plat">X</div>
+                    <a class="at" href="https://x.com/soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <p class="how"><b>Login</b>Native Google login with the shared account.</p>
+                </div>
+                <div class="social">
+                    <div class="plat">Bluesky</div>
+                    <a class="at" href="https://bsky.app/profile/soldoutcomedy.bsky.social" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <p class="how"><b>Login</b>A dedicated account, password in Google Password Manager.</p>
+                </div>
+                <div class="social">
+                    <div class="plat">TikTok</div>
+                    <a class="at" href="https://www.tiktok.com/@soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <p class="how"><b>Login</b>Native Google login with the shared account.</p>
+                </div>
+                <div class="social">
+                    <div class="plat">YouTube</div>
+                    <a class="at" href="https://www.youtube.com/@SOLDOUTComedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <p class="how"><b>Login</b>The shared account, password in Google Password Manager.</p>
+                </div>
+                <div class="social">
+                    <div class="plat">Reddit</div>
+                    <a class="at" href="https://www.reddit.com/user/SOLDOUTComedy" target="_blank" rel="noopener">SOLDOUTComedy</a>
+                    <p class="how"><b>Login</b>The shared account, password in Google Password Manager. Not native Google login.</p>
+                </div>
+                <div class="social">
+                    <div class="plat">Whatnot</div>
+                    <a class="at" href="https://www.whatnot.com/user/soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <p class="how"><b>Login</b>Native Google login with the shared account.</p>
+                </div>
+                <div class="social">
+                    <div class="plat">Poshmark</div>
+                    <a class="at" href="https://poshmark.com/closet/soldoutcomedy" target="_blank" rel="noopener">SOLDOUTcomedy</a>
+                    <p class="how"><b>Login</b>Native Google login with the shared account.</p>
+                </div>
+            </div>
+        </details>
+
         <div class="panel">
-            <h2>Add a candidate</h2>
+            <h2>ADD A CANDIDATE</h2>
 
             <div class="field">
                 <label for="url">Link <span class="hint">- the post itself, not a feed</span></label>
@@ -202,17 +303,22 @@
         </div>
 
         <div class="queue">
-            <h2>The queue</h2>
+            <h2>THE QUEUE</h2>
             <div class="tabs" id="tabs"></div>
             <div id="list"></div>
         </div>
 
         <details>
-            <summary>The bookmarklet</summary>
-            <p>Drag this to your bookmarks bar. Press it on any post and this page opens in a
-               small window with the link, the author and the platform already filled in.</p>
-            <a class="mark" id="mark" href="#">SOC</a>
-            <p>It carries nothing secret. All it does is hand this page a URL.</p>
+            <summary>FUNNY BUTTON</summary>
+            <p>Make a bookmark in your browser bar, call it FUNNY, or whatever you'd like,
+               and paste the line below in as its URL. While browsing the web, including
+               social media sites, click the funny button to add the page or post to the
+               queue. It opens the Socializer in a small window with the link, the author
+               and the platform already filled in.</p>
+            <code class="line" id="markLine"></code>
+            <p>Or drag this to the bar and skip the pasting. It carries nothing secret:
+               all it does is hand this page a URL.</p>
+            <a class="mark" id="mark" href="#">FUNNY</a>
         </details>
     </div>
 </div>
@@ -630,7 +736,7 @@ function prefill() {
     history.replaceState(null, '', clean);
 }
 
-$('mark').setAttribute('href',
+const FUNNY =
     "javascript:(function(){"
     + "var s=String(window.getSelection()||'').trim();"
     + "var t=s||document.title||'';"
@@ -641,11 +747,14 @@ $('mark').setAttribute('href',
     + "+'&h='+encodeURIComponent(h.slice(0,80));"
     + "var w=window.open(u,'socializer','width=560,height=760,menubar=no,toolbar=no,location=no,status=no');"
     + "if(w){w.focus();}else{location.href=u;}"
-    + "})()");
+    + "})()";
+
+$('mark').setAttribute('href', FUNNY);
+$('markLine').textContent = FUNNY;
 
 $('mark').addEventListener('click', (e) => {
     e.preventDefault();
-    status('Drag it to your bookmarks bar, then press it on a post.', 'busy');
+    status('Drag it to your bookmarks bar, or paste the line above into a new bookmark.', 'busy');
 });
 
 function render(user) {
