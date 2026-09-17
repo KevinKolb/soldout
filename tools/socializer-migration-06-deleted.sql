@@ -1,3 +1,8 @@
+-- SUPERSEDED by socializer-migration-10-hints.sql, which removes DELETED again. There
+-- is no reason to run this one now: on a database that never had it, 10 alone is right,
+-- and running this first only adds a status for 10 to take away. Kept because it is the
+-- history of what the queue was asked to do, and 10 reads as an answer to it.
+--
 -- A fourth status: DELETED.
 --
 -- Run this once in the Supabase SQL editor for the SOLD OUT! project, BEFORE the

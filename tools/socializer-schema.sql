@@ -24,16 +24,26 @@ create table if not exists public.socializer (
                                               'Threads', 'TikTok', 'Reddit', 'Web')),
 
     author      text        not null default '',
-    body        text        not null default '',
+
+    -- The post's own words: its title, or the text that was selected when the funny
+    -- button was pressed. Not ours - see `why` for that.
+    headline    text        not null default '',
     posted_at   text        not null default '',
     why         text        not null default '',
 
-    -- How it reached the queue.
-    submitter   text        not null default 'Manual'
-                            check (submitter in ('Bookmarklet', 'Bot', 'Manual')),
+    -- Who put it here: 'Bot' for the routine, or the signed-in email address of the
+    -- person who filed it. How they filed it is not recorded and never mattered.
+    submitter   text        not null default 'Bot'
+                            check (submitter = 'Bot' or submitter like '_%@_%._%'),
 
     status      text        not null default 'NEW'
-                            check (status in ('NEW', 'SKIPPED', 'POSTED', 'DELETED')),
+                            check (status in ('NEW', 'SKIPPED', 'POSTED')),
+
+    -- What the bot should make of a pass. The exact URL is blocked for every row by the
+    -- unique index on post_key, whatever this says; this only leans the bot toward or
+    -- away from things of the same kind. '' where nothing has been passed.
+    bot_hint    text        not null default ''
+                            check (bot_hint in ('', 'LIKE', 'HIDE')),
 
     repost_text text        not null default '',
 

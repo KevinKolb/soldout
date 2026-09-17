@@ -24,31 +24,96 @@ New rows in the `socializer` table. Nothing else, anywhere.
 You **add rows**. You never edit or delete an existing one. A row that is already there is
 either a candidate somebody has not read yet or one they have already ruled on, and neither
 is yours to touch. In particular you never set a Status other than `New`: deciding that
-something has been posted or passed on is the human's half of this job. You make **no git
+something has been posted or skipped is the human's half of this job. You make **no git
 commits**, and you write to no database but this one.
 
 The Notion SOCIALS page holds the account names and logins. You have no business there.
 
 ## The table
 
-`socializer`, in the SOLD OUT! Supabase project `tjteeqofqozmncfoiofy`. Reach it through
-PostgREST with the publishable key, the same key committed in
-[assets/js/auth.js](../assets/js/auth.js) and in build-inventory.py.
+`socializer`, in the SOLD OUT! Supabase project `tjteeqofqozmncfoiofy`, reached through
+PostgREST.
+
+### How you reach it
+
+You do **not** write to the table directly, and you cannot read it. Row-level security
+grants this table to the owner's signed-in browser and to nobody else - and the
+publishable key is the `anon` role, which no policy names. A select you make returns
+HTTP 200 and `[]`; an insert returns 42501.
+
+Instead you call two functions, with the publishable key committed in
+[assets/js/auth.js](../assets/js/auth.js) and nothing else. No account, no password.
+
+**To add a candidate:**
+
+```
+POST https://tjteeqofqozmncfoiofy.supabase.co/rest/v1/rpc/soc_nominate
+  apikey: <publishable key>
+  Content-Type: application/json
+
+  {"p_post_key":  "ig:C1a2b3",
+   "p_post_url":  "https://www.instagram.com/reel/C1a2b3/",
+   "p_source":    "Instagram",
+   "p_headline":  "What the post itself says, quoted.",
+   "p_author":    "@bigwhaleconsignment",
+   "p_why":       "Your sentence about what the joke is.",
+   "p_has_media": true,
+   "p_media_url": "https://..."}
+```
+
+It returns `"added"` or `"duplicate"`. It sets the submitter and the status itself, so
+there is nothing for you to decide there. `p_post_url` and `p_media_url` must be http or
+https; anything else is refused.
+
+**To read what has been posted:**
+
+```
+POST https://tjteeqofqozmncfoiofy.supabase.co/rest/v1/rpc/soc_taste
+  apikey: <publishable key>
+```
+
+That returns up to 80 rows a human has ruled on, each with a `verdict`:
+
+| verdict | What it means for you |
+|---|---|
+| `LIKE` | A yes about the kind of thing it is. Either we published it, or we liked it and did not get to it - which of the two is not your problem. Find more like it. |
+| `HIDE` | Not for us. Steer away from things of this kind. |
+
+`HIDE` is a lean, not a filter. Nobody expects you to draw a hard line around "this kind
+of thing", and you will not be wrong for nominating something that turns out to sit near
+one. Read the three together as taste and let them pull you.
+
+The one hard rule is the exact link, and it is not yours to enforce: every URL already on
+the table is blocked by the database, whatever its verdict, and `soc_nominate` will tell
+you so.
+
+### When it does not work
+
+If a nominate call fails with anything other than `"duplicate"`, stop and say so in the
+notification and in your run notes. Do not go looking for more candidates you have
+nowhere to put.
+
+Between 2026-09-15 and 2026-09-17 this job ran daily, found things, and lost every one of
+them, because it was writing to the table directly and being refused. Nobody noticed,
+because the run before it read the queue, got an empty array, and reported "no candidates"
+in good faith. If the work disappears, say so loudly rather than reporting a quiet zero.
 
 If Supabase is unreachable, say so plainly in your final message and stop. Do not write the
 candidates somewhere else instead.
 
 | Column | What goes in it |
 |---|---|
-| `why` | One sentence, your words. What the joke is. This is the line a human reads down. |
+| `headline` | The post's OWN words - its title, or the line it leads with. Quote it, never write it. Empty if the post has no text of its own. |
+| `why` | One sentence, YOUR words. What the joke is. This is the line a human reads down, and it is never the post's own text handed back. |
 | `post_url` | The confirmed permalink. |
 | `post_key` | The dedupe key, derived from the URL - see below. Unique, so a repeat is rejected by the database rather than by your judgement. |
 | `author` | Who posted it, `@name`. Empty if the source has no handle. |
+| `p_post_key` / `p_post_url` etc | The arguments to `soc_nominate`, below. The column each one fills is named after it. |
 | `source` | Where the post came from: `X`, `Bluesky`, `Facebook`, `Instagram`, `YouTube`, `Threads`, `TikTok`, `Reddit`, or `Web`. |
 | `has_media` | `true` when the post carries an image or a video. |
 | `media_url` | The post's own picture, from its `og:image` or `twitter:image` tag, so the queue can show it. Empty string when the page has neither. Never a URL you have not seen in the page's own head. |
-| `submitter` | How it reached the queue. Always `Bot`. |
-| `status` | Always `NEW`. Never anything else. |
+| `submitter` | Who filed it. `soc_nominate` sets this to `Bot` itself - you cannot pass it. A row filed by a person carries their email address instead. |
+| `status` | `soc_nominate` sets this to `NEW` itself - you cannot pass it, so you cannot get it wrong. |
 
 `created_at` fills itself in.
 
@@ -80,24 +145,26 @@ change it.
 
 More criteria to come. Add them here, commit, and the next run follows the new list.
 
-## Step 2 - read the queue before you add to it
+## Step 2 - read what has already been posted
 
-Select from `socializer` first, every run. It does two jobs at once.
+Call `soc_taste` first, every run.
 
-**It is the dedupe list.** Read `post_key` and `post_url` across every row, whatever its
-status. If one is already there, skip it and say nothing more about it. Re-nominating
-something is arguing with a person who has already looked, and a `POSTED`, `SKIPPED` or
-`DELETED` row is the strongest possible signal that they have. `DELETED` rows are kept for
-exactly this reason: the row is gone from the working queue but its `post_key` still
-stands, so a post somebody threw out does not come back a week later.
-
-**It is the taste.** Read the rows for the things the criteria cannot say out loud: how
+**It is the taste.** Read those rows for the things the criteria cannot say out loud: how
 broad or how dry the joke tends to be, whether it leans more to selling or more to found
-objects, which sources keep earning their place. Rows marked `POSTED` are the clearest
-signal of all, because somebody actually put their name to those.
+objects, which sources keep earning their place. Every row it returns is one a human sat
+and ruled on, and the `verdict` says which way they went: `LIKE` pulling you toward that
+kind of thing, `HIDE` pushing you off it.
 
 The list starts thin. That is fine. Fall back on the criteria and do not invent a pattern
 out of two entries.
+
+**Dedupe is not your job.** You cannot see the queue, so do not try to check it. Nominate,
+and read the answer: `soc_nominate` returns `"duplicate"` when that `post_key` is already
+on the table, whatever status it holds - waiting, posted or skipped. That is the
+database telling you somebody has already seen this one. Drop it and say nothing more
+about it. `DELETED` rows are kept for exactly this reason: the row is gone from the
+working queue but its `post_key` still stands, so a post somebody threw out does not come
+back a week later.
 
 ## Step 3 - check the popular sources first
 
@@ -169,14 +236,19 @@ page's own head is a guess.
 
 ## Step 6 - add them to the queue
 
-One row per candidate, filled in as the table above describes.
+One `soc_nominate` call per candidate.
 
 - Strip tracking parameters (`utm_*`, `fbclid`, `igshid`, `si`, `ref`, and the like) from
-  every URL before it goes in **post_url**, and before you derive **post_key** from it.
-- **why** is *your* sentence: what the joke is, and which criterion it hits. Do not paste
-  the post's own text in place of it, and do not write a title.
-- **status** is `NEW` on every row you create, without exception.
-- Add rows only. Never edit an existing row, never change anybody's Status, never delete.
+  every URL before it goes in **p_post_url**, and before you derive **p_post_key** from it.
+- **p_headline** is *theirs* and **p_why** is *yours*, and the two are never the same
+  string. The headline is quoted off the post: its title, or the line it leads with. The
+  why is your sentence - what the joke is, and which criterion it hits. If you find the
+  post's own words going into **p_why**, they belong in **p_headline**, and the why is
+  still unwritten.
+- Count `"added"` and `"duplicate"` separately. The first is the number for the
+  notification; the second is worth a line in your run notes and nothing more.
+- There is nothing else you can do to this table. Editing a row, overturning a ruling and
+  deleting anything are all closed to you at the database, not merely asked against.
 
 ## Step 7 - send a notification
 
@@ -200,7 +272,7 @@ failure is the thing that arrives rather than nothing at all.
 
 ## Step 8 - say what you did
 
-End your run with a short plain-language note: how many you added, what you passed on and
+End your run with a short plain-language note: how many you added, what you skipped and
 why, and anything about the search that was unusually good or unusually barren. This is the
 longer version of the notification, for whoever opens the run itself. If the table could
 not be read or written, say that instead of reporting a run that did not happen.

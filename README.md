@@ -34,19 +34,20 @@ file for you to download and commit.
 
 ## SOC SOCIALIZER BOT
 
-A routine that goes looking for funny posts once a day and adds what it finds to the
-**POST CANDIDATES** database in Notion, under SOCIALS. One row per candidate: why it is
-funny, the handle, the permalink, the platform, and a Media tick where the source carries
-an image or a video.
+A routine that goes looking for funny posts once a day and files what it finds in the
+`socializer` table in Supabase. One row per candidate: why it is funny, the handle, the
+permalink, where it was found, and a Media tick where the post carries an image or a
+video. It files through `soc_nominate` rather than writing to the table, because the
+table itself is readable only by the owner's signed-in browser.
 
 The **Socializer** at [socializer](socializer/index.html) is where
 that queue is worked, and its bookmarklet is the same job done by hand: press it on any
-post and the page opens with the link, the author and the platform already filled in.
+post and the page opens with the link, the author and the source already filled in.
 
 Rows arrive as `NEW` and nothing changes that but a person. Each card offers the native
 repost on the platform the post already lives on - which keeps the author's credit and
-inherits the engagement, where a fresh post carrying a link does neither - and composers
-for everywhere else, minus the platform it came from.
+inherits the engagement, where a fresh post carrying a link does neither - and a composer
+for every other platform. Pressing any of them is what marks the candidate posted.
 
 For a day this queue lived in a Notion database. It came back because Notion's API refuses
 cross-origin browser requests, so every write needed an edge function holding a token, and
@@ -59,17 +60,6 @@ Standing orders are [tools/socializer-bot.md](tools/socializer-bot.md), not the 
 prompt: the prompt is one line and points at that file, so the orders can be changed by
 committing. That file holds what qualifies, the **Popular sources** worth watching, and the
 fields of a row. Manage the routine at <https://claude.ai/code/routines>.
-
-### What this replaced
-
-There was a repost desk at `backstage/socializer.html` and a queue behind it in Supabase:
-a card per candidate, prefilled composers for X, Facebook, Bluesky, Threads and Instagram,
-a media thumbnail, and per-destination ticks. A bookmarklet captured posts into it from any
-page.
-
-It is gone, deliberately — everything lives in Notion now. The `socializer` table still
-exists with what it collected, and [tools/socializer-schema.sql](tools/socializer-schema.sql)
-and its migrations still describe it, but nothing reads or writes it any more.
 
 ## Local development
 

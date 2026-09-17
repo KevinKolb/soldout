@@ -36,10 +36,7 @@
             flex: none;
             display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;
         }
-        .mastlinks .btn {
-            white-space: nowrap;
-            display: inline-flex; align-items: center; gap: 7px;
-        }
+        .mastlinks .btn { display: inline-flex; align-items: center; gap: 7px; }
         .mastlinks .btn img { height: 18px; width: auto; }
 
         button, .btn {
@@ -47,6 +44,9 @@
             font-family: inherit; font-size: 14px; font-weight: 600;
             padding: 10px 16px; border: 2px solid #000;
             background: #000; color: #fff; text-decoration: none; cursor: pointer;
+            /* Never two lines. A label that wraps turns a row of buttons into a ragged
+               wall and makes the taller one look like it means more. */
+            white-space: nowrap;
         }
         button:hover:not(:disabled), .btn:hover { background: #fff; color: #000; }
         button:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -66,6 +66,10 @@
             width: 100%; padding: 10px 11px; border: 2px solid #000;
             font-family: inherit; font-size: 15px; background: #fff; color: #000;
         }
+        /* Read off the link rather than typed. Grey says so before you try. Scoped to
+           the form: the account URLs in SOCIAL SETTINGS are readonly too, and they are
+           meant to be read and copied, so they keep their black-on-light treatment. */
+        .field input[readonly] { background: #ededed; color: #555; cursor: default; }
         input:focus, textarea:focus { outline: 3px solid #ffd93d; outline-offset: -1px; }
         textarea { resize: vertical; min-height: 64px; }
 
@@ -87,17 +91,46 @@
         }
         .tab.on { background: #000; color: #fff; }
         .tab.far { margin-left: auto; }
+
+        /* Skipped wears the colour a card flashes as you swipe it there, so the gesture
+           and its destination are plainly the same thing. Pale while you are elsewhere,
+           full strength when you are standing in it - the black-on-white convention the
+           other tabs use would throw the colour away exactly when it is the subject. */
+        .tab.skip { background: #ffd9d6; }
+        .tab.skip.on { background: #ff6b6b; color: #000; }
         /* Opacity rather than a colour, so the count stays legible when .on inverts. */
         .tab .n { margin-left: 7px; opacity: 0.5; }
 
-        .card { border: 2px solid #000; padding: 16px 18px; margin-bottom: 14px; }
+        .card {
+            border: 2px solid #000; padding: 16px 18px; margin-bottom: 14px;
+            display: flex; gap: 18px;
+        }
+        /* min-width:0 on the words, so a long URL wraps rather than shoving the button
+           column off the card. The column itself never gives ground. */
+        .card .main { flex: 1; min-width: 0; }
+        .card .acts {
+            flex: none; width: 200px; display: flex; flex-direction: column;
+            border-left: 2px solid #000; padding-left: 18px;
+        }
         .card.done { opacity: 0.55; }
+        /* pan-y leaves vertical scrolling to the page and keeps the sideways gesture
+           for us, so a swipe never fights a scroll. */
+        .card.swipe { touch-action: pan-y; }
+        /* Far enough to count: the card wears the colour of the ruling it is about to
+           get, on the edge it is heading towards. */
+        .card.arming { box-shadow: inset -10px 0 0 #ff6b6b; }
         /* View is placed by the flex row rather than absolutely, so a strip of tags long
            enough to wrap pushes it along instead of running underneath it. */
         .card .top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
         .card .top .chips { flex: 1; margin-bottom: 0; }
         .card .view { flex: none; font-size: 12px; padding: 6px 12px; }
+        .card .when { font-size: 11px; letter-spacing: 0.5px; color: #000; margin-bottom: 3px; }
+        .card .when b { font-weight: 700; text-transform: uppercase; }
         .card .why { font-size: 16px; font-weight: 600; overflow-wrap: break-word; margin-bottom: 6px; }
+        .card .headline {
+            font-size: 13px; color: #555; line-height: 1.4; margin-bottom: 6px;
+            padding-left: 9px; border-left: 3px solid #ddd; overflow-wrap: anywhere;
+        }
         /* Thumbnail left, words right. min-width:0 is what lets a long URL in the meta
            line wrap instead of stretching the row and squeezing the picture. */
         .card .body { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px; }
@@ -128,19 +161,66 @@
 
         .note {
             border: 2px solid #000; background: #ffd93d;
-            padding: 10px 14px; margin-bottom: 14px;
-            font-size: 13px; font-weight: 600;
+            padding: 11px 14px; margin-bottom: 14px;
+            font-size: 13px; font-weight: 500; line-height: 1.5;
         }
 
-        .card .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
-        /* margin-left:auto takes the gap between the destinations and the ruling, so
-           Post and Pass sit hard right - and stay together when the row wraps. */
-        .card .rules { display: flex; gap: 6px; margin-left: auto; }
-        .card .row button, .card .row .btn { font-size: 13px; padding: 8px 12px; }
-        .repost { background: #6cc5ff; color: #000; }
-        .repost:hover { background: #000; color: #6cc5ff; }
+        /* One button per line, stacked. The gap above the rules is what separates
+           "send it somewhere" from "decide about it". */
+        /* Direct children only, all the way down. The toggle's two halves are <button>
+           elements sitting inside .rules, so a descendant selector reached them: they
+           were picking up the 6px bottom margin meant for stacked buttons, and the
+           :last-child that clears it took it off HIDE but not LIKE - which is what made
+           the two halves different heights. The same selector was overriding their font
+           size and padding. */
+        .card .rules { display: flex; flex-direction: column; margin-top: 10px; }
+        .card .acts > .rules:first-child { margin-top: 0; }
+        .card .acts > *, .card .rules > * { width: 100%; }
+        .card .acts > .btn { text-align: center; }
+        .card .acts > .btn,
+        .card .rules > button { font-size: 13px; padding: 8px 12px; margin-bottom: 6px; }
+        .card .acts > .btn:last-child,
+        .card .rules > button:last-child { margin-bottom: 0; }
 
-        .sent { background: #000; color: #fff; }
+        /* The toggle sits on its own line under the buttons: it is an opinion about the
+           thing, not another place to send it. The pair reads as one control, so they
+           share a border rather than each carrying their own. */
+        /* Stated, not offered: no border, no hover, nothing to press. */
+        .card .recommend {
+            flex-basis: 100%; font-size: 13px; color: #666; line-height: 1.3;
+        }
+        .card .recommend b { color: #000; font-weight: 600; }
+
+        /* A panel that says what it is, with the chosen side filled in. Sitting in a
+           column between destination buttons and Move back, an unlabelled pair reads as
+           two more things to press; the cap makes it a setting with a current state. */
+        /* The 3px margin belongs to the whole panel, not just the cells. With it only
+           on the cells, the cap ran edge to edge while the switch beneath it sat inset,
+           and the cap read as the wider of the two. Cap, LIKE and HIDE now share one
+           left edge and one right edge. */
+        .card .hint-toggle {
+            border: 2px solid #000; background: #fff; padding: 3px;
+            margin-bottom: 10px;
+        }
+        .card .hint-toggle .cap {
+            font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: #fff; background: #000;
+            padding: 4px 7px; margin-bottom: 3px;
+        }
+        .card .hint-toggle .cells { display: flex; gap: 3px; }
+        /* Grey, not white: against the white margin inside the frame, an unchosen cell
+           had no edges of its own and the space under its label read as a gap in the
+           control. Both cells are cells now; one of them is lit. */
+        .hintbtn {
+            flex: 1 1 0; min-width: 0;
+            font-family: inherit; font-size: 11px; font-weight: 700;
+            letter-spacing: 1px; text-transform: uppercase;
+            padding: 9px 4px; border: 0;
+            background: #ededed; color: #8a8a8a; cursor: pointer;
+        }
+        .hintbtn:hover:not(.on) { background: #e0e0e0; color: #000; }
+        .hintbtn.on { background: #5ce08a; color: #000; }
+        .hintbtn.on:last-child { background: #ff6b6b; }
 
         .empty { border: 2px dashed #999; padding: 30px; text-align: center; color: #666; }
 
@@ -219,6 +299,15 @@
             text-transform: uppercase; color: #999; font-weight: 700;
         }
 
+        @media (max-width: 620px) {
+            .card { display: block; }
+            .card .acts {
+                width: auto; margin-top: 14px;
+                border-left: 0; padding-left: 0;
+                border-top: 2px solid #000; padding-top: 14px;
+            }
+        }
+
         @media (max-width: 560px) {
             body { padding: 24px 16px; }
             h1 { font-size: 26px; }
@@ -233,7 +322,7 @@
     <div class="masthead">
         <div>
             <h1>Socializer</h1>
-            <div class="subtitle">Keep connected to the audience!</div>
+            <div class="subtitle">Keep connected to YOUR audience!</div>
         </div>
         <div class="mastlinks">
             <a class="btn ghost" href="/" title="The public site."
@@ -264,6 +353,11 @@
                 <div class="field">
                     <label for="url">Link <span class="hint">- the post itself, not a feed</span></label>
                     <input type="text" id="url" placeholder="https://...">
+                </div>
+
+                <div class="field">
+                    <label for="headline">Headline <span class="hint">- the post's own words, not yours</span></label>
+                    <input type="text" id="headline" placeholder="What the post itself says">
                 </div>
 
                 <div class="two">
@@ -464,7 +558,7 @@
 /* The Socializer, back where it started and pointed at Supabase again.
  *
  * It replaced a Notion database that replaced this page. The round trip was worth it for
- * one reason: the Notion version taught us the queue needs state - New, Posted, Passed -
+ * one reason: the Notion version taught us the queue needs state - New, Posted, Skipped -
  * which the original never had. That is the `status` column, and it is the only part of
  * the old schema this leans on that the old page did not use well.
  *
@@ -496,13 +590,45 @@ function status(msg, kind) {
 const HOSTS = [
     [/^(x|twitter)\.com$/,            'X'],
     [/^bsky\.app$/,                   'Bluesky'],
-    [/^instagram\.com$/,              'Instagram'],
+    [/^(instagram\.com|instagr\.am)$/, 'Instagram'],
     [/^threads\.(com|net)$/,          'Threads'],
     [/^(facebook\.com|fb\.(com|watch))$/, 'Facebook'],
-    [/^tiktok\.com$/,                 'TikTok'],
+    [/^(vt\.|vm\.)?tiktok\.com$/,      'TikTok'],
     [/^(youtube\.com|youtu\.be)$/,    'YouTube'],
     [/^(reddit\.com|redd\.it)$/,      'Reddit'],
 ];
+
+/* A link out of a share sheet arrives wearing whatever the app clipped to it. None of
+   it identifies the post, all of it follows us around, and two routes to the same post
+   would otherwise store two different URLs. Dropped by name rather than by keeping an
+   allowlist, because the parameter that matters is different on every host - YouTube
+   needs `v`, Reddit needs nothing, and guessing wrong breaks the link itself.
+   `s` and `t` are share tags on X and a timestamp on YouTube, so they go by host. */
+const JUNK = new RegExp('^(' + [
+    'fbclid', 'gclid', 'mc_cid', 'mc_eid', 'ncid', 'cmpid', 'smid', 'smtyp',
+    'igshid', 'igsh',                                   // Instagram
+    'mibextid', 'rdid', 'share_fbid', 'share_source',   // Facebook
+    'is_from_webapp', 'sender_device', 'web_id', '_r', '_t', 'checksum', 'xmt',
+    'si', 'feature', 'app',                             // YouTube
+    'ref', 'ref_src', 'ref_url', 'share_app_id', 'share_link_id',
+    '_branch_match_id', 'spm',
+].join('|') + ')$', 'i');
+
+function cleanUrl(u) {
+    let p;
+    try { p = new URL(u); } catch (e) { return u.trim(); }
+
+    const host = p.hostname.toLowerCase().replace(/^www\./, '');
+    const xish = /^(x|twitter)\.com$/.test(host);
+
+    [...p.searchParams.keys()].forEach((k) => {
+        if (JUNK.test(k) || k.toLowerCase().startsWith('utm_')) p.searchParams.delete(k);
+        else if (xish && /^[st]$/i.test(k)) p.searchParams.delete(k);
+    });
+
+    p.hash = '';
+    return p.toString().replace(/\?$/, '');
+}
 
 function hostOf(u) {
     try { return new URL(u).hostname.toLowerCase().replace(/^www\./, ''); }
@@ -576,22 +702,21 @@ function postKey(u) {
    it keeps the author's credit, inherits the engagement already on it, and renders as the
    real thing instead of a preview card. Only X can do that from a URL; everywhere else
    the button opens the post and you press their own control. */
-const NATIVE = {
-    X:         'Retweet it',
-    Bluesky:   'Repost it',
-    Threads:   'Repost it',
-    Facebook:  'Share it',
-    Reddit:    'Crosspost it',
-    Instagram: 'Open it',
-    TikTok:    'Open it',
-};
+const NATIVE = ['X', 'Bluesky', 'Threads', 'Facebook', 'Reddit', 'Instagram', 'TikTok'];
+
+/* The order the destinations are offered in, whatever a given button says. A repost
+   belongs at its own platform's place in this run rather than jumping to the top: it is
+   one of the ways to send the thing, not a different kind of thing. Instagram and TikTok
+   have no composer, so they only ever appear here as a repost, at the end where they
+   sit in the order. */
+const PLATFORMS = ['X', 'Bluesky', 'Threads', 'Facebook', 'Reddit', 'Instagram', 'TikTok'];
 
 function nativeUrl(row) {
     if (row.source === 'X') {
         const m = row.post_url.match(/status(?:es)?\/(\d+)/);
         if (m) return 'https://x.com/intent/retweet?tweet_id=' + m[1];
     }
-    return row.post_url;
+    return safeUrl(row.post_url);
 }
 
 function composers(row) {
@@ -604,9 +729,16 @@ function composers(row) {
         { id: 'Threads',  url: 'https://www.threads.net/intent/post?text=' + e(t + ' ' + u) },
         { id: 'Facebook', url: 'https://www.facebook.com/sharer/sharer.php?u=' + e(u) },
         { id: 'Reddit',   url: 'https://www.reddit.com/submit?url=' + e(u) + '&title=' + e(t) },
-    /* Skip the one it came from. Posting a Bluesky link to Bluesky reads as a bot, and
-       the repost above is the better move anyway. */
-    ].filter((c) => c.id !== row.source);
+    ];
+}
+
+/* soc_nominate refuses a post_url that is not http(s), because from now on a stranger
+   holding the publishable key can call it. This is the same check on the way out: an
+   href is not where you want to discover the value was 'javascript:...', since that
+   would run in the owner's signed-in session the moment they clicked it. Rows written
+   before either check existed are covered too. */
+function safeUrl(u) {
+    return /^https?:\/\//i.test(u || '') ? u : '';
 }
 
 /* The picture for a row, or '' if there is none to be had.
@@ -624,12 +756,15 @@ function shotOf(row) {
 /* --- the queue --------------------------------------------------------------------- */
 const TABS = [
     { key: 'ADD',      label: 'Add' },
-    { key: 'NEW',      label: 'To post',    bin: true },
-    { key: 'POSTED',   label: 'Posted',     bin: true },
-    { key: 'SKIPPED',  label: 'Passed',     bin: true },
+    { key: 'NEW',      label: 'To post', bin: true, empty: 'Your work here is done!' },
+    { key: 'POSTED',   label: 'Posted',  bin: true, empty: 'No posts yet' },
     {
-        key: 'DELETED', label: 'Deleted', bin: true,
-        note: 'Deleted post candidates may be refound by the SOC Socializer Bot',
+        key: 'SKIPPED', label: 'Skipped', bin: true, tone: 'skip',
+        empty: 'No skipped posts yet',
+        note: 'Everything you have skipped. A skip always stops the bot nominating'
+            + ' that exact link again; the toggle decides what it makes of the kind of'
+            + ' thing it was. LIKE, where every skip starts, keeps it hunting more like'
+            + ' this one. HIDE steers it clear.',
     },
     { key: 'SETTINGS', label: 'Settings',   far: true },
 ];
@@ -664,7 +799,8 @@ function paintTabs() {
     $('tabs').innerHTML = '';
     TABS.forEach((t) => {
         const b = document.createElement('button');
-        b.className = 'tab' + (t.key === tab ? ' on' : '') + (t.far ? ' far' : '');
+        b.className = 'tab' + (t.key === tab ? ' on' : '')
+            + (t.far ? ' far' : '') + (t.tone ? ' ' + t.tone : '');
         b.textContent = t.label;
 
         /* ADD and SETTINGS are not bins. Nothing to count, and a 0 beside either would
@@ -719,9 +855,7 @@ function paint() {
     if (!rows.length) {
         const d = document.createElement('div');
         d.className = 'empty';
-        d.textContent = tab === 'NEW'
-            ? 'Nothing waiting. The bot runs once a day, or file one on the ADD tab.'
-            : 'Nothing here.';
+        d.textContent = (tabDef && tabDef.empty) || 'Nothing here.';
         list.appendChild(d);
         return;
     }
@@ -731,16 +865,26 @@ function paint() {
 
 function card(row) {
     const el = document.createElement('div');
-    el.className = 'card' + (row.status === 'NEW' ? '' : ' done');
+    /* Only a posted row fades. A skip is a decision, not a card that is finished with -
+       it still carries a toggle you are meant to be able to read and press. */
+    el.className = 'card' + (row.status === 'POSTED' ? ' done' : '');
+
+    /* Every link on this card comes from here. Empty means the row carries something
+       that is not a web address, and nothing on the card becomes clickable. */
+    const link = safeUrl(row.post_url);
+    const native = NATIVE.includes(row.source);
+
+    /* What the card says, on the left. What you can do about it, on the right. */
+    const main = document.createElement('div');
+    main.className = 'main';
 
     /* What it is, before what it says: where it came from, who put it in the queue,
        where it stands. They read as a strip across the top of the card. */
     const chips = document.createElement('div');
     chips.className = 'chips';
     [
-        { text: row.source, cls: ' source' },
-        { text: row.submitter, cls: ' submitter' },
-        { text: row.status === 'NEW' ? null : row.status },
+        { text: row.source ? 'Found on ' + row.source : null, cls: ' source' },
+        { text: row.submitter ? 'Found by ' + row.submitter : null, cls: ' submitter' },
     ]
         .filter((chip) => chip.text)
         .forEach((chip) => {
@@ -749,28 +893,24 @@ function card(row) {
             c.textContent = chip.text;
             chips.appendChild(c);
         });
-    /* Where it has actually gone out, as opposed to whether it is still waiting. */
-    (row.posted_to || []).forEach((d) => {
-        const c = document.createElement('span');
-        c.className = 'chip';
-        c.textContent = 'sent: ' + d;
-        chips.appendChild(c);
-    });
-
-    /* Straight to the post it was cut from. It records nothing: looking at a thing is
-       not the same as sending it anywhere, which is what markSent is for. */
-    const view = document.createElement('a');
-    view.className = 'btn ghost view';
-    view.href = row.post_url;
-    view.target = '_blank';
-    view.rel = 'noopener';
-    view.textContent = 'View';
-
     /* Tags run left, View sits hard right, the two level across the top of the card. */
     const top = document.createElement('div');
     top.className = 'top';
-    top.append(chips, view);
-    el.appendChild(top);
+    top.appendChild(chips);
+
+    if (link) {
+        /* Straight to the post it was cut from. It records nothing: looking at a thing
+           is not the same as sending it anywhere, which is what markSent is for. */
+        const view = document.createElement('a');
+        view.className = 'btn ghost view';
+        view.href = link;
+        view.target = '_blank';
+        view.rel = 'noopener';
+        view.textContent = 'View';
+        top.appendChild(view);
+    }
+
+    main.appendChild(top);
 
     const body = document.createElement('div');
     body.className = 'body';
@@ -779,7 +919,7 @@ function card(row) {
     if (shot) {
         const img = document.createElement('img');
         img.className = 'shot';
-        img.src = shot;
+        img.src = safeUrl(shot);
         img.alt = '';
         img.loading = 'lazy';
         /* A dead or hotlink-blocked thumbnail leaves the browser's broken-image icon,
@@ -793,74 +933,229 @@ function card(row) {
     const text = document.createElement('div');
     text.className = 'text';
 
+    /* How old it is, above the line rather than buried in the byline. On a queue you
+       work through in order, age is the first thing you want to know about a card. */
+    const when = document.createElement('div');
+    when.className = 'when';
+
+    /* Only the age is set in caps - the handle is somebody's name and keeps its own
+       shape, which is also what stops a long one shouting over the title below it. */
+    const age = document.createElement('b');
+    age.textContent = ago(row.created_at);
+    when.appendChild(age);
+    if (row.author) when.append(document.createTextNode(' by ' + row.author));
+
+    text.appendChild(when);
+
     const why = document.createElement('div');
     why.className = 'why';
     why.textContent = row.why || '(no two cents yet)';
     text.appendChild(why);
 
+    /* Our line first, then theirs. The two cents is what a queue is read down; the
+       headline is the evidence for it, so it is quoted rather than announced. */
+    if (row.headline) {
+        const head = document.createElement('div');
+        head.className = 'headline';
+        head.textContent = row.headline;
+        text.appendChild(head);
+    }
+
+    /* The handle has moved up to the line above, so this is the link and nothing else. */
     const meta = document.createElement('div');
     meta.className = 'meta';
-    const a = document.createElement('a');
-    a.href = row.post_url;
-    a.target = '_blank';
-    a.rel = 'noopener';
-    a.textContent = row.post_url;
-    meta.append(
-        document.createTextNode((row.author ? row.author + ' · ' : '') + ago(row.created_at) + ' · '),
-        a,
-    );
+
+    if (link) {
+        const a = document.createElement('a');
+        a.href = link;
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = link;
+        meta.appendChild(a);
+    } else {
+        /* Still worth showing, as text, so a bad row is visible rather than blank. */
+        meta.textContent = row.post_url;
+    }
     text.appendChild(meta);
 
     body.appendChild(text);
-    el.appendChild(body);
+    main.appendChild(body);
 
-    const bar = document.createElement('div');
-    bar.className = 'row';
+    const said = (label, value) => {
+        const d = document.createElement('div');
+        d.className = 'recommend';
+        const b = document.createElement('b');
+        b.textContent = value;
+        d.append(document.createTextNode(label), b);
+        return d;
+    };
 
-    const verb = NATIVE[row.source];
-    if (verb) {
-        const rp = document.createElement('a');
-        rp.className = 'btn repost';
-        rp.href = nativeUrl(row);
-        rp.target = '_blank';
-        rp.rel = 'noopener';
-        rp.textContent = verb + ' on ' + row.source;
-        rp.onclick = () => markSent(row, row.source);
-        bar.appendChild(rp);
+    /* A skipped candidate is not going anywhere, so the places it could have gone are a
+       record rather than an offer. Same list, stated instead of clickable - and it stays
+       on the left, because it is one of the things the card says. */
+    if (row.status === 'SKIPPED') {
+        const where = [...new Set((native ? [row.source] : [])
+            .concat(composers(row).map((c) => c.id)))];
+        if (where.length) main.appendChild(said('Recommended for: ', where.join(', ')));
     }
 
-    composers(row).forEach((c) => {
-        const b = document.createElement('a');
-        b.className = 'btn' + ((row.posted_to || []).includes(c.id) ? ' sent' : ' ghost');
-        b.href = c.url;
-        b.target = '_blank';
-        b.rel = 'noopener';
-        b.textContent = c.id;
-        b.onclick = () => markSent(row, c.id);
-        bar.appendChild(b);
-    });
+    /* Where it actually went. Once a card has been ruled on this is its record and worth
+       stating either way, including "nowhere"; before that there is nothing to report
+       unless something has already gone out, so a waiting card stays quiet about it. */
+    const gone = row.posted_to || [];
+    if (gone.length || row.status !== 'NEW') {
+        main.appendChild(said('Posted to: ', gone.length ? gone.join(', ') : 'nowhere'));
+    }
 
-    /* Ruling on a candidate is a different act from sending it somewhere, so it sits
-       apart from the destinations rather than at the end of the same run of buttons. */
+    /* Everything pressable, in one column down the right: where to send it, then what to
+       rule about it. Whichever kind of card this is, the buttons are in the same place. */
+    const acts = document.createElement('div');
+    acts.className = 'acts';
+
+    /* Somewhere to send it is only a question while it is still waiting to go out. */
+    if (row.status === 'NEW' && link) {
+        const dest = (label, url, id) => {
+            const b = document.createElement('a');
+            b.className = 'btn';
+            b.href = url;
+            b.target = '_blank';
+            b.rel = 'noopener';
+            b.textContent = label;
+            b.onclick = () => markSent(row, id);
+            acts.appendChild(b);
+        };
+
+        const posts = {};
+        composers(row).forEach((c) => { posts[c.id] = c.url; });
+
+        PLATFORMS.forEach((id) => {
+            /* Reposting where it already lives comes before posting a link to it there,
+               because it is the better move - but only within that platform's turn. */
+            if (id === row.source && native) dest('Repost on ' + id, nativeUrl(row), id);
+            if (posts[id]) dest('Post on ' + id, posts[id], id);
+        });
+    }
+
+    /* Ruling on a candidate is a different act from sending it somewhere, so the rules
+       sit under the destinations with a gap, rather than continuing the same run. */
     const rules = document.createElement('div');
     rules.className = 'rules';
+
     if (row.status === 'NEW') {
-        rules.appendChild(btn('Post', () => rule(row, 'POSTED')));
-        rules.appendChild(btn('Pass', () => rule(row, 'SKIPPED'), true));
-    } else {
+        /* A skip starts as a LIKE. Skipping is usually "good, but not this one", and
+           HIDE is the stronger thing you go out of your way to say. */
+        rules.appendChild(btn('← Skip', () => rule(row, 'SKIPPED', 'LIKE'), true));
+    } else if (row.status === 'SKIPPED') {
+        rules.appendChild(hintToggle(row));
         rules.appendChild(btn('Move back to "TO POST"', () => rule(row, 'NEW'), true));
     }
 
-    /* A soft delete: the row stays, so the bot still sees its post_key on the dedupe
-       pass and cannot nominate the same post again. Nothing asks you to confirm,
-       because nothing is destroyed - the Deleted tab has it, with the way back on it. */
-    if (row.status !== 'DELETED') {
-        rules.appendChild(btn('Delete', () => rule(row, 'DELETED'), true));
-    }
-    bar.appendChild(rules);
+    if (rules.children.length) acts.appendChild(rules);
 
-    el.appendChild(bar);
+    /* A posted card is a record of something already done. Nothing on it is pressable
+       but View, up in its corner - so it gets no column, and no rule beside an empty
+       one. The card takes the whole width instead. */
+    el.appendChild(main);
+    if (acts.children.length) el.appendChild(acts);
+
+    if (row.status === 'NEW') {
+        el.classList.add('swipe');
+        swipeToSkip(el, row);
+    }
+
     return el;
+}
+
+/* The toggle belongs to a skip and nothing else: a posted row has already said the
+   kindest thing there is to say about itself. */
+function hintToggle(row) {
+    const hint = document.createElement('div');
+    hint.className = 'hint-toggle';
+
+    const cap = document.createElement('div');
+    cap.className = 'cap';
+    cap.textContent = 'Tell the bot';
+    hint.appendChild(cap);
+
+    const cells = document.createElement('div');
+    cells.className = 'cells';
+
+    [
+        { key: 'LIKE', label: 'Like', note: 'Keep finding things like this' },
+        { key: 'HIDE', label: 'Hide', note: 'Steer away from this kind of thing' },
+    ].forEach((opt) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'hintbtn' + (row.bot_hint === opt.key ? ' on' : '');
+        b.textContent = opt.label;
+        b.title = opt.note;
+        b.onclick = async () => {
+            if (row.bot_hint === opt.key) return;
+            b.disabled = true;
+            await setHint(row, opt.key);
+        };
+        cells.appendChild(b);
+    });
+
+    hint.appendChild(cells);
+    return hint;
+}
+
+/* Drag a waiting candidate to the left to skip it - the same ruling the Skip button
+   makes, which is why that button wears the same arrow.
+
+   Three things keep it from being a nuisance. A press that starts on a link or a button
+   is left to that link or button. The gesture does not commit until it has travelled far
+   enough to tell a swipe from a tap, and it gives up entirely if the movement is more
+   down than across, so the page still scrolls normally under a finger. And it only ever
+   reads leftward travel, so dragging right does nothing at all. */
+function swipeToSkip(el, row) {
+    const COMMIT = 90;
+    let startX = 0, startY = 0, dx = 0, tracking = false, swiping = false;
+
+    el.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('a, button')) return;
+        startX = e.clientX; startY = e.clientY;
+        dx = 0; tracking = true; swiping = false;
+        el.style.transition = '';
+        el.setPointerCapture(e.pointerId);
+    });
+
+    el.addEventListener('pointermove', (e) => {
+        if (!tracking) return;
+        const x = e.clientX - startX;
+        const y = e.clientY - startY;
+
+        if (!swiping) {
+            if (Math.abs(x) < 10 && Math.abs(y) < 10) return;
+            if (Math.abs(x) <= Math.abs(y)) { tracking = false; return; }
+            swiping = true;
+            el.style.userSelect = 'none';
+        }
+
+        e.preventDefault();
+        dx = Math.min(0, x);
+        el.style.transform = 'translateX(' + dx + 'px)';
+        el.classList.toggle('arming', dx <= -COMMIT);
+    });
+
+    const settle = async () => {
+        if (!tracking) return;
+        tracking = false;
+        el.style.userSelect = '';
+        el.style.transition = 'transform .16s ease-out';
+
+        if (swiping && dx <= -COMMIT) {
+            el.style.transform = 'translateX(-105%)';
+            await rule(row, 'SKIPPED', 'LIKE');
+            return;
+        }
+        el.style.transform = '';
+        el.classList.remove('arming');
+    };
+
+    el.addEventListener('pointerup', settle);
+    el.addEventListener('pointercancel', settle);
 }
 
 function btn(label, fn, ghost) {
@@ -872,10 +1167,16 @@ function btn(label, fn, ghost) {
     return b;
 }
 
-async function rule(row, next) {
+async function rule(row, next, hint) {
+    const patch = { status: next, handled_at: new Date().toISOString() };
+    /* Leaving a skip sets the opinion back to none, so a row that comes back to the
+       queue and gets skipped again starts the question over. */
+    if (hint !== undefined) patch.bot_hint = hint;
+    else if (next !== 'SKIPPED') patch.bot_hint = '';
+
     const { error } = await supabase
         .from('socializer')
-        .update({ status: next, handled_at: new Date().toISOString() })
+        .update(patch)
         .eq('id', row.id);
     if (error) {
         status(error.code === '23514'
@@ -887,24 +1188,36 @@ async function rule(row, next) {
     load();
 }
 
-/* Pressing a destination records that it went there. It does not mark the whole candidate
-   posted: a thing can go to Bluesky today and X tomorrow, and the two are different
-   questions. Fired on the link's own click, so the tab opens either way. */
-async function markSent(row, dest) {
-    const seen = row.posted_to || [];
-    if (seen.includes(dest)) return;
+async function setHint(row, hint) {
     const { error } = await supabase
         .from('socializer')
-        .update({ posted_to: seen.concat([dest]) })
+        .update({ bot_hint: hint })
         .eq('id', row.id);
+    if (error) { status('Could not save that: ' + error.message, 'err'); return; }
+    load();
+}
+
+/* Pressing a destination records that it went there, and the first one moves the card
+   out of TO POST - with no Post button left, sending it somewhere is what posting means.
+   The other destinations stay on the card afterwards, because a thing can go to Bluesky
+   today and X tomorrow and those remain two separate questions. Fired on the link's own
+   click, so the tab opens either way. */
+async function markSent(row, dest) {
+    const seen = row.posted_to || [];
+    const patch = {};
+
+    if (!seen.includes(dest)) patch.posted_to = seen.concat([dest]);
+    if (row.status === 'NEW') {
+        patch.status = 'POSTED';
+        patch.handled_at = new Date().toISOString();
+    }
+    if (!Object.keys(patch).length) return;
+
+    const { error } = await supabase.from('socializer').update(patch).eq('id', row.id);
     if (!error) load();
 }
 
 /* --- adding one -------------------------------------------------------------------- */
-/* The bookmarklet's og:image, held between the press and the save. There is no field
-   for it on the form: it is not something you would type. */
-let pendingShot = '';
-
 function readSource() {
     const u = $('url').value.trim();
     $('source').value = u ? sourceOf(u) : '';
@@ -915,8 +1228,9 @@ $('url').addEventListener('input', readSource);
 $('url').addEventListener('paste', () => setTimeout(readSource, 0));
 
 $('save').onclick = async () => {
-    const link = $('url').value.trim();
+    const link = cleanUrl($('url').value);
     if (!/^https?:\/\//i.test(link)) { status('Paste the link to the post first.', 'err'); return; }
+    $('url').value = link;
 
     $('save').disabled = true;
     status('Saving...', 'busy');
@@ -925,11 +1239,12 @@ $('save').onclick = async () => {
         post_key: postKey(link),
         post_url: link,
         source: sourceOf(link),
+        headline: $('headline').value.trim(),
         author: $('who').value.trim(),
         why: $('why').value.trim(),
         has_media: $('media').checked,
         media_url: pendingShot,
-        submitter: 'Manual',
+        submitter: me,
         status: 'NEW',
     });
 
@@ -956,6 +1271,7 @@ $('save').onclick = async () => {
 
 function clearForm() {
     $('url').value = $('who').value = $('why').value = $('source').value = '';
+    $('headline').value = '';
     $('media').checked = false;
     pendingShot = '';
 }
@@ -965,6 +1281,9 @@ $('out').onclick = async () => { await signOut(); location.reload(); };
 
 /* --- the door ----------------------------------------------------------------------- */
 let wrongAccount = false;
+
+/* The signed-in address, which is what a row filed by hand is signed with. */
+let me = '';
 
 $('signin').onclick = async (e) => {
     e.target.disabled = true;
@@ -994,9 +1313,12 @@ function prefill() {
     const u = q.get('u');
     if (!u) return;
 
-    $('url').value = u.trim();
+    $('url').value = cleanUrl(u);
+    /* What the funny button caught - the page title, or whatever was selected when it
+       was pressed. That is the post talking, so it goes to the headline. `why` is ours
+       and stays empty until somebody writes in it. */
     const t = (q.get('t') || '').trim();
-    if (t && !$('why').value) $('why').value = t;
+    if (t && !$('headline').value) $('headline').value = t;
     const h = (q.get('h') || '').trim();
     if (h) $('who').value = /^[@]|^[ur]\//.test(h) ? h : '@' + h.replace(/^@+/, '');
     pendingShot = (q.get('m') || '').trim();
@@ -1072,6 +1394,7 @@ function render(user) {
     if (wrongAccount) status('That is not ' + OWNER + '.', 'err');
 
     if (!ok) return;
+    me = user.email || '';
     $('out').hidden = false;
     prefill();
 
