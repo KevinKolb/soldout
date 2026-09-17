@@ -1218,6 +1218,10 @@ async function markSent(row, dest) {
 }
 
 /* --- adding one -------------------------------------------------------------------- */
+/* The bookmarklet's og:image, held between the press and the save. There is no field for
+   it on the form: it is not something you would type. */
+let pendingShot = '';
+
 function readSource() {
     const u = $('url').value.trim();
     $('source').value = u ? sourceOf(u) : '';
@@ -1396,12 +1400,20 @@ function render(user) {
     if (!ok) return;
     me = user.email || '';
     $('out').hidden = false;
-    prefill();
 
     /* The whole page either way - the tabs already show one thing at a time, which is
        all the old stripped-down capture mode was doing. A bookmarklet press just picks
        which tab you land on. */
     show(CAPTURE ? 'ADD' : 'NEW');
+
+    /* Filling the form comes after showing it. A throw in here used to leave every pane
+       hidden and the page blank, which looks like a dead site rather than a bad link. */
+    try {
+        prefill();
+    } catch (e) {
+        status('Could not read what the funny button sent: ' + e.message, 'err');
+    }
+
     load();
 }
 
