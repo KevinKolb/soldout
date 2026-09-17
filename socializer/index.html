@@ -21,14 +21,26 @@
         h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 6px; }
         .subtitle { font-size: 15px; color: #666; margin-bottom: 28px; }
 
-        /* Title on the left, the bot on the right. The bot fills this queue, so the way
-           to go and look at it belongs level with the name of the page, not buried. */
+        /* Title on the left, the ways out on the right. This is the only page on the
+           site with a sign-in button on it, so it is also where the ways back out to
+           the show and to Backstage have to be. */
         .masthead {
             display: flex; align-items: flex-start; justify-content: space-between;
             gap: 16px; margin-bottom: 28px;
         }
         .masthead .subtitle { margin-bottom: 0; }
-        .botlink { flex: none; white-space: nowrap; }
+
+        /* flex-end so a wrapped row stacks against the right edge under the bot link
+           rather than drifting away from it. */
+        .mastlinks {
+            flex: none;
+            display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end;
+        }
+        .mastlinks .btn {
+            white-space: nowrap;
+            display: inline-flex; align-items: center; gap: 7px;
+        }
+        .mastlinks .btn img { height: 18px; width: auto; }
 
         button, .btn {
             display: inline-block;
@@ -41,13 +53,7 @@
         button.ghost, .btn.ghost { background: #fff; color: #000; }
         button.ghost:hover:not(:disabled), .btn.ghost:hover { background: #000; color: #fff; }
 
-        /* --- the capture form -------------------------------------------------- */
-        .panel { border: 2px solid #000; padding: 20px; margin-bottom: 30px; }
-        .panel h2, .queue h2 {
-            font-size: 12px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 1px; color: #666;
-            border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 16px;
-        }
+        /* --- the ADD pane -------------------------------------------------------- */
 
         .field { margin-bottom: 14px; }
         .field label {
@@ -71,6 +77,8 @@
 
         .actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 18px; }
 
+        #bot p { color: #444; margin-bottom: 16px; }
+
         /* --- the queue --------------------------------------------------------- */
         .tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
         .tab {
@@ -78,27 +86,59 @@
             padding: 8px 14px; border: 2px solid #000; background: #fff; color: #000; cursor: pointer;
         }
         .tab.on { background: #000; color: #fff; }
+        .tab.far { margin-left: auto; }
+        /* Opacity rather than a colour, so the count stays legible when .on inverts. */
+        .tab .n { margin-left: 7px; opacity: 0.5; }
 
         .card { border: 2px solid #000; padding: 16px 18px; margin-bottom: 14px; }
         .card.done { opacity: 0.55; }
-        .card .why { font-size: 16px; font-weight: 600; margin-bottom: 6px; overflow-wrap: break-word; }
-        .card .meta { font-size: 12px; color: #666; margin-bottom: 10px; }
+        /* View is placed by the flex row rather than absolutely, so a strip of tags long
+           enough to wrap pushes it along instead of running underneath it. */
+        .card .top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+        .card .top .chips { flex: 1; margin-bottom: 0; }
+        .card .view { flex: none; font-size: 12px; padding: 6px 12px; }
+        .card .why { font-size: 16px; font-weight: 600; overflow-wrap: break-word; margin-bottom: 6px; }
+        /* Thumbnail left, words right. min-width:0 is what lets a long URL in the meta
+           line wrap instead of stretching the row and squeezing the picture. */
+        .card .body { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px; }
+        .card .body .text { flex: 1; min-width: 0; }
+
+        /* One fixed square, cropped to fill, so a column of cards keeps its rhythm
+           whatever shape the pictures are. The offset rule is the same hard shadow the
+           shop uses - it lifts the picture off the card without softening anything. */
+        .card .shot {
+            flex: none; width: 120px; height: 120px; object-fit: cover;
+            border: 2px solid #000; box-shadow: 5px 5px 0 #000;
+            background: #f4f4f4; margin: 1px 5px 5px 1px;
+        }
+
+        @media (max-width: 460px) {
+            .card .shot { width: 88px; height: 88px; }
+        }
+        .card .meta { font-size: 12px; color: #666; }
         .card .meta a { color: #666; word-break: break-all; }
 
-        .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+        .chips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
         .chip {
             font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
             padding: 3px 8px; border: 2px solid #000; background: #fff;
         }
-        .chip.acid { background: #ffd93d; }
+        .chip.source { background: #6cc5ff; }
+        .chip.submitter { background: #ff9f43; }
+
+        .note {
+            border: 2px solid #000; background: #ffd93d;
+            padding: 10px 14px; margin-bottom: 14px;
+            font-size: 13px; font-weight: 600;
+        }
 
         .card .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: flex-start; }
         /* margin-left:auto takes the gap between the destinations and the ruling, so
            Post and Pass sit hard right - and stay together when the row wraps. */
         .card .rules { display: flex; gap: 6px; margin-left: auto; }
         .card .row button, .card .row .btn { font-size: 13px; padding: 8px 12px; }
-        .repost { background: #ffd93d; color: #000; }
-        .repost:hover { background: #000; color: #ffd93d; }
+        .repost { background: #6cc5ff; color: #000; }
+        .repost:hover { background: #000; color: #6cc5ff; }
 
         .sent { background: #000; color: #fff; }
 
@@ -118,7 +158,9 @@
         .gate button + button { margin-left: 8px; }
 
         details { border: 2px solid #000; padding: 14px; margin-top: 30px; }
-        #app > details:first-child { margin-top: 0; margin-bottom: 30px; }
+        #paneAdd > details:first-child,
+        #paneSettings details { margin-top: 0; }
+        #addbox[open] summary { margin-bottom: 4px; }
         summary { cursor: pointer; font-weight: 600; font-size: 14px; }
         details p { font-size: 14px; margin-top: 12px; }
         .mark {
@@ -136,26 +178,38 @@
             font-size: 11px; line-height: 1.5;
             white-space: pre; overflow-x: auto; user-select: all;
         }
+        #markCopy { margin-top: 10px; font-size: 13px; padding: 8px 12px; }
 
         /* The account list, mirrored from the SOCIALS page in Notion. Handles and
-           profile links only - see the note in the panel about what is not here. */
+           profile links only - the note above it in SOCIAL SETTINGS says what is not
+           here, and why. */
         .socials {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr));
             gap: 8px; margin-top: 12px;
         }
-        /* The whole tile is the link, so every part of it has to carry through on
-           hover - muted greys on white go muddy on the yellow otherwise. */
+        /* The tile is no longer the link - View is, and the URL is a box you can take
+           a copy out of. So the tile keeps its own greys and never changes on hover. */
         .social {
             display: block; border: 2px solid #000; padding: 10px 12px;
-            background: #fff; color: #000; text-decoration: none;
+            background: #fff; color: #000;
         }
-        .social:hover { background: #ffd93d; }
+        /* Name left, View hard right. min-width:0 lets a long handle wrap inside the
+           flex item instead of forcing the button off the tile. */
+        .social .sochead { display: flex; align-items: flex-start; gap: 10px; }
+        .social .sochead > div { flex: 1; min-width: 0; }
+        .social .view { flex: none; font-size: 11px; padding: 5px 10px; }
         .social .plat {
             font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
             text-transform: uppercase; color: #666;
         }
         .social .at {
             font-size: 15px; font-weight: 600; overflow-wrap: anywhere;
+        }
+        /* Readonly, and styled like the bookmarklet line rather than like a field you
+           are meant to fill in: it is here to be read and copied, not edited. */
+        .social .url {
+            margin-top: 7px; padding: 5px 7px; background: #f4f4f4;
+            font-family: 'Courier New', Courier, monospace; font-size: 11px;
         }
         .social .how {
             font-size: 12px; line-height: 1.45; color: #444; margin-top: 7px;
@@ -164,28 +218,13 @@
             display: block; font-size: 10px; letter-spacing: 0.5px;
             text-transform: uppercase; color: #999; font-weight: 700;
         }
-        .social:hover .plat,
-        .social:hover .how,
-        .social:hover .how b { color: #000; }
-
-        /* Capture mode: the bookmarklet opens this in a 560x760 popup to file one post,
-           so the page shows the form and nothing else. The queue, the bot and the
-           bookmarklet's own instructions are all the full page's business. */
-        body.capture .queue,
-        body.capture details,
-        body.capture .botlink,
-        body.capture .subtitle { display: none; }
-        body.capture { padding: 22px 18px; }
-        body.capture h1 { font-size: 22px; margin-bottom: 0; }
-        body.capture .masthead { margin-bottom: 18px; }
-        body.capture .panel { margin-bottom: 0; }
 
         @media (max-width: 560px) {
             body { padding: 24px 16px; }
             h1 { font-size: 26px; }
             .two { display: block; }
             .masthead { display: block; }
-            .botlink { margin-top: 14px; }
+            .mastlinks { margin-top: 14px; justify-content: flex-start; }
         }
     </style>
 </head>
@@ -196,10 +235,15 @@
             <h1>Socializer</h1>
             <div class="subtitle">Keep connected to the audience!</div>
         </div>
-        <a class="btn ghost botlink" href="https://claude.ai/code/routines"
-           target="_blank" rel="noopener"
-           title="A Claude Routine that runs once a day and fills the post candidate table below."
-           >🤖 SOC Socializer Bot</a>
+        <div class="mastlinks">
+            <a class="btn ghost" href="/" title="The public site."
+               ><img src="/assets/images/soldoutlogo.png" alt="">SOC</a>
+            <a class="btn ghost" href="/backstage/"
+               target="_blank" rel="noopener"
+               title="Backstage in Notion: scripts, scenes, krewe, tech."
+               >🚪 Backstage</a>
+            <button id="out" class="btn ghost" type="button" hidden>Sign out</button>
+        </div>
     </div>
 
     <div id="status"></div>
@@ -211,123 +255,208 @@
     </div>
 
     <div id="app" hidden>
-        <details>
-            <summary>SOCIALS</summary>
-            <p>Sign into Chrome as
-               <b>soldoutcomedy@gmail.com</b> and passwords for social media sites will
-               automatically popup. Some platforms use delegated access, which lets you work
-               from your own login instead; use that where it's offered and skip the shared
-               password stuff. Contact Kevin for the <b>soldoutcomedy@gmail.com</b> password
-               and/or to get set up with delegated access.</p>
-            <div class="socials">
-                <a class="social" href="https://facebook.com/soldoutcomedy" target="_blank" rel="noopener">
-                    <div class="plat">Facebook</div>
-                    <div class="at">SOLDOUTcomedy</div>
-                    <p class="how"><b>Login</b>Your own Facebook login, then switch to the SOLD OUT! profile. No password is shared.</p>
-                    <p class="how"><b>Enable</b>Kevin adds you under Page settings &rarr; Page access. Facebook access is full or partial; Task access is post and message only.</p>
-                </a>
-                <a class="social" href="https://www.instagram.com/soldout.comedy" target="_blank" rel="noopener">
-                    <div class="plat">Instagram</div>
-                    <div class="at">SOLDOUT.comedy</div>
-                    <p class="how"><b>Login</b>The shared account, password in Google Password Manager.</p>
-                </a>
-                <a class="social" href="https://www.threads.com/@soldout.comedy" target="_blank" rel="noopener">
-                    <div class="plat">Threads</div>
-                    <div class="at">SOLDOUT.comedy</div>
-                    <p class="how"><b>Login</b>Uses the Instagram login.</p>
-                </a>
-                <a class="social" href="https://x.com/soldoutcomedy" target="_blank" rel="noopener">
-                    <div class="plat">X</div>
-                    <div class="at">SOLDOUTcomedy</div>
-                    <p class="how"><b>Login</b>Native Google login with the shared account.</p>
-                </a>
-                <a class="social" href="https://bsky.app/profile/soldoutcomedy.bsky.social" target="_blank" rel="noopener">
-                    <div class="plat">Bluesky</div>
-                    <div class="at">SOLDOUTcomedy</div>
-                    <p class="how"><b>Login</b>A dedicated account, password in Google Password Manager.</p>
-                </a>
-                <a class="social" href="https://www.tiktok.com/@soldoutcomedy" target="_blank" rel="noopener">
-                    <div class="plat">TikTok</div>
-                    <div class="at">SOLDOUTcomedy</div>
-                    <p class="how"><b>Login</b>Native Google login with the shared account.</p>
-                </a>
-                <a class="social" href="https://www.youtube.com/@SOLDOUTComedy" target="_blank" rel="noopener">
-                    <div class="plat">YouTube</div>
-                    <div class="at">SOLDOUTcomedy</div>
-                    <p class="how"><b>Login</b>The shared account, password in Google Password Manager.</p>
-                </a>
-                <a class="social" href="https://www.reddit.com/user/SOLDOUTComedy" target="_blank" rel="noopener">
-                    <div class="plat">Reddit</div>
-                    <div class="at">SOLDOUTComedy</div>
-                    <p class="how"><b>Login</b>The shared account, password in Google Password Manager. Not native Google login.</p>
-                </a>
-                <a class="social" href="https://www.whatnot.com/user/soldoutcomedy" target="_blank" rel="noopener">
-                    <div class="plat">Whatnot</div>
-                    <div class="at">SOLDOUTcomedy</div>
-                    <p class="how"><b>Login</b>Native Google login with the shared account.</p>
-                </a>
-                <a class="social" href="https://poshmark.com/closet/soldoutcomedy" target="_blank" rel="noopener">
-                    <div class="plat">Poshmark</div>
-                    <div class="at">SOLDOUTcomedy</div>
-                    <p class="how"><b>Login</b>Native Google login with the shared account.</p>
-                </a>
-            </div>
-        </details>
+        <div class="tabs" id="tabs"></div>
 
-        <div class="panel">
-            <h2>ADD A CANDIDATE</h2>
+        <div id="paneAdd" hidden>
+            <details id="addbox" open>
+                <summary>ADD POST CANDIDATE</summary>
 
-            <div class="field">
-                <label for="url">Link <span class="hint">- the post itself, not a feed</span></label>
-                <input type="text" id="url" placeholder="https://...">
-            </div>
-
-            <div class="two">
                 <div class="field">
-                    <label for="who">Who posted it <span class="hint">- filled from the link</span></label>
-                    <input type="text" id="who" placeholder="@someone">
+                    <label for="url">Link <span class="hint">- the post itself, not a feed</span></label>
+                    <input type="text" id="url" placeholder="https://...">
                 </div>
+
+                <div class="two">
+                    <div class="field">
+                        <label for="who">Who posted it <span class="hint">- filled from the link</span></label>
+                        <input type="text" id="who" placeholder="@someone">
+                    </div>
+                    <div class="field">
+                        <label for="source">Source <span class="hint">- read from the link</span></label>
+                        <input type="text" id="source" placeholder="Web" readonly>
+                    </div>
+                </div>
+
                 <div class="field">
-                    <label for="platform">Platform <span class="hint">- read from the link</span></label>
-                    <input type="text" id="platform" placeholder="Web" readonly>
+                    <label for="why">Our two cents <span class="hint">- one sentence, in your words</span></label>
+                    <textarea id="why" placeholder="What the joke is."></textarea>
                 </div>
-            </div>
 
-            <div class="field">
-                <label for="why">Our two cents <span class="hint">- one sentence, in your words</span></label>
-                <textarea id="why" placeholder="What the joke is."></textarea>
-            </div>
+                <div class="field check">
+                    <input type="checkbox" id="media">
+                    <label for="media" style="margin:0">It carries an image or a video</label>
+                </div>
 
-            <div class="field check">
-                <input type="checkbox" id="media">
-                <label for="media" style="margin:0">It carries an image or a video</label>
-            </div>
+                <div class="actions">
+                    <button id="save" type="button">Send</button>
+                    <button id="clear" class="ghost" type="button">Clear</button>
+                </div>
+            </details>
 
-            <div class="actions">
-                <button id="save" type="button">Send</button>
-                <button id="clear" class="ghost" type="button">Clear</button>
-                <button id="out" class="ghost" type="button">Sign out</button>
-            </div>
+            <details>
+                <summary>FUNNY BUTTON</summary>
+                <p>Make a bookmark in your browser bar, call it FUNNY, or whatever you'd like,
+                   and paste the line below in as its URL. While browsing the web, including
+                   social media sites, click the funny button to add the page or post to the
+                   queue. It opens the Socializer in a tab, on ADD, with the link, the author
+                   and the source already filled in. Press it again later and the same tab
+                   is reused rather than another one opening.</p>
+                <code class="line" id="markLine"></code>
+                <button id="markCopy" class="ghost" type="button">Copy the JavaScript for URL</button>
+                <p>Or drag this to the bar and skip the pasting. It carries nothing secret:
+                   all it does is hand this page a URL.</p>
+                <a class="mark" id="mark" href="#">FUNNY</a>
+            </details>
+
+            <details id="bot">
+                <summary>SOC SOCIALIZER BOT</summary>
+                <p>The form and the funny button above are the hand-made ways in. The
+                   bot is the other one: a Claude Routine that runs once a day and files
+                   what it finds into the queue by itself. This is where it lives.</p>
+                <a class="btn ghost" href="https://claude.ai/code/routines"
+                   target="_blank" rel="noopener">🤖 SOC Socializer Bot</a>
+            </details>
         </div>
 
-        <div class="queue">
-            <h2>THE QUEUE</h2>
-            <div class="tabs" id="tabs"></div>
+        <div class="queue" id="paneQueue" hidden>
+            <div class="note" id="note" hidden></div>
             <div id="list"></div>
         </div>
 
-        <details>
-            <summary>FUNNY BUTTON</summary>
-            <p>Make a bookmark in your browser bar, call it FUNNY, or whatever you'd like,
-               and paste the line below in as its URL. While browsing the web, including
-               social media sites, click the funny button to add the page or post to the
-               queue. It opens the Socializer in a small window with the link, the author
-               and the platform already filled in.</p>
-            <code class="line" id="markLine"></code>
-            <p>Or drag this to the bar and skip the pasting. It carries nothing secret:
-               all it does is hand this page a URL.</p>
-            <a class="mark" id="mark" href="#">FUNNY</a>
-        </details>
+        <div id="paneSettings" hidden>
+            <details open>
+                <summary>SOCIAL SETTINGS</summary>
+                <p>Sign into Chrome as
+                   <b>soldoutcomedy@gmail.com</b> and passwords for social media sites will
+                   automatically popup. Some platforms use delegated access, which lets you work
+                   from your own login instead; use that where it's offered and skip the shared
+                   password stuff. Contact Kevin for the <b>soldoutcomedy@gmail.com</b> password
+                   and/or to get set up with delegated access.</p>
+                <div class="socials">
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">Facebook</div>
+                                <div class="at">SOLDOUTcomedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://facebook.com/soldoutcomedy"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://facebook.com/soldoutcomedy" readonly>
+                        <p class="how"><b>Login</b>Your own Facebook login, then switch to the SOLD OUT! profile. No password is shared.</p>
+                        <p class="how"><b>Enable</b>Kevin adds you under Page settings &rarr; Page access. Facebook access is full or partial; Task access is post and message only.</p>
+                    </div>
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">Instagram</div>
+                                <div class="at">SOLDOUT.comedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://www.instagram.com/soldout.comedy"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://www.instagram.com/soldout.comedy" readonly>
+                        <p class="how"><b>Login</b>The shared account, password in Google Password Manager.</p>
+                    </div>
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">Threads</div>
+                                <div class="at">SOLDOUT.comedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://www.threads.com/@soldout.comedy"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://www.threads.com/@soldout.comedy" readonly>
+                        <p class="how"><b>Login</b>Uses the Instagram login.</p>
+                    </div>
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">X</div>
+                                <div class="at">SOLDOUTcomedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://x.com/soldoutcomedy"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://x.com/soldoutcomedy" readonly>
+                        <p class="how"><b>Login</b>Native Google login with the shared account.</p>
+                    </div>
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">Bluesky</div>
+                                <div class="at">SOLDOUTcomedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://bsky.app/profile/soldoutcomedy.bsky.social"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://bsky.app/profile/soldoutcomedy.bsky.social" readonly>
+                        <p class="how"><b>Login</b>A dedicated account, password in Google Password Manager.</p>
+                    </div>
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">TikTok</div>
+                                <div class="at">SOLDOUTcomedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://www.tiktok.com/@soldoutcomedy"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://www.tiktok.com/@soldoutcomedy" readonly>
+                        <p class="how"><b>Login</b>Native Google login with the shared account.</p>
+                    </div>
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">YouTube</div>
+                                <div class="at">SOLDOUTcomedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://www.youtube.com/@SOLDOUTComedy"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://www.youtube.com/@SOLDOUTComedy" readonly>
+                        <p class="how"><b>Login</b>The shared account, password in Google Password Manager.</p>
+                    </div>
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">Reddit</div>
+                                <div class="at">SOLDOUTComedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://www.reddit.com/user/SOLDOUTComedy"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://www.reddit.com/user/SOLDOUTComedy" readonly>
+                        <p class="how"><b>Login</b>The shared account, password in Google Password Manager. Not native Google login.</p>
+                    </div>
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">Whatnot</div>
+                                <div class="at">SOLDOUTcomedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://www.whatnot.com/user/soldoutcomedy"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://www.whatnot.com/user/soldoutcomedy" readonly>
+                        <p class="how"><b>Login</b>Native Google login with the shared account.</p>
+                    </div>
+                    <div class="social">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">Poshmark</div>
+                                <div class="at">SOLDOUTcomedy</div>
+                            </div>
+                            <a class="btn ghost view" href="https://poshmark.com/closet/soldoutcomedy"
+                               target="_blank" rel="noopener">View</a>
+                        </div>
+                        <input class="url" type="text" value="https://poshmark.com/closet/soldoutcomedy" readonly>
+                        <p class="how"><b>Login</b>Native Google login with the shared account.</p>
+                    </div>
+                </div>
+            </details>
+        </div>
     </div>
 </div>
 
@@ -362,7 +491,7 @@ function status(msg, kind) {
 }
 
 /* --- where a post lives ---------------------------------------------------------
-   One list, used for three things: the platform stamped on a new row, the author read
+   One list, used for three things: the source stamped on a new row, the author read
    out of the permalink, and which composer to skip when sharing it onward. */
 const HOSTS = [
     [/^(x|twitter)\.com$/,            'X'],
@@ -380,7 +509,7 @@ function hostOf(u) {
     catch (e) { return ''; }
 }
 
-function platformOf(u) {
+function sourceOf(u) {
     const host = hostOf(u);
     for (const [re, name] of HOSTS) if (re.test(host)) return name;
     return 'Web';
@@ -458,7 +587,7 @@ const NATIVE = {
 };
 
 function nativeUrl(row) {
-    if (row.platform === 'X') {
+    if (row.source === 'X') {
         const m = row.post_url.match(/status(?:es)?\/(\d+)/);
         if (m) return 'https://x.com/intent/retweet?tweet_id=' + m[1];
     }
@@ -477,26 +606,57 @@ function composers(row) {
         { id: 'Reddit',   url: 'https://www.reddit.com/submit?url=' + e(u) + '&title=' + e(t) },
     /* Skip the one it came from. Posting a Bluesky link to Bluesky reads as a bot, and
        the repost above is the better move anyway. */
-    ].filter((c) => c.id !== row.platform);
+    ].filter((c) => c.id !== row.source);
+}
+
+/* The picture for a row, or '' if there is none to be had.
+   media_url is what the bookmarklet and the bot put there. YouTube needs neither: the
+   video id is already in post_key for deduping, and YouTube serves a thumbnail at a
+   fixed address derived from it - so every YouTube row ever filed has one, including
+   the ones added long before media_url existed. */
+function shotOf(row) {
+    if (row.media_url) return row.media_url;
+    const key = row.post_key || '';
+    if (key.startsWith('yt:')) return 'https://img.youtube.com/vi/' + key.slice(3) + '/hqdefault.jpg';
+    return '';
 }
 
 /* --- the queue --------------------------------------------------------------------- */
 const TABS = [
-    { key: 'NEW',     label: 'New' },
-    { key: 'POSTED',  label: 'Posted' },
-    { key: 'SKIPPED', label: 'Passed' },
-    { key: 'ALL',     label: 'Everything' },
+    { key: 'ADD',      label: 'Add' },
+    { key: 'NEW',      label: 'To post',    bin: true },
+    { key: 'POSTED',   label: 'Posted',     bin: true },
+    { key: 'SKIPPED',  label: 'Passed',     bin: true },
+    {
+        key: 'DELETED', label: 'Deleted', bin: true,
+        note: 'Deleted post candidates may be refound by the SOC Socializer Bot',
+    },
+    { key: 'SETTINGS', label: 'Settings',   far: true },
 ];
+
+/* Is this tab a pile of rows, as opposed to a form or a settings page? */
+function isBin(key) {
+    return TABS.some((t) => t.key === key && t.bin);
+}
 let tab = 'NEW';
-let rows = [];
+
+/* Every row of every status, read once. The counts on the tabs need all of them
+   anyway, and a repost queue is small enough that one read beats a round trip per
+   tab - which has the happy side effect of making a tab switch instant. */
+let all = [];
+let loaded = false;
+
+function rowsFor(key) {
+    return all.filter((r) => r.status === key);
+}
 
 async function load() {
-    let q = supabase.from('socializer').select('*').order('created_at', { ascending: false });
-    if (tab !== 'ALL') q = q.eq('status', tab);
-
-    const { data, error } = await q;
+    const { data, error } = await supabase
+        .from('socializer').select('*').order('created_at', { ascending: false });
     if (error) { status('Could not read the queue: ' + error.message, 'err'); return; }
-    rows = data || [];
+    all = data || [];
+    loaded = true;
+    paintTabs();
     paint();
 }
 
@@ -504,11 +664,33 @@ function paintTabs() {
     $('tabs').innerHTML = '';
     TABS.forEach((t) => {
         const b = document.createElement('button');
-        b.className = 'tab' + (t.key === tab ? ' on' : '');
+        b.className = 'tab' + (t.key === tab ? ' on' : '') + (t.far ? ' far' : '');
         b.textContent = t.label;
-        b.onclick = () => { tab = t.key; paintTabs(); load(); };
+
+        /* ADD and SETTINGS are not bins. Nothing to count, and a 0 beside either would
+           read as an empty queue rather than as "no number applies". */
+        if (t.bin && loaded) {
+            const n = document.createElement('span');
+            n.className = 'n';
+            n.textContent = rowsFor(t.key).length;
+            b.appendChild(n);
+        }
+
+        b.onclick = () => show(t.key);
         $('tabs').appendChild(b);
     });
+}
+
+/* One pane at a time. The queue pane answers for all four bins; ADD and SETTINGS
+   have a pane each. */
+function show(key) {
+    tab = key;
+    $('paneAdd').hidden = key !== 'ADD';
+    $('paneSettings').hidden = key !== 'SETTINGS';
+    $('paneQueue').hidden = !isBin(key);
+    paintTabs();
+    paint();
+    if (key === 'ADD') $('url').focus();
 }
 
 function ago(iso) {
@@ -522,11 +704,23 @@ function paint() {
     const list = $('list');
     list.innerHTML = '';
 
+    /* Set before the early return below, so the tab's note is up while its rows are
+       still being read rather than appearing a beat after them. */
+    const tabDef = TABS.find((t) => t.key === tab);
+    const note = $('note');
+    note.textContent = (tabDef && tabDef.note) || '';
+    note.hidden = !note.textContent;
+
+    /* Before the first read there is nothing to say yet, and saying "nothing here"
+       while the answer is still in flight is a lie the page tells for a moment. */
+    if (!isBin(tab) || !loaded) return;
+
+    const rows = rowsFor(tab);
     if (!rows.length) {
         const d = document.createElement('div');
         d.className = 'empty';
         d.textContent = tab === 'NEW'
-            ? 'Nothing waiting. The bot runs once a day, or add one above.'
+            ? 'Nothing waiting. The bot runs once a day, or file one on the ADD tab.'
             : 'Nothing here.';
         list.appendChild(d);
         return;
@@ -539,10 +733,70 @@ function card(row) {
     const el = document.createElement('div');
     el.className = 'card' + (row.status === 'NEW' ? '' : ' done');
 
+    /* What it is, before what it says: where it came from, who put it in the queue,
+       where it stands. They read as a strip across the top of the card. */
+    const chips = document.createElement('div');
+    chips.className = 'chips';
+    [
+        { text: row.source, cls: ' source' },
+        { text: row.submitter, cls: ' submitter' },
+        { text: row.status === 'NEW' ? null : row.status },
+    ]
+        .filter((chip) => chip.text)
+        .forEach((chip) => {
+            const c = document.createElement('span');
+            c.className = 'chip' + (chip.cls || '');
+            c.textContent = chip.text;
+            chips.appendChild(c);
+        });
+    /* Where it has actually gone out, as opposed to whether it is still waiting. */
+    (row.posted_to || []).forEach((d) => {
+        const c = document.createElement('span');
+        c.className = 'chip';
+        c.textContent = 'sent: ' + d;
+        chips.appendChild(c);
+    });
+
+    /* Straight to the post it was cut from. It records nothing: looking at a thing is
+       not the same as sending it anywhere, which is what markSent is for. */
+    const view = document.createElement('a');
+    view.className = 'btn ghost view';
+    view.href = row.post_url;
+    view.target = '_blank';
+    view.rel = 'noopener';
+    view.textContent = 'View';
+
+    /* Tags run left, View sits hard right, the two level across the top of the card. */
+    const top = document.createElement('div');
+    top.className = 'top';
+    top.append(chips, view);
+    el.appendChild(top);
+
+    const body = document.createElement('div');
+    body.className = 'body';
+
+    const shot = shotOf(row);
+    if (shot) {
+        const img = document.createElement('img');
+        img.className = 'shot';
+        img.src = shot;
+        img.alt = '';
+        img.loading = 'lazy';
+        /* A dead or hotlink-blocked thumbnail leaves the browser's broken-image icon,
+           which reads as a fault in the page. Take it out instead, and the card is
+           simply one without a picture - the text beside it takes the space back on
+           its own. View is still there to go and look. */
+        img.onerror = () => img.remove();
+        body.appendChild(img);
+    }
+
+    const text = document.createElement('div');
+    text.className = 'text';
+
     const why = document.createElement('div');
     why.className = 'why';
     why.textContent = row.why || '(no two cents yet)';
-    el.appendChild(why);
+    text.appendChild(why);
 
     const meta = document.createElement('div');
     meta.className = 'meta';
@@ -555,39 +809,23 @@ function card(row) {
         document.createTextNode((row.author ? row.author + ' · ' : '') + ago(row.created_at) + ' · '),
         a,
     );
-    el.appendChild(meta);
+    text.appendChild(meta);
 
-    const chips = document.createElement('div');
-    chips.className = 'chips';
-    [row.platform, row.has_media ? 'has media' : null, row.source, row.status]
-        .filter(Boolean)
-        .forEach((text, i) => {
-            const c = document.createElement('span');
-            c.className = 'chip' + (i === 0 ? ' acid' : '');
-            c.textContent = text;
-            chips.appendChild(c);
-        });
-    /* Where it has actually gone out, as opposed to whether it is still waiting. */
-    (row.posted_to || []).forEach((d) => {
-        const c = document.createElement('span');
-        c.className = 'chip';
-        c.textContent = 'sent: ' + d;
-        chips.appendChild(c);
-    });
-    el.appendChild(chips);
+    body.appendChild(text);
+    el.appendChild(body);
 
     const bar = document.createElement('div');
     bar.className = 'row';
 
-    const verb = NATIVE[row.platform];
+    const verb = NATIVE[row.source];
     if (verb) {
         const rp = document.createElement('a');
         rp.className = 'btn repost';
         rp.href = nativeUrl(row);
         rp.target = '_blank';
         rp.rel = 'noopener';
-        rp.textContent = verb + ' on ' + row.platform;
-        rp.onclick = () => markSent(row, row.platform);
+        rp.textContent = verb + ' on ' + row.source;
+        rp.onclick = () => markSent(row, row.source);
         bar.appendChild(rp);
     }
 
@@ -610,7 +848,14 @@ function card(row) {
         rules.appendChild(btn('Post', () => rule(row, 'POSTED')));
         rules.appendChild(btn('Pass', () => rule(row, 'SKIPPED'), true));
     } else {
-        rules.appendChild(btn('Back to new', () => rule(row, 'NEW'), true));
+        rules.appendChild(btn('Move back to "TO POST"', () => rule(row, 'NEW'), true));
+    }
+
+    /* A soft delete: the row stays, so the bot still sees its post_key on the dedupe
+       pass and cannot nominate the same post again. Nothing asks you to confirm,
+       because nothing is destroyed - the Deleted tab has it, with the way back on it. */
+    if (row.status !== 'DELETED') {
+        rules.appendChild(btn('Delete', () => rule(row, 'DELETED'), true));
     }
     bar.appendChild(rules);
 
@@ -632,7 +877,13 @@ async function rule(row, next) {
         .from('socializer')
         .update({ status: next, handled_at: new Date().toISOString() })
         .eq('id', row.id);
-    if (error) { status('Could not save that: ' + error.message, 'err'); return; }
+    if (error) {
+        status(error.code === '23514'
+            ? 'The database does not know that status yet - run'
+              + ' tools/socializer-migration-06-deleted.sql in Supabase.'
+            : 'Could not save that: ' + error.message, 'err');
+        return;
+    }
     load();
 }
 
@@ -650,14 +901,18 @@ async function markSent(row, dest) {
 }
 
 /* --- adding one -------------------------------------------------------------------- */
-function readPlatform() {
+/* The bookmarklet's og:image, held between the press and the save. There is no field
+   for it on the form: it is not something you would type. */
+let pendingShot = '';
+
+function readSource() {
     const u = $('url').value.trim();
-    $('platform').value = u ? platformOf(u) : '';
+    $('source').value = u ? sourceOf(u) : '';
     if (u && !$('who').value.trim()) $('who').value = authorOf(u);
 }
 
-$('url').addEventListener('input', readPlatform);
-$('url').addEventListener('paste', () => setTimeout(readPlatform, 0));
+$('url').addEventListener('input', readSource);
+$('url').addEventListener('paste', () => setTimeout(readSource, 0));
 
 $('save').onclick = async () => {
     const link = $('url').value.trim();
@@ -669,11 +924,12 @@ $('save').onclick = async () => {
     const { error } = await supabase.from('socializer').insert({
         post_key: postKey(link),
         post_url: link,
-        platform: platformOf(link),
+        source: sourceOf(link),
         author: $('who').value.trim(),
         why: $('why').value.trim(),
         has_media: $('media').checked,
-        source: 'Manual',
+        media_url: pendingShot,
+        submitter: 'Manual',
         status: 'NEW',
     });
 
@@ -685,21 +941,23 @@ $('save').onclick = async () => {
            thing to happen and not a fault. */
         status(error.code === '23505'
             ? 'That one is already in the queue.'
-            : 'Could not save it: ' + error.message, 'err');
+            : (error.code === 'PGRST204' || error.code === '42703')
+                ? 'The table is missing a column this page writes - run the migrations'
+                  + ' in tools/ that you have not run yet.'
+                : 'Could not save it: ' + error.message, 'err');
         return;
     }
 
     clearForm();
     status('In the queue.', 'good');
-    if (CAPTURE) return;
-    tab = 'NEW';
-    paintTabs();
-    load();
+    await load();
+    if (!CAPTURE) show('NEW');
 };
 
 function clearForm() {
-    $('url').value = $('who').value = $('why').value = $('platform').value = '';
+    $('url').value = $('who').value = $('why').value = $('source').value = '';
     $('media').checked = false;
+    pendingShot = '';
 }
 
 $('clear').onclick = () => { clearForm(); statusEl.className = ''; $('url').focus(); };
@@ -728,7 +986,6 @@ $('gateOut').onclick = async () => { await signOut(); location.reload(); };
    one post". Read it now: prefill() strips the query string, so by the time anything
    else asks, the evidence is gone. */
 const CAPTURE = new URLSearchParams(location.search).has('u');
-if (CAPTURE) document.body.classList.add('capture');
 
 /* What the bookmarklet handed over, cleared from the address bar afterwards so a refresh
    does not silently re-fill a form you have already emptied. */
@@ -742,7 +999,8 @@ function prefill() {
     if (t && !$('why').value) $('why').value = t;
     const h = (q.get('h') || '').trim();
     if (h) $('who').value = /^[@]|^[ur]\//.test(h) ? h : '@' + h.replace(/^@+/, '');
-    readPlatform();
+    pendingShot = (q.get('m') || '').trim();
+    readSource();
 
     const clean = new URL(location.href);
     clean.search = '';
@@ -755,15 +1013,45 @@ const FUNNY =
     + "var t=s||document.title||'';"
     + "var a=document.querySelector('meta[name=\"twitter:creator\"],meta[name=\"author\"],meta[property=\"article:author\"]');"
     + "var h=a?String(a.content||'').trim():'';"
+    + "var g=document.querySelector('meta[property=\"og:image\"],meta[name=\"twitter:image\"]');"
+    + "var m=g?String(g.content||'').trim():'';"
     + "var u='https://www.soldoutcomedy.com/socializer/?u='"
     + "+encodeURIComponent(location.href)+'&t='+encodeURIComponent(t.slice(0,300))"
-    + "+'&h='+encodeURIComponent(h.slice(0,80));"
-    + "var w=window.open(u,'socializer','width=560,height=760,menubar=no,toolbar=no,location=no,status=no');"
+    + "+'&h='+encodeURIComponent(h.slice(0,80))"
+    + "+'&m='+encodeURIComponent(m.slice(0,500));"
+    + "var w=window.open(u,'socializer');"
     + "if(w){w.focus();}else{location.href=u;}"
     + "})()";
 
 $('mark').setAttribute('href', FUNNY);
 $('markLine').textContent = FUNNY;
+
+function selectLine() {
+    const r = document.createRange();
+    r.selectNodeContents($('markLine'));
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+}
+
+/* The line is user-select:all, so selecting it by hand already works. This is for the
+   case where the whole point is not to have to - and it highlights the line either way,
+   so you can see exactly what went to the clipboard, and still have it selected to copy
+   by hand if the clipboard was not reachable. */
+$('markCopy').onclick = async (e) => {
+    const b = e.target;
+    selectLine();
+    try {
+        await navigator.clipboard.writeText(FUNNY);
+        b.textContent = 'Copied';
+        setTimeout(() => { b.textContent = 'Copy the JavaScript for URL'; }, 3000);
+        status('Copied. Make a new bookmark and paste it in as the URL.', 'good');
+    } catch {
+        /* No clipboard: an insecure origin, or permission refused. The line is already
+           selected, so the keyboard can finish the job. */
+        status('Could not reach the clipboard - the line is selected, press Ctrl+C.', 'err');
+    }
+};
 
 $('mark').addEventListener('click', (e) => {
     e.preventDefault();
@@ -784,9 +1072,13 @@ function render(user) {
     if (wrongAccount) status('That is not ' + OWNER + '.', 'err');
 
     if (!ok) return;
+    $('out').hidden = false;
     prefill();
-    if (CAPTURE) { $('url').focus(); return; }
-    paintTabs();
+
+    /* The whole page either way - the tabs already show one thing at a time, which is
+       all the old stripped-down capture mode was doing. A bookmarklet press just picks
+       which tab you land on. */
+    show(CAPTURE ? 'ADD' : 'NEW');
     load();
 }
 

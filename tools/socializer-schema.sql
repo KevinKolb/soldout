@@ -19,8 +19,9 @@ create table if not exists public.socializer (
     post_url    text        not null,
 
     -- Where the post came FROM. Where it goes is always X, for now.
-    platform    text        not null default 'Web'
-                            check (platform in ('X', 'Bluesky', 'Facebook', 'Instagram', 'YouTube', 'Web')),
+    source      text        not null default 'Web'
+                            check (source in ('X', 'Bluesky', 'Facebook', 'Instagram', 'YouTube',
+                                              'Threads', 'TikTok', 'Reddit', 'Web')),
 
     author      text        not null default '',
     body        text        not null default '',
@@ -28,17 +29,22 @@ create table if not exists public.socializer (
     why         text        not null default '',
 
     -- How it reached the queue.
-    source      text        not null default 'Manual'
-                            check (source in ('Bookmarklet', 'Bot', 'Manual')),
+    submitter   text        not null default 'Manual'
+                            check (submitter in ('Bookmarklet', 'Bot', 'Manual')),
 
     status      text        not null default 'NEW'
-                            check (status in ('NEW', 'SKIPPED', 'POSTED')),
+                            check (status in ('NEW', 'SKIPPED', 'POSTED', 'DELETED')),
 
     repost_text text        not null default '',
 
     -- Where it has actually gone out. status says whether the article is still
     -- waiting; this says which destinations already have it.
     posted_to   text[]      not null default '{}',
+
+    -- The post's own image, from its og:image tag: the bookmarklet reads it off the
+    -- page it was pressed on, and the bot reads it when it confirms the permalink.
+    -- Empty means no picture was found, not that there is none.
+    media_url   text        not null default '',
 
     -- Did the source carry an image or video? Instagram will not take a text-only
     -- post, so the page greys its button out when this is false. NULL = never checked.

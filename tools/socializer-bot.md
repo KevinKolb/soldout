@@ -44,9 +44,10 @@ candidates somewhere else instead.
 | `post_url` | The confirmed permalink. |
 | `post_key` | The dedupe key, derived from the URL - see below. Unique, so a repeat is rejected by the database rather than by your judgement. |
 | `author` | Who posted it, `@name`. Empty if the source has no handle. |
-| `platform` | `X`, `Bluesky`, `Facebook`, `Instagram`, `YouTube`, `Threads`, `TikTok`, `Reddit`, or `Web`. |
+| `source` | Where the post came from: `X`, `Bluesky`, `Facebook`, `Instagram`, `YouTube`, `Threads`, `TikTok`, `Reddit`, or `Web`. |
 | `has_media` | `true` when the post carries an image or a video. |
-| `source` | Always `Bot`. |
+| `media_url` | The post's own picture, from its `og:image` or `twitter:image` tag, so the queue can show it. Empty string when the page has neither. Never a URL you have not seen in the page's own head. |
+| `submitter` | How it reached the queue. Always `Bot`. |
 | `status` | Always `NEW`. Never anything else. |
 
 `created_at` fills itself in.
@@ -85,8 +86,10 @@ Select from `socializer` first, every run. It does two jobs at once.
 
 **It is the dedupe list.** Read `post_key` and `post_url` across every row, whatever its
 status. If one is already there, skip it and say nothing more about it. Re-nominating
-something is arguing with a person who has already looked, and a `POSTED` or `SKIPPED` row
-is the strongest possible signal that they have.
+something is arguing with a person who has already looked, and a `POSTED`, `SKIPPED` or
+`DELETED` row is the strongest possible signal that they have. `DELETED` rows are kept for
+exactly this reason: the row is gone from the working queue but its `post_key` still
+stands, so a post somebody threw out does not come back a week later.
 
 **It is the taste.** Read the rows for the things the criteria cannot say out loud: how
 broad or how dry the joke tends to be, whether it leans more to selling or more to found
@@ -113,6 +116,14 @@ particular.
 
 Check all three; the same clip often goes up on more than one, so pick whichever permalink
 you can actually confirm and nominate it once.
+
+### Big Whale Consignment
+
+- Instagram - <https://www.instagram.com/bigwhaleconsignment>
+- Instagram reels - <https://www.instagram.com/bigwhaleconsignment/reels/>
+
+The reels tab is where the funny is. Both of those are feeds, so neither is ever the
+candidate: find the clip there, then nominate its own `/reel/` permalink.
 
 *(This list is the place to add sources. Add a heading and its links, commit, and the next
 run picks it up.)*
@@ -149,6 +160,12 @@ A post carrying an image or a video is worth more than one without, because it c
 Instagram and Threads as well as to X, Facebook and Bluesky. Not a rule, since a funny line
 with no picture still beats a dull picture, but it is the tie-breaker. Tick **Media** on
 those rows so whoever posts it knows before they open it.
+
+While you have the page open to confirm the permalink, take its `og:image` (or
+`twitter:image`) and put it in **media_url**. The queue shows it on the card, so whoever
+reads the row sees the joke rather than a description of it. Leave it empty rather than
+guessing: a wrong picture is worse than none, and a URL you did not read out of that
+page's own head is a guess.
 
 ## Step 6 - add them to the queue
 
