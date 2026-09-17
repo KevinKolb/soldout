@@ -111,10 +111,14 @@ How it works now:
 
 ## Backstage and login
 
-`/backstage` is the card grid, behind a Google sign-in, with the **Socializer**
-([socializer/](socializer/index.html)) on it. The browser tools live in
-[tools/](tools/). `backstage.soldoutcomedy.com` forwards to `/backstage`, so that page must
-never redirect to the subdomain or the two will loop.
+`/backstage` is a bare redirect to the BACKSTAGE page in Notion and nothing else: no card
+grid, no sign-in, no styling. `backstage.soldoutcomedy.com` forwards to `/backstage`, so
+that page must never redirect to the subdomain or the two will loop — Notion is a different
+origin, so the redirect it does carry is safe.
+
+Nothing links to the **Socializer** ([socializer/](socializer/index.html)) or the browser
+tools in [tools/](tools/) any more. They still work; reach them by URL. The card grid that
+used to list them, along with Airtable and Supabase, is recoverable from git history.
 
 Auth is Supabase, shared across the origin by [assets/js/auth.js](assets/js/auth.js), so
 signing in on one page also unlocks editing on `/shop`. Only `kevinmkolb@gmail.com` can

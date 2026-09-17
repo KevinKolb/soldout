@@ -18,7 +18,7 @@ assets/               All static assets
   data/               Site content as XML (shows, taglines, videos, musicvids)
 
 live/                 Show-day pages: prop check-in form, prop display, QR codes
-backstage/            Backstage: the card grid, and the Socializer
+backstage/            Redirect to Backstage in Notion
 tools/                The browser tools, the build scripts and the bots' orders
 archive/              Previous homepage and its alternate themes
 ```
@@ -110,14 +110,18 @@ committed in `tools/build-inventory.py`.
 
 ## Backstage
 
-`/backstage` is the card grid, behind a Google sign-in, and `backstage.soldoutcomedy.com`
-forwards to it. It must never redirect back to that subdomain: Cloudflare points the
-subdomain here, so the two would loop. It did, once.
+`/backstage` redirects to the BACKSTAGE page in Notion and does nothing else: a meta
+refresh and a `location.replace`, with no card grid, no sign-in and no styling. Notion
+decides who gets in.
 
-Notion is reached from the Bible and Socials cards. It holds show material and the social
-account list, and nothing the site depends on.
+`backstage.soldoutcomedy.com` forwards to `/backstage`. That page must never redirect back
+to the subdomain: Cloudflare points the subdomain here, so the two would loop. It did,
+once. Notion is a different origin, so the redirect there now is safe.
 
-The browser tools live in `tools/`, linked from the grid.
+Notion holds show material and the social account list, and nothing the site depends on.
+
+The Socializer is at `/socializer/` and the browser tools live in `tools/`. Nothing links
+to them now — reach them by URL.
 
 ## Logging in
 
