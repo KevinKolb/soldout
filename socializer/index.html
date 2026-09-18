@@ -153,6 +153,14 @@
         .donebtn { background: #ff6b6b; color: #000; }
         .donebtn:hover:not(:disabled) { background: #000; color: #ff6b6b; }
 
+        /* A destination this card has already gone to, wearing the button's colours the
+           other way round. The card now stays on POST through as many destinations as you
+           care to press, so the buttons themselves have to carry which ones are done -
+           otherwise the only record of a press is a tab that opened and closed. The
+           Posted to line says the same thing in words. */
+        .card .acts > .btn.sent { background: #fff; color: #000; }
+        .card .acts > .btn.sent:hover { background: #000; color: #fff; }
+
         /* The deep red, matching the band a card wears as you swipe it away - the two
            do the same thing, so they are the same colour. Armed goes black with red
            lettering rather than a redder red: the second press has to look like a
@@ -893,6 +901,7 @@ const TABS = [
         key: 'ADD', label: '+', tone: 'plus',
         hint: 'Add one by hand, or set up the funny button',
     },
+    { key: 'NEW',   label: 'Candidates', bin: true, empty: 'Your work here is done!' },
     {
         key: 'SKIPPED', label: 'Archive', bin: true, tone: 'skip',
         /* Everything no longer in play: the ones you passed on, and the ones that have
@@ -901,7 +910,6 @@ const TABS = [
         holds: ['SKIPPED', 'POSTED'],
         empty: 'Your work here is done!',
     },
-    { key: 'NEW',   label: 'Candidates', bin: true, empty: 'Your work here is done!' },
     { key: 'POST',  label: 'Post', bin: true, tone: 'post', empty: 'Your work here is done!' },
     { key: 'SETTINGS', label: 'Settings', far: true },
 ];
@@ -1179,12 +1187,16 @@ function card(row) {
     if (row.status === 'POST' && link) {
         const dest = (label, url, id) => {
             const b = document.createElement('a');
-            b.className = 'btn';
+            b.className = 'btn' + (gone.includes(id) ? ' sent' : '');
             b.href = url;
             b.target = '_blank';
             b.rel = 'noopener';
             b.textContent = label;
-            b.onclick = () => markSent(row, id);
+            /* Turned round on the press, not on the reload that follows it: the tab for
+               the destination opens over this page, and the button has to have changed
+               by the time you come back to it. markSent's own repaint agrees a moment
+               later, or puts it back if the save did not take. */
+            b.onclick = () => { b.classList.add('sent'); markSent(row, id); };
             acts.appendChild(b);
         };
 
@@ -1239,10 +1251,11 @@ function card(row) {
         del = confirmBtn('DELETE', 'SURE? DELETE', () => hide(row));
         rules.appendChild(del);
     } else {
-        /* Posted by hand, or posted from here and the destination press did not happen.
-           Either way this is the only thing that can say so - pressing a destination was
-           the only route to the archive, and there is no destination for "I did it on my
-           phone". Left, because that is where the ARCHIVE tab is, same as SKIP. */
+        /* The only route to the archive, and deliberately a press of its own: a card
+           stays here through as many destinations as you care to send it to, and you say
+           when you are finished with it. That also covers the ones with no destination to
+           press - posted by hand, or posted from your phone. Left, because that is where
+           the ARCHIVE tab is, same as SKIP. */
         const done = btn('← DONE', () => rule(row, 'POSTED'));
         done.classList.add('donebtn');
         rules.appendChild(done);
@@ -1499,24 +1512,31 @@ function confirmBtn(label, question, fn) {
     return b;
 }
 
-/* Pressing a destination records that it went there, and the first one moves the card
-   out of CANDIDATES - with no Post button left, sending it somewhere is what posting means.
-   The other destinations stay on the card afterwards, because a thing can go to Bluesky
-   today and X tomorrow and those remain two separate questions. Fired on the link's own
-   click, so the tab opens either way. */
+/* Pressing a destination records that it went there, and nothing else. It used to archive
+   the card on the first press, which contradicted the whole point of leaving the other
+   destinations up: a thing can go to Bluesky today and X tomorrow, and the card was gone
+   before tomorrow. Leaving the POST tab is DONE's job now. Fired on the link's own click,
+   so the tab opens either way. */
 async function markSent(row, dest) {
     const seen = row.posted_to || [];
-    const patch = {};
-
-    if (!seen.includes(dest)) patch.posted_to = seen.concat([dest]);
-    if (row.status === 'POST') {
-        patch.status = 'POSTED';
-        patch.handled_at = new Date().toISOString();
-    }
-    if (!Object.keys(patch).length) return;
+    if (seen.includes(dest)) return;
+    const patch = { posted_to: seen.concat([dest]) };
 
     const { error } = await supabase.from('socializer').update(patch).eq('id', row.id);
-    if (!error) load();
+    if (error) {
+        /* The button was turned round before this ran. Repainting from the rows we
+           already hold puts it back, so a failed save does not leave the card claiming
+           the post went somewhere it did not. */
+        status('Could not record that it went to ' + dest + ': ' + error.message, 'err');
+        paint();
+        return;
+    }
+
+    /* Recorded on the row we already hold as well as in the table, so the Posted to line
+       names the new destination on this repaint rather than on the next read. */
+    row.posted_to = patch.posted_to;
+    paint();
+    load();
 }
 
 /* --- adding one -------------------------------------------------------------------- */
@@ -1606,14 +1626,40 @@ $('signin').onclick = async (e) => {
 $('gateOut').onclick = async () => { await signOut(); location.reload(); };
 
 /* A bookmarklet press is the only thing that arrives with ?u=, and it means "file this
-   one post". Read it now: prefill() strips the query string, so by the time anything
-   else asks, the evidence is gone. */
-const CAPTURE = new URLSearchParams(location.search).has('u');
+   one post".
+ *
+ * Read at module load, before the first await, and held in CAUGHT rather than re-read
+ * later - because by the time prefill() runs, two different things have had a go at the
+ * address bar. prefill clears it itself, and Supabase strips its own ?code= after an
+ * OAuth round trip. A payload read late is a payload sometimes gone.
+ *
+ * The copy in sessionStorage covers the sign-in redirect. Pressing FUNNY with a lapsed
+ * session sends you to Google and brings you back to a bare /socializer/, and the post
+ * you were filing used to die there: the queue opened on an empty form as though the
+ * button had done nothing. It lives in the tab, so it goes when the tab does. */
+const STASH = 'soc.capture';
 
-/* What the bookmarklet handed over, cleared from the address bar afterwards so a refresh
-   does not silently re-fill a form you have already emptied. */
-function prefill() {
+function caught() {
     const q = new URLSearchParams(location.search);
+    if (q.has('u')) {
+        try { sessionStorage.setItem(STASH, location.search); } catch (e) { /* private mode */ }
+        return q;
+    }
+    try {
+        const held = sessionStorage.getItem(STASH);
+        if (held) return new URLSearchParams(held);
+    } catch (e) { /* private mode */ }
+    return null;
+}
+
+const CAUGHT = caught();
+const CAPTURE = !!CAUGHT;
+
+/* What the bookmarklet handed over, cleared from the address bar and from the tab
+   afterwards so a refresh does not silently re-fill a form you have already emptied. */
+function prefill() {
+    if (!CAUGHT) return;
+    const q = CAUGHT;
     const u = q.get('u');
     if (!u) return;
 
@@ -1627,6 +1673,8 @@ function prefill() {
     if (h) $('who').value = /^[@]|^[ur]\//.test(h) ? h : '@' + h.replace(/^@+/, '');
     pendingShot = (q.get('m') || '').trim();
     readSource();
+
+    try { sessionStorage.removeItem(STASH); } catch (e) { /* private mode */ }
 
     const clean = new URL(location.href);
     clean.search = '';
