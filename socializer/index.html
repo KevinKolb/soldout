@@ -401,17 +401,40 @@
         .social .credsays.on { color: #167c3c; font-weight: 600; }
         .social .credsays.warn { color: #b3541e; font-weight: 600; }
 
-        /* Separate buttons with a gap rather than one segmented bar: three of them do not
-           fit across a 235px tile without wrapping, and a wrapped segment leaves its shared
-           border hanging in the air. Each carrying its own border wraps cleanly. */
-        .social .method { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
-        .social .mbtn {
-            flex: 1 1 auto; border: 2px solid #000; padding: 5px 6px; font-size: 10px;
-            font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
-            white-space: nowrap; background: #fff; color: #000;
+        /* The account name, which is the one fact a tile holds about where it posts. The
+           address below it is worked out from this, so the two cannot disagree. */
+        .social .handle { margin-top: 10px; }
+        .social .handle label {
+            display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+            text-transform: uppercase; color: #999;
         }
-        .social .mbtn.on { background: #000; color: #fff; }
-        .social .mbtn:not(:disabled):not(.on):hover { background: #ffd93d; }
+        .social .handle input {
+            width: 100%; margin-top: 4px; padding: 5px 7px; border: 2px solid #000;
+            font-family: 'Courier New', Courier, monospace; font-size: 12px; background: #fff;
+        }
+
+        /* One box per way of posting, stacked. Boxes rather than a row of buttons because each
+           one now carries its own sentence, and the automatic one carries a token field as
+           well - which is not something that fits in a segment of a toggle. */
+        .social .method { margin-top: 10px; }
+        .social .ptype {
+            display: block; border: 2px solid #000; padding: 7px 9px; cursor: pointer;
+            background: #fff;
+        }
+        .social .ptype + .ptype { margin-top: 5px; }
+        .social .ptype.on { background: #ffd93d; }
+        .social .ptype .pick {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+        }
+        .social .ptype .pick input {
+            flex: none; width: 14px; height: 14px; margin: 0; accent-color: #000;
+            cursor: pointer;
+        }
+        .social .ptype .blurb {
+            font-size: 11px; line-height: 1.4; color: #444; margin: 5px 0 0 21px;
+        }
+        .social .ptype.on .blurb { color: #000; }
 
         @media (max-width: 620px) {
             .card { display: block; }
@@ -904,9 +927,13 @@ const PLATFORMS = ['X', 'Bluesky', 'Threads', 'Facebook', 'Reddit', 'Instagram',
  *   api: false    the platform will not allow it, and `note` says why.
  */
 const METHOD = {
-    INTENT: { label: 'By hand', only: 'By hand only' },
-    PASTE: { label: 'Paste', only: 'Paste only' },
-    API: { label: 'Automatic', only: 'Automatic only' },
+    INTENT: { label: 'By hand', only: 'By hand only',
+        blurb: 'Their composer opens in a tab with the two cents already in it. You press'
+            + ' their Post button.' },
+    PASTE: { label: 'Paste', only: 'Paste only',
+        blurb: 'The two cents go to the clipboard and their page opens. You paste and post.' },
+    API: { label: 'Automatic', only: 'Automatic only',
+        blurb: 'Published from here outright. Nothing opens and nothing waits for you.' },
 };
 
 /* `methods` is what the SETTINGS tab offers for that platform, in order, and the first one
@@ -927,34 +954,48 @@ const METHOD = {
  */
 const PUBLISH = {
     Bluesky: { methods: ['INTENT', 'PASTE', 'API'], api: 'live',
+        /* The whole handle, including the .bsky.social, because that is what the address
+           wants and a bare name would give a profile that does not exist. */
+        at: (h) => 'https://bsky.app/profile/' + h,
         creds: { account: 'Handle', token: 'App password' },
         note: 'An app password from bsky.app, and that is all - no review, no cost.' },
     Facebook: { methods: ['PASTE', 'API'], api: 'live',
+        /* No www, matching the address this tile has always linked to. Facebook redirects
+           either way; computing the URL is not the moment to quietly change one. */
+        at: (h) => 'https://facebook.com/' + h,
         creds: { account: 'Page ID', token: 'Page access token' },
         note: 'Automatic publishes as the PAGE. Nothing can post to a personal profile,'
             + ' and no composer URL will carry our words - hence Paste.' },
     Threads: { methods: ['INTENT', 'PASTE', 'API'], api: 'live',
+        at: (h) => 'https://www.threads.com/@' + h,
         /* No account field: the token names its own account, and /me is asked for it when the
            token is saved. Typing it in as well would be a second chance to get it wrong. */
         creds: { token: 'Access token' },
         note: 'A token from a Meta app with threads_content_publish. It lasts 60 days and is'
             + ' renewed on use, so posting once a month keeps it alive by itself.' },
     Instagram: { methods: ['PASTE'], api: 'soon',
+        at: (h) => 'https://www.instagram.com/' + h,
         note: 'No composer URL at all, so Paste is the only way by hand. A Business or'
             + ' Creator account can publish, but only with a picture.' },
     X: { methods: ['INTENT', 'PASTE'], api: 'soon',
+        at: (h) => 'https://x.com/' + h,
         note: 'Publishing needs a paid API tier. The free one cannot post often enough'
             + ' to be worth the wiring.' },
     Reddit: { methods: ['INTENT', 'PASTE'], api: 'soon',
+        at: (h) => 'https://www.reddit.com/user/' + h,
         note: 'The API can publish. Automated self-promotion is how accounts get banned,'
             + ' so this one wants a human more than the others do.' },
     TikTok: { methods: ['PASTE'], api: false,
+        at: (h) => 'https://www.tiktok.com/@' + h,
         note: 'Its posting API is video only and needs an audit to leave sandbox.' },
     YouTube: { methods: [], api: false,
+        at: (h) => 'https://www.youtube.com/@' + h,
         note: 'Video uploads only. There is nothing in this queue it would take.' },
     Whatnot: { methods: [], api: false,
+        at: (h) => 'https://www.whatnot.com/user/' + h,
         note: 'No public API and nothing in this queue goes there.' },
     Poshmark: { methods: [], api: false,
+        at: (h) => 'https://poshmark.com/closet/' + h,
         note: 'No public API and nothing in this queue goes there.' },
 };
 
@@ -973,8 +1014,63 @@ let onPlat = {};
    but the publishing function, so the page can say when it was saved and never what it is. */
 let creds = {};
 
+/* platform -> the account name there. Empty before the migration, which is why every tile's
+   own markup still carries its address: an unknown handle shows what the page always showed
+   rather than an empty box where a link used to be. */
+let handles = {};
+
 function isOn(id) {
     return onPlat[id] !== false;
+}
+
+/* The address of our account there, or '' if we do not know the handle. Worked out rather than
+   stored, so there is one copy of the fact and the link cannot drift from the name above it. */
+function accountUrl(id) {
+    const h = (handles[id] || '').trim();
+    const def = PUBLISH[id];
+    return h && def && def.at ? def.at(h) : '';
+}
+
+/* What somebody types into a handle field is whatever was on the clipboard: a bare name, an
+   @name, or the whole profile URL they were just looking at. All three mean the same thing, so
+   all three are accepted and reduced to the name.
+ *
+ * The URL case takes the last non-empty path segment, which is right for every template in
+ * PUBLISH - profile/<handle>, user/<handle>, closet/<handle>, @<handle> and a bare /<handle>
+ * all put it last. */
+function cleanHandle(said) {
+    let h = (said || '').trim();
+    if (/^https?:\/\//i.test(h)) {
+        try {
+            const parts = new URL(h).pathname.split('/').filter(Boolean);
+            h = parts.length ? parts[parts.length - 1] : '';
+        } catch (e) { /* not a URL after all; leave it be */ }
+    }
+    return h.replace(/^@+/, '').trim();
+}
+
+async function setHandle(platform, said, tile) {
+    const handle = cleanHandle(said);
+    if (handle === (handles[platform] || '')) return;
+
+    const { data, error } = await supabase
+        .from('socializer_channel')
+        .update({ handle, updated_at: new Date().toISOString() })
+        .eq('platform', platform)
+        .select('platform');
+    if (error || !(data || []).length) {
+        status('Could not save the ' + platform + ' account name: '
+            + (error ? error.message : 'the channel table has no row for it.')
+            + ' Has tools/socializer-migration-20-handles.sql been run?', 'err');
+        return;
+    }
+
+    handles[platform] = handle;
+    status(handle ? platform + ' is @' + handle + ' - ' + accountUrl(platform)
+        : platform + ' has no account name now.', 'good');
+    /* Just this tile. Repainting all ten would take the focus out of the field somebody is
+       still in, and nothing else on the page depends on one platform's handle. */
+    paintTile(tile);
 }
 
 /* The method actually in force, which is not always the one stored: a platform that stops
@@ -992,13 +1088,15 @@ async function loadMethods() {
     methods = {};
     onPlat = {};
     creds = {};
+    handles = {};
 
     const { data, error } = await supabase
-        .from('socializer_channel').select('platform, method, enabled');
+        .from('socializer_channel').select('platform, method, enabled, handle');
     if (!error) {
         (data || []).forEach((r) => {
             methods[r.platform] = r.method;
             onPlat[r.platform] = r.enabled !== false;
+            handles[r.platform] = r.handle || '';
         });
     }
     /* Before the migration is run neither table is there, which is not worth shouting about:
@@ -1105,73 +1203,127 @@ async function setMethod(platform, method) {
     paint();
 }
 
-/* Everything the SETTINGS tab decides, added to each account tile: whether we post there, how,
-   and the credential if the how needs one. The tiles are static markup - one per account, with
-   the platform's name in .plat - so this reads the name off the tile rather than keeping a
-   second list of platforms in step with the first. */
+/* Everything the SETTINGS tab decides, on each account tile: which account, whether we post
+   there, how, and the credential if the how needs one. The tiles are static markup - one per
+   account, with the platform's name in .plat - so this reads the name off the tile rather than
+   keeping a second list of platforms in step with the first. */
 function paintChannels() {
-    document.querySelectorAll('#paneSettings .social').forEach((tile) => {
-        const head = tile.querySelector('.plat');
-        const name = ((head && head.textContent) || '').trim();
-        const can = PUBLISH[name];
-        if (!can) return;
+    document.querySelectorAll('#paneSettings .social').forEach(paintTile);
+}
 
-        tile.querySelectorAll('.onoff, .method, .cred, .methodnote').forEach((o) => o.remove());
+function platformOf(tile) {
+    const head = tile.querySelector('.plat');
+    return ((head && head.textContent) || '').trim();
+}
 
-        const live = can.methods.length > 0;
-        const on = isOn(name);
+function paintTile(tile) {
+    const name = platformOf(tile);
+    const can = PUBLISH[name];
+    if (!can) return;
 
-        /* The checkbox, wherever there is anything to post. A platform with no way in at all
-           does not get one: unchecking something that was never offered is not a choice. */
-        if (live) {
-            const label = document.createElement('label');
-            label.className = 'onoff' + (on ? '' : ' off');
-            const box = document.createElement('input');
-            box.type = 'checkbox';
-            box.checked = on;
-            box.onchange = () => setEnabled(name, box.checked);
-            label.append(box, document.createTextNode(on ? 'Posting here' : 'Not posting here'));
-            tile.appendChild(label);
-        }
+    tile.querySelectorAll('.onoff, .handle, .method, .methodnote').forEach((o) => o.remove());
 
-        /* Off, the tile keeps its note and nothing else. How to post somewhere we are not
-           posting is not a question, and a chooser left sitting there would read as though it
-           still applied. */
-        if (live && on) {
-            const now = methodFor(name);
+    const live = can.methods.length > 0;
+    const on = isOn(name);
 
-            /* A chooser only where there is a choice. One method is a fact about the platform
-               rather than a decision, and a lone button you cannot press reads as broken - so
-               that case goes in the note's heading instead. */
-            if (can.methods.length > 1) {
-                const row = document.createElement('div');
-                row.className = 'method';
-                can.methods.forEach((key) => {
-                    const b = document.createElement('button');
-                    b.type = 'button';
-                    b.className = 'mbtn' + (now === key ? ' on' : '');
-                    b.textContent = METHOD[key].label;
-                    b.onclick = () => { if (methodFor(name) !== key) setMethod(name, key); };
-                    row.appendChild(b);
-                });
-                tile.appendChild(row);
-            }
+    /* The handle, and the address worked out from it. Both of the tile's own copies of that
+       address are overwritten here rather than left as they were: the View link and the box you
+       copy out of are now views of the handle, and a stale one beside a live one is worse than
+       either. Until the migration runs there is no handle, and the markup's own address stands -
+       which is the address that was always there, so nothing looks broken in the meantime. */
+    const url = accountUrl(name);
+    if (url) {
+        const at = tile.querySelector('.at');
+        if (at) at.textContent = (handles[name] || '');
+        const view = tile.querySelector('.view');
+        if (view) view.href = url;
+        const box = tile.querySelector('input.url');
+        if (box) box.value = url;
+    }
 
-            /* The credential, only under Automatic - it is the only method that uses one, and a
-               token field under By hand would be asking for something for no reason. */
-            if (now === 'API' && can.creds) tile.appendChild(credBox(name, can.creds));
-        }
+    const field = document.createElement('div');
+    field.className = 'handle';
+    const tag = document.createElement('label');
+    tag.textContent = 'Username';
+    const put = document.createElement('input');
+    put.type = 'text';
+    put.value = handles[name] || '';
+    put.placeholder = 'the account name on ' + name;
+    put.autocomplete = 'off';
+    put.spellcheck = false;
+    /* On change, not on every keystroke: a write per letter would be a write per letter, and
+       change fires on blur and on Enter, which is when somebody has finished saying it. */
+    put.onchange = () => setHandle(name, put.value, tile);
+    put.onkeydown = (e) => { if (e.key === 'Enter') put.blur(); };
+    tag.appendChild(put);
+    field.appendChild(tag);
+    tile.appendChild(field);
 
-        const note = document.createElement('p');
-        note.className = 'how methodnote';
-        const label = document.createElement('b');
-        label.textContent = !live ? 'Nothing to post'
-            : !on ? 'Off'
-            : can.methods.length > 1 ? 'Posting'
-            : METHOD[can.methods[0]].only;
-        note.append(label, document.createTextNode(can.note));
-        tile.appendChild(note);
-    });
+    /* The checkbox, wherever there is anything to post. A platform with no way in at all does
+       not get one: unchecking something that was never offered is not a choice. */
+    if (live) {
+        const label = document.createElement('label');
+        label.className = 'onoff' + (on ? '' : ' off');
+        const box = document.createElement('input');
+        box.type = 'checkbox';
+        box.checked = on;
+        box.onchange = () => setEnabled(name, box.checked);
+        label.append(box, document.createTextNode(on ? 'Posting here' : 'Not posting here'));
+        tile.appendChild(label);
+    }
+
+    /* Off, the tile keeps its note and nothing else. How to post somewhere we are not posting is
+       not a question, and a chooser left sitting there would read as though it still applied. */
+    if (live && on) {
+        const now = methodFor(name);
+        const box = document.createElement('div');
+        box.className = 'method';
+
+        can.methods.forEach((key) => {
+            /* One box per post type, and the whole box is the label - so the sentence explaining
+               a method is part of pressing it rather than something to read first and then go
+               and find the right radio for. */
+            const pick = document.createElement('label');
+            pick.className = 'ptype' + (now === key ? ' on' : '');
+
+            const head = document.createElement('div');
+            head.className = 'pick';
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            /* One group per platform. A single name across the page would make choosing Paste on
+               Bluesky un-choose whatever Facebook was on. */
+            radio.name = 'ptype-' + name;
+            radio.value = key;
+            radio.checked = now === key;
+            radio.onchange = () => { if (methodFor(name) !== key) setMethod(name, key); };
+            head.append(radio, document.createTextNode(METHOD[key].label));
+            pick.appendChild(head);
+
+            const blurb = document.createElement('p');
+            blurb.className = 'blurb';
+            blurb.textContent = METHOD[key].blurb;
+            pick.appendChild(blurb);
+
+            /* The credential lives in the box for the method that uses it, and stays visible
+               whether or not that method is the chosen one - so a token can be set up before
+               switching over, rather than only after. */
+            if (key === 'API' && can.creds) pick.appendChild(credBox(name, can.creds));
+
+            box.appendChild(pick);
+        });
+
+        tile.appendChild(box);
+    }
+
+    const note = document.createElement('p');
+    note.className = 'how methodnote';
+    const label = document.createElement('b');
+    label.textContent = !live ? 'Nothing to post'
+        : !on ? 'Off'
+        : can.methods.length > 1 ? 'Posting'
+        : METHOD[can.methods[0]].only;
+    note.append(label, document.createTextNode(can.note));
+    tile.appendChild(note);
 }
 
 /* The credential fields for one platform. Nothing here ever shows a token: the stored one
@@ -1180,6 +1332,11 @@ function paintChannels() {
 function credBox(name, fields) {
     const box = document.createElement('div');
     box.className = 'cred';
+
+    /* This sits inside the post type's <label>, so without this a press on the token field or
+       the Connect button would also tick that label's radio and switch the method. Typing a
+       credential is not the same act as choosing to use it. */
+    box.onclick = (e) => e.preventDefault();
 
     const line = document.createElement('p');
     line.className = 'credsays';

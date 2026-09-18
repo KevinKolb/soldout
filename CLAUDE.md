@@ -113,10 +113,16 @@ How it works now:
 
 ## Posting (the Socializer)
 
-Every platform has a checkbox on the SETTINGS tab (`socializer_channel.enabled`). Unchecked,
-the POST tab offers no button for it at all — that is what keeps a card down to the three
-places you actually use. Checked, it leaves the queue one of three ways, chosen per platform
-and stored in `socializer_channel.method`:
+Each account tile on the SETTINGS tab holds that platform's **username**
+(`socializer_channel.handle`). The profile address is computed from it by a template per
+platform in `PUBLISH`, and never stored — the tile's View link and its copy box are both views
+of the handle, so they cannot drift from it the way three hand-written copies had already begun
+to. A pasted profile URL or an `@name` is reduced to the name.
+
+Every platform also has a checkbox (`socializer_channel.enabled`). Unchecked, the POST tab
+offers no button for it at all — that is what keeps a card down to the three places you
+actually use. Checked, it leaves the queue one of three ways, picked with a radio in its own
+box on the tile and stored in `socializer_channel.method`:
 
 - **By hand (`INTENT`)** — the platform's composer opens with our words already in the URL,
   and a human presses their Post button. Needs no credentials and cannot half-work.
