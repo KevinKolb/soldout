@@ -372,6 +372,35 @@
         /* How this platform gets posted to, on the tile for the account it posts to. Two
            buttons rather than a menu: there are two answers and both are worth seeing at
            once, since the whole point is that they are a choice. */
+        /* Whether we post to this platform at all, above how. Unchecked, the tile keeps its
+           note and loses everything else - there is nothing to decide about a destination we
+           are not using, and a chooser left behind would look like it still applied. */
+        .social .onoff {
+            display: flex; align-items: center; gap: 7px; margin-top: 10px; cursor: pointer;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+        }
+        .social .onoff input {
+            flex: none; width: 15px; height: 15px; margin: 0; accent-color: #000; cursor: pointer;
+        }
+        .social .onoff.off { color: #999; }
+
+        /* The credential. type=password on the token, so a screen share or a photographed
+           laptop does not hand it over - and it is never read back out of the database, so an
+           empty field means "unchanged", not "no token". */
+        .social .cred { margin-top: 9px; }
+        .social .cred input {
+            width: 100%; margin-top: 5px; padding: 5px 7px; border: 2px solid #000;
+            font-family: 'Courier New', Courier, monospace; font-size: 11px; background: #fff;
+        }
+        .social .cred .credrow { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+        .social .cred .credrow button {
+            flex: 1 1 auto; font-size: 10px; padding: 5px 6px; letter-spacing: 0.4px;
+            text-transform: uppercase; white-space: nowrap;
+        }
+        .social .credsays { font-size: 11px; line-height: 1.4; color: #444; margin-top: 6px; }
+        .social .credsays.on { color: #167c3c; font-weight: 600; }
+        .social .credsays.warn { color: #b3541e; font-weight: 600; }
+
         /* Separate buttons with a gap rather than one segmented bar: three of them do not
            fit across a 235px tile without wrapping, and a wrapped segment leaves its shared
            border hanging in the air. Each carrying its own border wraps cleanly. */
@@ -898,12 +927,18 @@ const METHOD = {
  */
 const PUBLISH = {
     Bluesky: { methods: ['INTENT', 'PASTE', 'API'], api: 'live',
+        creds: { account: 'Handle', token: 'App password' },
         note: 'An app password from bsky.app, and that is all - no review, no cost.' },
     Facebook: { methods: ['PASTE', 'API'], api: 'live',
+        creds: { account: 'Page ID', token: 'Page access token' },
         note: 'Automatic publishes as the PAGE. Nothing can post to a personal profile,'
             + ' and no composer URL will carry our words - hence Paste.' },
-    Threads: { methods: ['INTENT', 'PASTE'], api: 'soon',
-            note: 'The Threads API can publish. Not wired up here yet.' },
+    Threads: { methods: ['INTENT', 'PASTE', 'API'], api: 'live',
+        /* No account field: the token names its own account, and /me is asked for it when the
+           token is saved. Typing it in as well would be a second chance to get it wrong. */
+        creds: { token: 'Access token' },
+        note: 'A token from a Meta app with threads_content_publish. It lasts 60 days and is'
+            + ' renewed on use, so posting once a month keeps it alive by itself.' },
     Instagram: { methods: ['PASTE'], api: 'soon',
         note: 'No composer URL at all, so Paste is the only way by hand. A Business or'
             + ' Creator account can publish, but only with a picture.' },
@@ -928,6 +963,20 @@ const PUBLISH = {
    before the migration is run. */
 let methods = {};
 
+/* platform -> whether we post there at all. Same table, and the same rule for an empty one:
+   before the migration the page behaves as it always did, which is that everything with a
+   composer gets a button. */
+let onPlat = {};
+
+/* platform -> what is known about its stored credential, which is everything except the
+   credential. The token itself is sealed in the database and cannot be read back by anything
+   but the publishing function, so the page can say when it was saved and never what it is. */
+let creds = {};
+
+function isOn(id) {
+    return onPlat[id] !== false;
+}
+
 /* The method actually in force, which is not always the one stored: a platform that stops
    offering a method - because it was wired up and then was not, or because this list
    changed under a row - falls back to its first. Nothing should be able to strand a card
@@ -940,15 +989,97 @@ function methodFor(id) {
 }
 
 async function loadMethods() {
-    const { data, error } = await supabase.from('socializer_channel').select('platform, method');
     methods = {};
-    if (error) {
-        /* Before the migration is run the table is not there, which is not worth shouting
-           about: everything posts by hand until it exists, which is what it did before. The
-           settings tab says so in the one place somebody is looking for the switch. */
+    onPlat = {};
+    creds = {};
+
+    const { data, error } = await supabase
+        .from('socializer_channel').select('platform, method, enabled');
+    if (!error) {
+        (data || []).forEach((r) => {
+            methods[r.platform] = r.method;
+            onPlat[r.platform] = r.enabled !== false;
+        });
+    }
+    /* Before the migration is run neither table is there, which is not worth shouting about:
+       everything posts by hand until they exist, which is what it did before. The settings tab
+       says so in the one place somebody is looking for the switch. */
+
+    /* Named columns, not *: there is no reason to pull the sealed credential into a browser
+       that has nothing to open it with. It would be harmless - that is what sealing it buys -
+       but a page that never holds one cannot leak one. */
+    const said = await supabase
+        .from('socializer_secret').select('platform, account, expires_at, updated_at, set_by');
+    if (!said.error) {
+        (said.data || []).forEach((r) => { creds[r.platform] = r; });
+    }
+}
+
+async function setEnabled(platform, on) {
+    const { data, error } = await supabase
+        .from('socializer_channel')
+        .update({ enabled: on, updated_at: new Date().toISOString() })
+        .eq('platform', platform)
+        .select('platform');
+    if (error || !(data || []).length) {
+        status('Could not turn ' + platform + (on ? ' on: ' : ' off: ')
+            + (error ? error.message : 'the channel table has no row for it.')
+            + ' Has tools/socializer-migration-19-credentials.sql been run?', 'err');
         return;
     }
-    (data || []).forEach((r) => { methods[r.platform] = r.method; });
+    onPlat[platform] = on;
+    status(on ? platform + ' is a destination again.'
+        : platform + ' will not be offered on a card any more.', 'good');
+    paintChannels();
+    paint();
+}
+
+/* Saving a credential goes through soc-connect, never straight into the table: the function
+   holds the key that seals it, and it proves the credential works with the platform before
+   keeping it. So a green line here means it really is connected. */
+async function connect(platform, account, token, said) {
+    said('Checking it with ' + platform + '...', '');
+    try {
+        const out = await callFn('soc-connect', { platform, account, token });
+        creds[platform] = {
+            platform,
+            account: out.account || '',
+            expires_at: out.expires || null,
+            updated_at: new Date().toISOString(),
+            set_by: me,
+        };
+        status('Connected to ' + platform + (out.says ? ' as ' + out.says : '') + '.', 'good');
+        paintChannels();
+        paint();
+    } catch (e) {
+        said(e.message, 'warn');
+    }
+}
+
+async function disconnect(platform, said) {
+    try {
+        await callFn('soc-connect', { platform, forget: true });
+        delete creds[platform];
+        status(platform + ' is disconnected. Its token is gone, not disabled.', 'good');
+        paintChannels();
+        paint();
+    } catch (e) {
+        said(e.message, 'warn');
+    }
+}
+
+/* How long a token has, in the words you would use about it. Null means it does not expire,
+   which is true of a Bluesky app password and a Facebook System User token - they are revoked
+   instead, and nothing here can see that coming. */
+function credLife(row) {
+    if (!row.expires_at) return { text: 'Does not expire.', tone: 'on' };
+    const days = Math.floor((new Date(row.expires_at).getTime() - Date.now()) / 864e5);
+    if (days < 0) return { text: 'Expired. Enter a new one.', tone: 'warn' };
+    if (days <= 7) {
+        return { text: days + ' day' + (days === 1 ? '' : 's') + ' left - publish something'
+            + ' and it renews itself, or enter a new token.', tone: 'warn' };
+    }
+    return { text: days + ' days left, renewed automatically when it publishes.', tone: 'on' };
 }
 
 async function setMethod(platform, method) {
@@ -969,52 +1100,138 @@ async function setMethod(platform, method) {
         PASTE: 'the words go to the clipboard and its page opens, for you to paste.',
         API: 'it will be published to outright, no tab, no pressing.',
     }[method], 'good');
-    paintMethods();
+    paintChannels();
     /* The POST tab's buttons are built out of this, so they change with it. */
     paint();
 }
 
-/* The chooser, added to each account tile on SETTINGS. The tiles are static markup - one
-   per account, with the platform's name in .plat - so this reads the name off the tile
-   rather than keeping a second list of them in step with the first. */
-function paintMethods() {
+/* Everything the SETTINGS tab decides, added to each account tile: whether we post there, how,
+   and the credential if the how needs one. The tiles are static markup - one per account, with
+   the platform's name in .plat - so this reads the name off the tile rather than keeping a
+   second list of platforms in step with the first. */
+function paintChannels() {
     document.querySelectorAll('#paneSettings .social').forEach((tile) => {
         const head = tile.querySelector('.plat');
         const name = ((head && head.textContent) || '').trim();
         const can = PUBLISH[name];
         if (!can) return;
 
-        tile.querySelectorAll('.method, .methodnote').forEach((old) => old.remove());
+        tile.querySelectorAll('.onoff, .method, .cred, .methodnote').forEach((o) => o.remove());
 
-        const on = can.methods;
-        const now = methodFor(name);
+        const live = can.methods.length > 0;
+        const on = isOn(name);
 
-        /* Only where there is a choice to make. One method is a fact about the platform
-           rather than a decision, and a lone button you cannot press reads as broken - so
-           that case goes in the note's heading instead. */
-        if (on.length > 1) {
-            const row = document.createElement('div');
-            row.className = 'method';
-            on.forEach((key) => {
-                const b = document.createElement('button');
-                b.type = 'button';
-                b.className = 'mbtn' + (now === key ? ' on' : '');
-                b.textContent = METHOD[key].label;
-                b.onclick = () => { if (methodFor(name) !== key) setMethod(name, key); };
-                row.appendChild(b);
-            });
-            tile.appendChild(row);
+        /* The checkbox, wherever there is anything to post. A platform with no way in at all
+           does not get one: unchecking something that was never offered is not a choice. */
+        if (live) {
+            const label = document.createElement('label');
+            label.className = 'onoff' + (on ? '' : ' off');
+            const box = document.createElement('input');
+            box.type = 'checkbox';
+            box.checked = on;
+            box.onchange = () => setEnabled(name, box.checked);
+            label.append(box, document.createTextNode(on ? 'Posting here' : 'Not posting here'));
+            tile.appendChild(label);
+        }
+
+        /* Off, the tile keeps its note and nothing else. How to post somewhere we are not
+           posting is not a question, and a chooser left sitting there would read as though it
+           still applied. */
+        if (live && on) {
+            const now = methodFor(name);
+
+            /* A chooser only where there is a choice. One method is a fact about the platform
+               rather than a decision, and a lone button you cannot press reads as broken - so
+               that case goes in the note's heading instead. */
+            if (can.methods.length > 1) {
+                const row = document.createElement('div');
+                row.className = 'method';
+                can.methods.forEach((key) => {
+                    const b = document.createElement('button');
+                    b.type = 'button';
+                    b.className = 'mbtn' + (now === key ? ' on' : '');
+                    b.textContent = METHOD[key].label;
+                    b.onclick = () => { if (methodFor(name) !== key) setMethod(name, key); };
+                    row.appendChild(b);
+                });
+                tile.appendChild(row);
+            }
+
+            /* The credential, only under Automatic - it is the only method that uses one, and a
+               token field under By hand would be asking for something for no reason. */
+            if (now === 'API' && can.creds) tile.appendChild(credBox(name, can.creds));
         }
 
         const note = document.createElement('p');
         note.className = 'how methodnote';
         const label = document.createElement('b');
-        label.textContent = on.length > 1 ? 'Posting'
-            : on.length === 1 ? METHOD[on[0]].only
-            : 'Nothing to post';
+        label.textContent = !live ? 'Nothing to post'
+            : !on ? 'Off'
+            : can.methods.length > 1 ? 'Posting'
+            : METHOD[can.methods[0]].only;
         note.append(label, document.createTextNode(can.note));
         tile.appendChild(note);
     });
+}
+
+/* The credential fields for one platform. Nothing here ever shows a token: the stored one
+   cannot be read back by this page at all, so the fields start empty and what is known about
+   the saved credential is said in words underneath it. */
+function credBox(name, fields) {
+    const box = document.createElement('div');
+    box.className = 'cred';
+
+    const line = document.createElement('p');
+    line.className = 'credsays';
+
+    const say = (text, tone) => {
+        line.textContent = text;
+        line.className = 'credsays' + (tone ? ' ' + tone : '');
+    };
+
+    const inputs = {};
+    Object.keys(fields).forEach((key) => {
+        const i = document.createElement('input');
+        i.type = key === 'token' ? 'password' : 'text';
+        i.placeholder = fields[key];
+        i.autocomplete = 'off';
+        i.spellcheck = false;
+        /* The account half is not a secret and is worth showing, so a wrong Page is something
+           you can see rather than something you find out from a post. */
+        if (key === 'account' && creds[name]) i.value = creds[name].account || '';
+        inputs[key] = i;
+        box.appendChild(i);
+    });
+
+    const row = document.createElement('div');
+    row.className = 'credrow';
+
+    const held = creds[name];
+    const save = btn(held ? 'Replace' : 'Connect', async () => {
+        const token = (inputs.token.value || '').trim();
+        if (!token) { say('Paste the token in first.', 'warn'); save.disabled = false; return; }
+        await connect(name, (inputs.account ? inputs.account.value : '').trim(), token, say);
+        /* Out of the DOM either way: a token left in a field is a token on the screen. */
+        inputs.token.value = '';
+        save.disabled = false;
+    });
+    row.appendChild(save);
+
+    if (held) {
+        row.appendChild(confirmBtn('Disconnect', 'Sure? Remove',
+            () => disconnect(name, say), 'delbtn'));
+    }
+    box.appendChild(row);
+
+    if (held) {
+        const life = credLife(held);
+        say('Connected' + (held.account ? ' as ' + held.account : '') + '. ' + life.text, life.tone);
+    } else {
+        say('No token saved. Automatic cannot publish until there is one.', 'warn');
+    }
+    box.appendChild(line);
+
+    return box;
 }
 
 function nativeUrl(row) {
@@ -1466,6 +1683,11 @@ function card(row) {
         composers(row).forEach((c) => { posts[c.id] = c; });
 
         PLATFORMS.forEach((id) => {
+            /* Unchecked on SETTINGS means not a destination, so not a button. This is the one
+               place that decides it: leaving the button out is the whole feature, and a card
+               offering nine places to post when three are in use is the thing it fixes. */
+            if (!isOn(id)) return;
+
             /* Reposting where it already lives comes before posting a link to it there,
                because it is the better move - but only within that platform's turn. It takes
                the clipboard where the platform is set to PASTE: you are about to be looking
@@ -2093,7 +2315,7 @@ async function render(user) {
     /* Before the first paint, because the POST tab's buttons are built out of it: reading it
        afterwards would draw every destination as a by-hand link and then swap them. */
     await loadMethods();
-    paintMethods();
+    paintChannels();
 
     /* The whole page either way - the tabs already show one thing at a time, which is
        all the old stripped-down capture mode was doing. A bookmarklet press just picks

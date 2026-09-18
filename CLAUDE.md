@@ -113,7 +113,9 @@ How it works now:
 
 ## Posting (the Socializer)
 
-A queued post leaves the queue one of three ways, chosen per platform on the SETTINGS tab
+Every platform has a checkbox on the SETTINGS tab (`socializer_channel.enabled`). Unchecked,
+the POST tab offers no button for it at all — that is what keeps a card down to the three
+places you actually use. Checked, it leaves the queue one of three ways, chosen per platform
 and stored in `socializer_channel.method`:
 
 - **By hand (`INTENT`)** — the platform's composer opens with our words already in the URL,
@@ -122,8 +124,31 @@ and stored in `socializer_channel.method`:
   only manual route where a composer URL will not carry text, and the only route at all for
   a platform with no composer.
 - **Automatic (`API`)** — [supabase/functions/soc-publish](supabase/functions/soc-publish/index.ts)
-  publishes it. Live for Bluesky and the Facebook **Page**. Two presses on the card, because
-  it puts words on the internet under the show's name with no undo.
+  publishes it. Live for Bluesky, Threads and the Facebook **Page**. Two presses on the card,
+  because it puts words on the internet under the show's name with no undo.
+
+### Credentials
+
+Entered on the SETTINGS tab under Automatic, not from a terminal. The page posts the token to
+[soc-connect](supabase/functions/soc-connect/index.ts), which **proves it works with the
+platform** before keeping it — so "Connected" means connected — then seals it with AES-256-GCM
+under `SOC_SECRET_KEY` and writes the ciphertext to `socializer_secret`.
+
+The sealing is what makes this safe without a service-role key, and that is the point. The
+usual shape — tokens in a table, a function with a service key to read them — would bypass
+row-level security for the whole project. Here `soc-publish` reads the row with the *caller's*
+own session, RLS applies throughout, and only the function's key opens the value. **Still no
+service-role key anywhere, and there must never be one.** See
+[_shared/secretbox.ts](supabase/functions/_shared/secretbox.ts).
+
+A token is never read back into the page: the credential field starts empty, and what is known
+about a saved one is stated in words beneath it. Disconnect deletes the row rather than
+flagging it — a token left behind with something saying to ignore it is still a token that can
+post. Changing `SOC_SECRET_KEY` while credentials are stored strands them; they are re-entered
+on the page, which is a nuisance rather than a catastrophe.
+
+Threads tokens last 60 days and `soc-publish` renews one on use when it is within a week of
+expiring, so posting once a month keeps it alive. The settings page shows the clock either way.
 
 Which of the three a platform can carry out is declared in `PUBLISH` in
 [socializer/index.html](socializer/index.html) — the table holds only the choice. A platform
