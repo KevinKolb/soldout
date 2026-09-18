@@ -5,7 +5,7 @@ once a day. The routine's prompt is one line long and points here, so these orde
 edited like any other file: change this page, commit, and the next run follows the new
 version.
 
-Manage the routine itself at <https://claude.ai/code/routines>.
+Manage the routine itself at <https://claude.ai/code/routines/trig_01TwjWSP2bjnhptQgtg7DcQa>.
 
 ## What the job is
 
@@ -104,7 +104,7 @@ candidates somewhere else instead.
 | Column | What goes in it |
 |---|---|
 | `headline` | The post's OWN words - its title, or the line it leads with. Quote it, never write it. Empty if the post has no text of its own. |
-| `why` | One sentence, YOUR words. What the joke is. This is the line a human reads down, and it is never the post's own text handed back. |
+| `why` | **The caption we would post with it.** Not a note about it - the actual line, ready to go out. See "How the caption has to sound" below. Never the post's own words handed back; those are `headline`. |
 | `post_url` | The confirmed permalink. |
 | `post_key` | The dedupe key, derived from the URL - see below. Unique, so a repeat is rejected by the database rather than by your judgement. |
 | `author` | Who posted it, `@name`. Empty if the source has no handle. |
@@ -234,17 +234,48 @@ reads the row sees the joke rather than a description of it. Leave it empty rath
 guessing: a wrong picture is worse than none, and a URL you did not read out of that
 page's own head is a guess.
 
+## How the caption has to sound
+
+`why` goes out. When somebody presses *Post on X* or *Post on Bluesky*, the composer opens
+with that exact text already in it and the link underneath. It is not a note to a human
+about your reasoning, and a sentence explaining which criterion a post hits reads, when
+published, like a bot talking about its own homework.
+
+So write the line, not the reason for the line.
+
+**It sounds like SOLD OUT! Comedy**, which is a consignment theater show: improvisers doing
+scenes with whatever junk the audience dragged in to sell. Dry, quick, plays it straight,
+and never laughs at its own joke.
+
+| Don't | Do |
+|---|---|
+| Found-object criterion - a Bob Ross mug paired with a Bob Ross coloring book on a thrift store shelf. | Somebody at this Goodwill is running a tribute act. |
+| Selling criterion - a real novelty listing for an urn-shaped jar labelled 'Ashes of Ex'. | Priced to move. |
+| This is hilarious, a marketplace seller's own haggling tactic backfiring on camera. | Every negotiation is a one-act play and this man is losing. |
+
+The rules under it:
+
+- **One line.** Two at the outside. It sits above a link, not in front of an audience.
+- **Never explain the joke**, point at it, or say that it is funny. No "I can't", no "this
+  sent me", no "wait for it".
+- **Never mention the criteria, the queue, the bot, or yourself.** Nobody reading it knows
+  any of that exists.
+- **Do not restate the post.** The picture and the link are right there. Say the thing the
+  post left unsaid.
+- **No hashtags.** An emoji only if the line genuinely does not work without one.
+- Write it so it could go out untouched. A human will often improve it, and often will not.
+
 ## Step 6 - add them to the queue
 
 One `soc_nominate` call per candidate.
 
 - Strip tracking parameters (`utm_*`, `fbclid`, `igshid`, `si`, `ref`, and the like) from
   every URL before it goes in **p_post_url**, and before you derive **p_post_key** from it.
-- **p_headline** is *theirs* and **p_why** is *yours*, and the two are never the same
-  string. The headline is quoted off the post: its title, or the line it leads with. The
-  why is your sentence - what the joke is, and which criterion it hits. If you find the
-  post's own words going into **p_why**, they belong in **p_headline**, and the why is
-  still unwritten.
+- **p_headline** is *theirs* and **p_why** is *ours*, and the two are never the same
+  string. The headline is quoted off the post: its title, or the line it leads with.
+  **p_why is the caption**, written to go out as it stands - see below. If you find the
+  post's own words going into **p_why**, they belong in **p_headline**, and the caption
+  is still unwritten.
 - Count `"added"` and `"duplicate"` separately. The first is the number for the
   notification; the second is worth a line in your run notes and nothing more.
 - There is nothing else you can do to this table. Editing a row, overturning a ruling and

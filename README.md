@@ -59,7 +59,7 @@ needs `status`, which the original never had.
 Standing orders are [tools/socializer-bot.md](tools/socializer-bot.md), not the routine's
 prompt: the prompt is one line and points at that file, so the orders can be changed by
 committing. That file holds what qualifies, the **Popular sources** worth watching, and the
-fields of a row. Manage the routine at <https://claude.ai/code/routines>.
+fields of a row. Manage the routine at <https://claude.ai/code/routines/trig_01TwjWSP2bjnhptQgtg7DcQa>.
 
 ## Local development
 
