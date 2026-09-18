@@ -466,18 +466,26 @@
                     <ol class="steps">
                         <li>Open <b>Shortcuts</b>, press <b>+</b>, and name it FUNNY.</li>
                         <li>In its settings turn on <b>Show in Share Sheet</b>. Under Accepted
-                            Types leave only <b>URLs</b> and <b>Safari web pages</b> on, or it
-                            offers itself for photos and text as well.</li>
+                            Types leave <b>URLs</b>, <b>Safari web pages</b> and <b>Text</b> on,
+                            and turn the rest off. Text matters: Instagram and TikTok often share
+                            a line of text with the link inside it, and a shortcut that refuses
+                            text never appears in their share sheets at all.</li>
+                        <li>Add <b>Get URLs from Input</b>, with Shortcut Input as its input.
+                            Whatever shape the share arrived in, this hands on a bare link, and
+                            a bare link is the only thing the queue accepts.</li>
                         <li>Add <b>Ask for Input</b>, question: <i>Your two cents?</i> - you have
                             the joke in your head now, and there is no way to write it later.</li>
                         <li>Add <b>Get Contents of URL</b> with the address below. Set Method to
                             <b>POST</b>. Add two headers: <code>apikey</code> with the key below,
                             and <code>Content-Type</code> set to <code>application/json</code>.</li>
-                        <li>Set Request Body to <b>JSON</b> with two fields:
-                            <code>p_post_url</code> = Shortcut Input, and
+                        <li>Set Request Body to <b>JSON</b> with two fields, both of type
+                            <b>Text</b>: <code>p_post_url</code> = <b>URLs</b> (the result of Get
+                            URLs from Input, not Shortcut Input), and
                             <code>p_why</code> = Provided Input.</li>
                         <li>Add <b>Show Notification</b> showing the Contents of URL, so you get
-                            back <i>added</i> or <i>duplicate</i> and know it landed.</li>
+                            back <i>added</i> or <i>duplicate</i> and know it landed. If it shows
+                            <i>post_url must start with http</i> instead, the link never reached
+                            the body: check the step above.</li>
                     </ol>
                     <code class="line" id="iosUrlLine">https://tjteeqofqozmncfoiofy.supabase.co/rest/v1/rpc/soc_file</code>
                     <button id="iosUrlCopy" class="ghost" type="button">Copy the address</button>
@@ -486,8 +494,11 @@
                     <p>The key is the publishable one, already committed in this site and readable
                        by anyone who views source. It can file a candidate and do nothing else:
                        not read the queue, not rule on one, not delete.</p>
-                    <p>The first time you use it, scroll to the end of the share sheet and press
-                       <b>Edit Actions</b> to pin FUNNY near the top. After that it is one tap.</p>
+                    <p>The first time you run it, iOS asks whether FUNNY may send data to
+                       supabase.co. Press <b>Always Allow</b>: anything else stops the shortcut
+                       dead, with no notification to say so. Then scroll to the end of the share
+                       sheet and press <b>Edit Actions</b> to pin FUNNY near the top. After that
+                       it is one tap.</p>
                 </div>
 
                 <div class="how" data-how="android" hidden>
