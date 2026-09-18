@@ -903,7 +903,7 @@ const TABS = [
     },
     { key: 'NEW',   label: 'Candidates', bin: true, empty: 'Your work here is done!' },
     {
-        key: 'SKIPPED', label: 'Archive', bin: true, tone: 'skip',
+        key: 'SKIPPED', label: 'Archive', bin: true, tone: 'skip', slug: 'archive',
         /* Everything no longer in play: the ones you passed on, and the ones that have
            been and gone. A tab's key is its own status; `holds` is for the ones that
            gather up more than one. */
@@ -984,8 +984,47 @@ function paintTabs() {
 
 /* One pane at a time. The queue pane answers for all four bins; ADD and SETTINGS
    have a pane each. */
+/* Which tab the address bar is pointing at, or '' if it is not pointing at one.
+ *
+ * The hash rather than a query parameter, because the query string is already spoken for:
+ * the funny button arrives on ?u=, Supabase hands a session back on ?code=, and prefill()
+ * clears the whole of it when it is done. A key has to be one we know - the hash is also
+ * where an implicit-flow sign-in would put its tokens, and #access_token is not a tab.
+ * Each tab's slug is its key lowercased unless it carries one of its own, which only
+ * ARCHIVE does - a link should say what the tab on screen says, and that tab's key is the
+ * status it holds rather than the word above it. */
+function slugOf(t) {
+    return t.slug || t.key.toLowerCase();
+}
+
+function hashNow() {
+    return location.hash.replace(/^#/, '').toLowerCase();
+}
+
+function tabFromHash() {
+    const want = hashNow();
+    if (!want) return '';
+    /* The slug first, then the bare key, so #skipped still opens the ARCHIVE tab: that is
+       the status's own name, and it is what a link saved before the tab had a slug says. */
+    const hit = TABS.find((t) => slugOf(t) === want)
+        || TABS.find((t) => t.key.toLowerCase() === want);
+    return hit ? hit.key : '';
+}
+
 function show(key) {
     tab = key;
+
+    /* So a refresh comes back to the tab you were on rather than to CANDIDATES, and so a
+       link to one tab is a thing you can send. replaceState, not pushState: the tabs are
+       one page showing one thing at a time, and making each glance at one its own history
+       entry would turn Back into an undo for looking around. */
+    const def = TABS.find((t) => t.key === key);
+    const slug = def ? slugOf(def) : key.toLowerCase();
+    if (hashNow() !== slug) {
+        const at = new URL(location.href);
+        at.hash = slug;
+        history.replaceState(history.state, '', at);
+    }
     $('paneAdd').hidden = key !== 'ADD';
     $('paneSettings').hidden = key !== 'SETTINGS';
     $('paneQueue').hidden = !isBin(key);
@@ -1768,8 +1807,9 @@ function render(user) {
 
     /* The whole page either way - the tabs already show one thing at a time, which is
        all the old stripped-down capture mode was doing. A bookmarklet press just picks
-       which tab you land on. */
-    show(CAPTURE ? 'ADD' : 'NEW');
+       which tab you land on, and it outranks the hash: pressing the funny button says
+       what you want more recently than the address bar does. */
+    show(CAPTURE ? 'ADD' : (tabFromHash() || 'NEW'));
 
     /* Filling the form comes after showing it. A throw in here used to leave every pane
        hidden and the page blank, which looks like a dead site rather than a bad link. */
@@ -1781,6 +1821,13 @@ function render(user) {
 
     load();
 }
+
+/* Typing a tab into the address bar, or reaching one with Back from wherever the hash
+   last changed for another reason. show()'s own replaceState never fires this. */
+addEventListener('hashchange', () => {
+    const want = tabFromHash();
+    if (want && want !== tab) show(want);
+});
 
 render(await currentUser());
 </script>
