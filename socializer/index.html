@@ -372,14 +372,16 @@
         /* How this platform gets posted to, on the tile for the account it posts to. Two
            buttons rather than a menu: there are two answers and both are worth seeing at
            once, since the whole point is that they are a choice. */
-        .social .method { display: flex; margin-top: 9px; border: 2px solid #000; }
+        /* Separate buttons with a gap rather than one segmented bar: three of them do not
+           fit across a 235px tile without wrapping, and a wrapped segment leaves its shared
+           border hanging in the air. Each carrying its own border wraps cleanly. */
+        .social .method { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
         .social .mbtn {
-            flex: 1; border: 0; padding: 6px 4px; font-size: 11px; font-weight: 700;
-            letter-spacing: 0.5px; text-transform: uppercase; background: #fff; color: #000;
+            flex: 1 1 auto; border: 2px solid #000; padding: 5px 6px; font-size: 10px;
+            font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+            white-space: nowrap; background: #fff; color: #000;
         }
-        .social .mbtn + .mbtn { border-left: 2px solid #000; }
         .social .mbtn.on { background: #000; color: #fff; }
-        .social .mbtn:disabled { color: #c4c4c4; cursor: not-allowed; opacity: 1; }
         .social .mbtn:not(:disabled):not(.on):hover { background: #ffd93d; }
 
         @media (max-width: 620px) {
@@ -872,41 +874,69 @@ const PLATFORMS = ['X', 'Bluesky', 'Threads', 'Facebook', 'Reddit', 'Instagram',
  *   api: 'soon'   the platform allows it; the function does not do it yet.
  *   api: false    the platform will not allow it, and `note` says why.
  */
-const PUBLISH = {
-    Bluesky: { api: 'live',
-        note: 'An app password from bsky.app, and that is all - no review, no cost.' },
-    Facebook: { api: 'live',
-        note: 'Publishes as the PAGE. Nothing can post to a personal profile: Facebook'
-            + ' withdrew that in 2018 and never replaced it.' },
-    Threads: { api: 'soon',
-        note: 'The Threads API can publish. Not wired up here yet.' },
-    Instagram: { api: 'soon',
-        note: 'A Business or Creator account can publish, but only with a picture -'
-            + ' Instagram takes no text-only post, and caption links are not clickable.' },
-    X: { api: 'soon',
-        note: 'Publishing needs a paid API tier. The free one cannot post often enough'
-            + ' to be worth the wiring.' },
-    Reddit: { api: 'soon',
-        note: 'The API can publish. Automated self-promotion is how accounts get banned,'
-            + ' so this one wants a human more than the others do.' },
-    TikTok: { api: false,
-        note: 'Its posting API is video only and needs an audit to leave sandbox.' },
-    YouTube: { api: false,
-        note: 'Video uploads only. There is nothing in this queue it would take.' },
-    Whatnot: { api: false, note: 'No public API. By hand is the only way in.' },
-    Poshmark: { api: false, note: 'No public API. By hand is the only way in.' },
+const METHOD = {
+    INTENT: { label: 'By hand', only: 'By hand only' },
+    PASTE: { label: 'Paste', only: 'Paste only' },
+    API: { label: 'Automatic', only: 'Automatic only' },
 };
 
-/* platform -> 'INTENT' | 'API', as the socializer_channel table has it. Empty until the
-   first read, and empty reads as INTENT, so the page works before the migration is run. */
+/* `methods` is what the SETTINGS tab offers for that platform, in order, and the first one
+   is what it does until somebody chooses otherwise. A platform only lists a method it can
+   actually carry out:
+ *
+ *   INTENT  its composer takes our words in the URL. Facebook's does not, which is the
+ *           whole reason PASTE exists, so Facebook does not offer INTENT - opening the
+ *           sharer with the words dropped is not a way of posting them.
+ *   PASTE   there is somewhere to open and our words go to the clipboard on the way.
+ *           The only manual route for anything with no composer at all.
+ *   API     soc-publish can publish there TODAY. Not "the platform allows it" - a switch
+ *           that turns on nothing is worse than no switch.
+ *
+ * `api` is separately what the platform would allow, which is what the note talks about.
+ * The two differ on purpose: X allows publishing and we have not wired it, and saying so is
+ * more use than hiding it.
+ */
+const PUBLISH = {
+    Bluesky: { methods: ['INTENT', 'PASTE', 'API'], api: 'live',
+        note: 'An app password from bsky.app, and that is all - no review, no cost.' },
+    Facebook: { methods: ['PASTE', 'API'], api: 'live',
+        note: 'Automatic publishes as the PAGE. Nothing can post to a personal profile,'
+            + ' and no composer URL will carry our words - hence Paste.' },
+    Threads: { methods: ['INTENT', 'PASTE'], api: 'soon',
+            note: 'The Threads API can publish. Not wired up here yet.' },
+    Instagram: { methods: ['PASTE'], api: 'soon',
+        note: 'No composer URL at all, so Paste is the only way by hand. A Business or'
+            + ' Creator account can publish, but only with a picture.' },
+    X: { methods: ['INTENT', 'PASTE'], api: 'soon',
+        note: 'Publishing needs a paid API tier. The free one cannot post often enough'
+            + ' to be worth the wiring.' },
+    Reddit: { methods: ['INTENT', 'PASTE'], api: 'soon',
+        note: 'The API can publish. Automated self-promotion is how accounts get banned,'
+            + ' so this one wants a human more than the others do.' },
+    TikTok: { methods: ['PASTE'], api: false,
+        note: 'Its posting API is video only and needs an audit to leave sandbox.' },
+    YouTube: { methods: [], api: false,
+        note: 'Video uploads only. There is nothing in this queue it would take.' },
+    Whatnot: { methods: [], api: false,
+        note: 'No public API and nothing in this queue goes there.' },
+    Poshmark: { methods: [], api: false,
+        note: 'No public API and nothing in this queue goes there.' },
+};
+
+/* platform -> 'INTENT' | 'PASTE' | 'API', as the socializer_channel table has it. Empty
+   until the first read, and empty means each platform's own default, so the page works
+   before the migration is run. */
 let methods = {};
 
-/* The method actually in force. A platform set to API that this page cannot publish to yet
-   still posts by hand, so a half-finished platform cannot strand a card behind a button
-   that does nothing. */
+/* The method actually in force, which is not always the one stored: a platform that stops
+   offering a method - because it was wired up and then was not, or because this list
+   changed under a row - falls back to its first. Nothing should be able to strand a card
+   behind a button that does nothing. */
 function methodFor(id) {
-    const can = PUBLISH[id] && PUBLISH[id].api === 'live';
-    return can && methods[id] === 'API' ? 'API' : 'INTENT';
+    const def = PUBLISH[id];
+    if (!def || !def.methods.length) return 'INTENT';
+    const want = methods[id];
+    return def.methods.includes(want) ? want : def.methods[0];
 }
 
 async function loadMethods() {
@@ -934,9 +964,11 @@ async function setMethod(platform, method) {
         return;
     }
     methods[platform] = method;
-    status(method === 'API'
-        ? platform + ' will be published to outright from now on.'
-        : platform + ' will open its own composer again.', 'good');
+    status(platform + ': ' + {
+        INTENT: 'its composer will open with the words already in it.',
+        PASTE: 'the words go to the clipboard and its page opens, for you to paste.',
+        API: 'it will be published to outright, no tab, no pressing.',
+    }[method], 'good');
     paintMethods();
     /* The POST tab's buttons are built out of this, so they change with it. */
     paint();
@@ -954,18 +986,21 @@ function paintMethods() {
 
         tile.querySelectorAll('.method, .methodnote').forEach((old) => old.remove());
 
-        const live = can.api === 'live';
+        const on = can.methods;
         const now = methodFor(name);
 
-        if (live) {
+        /* Only where there is a choice to make. One method is a fact about the platform
+           rather than a decision, and a lone button you cannot press reads as broken - so
+           that case goes in the note's heading instead. */
+        if (on.length > 1) {
             const row = document.createElement('div');
             row.className = 'method';
-            [['INTENT', 'By hand'], ['API', 'Automatic']].forEach((pair) => {
+            on.forEach((key) => {
                 const b = document.createElement('button');
                 b.type = 'button';
-                b.className = 'mbtn' + (now === pair[0] ? ' on' : '');
-                b.textContent = pair[1];
-                b.onclick = () => { if (now !== pair[0]) setMethod(name, pair[0]); };
+                b.className = 'mbtn' + (now === key ? ' on' : '');
+                b.textContent = METHOD[key].label;
+                b.onclick = () => { if (methodFor(name) !== key) setMethod(name, key); };
                 row.appendChild(b);
             });
             tile.appendChild(row);
@@ -974,7 +1009,9 @@ function paintMethods() {
         const note = document.createElement('p');
         note.className = 'how methodnote';
         const label = document.createElement('b');
-        label.textContent = live ? 'Posting' : 'By hand only';
+        label.textContent = on.length > 1 ? 'Posting'
+            : on.length === 1 ? METHOD[on[0]].only
+            : 'Nothing to post';
         note.append(label, document.createTextNode(can.note));
         tile.appendChild(note);
     });
@@ -999,10 +1036,9 @@ function composers(row) {
         /* No text on this one, because there is no parameter left that carries it. The
            quote= that sharer.php used to honour is ignored, and what Facebook shows is
            read from the Open Graph tags of the page being shared - somebody else's post,
-           whose tags are not ours to write. `paste` is how the two cents get there
-           instead: on the clipboard, ready for What's on your mind?. */
-        { id: 'Facebook', url: 'https://www.facebook.com/sharer/sharer.php?u=' + e(u),
-          paste: true },
+           whose tags are not ours to write. Which is why Facebook offers no INTENT in
+           PUBLISH above: the clipboard is the only way our words reach the box. */
+        { id: 'Facebook', url: 'https://www.facebook.com/sharer/sharer.php?u=' + e(u) },
         { id: 'Reddit',   url: 'https://www.reddit.com/submit?url=' + e(u) + '&title=' + e(t) },
     ];
 }
@@ -1431,14 +1467,22 @@ function card(row) {
 
         PLATFORMS.forEach((id) => {
             /* Reposting where it already lives comes before posting a link to it there,
-               because it is the better move - but only within that platform's turn. */
-            if (id === row.source && native) dest('Repost on ' + id, nativeUrl(row), id);
+               because it is the better move - but only within that platform's turn. It takes
+               the clipboard where the platform is set to PASTE: you are about to be looking
+               at a box to type in either way. Never the API, which publishes our own post
+               and is not what reposting someone else's means. */
+            if (id === row.source && native) {
+                dest('Repost on ' + id, nativeUrl(row), id, methodFor(id) === 'PASTE');
+            }
             if (!posts[id]) return;
 
-            /* Which of the two a platform gets is the SETTINGS tab's business, per platform.
-               The card only asks. */
-            if (methodFor(id) === 'API') auto('Publish to ' + id, id);
-            else dest('Post on ' + id, posts[id].url, id, posts[id].paste);
+            /* Which of the three a platform gets is the SETTINGS tab's business. The card
+               only asks - and the label says which, because a button that posts outright
+               and a button that opens a tab should not read the same. */
+            const how = methodFor(id);
+            if (how === 'API') auto('Publish to ' + id, id);
+            else if (how === 'PASTE') dest('Paste on ' + id, posts[id].url, id, true);
+            else dest('Post on ' + id, posts[id].url, id, false);
         });
     }
 

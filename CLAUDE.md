@@ -113,16 +113,24 @@ How it works now:
 
 ## Posting (the Socializer)
 
-A queued post leaves the queue one of two ways, chosen per platform on the SETTINGS tab and
-stored in `socializer_channel.method`:
+A queued post leaves the queue one of three ways, chosen per platform on the SETTINGS tab
+and stored in `socializer_channel.method`:
 
-- **By hand (`INTENT`)** — the platform's own composer opens in a tab with our words already
-  in it, and a human presses their Post button. Every platform has one, it needs no
-  credentials, and it is the default. It stays the fallback: some platforms will never offer
-  anything better.
+- **By hand (`INTENT`)** — the platform's composer opens with our words already in the URL,
+  and a human presses their Post button. Needs no credentials and cannot half-work.
+- **Paste (`PASTE`)** — our words go to the clipboard, the destination opens, you paste. The
+  only manual route where a composer URL will not carry text, and the only route at all for
+  a platform with no composer.
 - **Automatic (`API`)** — [supabase/functions/soc-publish](supabase/functions/soc-publish/index.ts)
   publishes it. Live for Bluesky and the Facebook **Page**. Two presses on the card, because
   it puts words on the internet under the show's name with no undo.
+
+Which of the three a platform can carry out is declared in `PUBLISH` in
+[socializer/index.html](socializer/index.html) — the table holds only the choice. A platform
+lists `API` there when `soc-publish` can publish to it **today**, not when the platform would
+allow it; a switch that turns on nothing is worse than no switch. A stored method the
+platform no longer offers falls back to one it does, so nothing strands a card behind a dead
+button.
 
 Facts worth not rediscovering:
 

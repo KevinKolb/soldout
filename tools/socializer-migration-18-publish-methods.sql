@@ -1,35 +1,55 @@
 -- How each platform gets posted to, chosen per platform on the SETTINGS tab.
 --
--- Until now there was one way out of the queue: open the platform's composer in a tab with
--- our words already in it, and press their Post button by hand. That is INTENT below, and
--- it is the only route some platforms will ever offer.
+-- There are three ways out of the queue, and the SETTINGS tab picks one per platform:
 --
--- API is us publishing outright, from supabase/functions/soc-publish. It is the one that
--- makes this an app rather than a set of bookmarks, and it is not available everywhere:
--- Facebook will publish as a Page but never as a person, Instagram refuses a post with no
--- picture, X wants a paid tier. So the choice is per platform and it is a choice - INTENT
--- stays correct, and stays the default, because it needs no credentials and cannot fail in
--- a way that leaves you wondering whether something went out.
+--   INTENT  open the platform's composer with our words already in the URL, and press
+--           their Post button. Free, needs no credentials, cannot half-work.
+--   PASTE   put our words on the clipboard, open the destination, paste them in. This is
+--           the only manual route where a composer URL will not carry text - Facebook
+--           ignores the quote= parameter it used to honour - and the only one at all for a
+--           platform with no composer URL, like Instagram.
+--   API     supabase/functions/soc-publish publishes it outright. Needs a credential per
+--           platform, and is not available everywhere: Facebook publishes as a Page but
+--           never as a person, Instagram refuses a post with no picture, X wants a paid
+--           tier.
 --
--- Run once in the Supabase SQL editor.
+-- Which of the three each platform can actually carry out is declared in the page, in
+-- PUBLISH. This table holds only the choice, so a platform that stops offering a method
+-- falls back to one it does rather than stranding a card behind a dead button.
+--
+-- Run once in the Supabase SQL editor. Safe to run again: the constraint is dropped and
+-- re-added rather than declared inline, so an earlier run that only knew INTENT and API
+-- gets PASTE from a second one.
 
 create table if not exists public.socializer_channel (
     platform   text primary key
                check (platform in ('X', 'Bluesky', 'Threads', 'Facebook',
                                    'Reddit', 'Instagram', 'TikTok')),
-
-    -- INTENT: open their composer, press their button. API: soc-publish does it.
-    method     text        not null default 'INTENT'
-               check (method in ('INTENT', 'API')),
-
+    method     text        not null default 'INTENT',
     updated_at timestamptz not null default now()
 );
 
--- Every platform the POST tab can offer a button for, all starting where they are today.
--- A platform missing from this table reads as INTENT anyway, so this is a convenience for
--- the settings page rather than something the queue depends on.
-insert into public.socializer_channel (platform)
-values ('X'), ('Bluesky'), ('Threads'), ('Facebook'), ('Reddit'), ('Instagram'), ('TikTok')
+-- Out here rather than inline, so re-running this file widens it. `create table if not
+-- exists` would skip a changed inline check silently and leave the page unable to save a
+-- method the table has never heard of.
+alter table public.socializer_channel
+    drop constraint if exists socializer_channel_method_check;
+
+alter table public.socializer_channel
+    add constraint socializer_channel_method_check
+    check (method in ('INTENT', 'PASTE', 'API'));
+
+-- Every platform the POST tab can offer a button for, each starting on the method it
+-- already behaved as. Facebook starts on PASTE because INTENT was never a real option
+-- there - its composer drops our words, which is the reason PASTE exists.
+--
+-- do nothing on conflict: a choice already made is not this file's to overwrite. A platform
+-- missing from the table falls back to its first method in PUBLISH anyway, so this is a
+-- convenience for the settings page rather than something the queue depends on.
+insert into public.socializer_channel (platform, method)
+values ('X', 'INTENT'), ('Bluesky', 'INTENT'), ('Threads', 'INTENT'),
+       ('Facebook', 'PASTE'), ('Reddit', 'INTENT'),
+       ('Instagram', 'PASTE'), ('TikTok', 'PASTE')
 on conflict (platform) do nothing;
 
 alter table public.socializer_channel enable row level security;
