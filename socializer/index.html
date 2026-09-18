@@ -117,9 +117,12 @@
             border: 2px solid #000; padding: 16px 18px; margin-bottom: 14px;
             display: flex; gap: 18px;
         }
-        /* The card is the link. The button that used to be is gone. */
+        /* The card is the link. The button that used to be is gone. No hover tint,
+           because the card already has one and a second would fight it. */
         .card.open { cursor: pointer; }
-        .card.open:hover { background: #fcfcfc; }
+
+        .card.tone-post { background: #d9f7e3; }
+        .card.tone-skip { background: #ffd9d6; }
         /* min-width:0 on the words, so a long URL wraps rather than shoving the button
            column off the card. The column itself never gives ground. */
         .card .main { flex: 1; min-width: 0; }
@@ -134,6 +137,7 @@
            The same two colours the LIKE / HIDE toggle already pairs - out of the queue in
            red, back into it in green - so the palette says the same thing in both places. */
         .card.left-skip.arm-left   { box-shadow: inset -10px 0 0 #ff6b6b; }
+        .card.left-delete.arm-left { box-shadow: inset -10px 0 0 #c0392b; }
         .card.right-post.arm-right { box-shadow: inset  10px 0 0 #5ce08a; }
 
         /* Each button wears the colour of the tab it sends the card to, which is the
@@ -144,13 +148,19 @@
         .skipbtn:hover:not(:disabled) { background: #000; color: #ff6b6b; }
         .postbtn { background: #5ce08a; color: #000; }
         .postbtn:hover:not(:disabled) { background: #000; color: #5ce08a; }
+        /* The same red as SKIP and as the ARCHIVE tab. Both buttons send a card to the
+           same place, so both wear the colour of the place. */
+        .donebtn { background: #ff6b6b; color: #000; }
+        .donebtn:hover:not(:disabled) { background: #000; color: #ff6b6b; }
 
-        /* Asking wears a darker red than offering, so an armed button does not look
-           like the one you meant to press. */
-        .delbtn { background: #ff6b6b; color: #000; }
-        .delbtn:hover:not(:disabled) { background: #000; color: #ff6b6b; }
-        .delbtn.armed { background: #c0392b; color: #fff; }
-        .delbtn.armed:hover:not(:disabled) { background: #000; color: #fff; }
+        /* The deep red, matching the band a card wears as you swipe it away - the two
+           do the same thing, so they are the same colour. Armed goes black with red
+           lettering rather than a redder red: the second press has to look like a
+           different button, not a louder one. */
+        .delbtn { background: #c0392b; color: #fff; }
+        .delbtn:hover:not(:disabled) { background: #000; color: #fff; }
+        .delbtn.armed { background: #000; color: #ff6b6b; }
+        .delbtn.armed:hover:not(:disabled) { background: #ff6b6b; color: #000; }
         /* One plain line for who, where and when. */
         .card .head {
             font-size: 12px; color: #777; margin-bottom: 8px; overflow-wrap: anywhere;
@@ -166,7 +176,7 @@
             outline: 0; cursor: text;
         }
         .card .why:empty::before { content: attr(data-placeholder); color: #c4c4c4; }
-        .card .why:hover { background: #f6f6f6; }
+        .card .why:hover { background: rgba(0, 0, 0, 0.05); }
         .card .why:focus { background: #fff; box-shadow: 0 0 0 2px #000; }
 
         /* The picture runs the width of the post, the way a post's picture does. Capped,
@@ -211,7 +221,20 @@
            the two halves different heights. The same selector was overriding their font
            size and padding. */
         .card .rules { display: flex; flex-direction: column; margin-top: 10px; }
-        .card .acts > .rules:first-child { margin-top: 0; }
+        /* The gap above the rules separates them from the destinations. With no
+           destinations there is nothing to separate them from, and the label above is
+           already spaced. */
+        .card .acts > .kind + .rules { margin-top: 0; }
+        .card .kind {
+            font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; color: #000;
+            border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 9px;
+        }
+        /* The tab colours, darkened until they work as lettering. The bright ones are
+           made to be read off a filled button and go weak as text on white. */
+        .card .kind-post { color: #1f9e59; }
+        .card .kind-skipped,
+        .card .kind-posted { color: #c0392b; }
         .card .acts > *, .card .rules > * { width: 100%; }
         .card .acts > .btn { text-align: center; }
         .card .acts > .btn,
@@ -222,42 +245,13 @@
         /* The toggle sits on its own line under the buttons: it is an opinion about the
            thing, not another place to send it. The pair reads as one control, so they
            share a border rather than each carrying their own. */
+        .card .facts { border-top: 2px solid #000; margin-top: 12px; padding-top: 9px; }
         /* Stated, not offered: no border, no hover, nothing to press. */
         .card .recommend {
             flex-basis: 100%; font-size: 13px; color: #666; line-height: 1.3;
         }
         .card .recommend b { color: #000; font-weight: 600; }
 
-        /* A panel that says what it is, with the chosen side filled in. Sitting in a
-           column between destination buttons and Move back, an unlabelled pair reads as
-           two more things to press; the cap makes it a setting with a current state. */
-        /* The 3px margin belongs to the whole panel, not just the cells. With it only
-           on the cells, the cap ran edge to edge while the switch beneath it sat inset,
-           and the cap read as the wider of the two. Cap, LIKE and HIDE now share one
-           left edge and one right edge. */
-        .card .hint-toggle {
-            border: 2px solid #000; background: #fff; padding: 3px;
-            margin-bottom: 10px;
-        }
-        .card .hint-toggle .cap {
-            font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
-            text-transform: uppercase; color: #fff; background: #000;
-            padding: 4px 7px; margin-bottom: 3px;
-        }
-        .card .hint-toggle .cells { display: flex; gap: 3px; }
-        /* Grey, not white: against the white margin inside the frame, an unchosen cell
-           had no edges of its own and the space under its label read as a gap in the
-           control. Both cells are cells now; one of them is lit. */
-        .hintbtn {
-            flex: 1 1 0; min-width: 0;
-            font-family: inherit; font-size: 11px; font-weight: 700;
-            letter-spacing: 1px; text-transform: uppercase;
-            padding: 9px 4px; border: 0;
-            background: #ededed; color: #8a8a8a; cursor: pointer;
-        }
-        .hintbtn:hover:not(.on) { background: #e0e0e0; color: #000; }
-        .hintbtn.on { background: #5ce08a; color: #000; }
-        .hintbtn.on:last-child { background: #ff6b6b; }
 
         .empty { border: 2px dashed #999; padding: 30px; text-align: center; color: #666; }
 
@@ -864,6 +858,15 @@ function safeUrl(u) {
     return /^https?:\/\//i.test(u || '') ? u : '';
 }
 
+/* What a card is, said once at the top of the things you can do to it. The statuses are
+   the queue's own words; these are the page's. */
+const KIND = {
+    NEW:     'Candidate',
+    POST:    'Post',
+    SKIPPED: 'Skipped',
+    POSTED:  'Archived',
+};
+
 /* Every card has a picture's worth of space whether or not it has a picture, so a
    column of them keeps one edge and the words all start in the same place. */
 function blankShot() {
@@ -891,17 +894,16 @@ const TABS = [
         hint: 'Add one by hand, or set up the funny button',
     },
     {
-        key: 'SKIPPED', label: 'Skip', bin: true, tone: 'skip',
-        empty: 'No skipped posts yet',
-        note: 'Everything you have skipped. A skip always stops the bot nominating'
-            + ' that exact link again; the toggle decides what it makes of the kind of'
-            + ' thing it was. LIKE, where every skip starts, keeps it hunting more like'
-            + ' this one. HIDE steers it clear.',
+        key: 'SKIPPED', label: 'Archive', bin: true, tone: 'skip',
+        /* Everything no longer in play: the ones you passed on, and the ones that have
+           been and gone. A tab's key is its own status; `holds` is for the ones that
+           gather up more than one. */
+        holds: ['SKIPPED', 'POSTED'],
+        empty: 'Your work here is done!',
     },
     { key: 'NEW',   label: 'Candidates', bin: true, empty: 'Your work here is done!' },
-    { key: 'POST',  label: 'Post', bin: true, tone: 'post', empty: 'Nothing waiting to go out' },
-    { key: 'POSTED',   label: 'Archive', bin: true, far: true, empty: 'No posts yet' },
-    { key: 'SETTINGS', label: 'Settings' },
+    { key: 'POST',  label: 'Post', bin: true, tone: 'post', empty: 'Your work here is done!' },
+    { key: 'SETTINGS', label: 'Settings', far: true },
 ];
 
 /* Is this tab a pile of rows, as opposed to a form or a settings page? */
@@ -916,8 +918,18 @@ let tab = 'NEW';
 let all = [];
 let loaded = false;
 
+function holdsOf(key) {
+    const def = TABS.find((t) => t.key === key);
+    return (def && def.holds) || [key];
+}
+
+function countOf(st) {
+    return all.filter((r) => !r.hidden && r.status === st).length;
+}
+
 function rowsFor(key) {
-    return all.filter((r) => !r.hidden && r.status === key);
+    const holds = holdsOf(key);
+    return all.filter((r) => !r.hidden && holds.includes(r.status));
 }
 
 async function load() {
@@ -942,10 +954,19 @@ function paintTabs() {
         /* ADD and SETTINGS are not bins. Nothing to count, and a 0 beside either would
            read as an empty queue rather than as "no number applies". */
         if (t.bin && loaded) {
+            const holds = holdsOf(t.key);
+            const counts = holds.map(countOf);
+
             const n = document.createElement('span');
             n.className = 'n';
-            n.textContent = rowsFor(t.key).length;
+            n.textContent = counts.join('/');
             b.appendChild(n);
+
+            /* Two numbers side by side and nothing saying which is which, so the labels
+               go where there is room for them. */
+            if (holds.length > 1) {
+                b.title = holds.map((st, i) => counts[i] + ' ' + st).join('/');
+            }
         }
 
         b.onclick = () => show(t.key);
@@ -1008,7 +1029,12 @@ function paint() {
 
 function card(row) {
     const el = document.createElement('div');
-    el.className = 'card';
+    /* The card wears its tab's colour, pale enough to read a paragraph off. A candidate
+       stays white: it is the one that has not been decided yet, and white is what
+       undecided looks like next to two that have. */
+    el.className = 'card'
+        + (row.status === 'POST' ? ' tone-post' : '')
+        + (row.status === 'SKIPPED' || row.status === 'POSTED' ? ' tone-skip' : '');
 
     /* Every link on this card comes from here. Empty means the row carries something
        that is not a web address, and nothing on the card becomes clickable. */
@@ -1100,6 +1126,11 @@ function card(row) {
         main.appendChild(said);
     }
 
+    /* The stated facts, under a rule: what the card says is one thing, what we know
+       about where it has been is another. */
+    const facts = document.createElement('div');
+    facts.className = 'facts';
+
     const line = (label, value) => {
         const d = document.createElement('div');
         d.className = 'recommend';
@@ -1109,26 +1140,40 @@ function card(row) {
         return d;
     };
 
-    /* A skipped candidate is not going anywhere, so the places it could have gone are a
-       record rather than an offer. Same list, stated instead of clickable. */
-    if (row.status === 'SKIPPED') {
+    /* Where this one could go, stated rather than clickable. On CANDIDATES it is part of
+       deciding - a thing with five destinations is worth more of your minute than one
+       with two. On SKIPPED it is the record of what you turned down. POST leaves it out,
+       because there the list is the buttons themselves. */
+    if (row.status === 'NEW' || row.status === 'SKIPPED') {
         const where = [...new Set((native ? [row.source] : [])
             .concat(composers(row).map((c) => c.id)))];
-        if (where.length) main.appendChild(line('Recommended for: ', where.join(', ')));
+        if (where.length) facts.appendChild(line('Recommended for: ', where.join(', ')));
     }
 
-    /* Where it actually went. Once a card has been ruled on this is its record and worth
-       stating either way, including "nowhere"; before that there is nothing to report
-       unless something has already gone out, so a waiting card stays quiet about it. */
+    /* Where it actually went, on every card. It used to be left off a waiting one, on
+       the grounds that there was nothing to report yet - but a line that appears and
+       disappears makes you check whether it is missing or the card is different. Saying
+       "none yet" costs nothing and means the cards all read the same way down. */
     const gone = row.posted_to || [];
-    if (gone.length || row.status !== 'NEW') {
-        main.appendChild(line('Posted to: ', gone.length ? gone.join(', ') : 'nowhere'));
-    }
+    const waiting = row.status === 'NEW' || row.status === 'POST';
+    facts.appendChild(line('Posted to: ',
+        gone.length ? gone.join(', ')
+        : waiting ? 'NONE YET'
+        : row.status === 'SKIPPED'
+            ? 'NONE (SKIPPED but still inspiration for the bot.)'
+            : 'NOT RECORDED'));
+
+    main.appendChild(facts);
 
     /* Everything pressable, in one column down the right: where to send it, then what to
        rule about it. Whichever kind of card this is, the buttons are in the same place. */
     const acts = document.createElement('div');
     acts.className = 'acts';
+
+    const kind = document.createElement('div');
+    kind.className = 'kind kind-' + row.status.toLowerCase();
+    kind.textContent = KIND[row.status] || row.status;
+    acts.appendChild(kind);
 
     /* Somewhere to send it is the POST tab's question, and only its question. */
     if (row.status === 'POST' && link) {
@@ -1159,29 +1204,48 @@ function card(row) {
     const rules = document.createElement('div');
     rules.className = 'rules';
 
+    /* Held out here because the swipe below shares it. */
+    let del = null;
+
     if (row.status === 'NEW') {
-        /* A skip starts as a LIKE. Skipping is usually "good, but not this one", and
-           HIDE is the stronger thing you go out of your way to say. */
-        const skip = btn('← SKIP', () => rule(row, 'SKIPPED', 'LIKE'));
+        /* SKIP is how a thing reaches the ARCHIVE tab - that tab holds skipped rows,
+           so there is no separate archiving to do. A skip starts as a LIKE: skipping is
+           usually "good, but not this one", and HIDE is the stronger thing you go out of
+           your way to say. */
+        const skip = btn('← SKIP', () => rule(row, 'SKIPPED'));
         skip.classList.add('skipbtn');
         rules.appendChild(skip);
 
         const post = btn('POST →', () => rule(row, 'POST'));
         post.classList.add('postbtn');
         rules.appendChild(post);
-    } else if (row.status === 'POSTED') {
-        const again = btn('REPEAT', () => repeat(row));
-        again.classList.add('postbtn');
-        rules.appendChild(again);
-        rules.appendChild(confirmBtn('DELETE', 'SURE? DELETE', () => hide(row)));
-    } else if (row.status === 'SKIPPED') {
-        rules.appendChild(hintToggle(row));
-        /* Straight to POST, not back to the top of the pile. You have already looked at
-           this one and changed your mind, and deciding whether it is worth it is the
-           only thing CANDIDATES was going to ask you again. */
-        const post = btn('POST →', () => rule(row, 'POST'));
-        post.classList.add('postbtn');
-        rules.appendChild(post);
+    } else if (row.status !== 'POST') {
+        if (row.status === 'SKIPPED') {
+            /* Straight to POST, not back to the top of the pile. You have already looked
+               at this one and changed your mind, and deciding whether it is worth it is
+               the only thing CANDIDATES was going to ask you again. */
+            const post = btn('POST →', () => rule(row, 'POST'));
+            post.classList.add('postbtn');
+            rules.appendChild(post);
+        } else {
+            /* Only a posted one repeats. A skipped card that you want back has POST
+               above, which moves it - copying one that never went out would leave two
+               rows for a thing that has been nowhere. */
+            const again = btn('REPEAT →', () => repeat(row));
+            again.classList.add('postbtn');
+            rules.appendChild(again);
+        }
+
+        del = confirmBtn('DELETE', 'SURE? DELETE', () => hide(row));
+        rules.appendChild(del);
+    } else {
+        /* Posted by hand, or posted from here and the destination press did not happen.
+           Either way this is the only thing that can say so - pressing a destination was
+           the only route to the archive, and there is no destination for "I did it on my
+           phone". Left, because that is where the ARCHIVE tab is, same as SKIP. */
+        const done = btn('← DONE', () => rule(row, 'POSTED'));
+        done.classList.add('donebtn');
+        rules.appendChild(done);
     }
 
     if (rules.children.length) acts.appendChild(rules);
@@ -1205,50 +1269,30 @@ function card(row) {
     if (row.status === 'NEW') {
         el.classList.add('swipe', 'left-skip', 'right-post');
         swipe(el, {
-            left:  () => rule(row, 'SKIPPED', 'LIKE'),
+            left:  () => rule(row, 'SKIPPED'),
             right: () => rule(row, 'POST'),
         });
-    } else if (row.status === 'SKIPPED') {
-        el.classList.add('swipe', 'right-post');
-        swipe(el, { right: () => rule(row, 'POST') });
+    } else if (del) {
+        /* Swiping asks the same question the button does, and gets the same four seconds
+           to answer it. The first swipe arms; the second, or a press of the button now
+           reading SURE? DELETE, goes through with it. */
+        const askThenDelete = () => {
+            if (del.isArmed()) return del.fire();
+            del.arm();
+            status('Swipe again, or press SURE? DELETE, to delete this.');
+            return false;
+        };
+
+        if (row.status === 'SKIPPED') {
+            el.classList.add('swipe', 'left-delete', 'right-post');
+            swipe(el, { left: askThenDelete, right: () => rule(row, 'POST') });
+        } else {
+            el.classList.add('swipe', 'left-delete');
+            swipe(el, { left: askThenDelete });
+        }
     }
 
     return el;
-}
-
-/* The toggle belongs to a skip and nothing else: a posted row has already said the
-   kindest thing there is to say about itself. */
-function hintToggle(row) {
-    const hint = document.createElement('div');
-    hint.className = 'hint-toggle';
-
-    const cap = document.createElement('div');
-    cap.className = 'cap';
-    cap.textContent = 'Tell the bot';
-    hint.appendChild(cap);
-
-    const cells = document.createElement('div');
-    cells.className = 'cells';
-
-    [
-        { key: 'LIKE', label: 'Like', note: 'Keep finding things like this' },
-        { key: 'HIDE', label: 'Hide', note: 'Steer away from this kind of thing' },
-    ].forEach((opt) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'hintbtn' + (row.bot_hint === opt.key ? ' on' : '');
-        b.textContent = opt.label;
-        b.title = opt.note;
-        b.onclick = async () => {
-            if (row.bot_hint === opt.key) return;
-            b.disabled = true;
-            await setHint(row, opt.key);
-        };
-        cells.appendChild(b);
-    });
-
-    hint.appendChild(cells);
-    return hint;
 }
 
 /* Drag a card sideways to rule on it. On a candidate: left skips it, right sends it to
@@ -1310,8 +1354,9 @@ function swipe(el, moves) {
         const go = Math.abs(dx) >= COMMIT && ruling(dx);
         if (swiping && go) {
             el.style.transform = 'translateX(' + (dx < 0 ? -105 : 105) + '%)';
-            await go();
-            return;
+            /* A move that answers false has not done anything yet - it is asking first -
+               so the card comes back rather than sliding away on a promise. */
+            if (await go() !== false) return;
         }
         el.style.transform = '';
         el.classList.remove('arm-left', 'arm-right');
@@ -1330,18 +1375,16 @@ function btn(label, fn, ghost) {
     return b;
 }
 
-async function rule(row, next, hint) {
+async function rule(row, next) {
     const patch = { status: next, handled_at: new Date().toISOString() };
 
-    /* A card you have pulled back out of SKIP is work again, and its age should say when
-       it became work rather than when it was first found - otherwise it returns already
-       buried under everything newer. Keyed on where it is coming FROM, so the button and
-       the swipe cannot drift apart: they are the same ruling. */
-    if (row.status === 'SKIPPED') patch.created_at = new Date().toISOString();
-    /* Leaving a skip sets the opinion back to none, so a row that comes back to the
-       queue and gets skipped again starts the question over. */
-    if (hint !== undefined) patch.bot_hint = hint;
-    else if (next !== 'SKIPPED') patch.bot_hint = '';
+    /* A card you have pulled back out of SKIPPED and into the work is work again, and
+       its age should say when it became work rather than when it was first found -
+       otherwise it comes back already buried under everything newer. Archiving one is
+       not that, so it keeps the date it has. */
+    if (row.status === 'SKIPPED' && next === 'POST') {
+        patch.created_at = new Date().toISOString();
+    }
 
     const { error } = await supabase
         .from('socializer')
@@ -1354,15 +1397,6 @@ async function rule(row, next, hint) {
             : 'Could not save that: ' + error.message, 'err');
         return;
     }
-    load();
-}
-
-async function setHint(row, hint) {
-    const { error } = await supabase
-        .from('socializer')
-        .update({ bot_hint: hint })
-        .eq('id', row.id);
-    if (error) { status('Could not save that: ' + error.message, 'err'); return; }
     load();
 }
 
@@ -1379,15 +1413,24 @@ async function saveWhy(row, text) {
     status('Two cents saved.', 'good');
 }
 
-/* Gone from the page, still in the table. The row is what stops the bot finding this
-   post all over again, so it is hidden rather than removed - see migration 16. */
+/* Gone from the page, and gone as far as the bot is concerned.
+ *
+ * The row itself stays - nothing here has a delete policy, deliberately - but its
+ * post_key is stood down. That key is the unique index the bot collides with when it
+ * nominates something already on the table, so while a hidden row keeps it, the post can
+ * never be found again. Deleting is not skipping: a skip is a judgement worth remembering
+ * and a delete is "get this off my screen", which should not quietly bar the thing for
+ * good. The original key is kept inside the new one, so the record still says what it was.
+ *
+ * It cannot collide: id is unique, and the 'gone:' prefix keeps it clear of the '#1'
+ * numbering a repeat uses. */
 async function hide(row) {
     const { error } = await supabase
         .from('socializer')
-        .update({ hidden: true })
+        .update({ hidden: true, post_key: 'gone:' + row.id + ':' + row.post_key })
         .eq('id', row.id);
     if (error) { status('Could not delete that: ' + error.message, 'err'); return; }
-    status('Deleted. It stays in the table so the bot cannot find it again.', 'good');
+    status('Deleted.', 'good');
     load();
 }
 
@@ -1419,7 +1462,11 @@ async function repeat(row) {
 
 /* Two presses instead of a dialog. The first turns the button into the question and
    starts a clock; the second answers it. Four seconds of nothing and it goes back to
-   being a button, so a stray press cannot leave something armed behind you. */
+   being a button, so a stray press cannot leave something armed behind you.
+ *
+ * The arming is exposed rather than kept inside the click handler, because the swipe
+ * asks the same question and has to be able to see the same answer. Two ways in, one
+ * state - or a card could be armed by one of them and deleted by the other. */
 function confirmBtn(label, question, fn) {
     const b = document.createElement('button');
     b.type = 'button';
@@ -1427,22 +1474,28 @@ function confirmBtn(label, question, fn) {
     b.textContent = label;
 
     let armed = 0;
-    b.onclick = async () => {
-        if (!armed) {
-            b.textContent = question;
-            b.classList.add('armed');
-            armed = setTimeout(() => {
-                armed = 0;
-                b.textContent = label;
-                b.classList.remove('armed');
-            }, 4000);
-            return;
-        }
+
+    b.isArmed = () => !!armed;
+
+    b.arm = () => {
+        clearTimeout(armed);
+        b.textContent = question;
+        b.classList.add('armed');
+        armed = setTimeout(() => {
+            armed = 0;
+            b.textContent = label;
+            b.classList.remove('armed');
+        }, 4000);
+    };
+
+    b.fire = async () => {
         clearTimeout(armed);
         armed = 0;
         b.disabled = true;
         await fn();
     };
+
+    b.onclick = () => (armed ? b.fire() : b.arm());
     return b;
 }
 
@@ -1516,7 +1569,7 @@ $('save').onclick = async () => {
     }
 
     clearForm();
-    status('In the queue.', 'good');
+    status('Got it!', 'good');
     await load();
     if (!CAPTURE) show('NEW');
 };

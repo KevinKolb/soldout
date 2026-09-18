@@ -1,19 +1,23 @@
 -- Somewhere to put a row you want gone from the page but not gone from the table.
 --
 -- WHY A COLUMN AND NOT A DELETE. This table has never had a delete policy and should not
--- get one: "a candidate is ruled on by moving it, never by removing the evidence." There
--- is a second, harder reason now. post_key is the only thing stopping the bot nominating
--- something you have already seen, and it only works while the row exists. Delete the row
--- and the post comes back a week later as a fresh find.
---
--- So DELETE on an archived card sets this instead. The page filters hidden rows out of
--- every tab and every count; the row itself stays where it is, holding its key.
+-- get one: "a candidate is ruled on by moving it, never by removing the evidence." So
+-- DELETE on a card sets this instead. The page filters hidden rows out of every tab and
+-- every count; the row itself stays where it is.
 --
 --   hidden = false   the normal state. Nothing to see here.
---   hidden = true    gone from the page. Still deduping, still unrepostable by accident.
+--   hidden = true    gone from the page, and gone as far as the bot is concerned.
 --
--- Nothing in the page unsets it. That is deliberate: hiding is meant to be the end of a
--- thing. If you need one back, it is one update in this editor.
+-- REVISED, and worth reading if you are looking at a hidden row wondering what happened
+-- to its key. This column first shipped meaning "gone, but still deduping" - the row kept
+-- its post_key so the bot could never nominate that post again. That was the wrong call.
+-- Skipping something is a judgement worth remembering; deleting it is "get this off my
+-- screen", and it should not quietly bar the post for good. So the page now stands the
+-- key down at the same time, rewriting it to 'gone:<id>:<the old key>'. The original is
+-- still legible inside it, and the post is free to be found again.
+--
+-- Nothing in the page unsets any of this. That is deliberate: deleting is meant to be the
+-- end of a thing. If you need one back, it is one update in this editor.
 --
 -- Run once in the Supabase SQL editor.
 

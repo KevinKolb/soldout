@@ -72,20 +72,16 @@ POST https://tjteeqofqozmncfoiofy.supabase.co/rest/v1/rpc/soc_taste
   apikey: <publishable key>
 ```
 
-That returns up to 80 rows a human has ruled on, each with a `verdict`:
+That returns up to 80 rows a human has ruled on, with their `why`, `source` and
+`post_url`. Every one of them is a yes: posted, queued to post, or skipped.
 
-| verdict | What it means for you |
-|---|---|
-| `LIKE` | A yes about the kind of thing it is. Either we published it, or we liked it and did not get to it - which of the two is not your problem. Find more like it. |
-| `HIDE` | Not for us. Steer away from things of this kind. |
-
-`HIDE` is a lean, not a filter. Nobody expects you to draw a hard line around "this kind
-of thing", and you will not be wrong for nominating something that turns out to sit near
-one. Read the three together as taste and let them pull you.
+**A skipped row is not a rejection.** Skipping something is almost always "good, not this
+week" rather than "never show me this again", so it counts for exactly as much as one we
+published. There is no negative list and nothing to weigh - anything a human genuinely
+did not want is deleted, and a deleted row never reaches you.
 
 The one hard rule is the exact link, and it is not yours to enforce: every URL already on
-the table is blocked by the database, whatever its verdict, and `soc_nominate` will tell
-you so.
+the table is blocked by the database, and `soc_nominate` will tell you so.
 
 ### When it does not work
 
@@ -152,8 +148,7 @@ Call `soc_taste` first, every run.
 **It is the taste.** Read those rows for the things the criteria cannot say out loud: how
 broad or how dry the joke tends to be, whether it leans more to selling or more to found
 objects, which sources keep earning their place. Every row it returns is one a human sat
-and ruled on, and the `verdict` says which way they went: `LIKE` pulling you toward that
-kind of thing, `HIDE` pushing you off it.
+and ruled on and chose to keep, so read the lot as one long yes and let it pull you.
 
 The list starts thin. That is fine. Fall back on the criteria and do not invent a pattern
 out of two entries.
