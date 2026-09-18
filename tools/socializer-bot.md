@@ -79,7 +79,14 @@ POST https://tjteeqofqozmncfoiofy.supabase.co/rest/v1/rpc/soc_taste
 ```
 
 That returns up to 80 rows a human has ruled on, with their `why`, `source` and
-`post_url`. Every one of them is a yes: posted, queued to post, or skipped.
+`post_url`. Every one of them is a yes: posted, queued to post, or skipped. Hidden rows
+never come back from it, and they are the only rows that do not.
+
+If the reply also carries a `verdict` column, the database is still running an older
+version of that function, one that left out skipped rows unless they carried a hint.
+Ignore the column and say so in your run notes: the fix is
+[tools/socializer-migration-17-no-hints.sql](socializer-migration-17-no-hints.sql), and
+it has to be run by hand.
 
 **A skipped row is not a rejection.** Skipping something is almost always "good, not this
 week" rather than "never show me this again", so it counts for exactly as much as one we
@@ -179,9 +186,13 @@ out of two entries.
 and read the answer: `soc_nominate` returns `"duplicate"` when that `post_key` is already
 on the table, whatever status it holds - waiting, posted or skipped. That is the
 database telling you somebody has already seen this one. Drop it and say nothing more
-about it. `DELETED` rows are kept for exactly this reason: the row is gone from the
-working queue but its `post_key` still stands, so a post somebody threw out does not come
-back a week later.
+about it.
+
+A hidden row is different, on purpose. Hiding stands its `post_key` down, so a post
+somebody swept off the screen can be nominated again later. That is the page's decision,
+not yours to second-guess: a skip is a judgement worth remembering, a hide is "get this
+off my screen", and the two are kept apart so that a hide never quietly bars a thing for
+good. If the database says `"added"`, it is added.
 
 ## Step 3 - check the popular sources first
 
@@ -368,8 +379,8 @@ do; any line the poster could not defend at a dinner party.
 
 **Write three, keep one.** For every candidate, draft three different lines, then keep the
 sharpest and throw the others away. Do not average them into one. Before you write, reread
-what `soc_taste` returned: those are the lines somebody actually put their name to, and
-they are the register to match.
+what `soc_taste` returned: those are the lines a human kept, whether they went out or were
+skipped for another week, and they are the register to match.
 
 Three more in the register, for shape rather than reuse:
 
