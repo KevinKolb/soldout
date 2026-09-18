@@ -852,9 +852,29 @@ function composers(row) {
         { id: 'X',        url: 'https://x.com/intent/post?text=' + e(t) + '&url=' + e(u) },
         { id: 'Bluesky',  url: 'https://bsky.app/intent/compose?text=' + e(t + ' ' + u) },
         { id: 'Threads',  url: 'https://www.threads.net/intent/post?text=' + e(t + ' ' + u) },
-        { id: 'Facebook', url: 'https://www.facebook.com/sharer/sharer.php?u=' + e(u) },
+        /* No text on this one, because there is no parameter left that carries it. The
+           quote= that sharer.php used to honour is ignored, and what Facebook shows is
+           read from the Open Graph tags of the page being shared - somebody else's post,
+           whose tags are not ours to write. `paste` is how the two cents get there
+           instead: on the clipboard, ready for What's on your mind?. */
+        { id: 'Facebook', url: 'https://www.facebook.com/sharer/sharer.php?u=' + e(u),
+          paste: true },
         { id: 'Reddit',   url: 'https://www.reddit.com/submit?url=' + e(u) + '&title=' + e(t) },
     ];
+}
+
+/* The two cents, handed over on the clipboard for the destinations that will not take
+   them in a URL. Fired inside the press so the write happens while this page still has
+   focus - a moment later the destination's own tab has it, and the clipboard is closed to
+   a document that does not. On failure the words go in the status line, so they are still
+   somewhere you can select them from. */
+async function handOver(why) {
+    try {
+        await navigator.clipboard.writeText(why);
+        status('Your two cents are on the clipboard - paste them into the box.', 'good');
+    } catch {
+        status('Could not reach the clipboard. Your two cents, to copy by hand: ' + why, 'err');
+    }
 }
 
 /* soc_nominate refuses a post_url that is not http(s), because from now on a stranger
@@ -1224,7 +1244,7 @@ function card(row) {
 
     /* Somewhere to send it is the POST tab's question, and only its question. */
     if (row.status === 'POST' && link) {
-        const dest = (label, url, id) => {
+        const dest = (label, url, id, paste) => {
             const b = document.createElement('a');
             b.className = 'btn' + (gone.includes(id) ? ' sent' : '');
             b.href = url;
@@ -1235,18 +1255,22 @@ function card(row) {
                the destination opens over this page, and the button has to have changed
                by the time you come back to it. markSent's own repaint agrees a moment
                later, or puts it back if the save did not take. */
-            b.onclick = () => { b.classList.add('sent'); markSent(row, id); };
+            b.onclick = () => {
+                if (paste && row.why) handOver(row.why);
+                b.classList.add('sent');
+                markSent(row, id);
+            };
             acts.appendChild(b);
         };
 
         const posts = {};
-        composers(row).forEach((c) => { posts[c.id] = c.url; });
+        composers(row).forEach((c) => { posts[c.id] = c; });
 
         PLATFORMS.forEach((id) => {
             /* Reposting where it already lives comes before posting a link to it there,
                because it is the better move - but only within that platform's turn. */
             if (id === row.source && native) dest('Repost on ' + id, nativeUrl(row), id);
-            if (posts[id]) dest('Post on ' + id, posts[id], id);
+            if (posts[id]) dest('Post on ' + id, posts[id].url, id, posts[id].paste);
         });
     }
 
