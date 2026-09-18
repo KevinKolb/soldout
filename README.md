@@ -98,6 +98,23 @@ These are for prop check-in (`live/`) only. The shop build needs no secret: it r
 `shop` table in Supabase through a public select policy, with the publishable key
 committed in `tools/build-inventory.py`.
 
+### Edge Function secrets
+
+These are not GitHub secrets and never reach the repo or a page. They are set on the
+Supabase project (`supabase secrets set NAME=value`, or Dashboard -> Edge Functions ->
+Secrets), and only the function that needs one can read it.
+
+| Secret | Used by | For |
+| --- | --- | --- |
+| `GITHUB_TOKEN_SOC` | `build-shop` | Starting a deploy so a shop edit goes live |
+| `BLUESKY_HANDLE`, `BLUESKY_APP_PASSWORD` | `soc-publish` | Publishing to Bluesky. An app password from bsky.app, revocable on its own - never the account password |
+| `FACEBOOK_PAGE_ID`, `FACEBOOK_PAGE_TOKEN` | `soc-publish` | Publishing to the Facebook Page. A System User token from Business Settings, which does not expire |
+
+A publishing token is worth more than the publishable key by a wide margin: it can post as
+the show. That is the whole reason `soc-publish` exists rather than the page calling these
+APIs itself. Each function's own header comments carry the click-path for getting its
+credential.
+
 ## Backstage
 
 `/backstage` redirects to the BACKSTAGE page in Notion and does nothing else: a meta

@@ -42,7 +42,9 @@ on them.
   the site runs on lives there.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the `shop` table that curates the shop, `socializer` for the repost
-  queue, and `prop_candidates` for the prop bot.
+  queue, `socializer_channel` for how each platform gets posted to, and `prop_candidates`
+  for the prop bot. Two Edge Functions: `build-shop` starts a deploy, `soc-publish`
+  publishes a queued post to a platform outright.
 
 Never commit real credentials. See "Deployment secrets" in [README.md](README.md).
 
@@ -108,6 +110,36 @@ How it works now:
 - A `shop` row whose listing has dropped off the storefront still publishes, and its
   link is dead.
 - `assets/storefronts.html` looks like an older copy of the shop page.
+
+## Posting (the Socializer)
+
+A queued post leaves the queue one of two ways, chosen per platform on the SETTINGS tab and
+stored in `socializer_channel.method`:
+
+- **By hand (`INTENT`)** — the platform's own composer opens in a tab with our words already
+  in it, and a human presses their Post button. Every platform has one, it needs no
+  credentials, and it is the default. It stays the fallback: some platforms will never offer
+  anything better.
+- **Automatic (`API`)** — [supabase/functions/soc-publish](supabase/functions/soc-publish/index.ts)
+  publishes it. Live for Bluesky and the Facebook **Page**. Two presses on the card, because
+  it puts words on the internet under the show's name with no undo.
+
+Facts worth not rediscovering:
+
+- **Nothing can post to a personal Facebook profile.** `publish_actions` was withdrawn in
+  2018 and never replaced. Facebook publishes as a Page or not at all.
+- **`sharer.php` ignores prefilled text.** The `quote` parameter is dead; Facebook reads what
+  it shows from the shared URL's Open Graph tags, which belong to whoever we are reposting.
+- **App Review is only for other people's accounts.** Publishing to a Page we administer
+  works with the app in development mode. Review plus Business Verification is the gate on a
+  multi-tenant product, and it is calendar time, not engineering time.
+- Instagram will not take a text-only post, which is what `has_media` on the queue is for.
+
+Pressing a destination records that it went there and nothing else. Only **DONE** archives a
+card — a post can go to one platform today and another tomorrow.
+
+Never put a publishing credential in a page. See "Edge Function secrets" in
+[README.md](README.md).
 
 ## Backstage and login
 

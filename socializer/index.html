@@ -158,8 +158,17 @@
            care to press, so the buttons themselves have to carry which ones are done -
            otherwise the only record of a press is a tab that opened and closed. The
            Posted to line says the same thing in words. */
-        .card .acts > .btn.sent { background: #fff; color: #000; }
-        .card .acts > .btn.sent:hover { background: #000; color: #fff; }
+        .card .acts > .sent { background: #fff; color: #000; }
+        .card .acts > .sent:hover { background: #000; color: #fff; }
+
+        /* Publishing outright, in the green the POST tab wears - it is the same errand as
+           the other destination buttons, so it is not a warning colour. Armed goes black
+           with green lettering, the way DELETE's second press does: the press that puts
+           something on the internet has to look like a different button. */
+        .pubbtn { background: #5ce08a; color: #000; }
+        .pubbtn:hover:not(:disabled) { background: #000; color: #5ce08a; }
+        .pubbtn.armed { background: #000; color: #5ce08a; }
+        .pubbtn.armed:hover:not(:disabled) { background: #5ce08a; color: #000; }
 
         /* The deep red, matching the band a card wears as you swipe it away - the two
            do the same thing, so they are the same colour. Armed goes black with red
@@ -360,6 +369,18 @@
             display: block; font-size: 10px; letter-spacing: 0.5px;
             text-transform: uppercase; color: #999; font-weight: 700;
         }
+        /* How this platform gets posted to, on the tile for the account it posts to. Two
+           buttons rather than a menu: there are two answers and both are worth seeing at
+           once, since the whole point is that they are a choice. */
+        .social .method { display: flex; margin-top: 9px; border: 2px solid #000; }
+        .social .mbtn {
+            flex: 1; border: 0; padding: 6px 4px; font-size: 11px; font-weight: 700;
+            letter-spacing: 0.5px; text-transform: uppercase; background: #fff; color: #000;
+        }
+        .social .mbtn + .mbtn { border-left: 2px solid #000; }
+        .social .mbtn.on { background: #000; color: #fff; }
+        .social .mbtn:disabled { color: #c4c4c4; cursor: not-allowed; opacity: 1; }
+        .social .mbtn:not(:disabled):not(.on):hover { background: #ffd93d; }
 
         @media (max-width: 620px) {
             .card { display: block; }
@@ -836,6 +857,129 @@ const NATIVE = ['X', 'Bluesky', 'Threads', 'Facebook', 'Reddit', 'Instagram', 'T
    sit in the order. */
 const PLATFORMS = ['X', 'Bluesky', 'Threads', 'Facebook', 'Reddit', 'Instagram', 'TikTok'];
 
+/* --- how each platform gets posted to ------------------------------------------------
+ *
+ * INTENT is the composer URL this page has always used: their tab opens with our words
+ * already in it, and a human presses their Post button. Every platform has one, it needs no
+ * credentials, and it cannot half-work - which is why it is the default and stays the
+ * fallback for good.
+ *
+ * API is supabase/functions/soc-publish doing it outright. That needs a credential per
+ * platform and is not available everywhere, so it is a choice made per platform on the
+ * SETTINGS tab rather than a mode the whole page is in.
+ *
+ *   api: 'live'   soc-publish can publish there today.
+ *   api: 'soon'   the platform allows it; the function does not do it yet.
+ *   api: false    the platform will not allow it, and `note` says why.
+ */
+const PUBLISH = {
+    Bluesky: { api: 'live',
+        note: 'An app password from bsky.app, and that is all - no review, no cost.' },
+    Facebook: { api: 'live',
+        note: 'Publishes as the PAGE. Nothing can post to a personal profile: Facebook'
+            + ' withdrew that in 2018 and never replaced it.' },
+    Threads: { api: 'soon',
+        note: 'The Threads API can publish. Not wired up here yet.' },
+    Instagram: { api: 'soon',
+        note: 'A Business or Creator account can publish, but only with a picture -'
+            + ' Instagram takes no text-only post, and caption links are not clickable.' },
+    X: { api: 'soon',
+        note: 'Publishing needs a paid API tier. The free one cannot post often enough'
+            + ' to be worth the wiring.' },
+    Reddit: { api: 'soon',
+        note: 'The API can publish. Automated self-promotion is how accounts get banned,'
+            + ' so this one wants a human more than the others do.' },
+    TikTok: { api: false,
+        note: 'Its posting API is video only and needs an audit to leave sandbox.' },
+    YouTube: { api: false,
+        note: 'Video uploads only. There is nothing in this queue it would take.' },
+    Whatnot: { api: false, note: 'No public API. By hand is the only way in.' },
+    Poshmark: { api: false, note: 'No public API. By hand is the only way in.' },
+};
+
+/* platform -> 'INTENT' | 'API', as the socializer_channel table has it. Empty until the
+   first read, and empty reads as INTENT, so the page works before the migration is run. */
+let methods = {};
+
+/* The method actually in force. A platform set to API that this page cannot publish to yet
+   still posts by hand, so a half-finished platform cannot strand a card behind a button
+   that does nothing. */
+function methodFor(id) {
+    const can = PUBLISH[id] && PUBLISH[id].api === 'live';
+    return can && methods[id] === 'API' ? 'API' : 'INTENT';
+}
+
+async function loadMethods() {
+    const { data, error } = await supabase.from('socializer_channel').select('platform, method');
+    methods = {};
+    if (error) {
+        /* Before the migration is run the table is not there, which is not worth shouting
+           about: everything posts by hand until it exists, which is what it did before. The
+           settings tab says so in the one place somebody is looking for the switch. */
+        return;
+    }
+    (data || []).forEach((r) => { methods[r.platform] = r.method; });
+}
+
+async function setMethod(platform, method) {
+    const { data, error } = await supabase
+        .from('socializer_channel')
+        .update({ method, updated_at: new Date().toISOString() })
+        .eq('platform', platform)
+        .select('platform');
+    if (error || !(data || []).length) {
+        status('Could not change how ' + platform + ' posts: '
+            + (error ? error.message : 'the channel table has no row for it.')
+            + ' Has tools/socializer-migration-18-publish-methods.sql been run?', 'err');
+        return;
+    }
+    methods[platform] = method;
+    status(method === 'API'
+        ? platform + ' will be published to outright from now on.'
+        : platform + ' will open its own composer again.', 'good');
+    paintMethods();
+    /* The POST tab's buttons are built out of this, so they change with it. */
+    paint();
+}
+
+/* The chooser, added to each account tile on SETTINGS. The tiles are static markup - one
+   per account, with the platform's name in .plat - so this reads the name off the tile
+   rather than keeping a second list of them in step with the first. */
+function paintMethods() {
+    document.querySelectorAll('#paneSettings .social').forEach((tile) => {
+        const head = tile.querySelector('.plat');
+        const name = ((head && head.textContent) || '').trim();
+        const can = PUBLISH[name];
+        if (!can) return;
+
+        tile.querySelectorAll('.method, .methodnote').forEach((old) => old.remove());
+
+        const live = can.api === 'live';
+        const now = methodFor(name);
+
+        if (live) {
+            const row = document.createElement('div');
+            row.className = 'method';
+            [['INTENT', 'By hand'], ['API', 'Automatic']].forEach((pair) => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'mbtn' + (now === pair[0] ? ' on' : '');
+                b.textContent = pair[1];
+                b.onclick = () => { if (now !== pair[0]) setMethod(name, pair[0]); };
+                row.appendChild(b);
+            });
+            tile.appendChild(row);
+        }
+
+        const note = document.createElement('p');
+        note.className = 'how methodnote';
+        const label = document.createElement('b');
+        label.textContent = live ? 'Posting' : 'By hand only';
+        note.append(label, document.createTextNode(can.note));
+        tile.appendChild(note);
+    });
+}
+
 function nativeUrl(row) {
     if (row.source === 'X') {
         const m = row.post_url.match(/status(?:es)?\/(\d+)/);
@@ -1263,6 +1407,25 @@ function card(row) {
             acts.appendChild(b);
         };
 
+        /* The automatic kind. A <button>, not a link, because nothing opens: the press is
+           the posting. Two presses, borrowed from DELETE - this one puts words on the
+           internet under the show's name and there is no taking them back, so it should not
+           be something a thumb can do on the way past.
+
+           The label says which it is. "Post on Bluesky" opens Bluesky for you to post in;
+           "Publish to Bluesky" does it, and the difference matters more than the two words
+           it costs. */
+        const auto = (label, id) => {
+            const b = confirmBtn(label, 'SURE? ' + label.toUpperCase(),
+                () => publishNow(row, id, b), 'pubbtn');
+            if (gone.includes(id)) {
+                b.classList.add('sent');
+                b.disabled = true;
+                b.title = 'Already went out this way.';
+            }
+            acts.appendChild(b);
+        };
+
         const posts = {};
         composers(row).forEach((c) => { posts[c.id] = c; });
 
@@ -1270,7 +1433,12 @@ function card(row) {
             /* Reposting where it already lives comes before posting a link to it there,
                because it is the better move - but only within that platform's turn. */
             if (id === row.source && native) dest('Repost on ' + id, nativeUrl(row), id);
-            if (posts[id]) dest('Post on ' + id, posts[id].url, id, posts[id].paste);
+            if (!posts[id]) return;
+
+            /* Which of the two a platform gets is the SETTINGS tab's business, per platform.
+               The card only asks. */
+            if (methodFor(id) === 'API') auto('Publish to ' + id, id);
+            else dest('Post on ' + id, posts[id].url, id, posts[id].paste);
         });
     }
 
@@ -1543,10 +1711,13 @@ async function repeat(row) {
  * The arming is exposed rather than kept inside the click handler, because the swipe
  * asks the same question and has to be able to see the same answer. Two ways in, one
  * state - or a card could be armed by one of them and deleted by the other. */
-function confirmBtn(label, question, fn) {
+function confirmBtn(label, question, fn, cls) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'delbtn';
+    /* DELETE was the only two-press button for a long time and the colour was baked in.
+       Publishing is the second one and it is not a destructive act, so the colour is the
+       caller's to say - the arming is what they are really borrowing. */
+    b.className = cls || 'delbtn';
     b.textContent = label;
 
     let armed = 0;
@@ -1569,6 +1740,14 @@ function confirmBtn(label, question, fn) {
         armed = 0;
         b.disabled = true;
         await fn();
+    };
+
+    /* For a caller whose action can fail and leave the card in place. Without this the
+       button sits there still asking SURE? about something that did not happen. */
+    b.reset = () => {
+        b.textContent = label;
+        b.classList.remove('armed');
+        b.disabled = false;
     };
 
     b.onclick = () => (armed ? b.fire() : b.arm());
@@ -1600,6 +1779,44 @@ async function markSent(row, dest) {
     row.posted_to = patch.posted_to;
     paint();
     load();
+}
+
+/* Publishing outright, through supabase/functions/soc-publish - which is where the tokens
+   live, because a token in this page would be readable by everyone who loads it.
+ *
+ * The card is NOT moved to the archive by this, any more than pressing a destination is.
+ * Going out somewhere and being finished with are two different things, and DONE is still
+ * the only thing that says the second one. */
+async function publishNow(row, platform, b) {
+    status('Publishing to ' + platform + '...', 'busy');
+
+    let out;
+    try {
+        out = await callFn('soc-publish', { id: row.id, platform });
+    } catch (e) {
+        status(e.message, 'err');
+        b.reset();
+        return;
+    }
+
+    /* A warning means it went out but the queue did not record it. Saying so matters more
+       than anything else on the page: the one thing not to do next is press it again. */
+    if (out.warning) status(out.warning, 'err');
+    else status('Published to ' + platform + '.' + (out.url ? ' ' + out.url : ''), 'good');
+
+    load();
+}
+
+/* An edge function's real complaint is in the body of its response, not in error.message -
+   which for any non-2xx says only that it was a non-2xx, and tells you nothing you can do
+   anything about. */
+async function callFn(name, body) {
+    const { data, error } = await supabase.functions.invoke(name, { body });
+    if (!error) return data || {};
+
+    let said = '';
+    try { said = ((await error.context.json()) || {}).error || ''; } catch (e) { /* not json */ }
+    throw new Error(said || error.message || 'It did not say why.');
 }
 
 /* --- adding one -------------------------------------------------------------------- */
@@ -1812,7 +2029,7 @@ $('mark').addEventListener('click', (e) => {
     status('Drag it to your bookmarks bar, or paste the line above into a new bookmark.', 'busy');
 });
 
-function render(user) {
+async function render(user) {
     const ok = isOwner(user);
     $('app').hidden = !ok;
     $('gate').hidden = ok;
@@ -1828,6 +2045,11 @@ function render(user) {
     if (!ok) return;
     me = user.email || '';
     $('out').hidden = false;
+
+    /* Before the first paint, because the POST tab's buttons are built out of it: reading it
+       afterwards would draw every destination as a by-hand link and then swap them. */
+    await loadMethods();
+    paintMethods();
 
     /* The whole page either way - the tabs already show one thing at a time, which is
        all the old stripped-down capture mode was doing. A bookmarklet press just picks
@@ -1853,7 +2075,7 @@ addEventListener('hashchange', () => {
     if (want && want !== tab) show(want);
 });
 
-render(await currentUser());
+await render(await currentUser());
 </script>
 </body>
 </html>
