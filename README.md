@@ -37,8 +37,11 @@ file for you to download and commit.
 A routine that goes looking for funny posts once a day and files what it finds in the
 `socializer` table in Supabase. One row per candidate: why it is funny, the handle, the
 permalink, where it was found, and a Media tick where the post carries an image or a
-video. It files through `soc_nominate` rather than writing to the table, because the
-table itself is readable only by the owner's signed-in browser.
+video. It aims for at least one repost from every platform on its list, plus two or three
+**Originals**: our own lines riding whatever is trending that day, written from the show's
+angle and filed with the story as their link. It files through `soc_nominate` rather than
+writing to the table, because the table itself is readable only by the owner's signed-in
+browser.
 
 The **Socializer** at [socializer](socializer/index.html) is where
 that queue is worked, and its bookmarklet is the same job done by hand: press it on any

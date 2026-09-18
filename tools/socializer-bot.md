@@ -9,7 +9,13 @@ Manage the routine itself at <https://claude.ai/code/routines/trig_01TwjWSP2bjnh
 
 ## What the job is
 
-Find funny posts worth reposting, and add them to the **Socializer queue** in Supabase.
+Find things worth posting, write the line we would post them with, and add them to the
+**Socializer queue** in Supabase. Two kinds of thing:
+
+- **Reposts.** Funny posts by other people, about selling and about found objects, that we
+  share with credit.
+- **Originals.** Our own lines riding whatever is trending today, written from the show's
+  angle: everything is for sale, everything has a price, everything is a prop.
 
 You **nominate candidates**. You do not post. Nothing in this job speaks for the account,
 and nothing you write reaches an audience. A human reads every candidate and decides.
@@ -134,12 +140,28 @@ change it.
 
 1. It is **funny**. Not relatable, not interesting. Funny.
 2. It is about **selling** something: a listing, a price, a haggle, a flip, a marketplace
-   message, a thing somebody is trying to move.
-3. Or it is a **found object**, the beautiful junk somebody photographed in the wild.
+   message, a live-auction or Whatnot moment, an estate sale, a thrift haul, a thing
+   somebody is trying to move. A listing that is funny because of the price alone is
+   enough.
+3. Or it is a **found object**: the beautiful junk somebody photographed in the wild, on a
+   shelf, at a sale, on a kerb.
 4. It stands on its own. No thread, no context, no inside joke required.
 5. Reposting it would not embarrass us tomorrow.
 
-More criteria to come. Add them here, commit, and the next run follows the new list.
+That is a **repost**. An **original** qualifies when:
+
+1. The topic is **trending today**: on the trend sources in Step 4, in the last day or two,
+   not a week ago.
+2. It is **fair game**. Not a death, a disaster, a crime, a court case, a health scare, an
+   election, a war, or a private person's bad day. Celebrities, products, sport, films,
+   music, animals, food, gadgets, prices, launches, feuds between brands, and things the
+   internet has decided are funny this week are all fine.
+3. The show has an **angle** on it: something in the story can be sold, appraised, bid on,
+   taken on consignment, or used as a prop. If you have to reach for the angle, it is not
+   ours; a trend with no thing in it is not a candidate.
+4. The line is funny **without the reader having seen the trend**. It should be better
+   with the context and fine without it.
+5. Posting it would not embarrass us tomorrow, or next week when the trend has gone.
 
 ## Step 2 - read what has already been posted
 
@@ -167,40 +189,94 @@ These are people who reliably make the kind of thing we want. Check them before 
 searching the open web, and take roughly half a run's candidates from here whenever they
 have posted anything good.
 
-A source can live on any platform. What we repost does not have to have started anywhere in
-particular.
+A source can live on any platform, and most live on several. Read the link marked **read
+this** first: it is the one a crawler can actually open, tested from this environment. The
+others are where the same material also lives; you reach them **sideways**, by searching
+the open web for the post and following through to a permalink, because Instagram and
+Facebook answer a crawler with a login page. None of these links is ever the candidate:
+they are feeds, and the candidate is the clip's own permalink.
+
+Whichever copy you can confirm, nominate the post **once**. The same clip on three
+platforms is one candidate, and the database will only tell you about an exact repeat.
 
 ### Blue Collar Corey
 
-- Facebook - <https://www.facebook.com/p/Blue-collar-corey-61582770742725/>
-- Instagram - <https://www.instagram.com/heidercorey>
-- YouTube - <https://www.youtube.com/@bluecollarcorey>
-
-Check all three; the same clip often goes up on more than one, so pick whichever permalink
-you can actually confirm and nominate it once.
+- YouTube, **read this** - feed <https://www.youtube.com/feeds/videos.xml?channel_id=UCzL0_kklItZWHCCS0FFdxOw>,
+  channel <https://www.youtube.com/@bluecollarcorey>
+- Instagram, sideways - <https://www.instagram.com/heidercorey>
+- Facebook, sideways - <https://www.facebook.com/p/Blue-collar-corey-61582770742725/>
 
 ### Big Whale Consignment
 
-- Instagram - <https://www.instagram.com/bigwhaleconsignment>
-- Instagram reels - <https://www.instagram.com/bigwhaleconsignment/reels/>
+A Seattle consignment shop that went viral for being funny about running one. The reels
+are where the funny is.
 
-The reels tab is where the funny is. Both of those are feeds, so neither is ever the
-candidate: find the clip there, then nominate its own `/reel/` permalink.
+- YouTube, **read this** - feed <https://www.youtube.com/feeds/videos.xml?channel_id=UC0jKipzK51XJEVJ_4wyOQkQ>,
+  channel <https://www.youtube.com/@bigwhaleconsignment8005>
+- Instagram reels, sideways - <https://www.instagram.com/bigwhaleconsignment/reels/>
+- TikTok, sideways - <https://www.tiktok.com/@bigwhalehome>
 
-*(This list is the place to add sources. Add a heading and its links, commit, and the next
-run picks it up.)*
+*(This list is the place to add sources. Add a heading and its links, mark which one is
+readable, commit, and the next run picks it up.)*
 
-## Step 4 - then search wide
+### Proposed, not yet on the list
+
+These came up while looking for company for the two above. Nobody has checked them yet,
+so **do not treat them as sources** until somebody moves them up and confirms the links.
+
+- **Marketplace Doubletakes** - an Instagram account of the wildest Facebook Marketplace
+  finds.
+- **"Weird Secondhand Finds That Just Need To Be Shared"** and **"is this item still
+  available?"** - Facebook groups where members post the strangest listings near them.
+- **r/ThriftStoreHauls** and **r/FacebookMarketplace** - Reddit, which a crawler cannot
+  read directly but which the open web quotes constantly.
+- **Bored Panda, Thunder Dungeon, Pleated Jeans** - not sources, but roundups that quote
+  marketplace posts with their handles, which is a good sideways route to a permalink.
+
+## Step 4 - read what is trending
+
+Then find out what the internet is talking about today. These all answer a plain fetch, so
+read them directly, in this order, and stop when you have a clear picture:
+
+1. **Google Trends, US** - <https://trends.google.com/trending/rss?geo=US>. The day's
+   rising searches, each with a headline or two that says why.
+2. **Wikipedia's most-read pages** -
+   <https://wikimedia.org/api/rest_v1/metrics/pageviews/top/en.wikipedia/all-access/YYYY/MM/DD>
+   with yesterday's date. What people went and looked up. Skip the perennials (`Main_Page`,
+   `Special:Search`, `Deaths_in_...`) and read the rest.
+3. **X's trends, mirrored** - <https://getdaytrends.com/united-states/> and
+   <https://trends24.in/united-states/>. X itself will not talk to a crawler; these will.
+4. **The tabloid and feature feeds** - <https://www.tmz.com/rss.xml>,
+   <https://www.buzzfeed.com/index.xml>, <https://feeds.bbci.co.uk/news/rss.xml>. For the
+   stories behind the trends, and for the ones with a thing in them.
+5. **TikTok's own list of what is popular** -
+   <https://ads.tiktok.com/business/creativecenter/inspiration/popular/hashtag/pc/en>,
+   which loads for a crawler but leans on scripts, so take what you can and do not fight it.
+
+Reddit, X, Bluesky's API, Whatnot and eBay all refuse a crawler with a 403. Do not spend the
+run retrying them. Where you need one of them, come at it sideways through a web search
+with a recency filter, and through the sites that quote them.
+
+From the whole picture, pick the **two or three trends** with the clearest angle for us
+(Step 1, "an original qualifies when") and write an Original for each. One take per trend:
+if `soc_taste` already shows a line of ours on it, the trend is done. Note every trend you
+considered in your run notes, including the ones you passed on and why.
+
+## Step 5 - then search wide
 
 Use WebSearch and WebFetch to find other public posts from roughly the last seven days.
 
 Angles that tend to pay off: resale and marketplace humour, absurd listings, cursed thrift
 and estate-sale finds, haggling screenshots, strange eBay or Facebook Marketplace listings,
-roadside junk, "found this at Goodwill".
+Whatnot and live-auction moments, roadside junk, "found this at Goodwill". And, now that
+you know what is trending, **the marketplace side of the trend**: whatever the internet is
+talking about today, somebody is already listing it, reselling it, or knocking it off, and
+that listing is often the funniest thing about the story.
 
 Social platforms serve very little to a crawler, so expect to come at them sideways: search
 the open web, including sites that quote or aggregate posts, then follow through to the
-original.
+original. Google and Bing both answer a plain fetch, and a past-week filter keeps them
+fresh.
 
 **A candidate is only real if you can confirm a working permalink to the post itself**: an
 `x.com/<handle>/status/<digits>`, a YouTube watch or shorts URL, an Instagram `/p/` or
@@ -208,11 +284,18 @@ original.
 to a feed or a profile. No confirmed permalink, no candidate. Never invent a URL, a handle,
 or post text, and never guess at an id.
 
-## Step 5 - judge hard
+## Step 6 - judge hard, and cover every platform
 
-Aim for **3 to 8** candidates a run. Returning one, or none, is a fine outcome and a much
-better one than padding. A thin list of things that are actually funny beats a fat one of
-things somebody has to scroll past.
+For reposts, aim for **at least one from every platform** on the list: X, Bluesky,
+Instagram, Threads, Facebook, TikTok, YouTube and Reddit. Each platform gets one native
+repost from us, so a run that covers them all gives the person posting something to do
+everywhere. For Originals, aim for **two or three**.
+
+Those are targets, not a licence. A platform that gave you nothing funny gets a line in
+your run notes, not a filler row, a trend with no angle gets a line, not a forced one, and
+a thin list of things that are actually funny still beats a fat one of things somebody has
+to scroll past. Beyond the targets, add only what is genuinely good. Returning one, or
+none, is still a fine outcome and a much better one than padding.
 
 Skip anything that is: an ad or brand marketing, engagement bait, cruel at somebody's
 expense, political, sexual, or about a named private individual. Skip anything you would
@@ -221,7 +304,8 @@ have to explain.
 A post carrying an image or a video is worth more than one without, because it can go to
 Instagram and Threads as well as to X, Facebook and Bluesky. Not a rule, since a funny line
 with no picture still beats a dull picture, but it is the tie-breaker. Tick **Media** on
-those rows so whoever posts it knows before they open it.
+those rows so whoever posts it knows before they open it. An Original has no media and no
+home platform: it is a line of ours, and it goes wherever the poster wants it.
 
 While you have the page open to confirm the permalink, take its `og:image` (or
 `twitter:image`) and put it in **media_url**. The queue shows it on the card, so whoever
@@ -260,9 +344,53 @@ The rules under it:
 - **No hashtags.** An emoji only if the line genuinely does not work without one.
 - Write it so it could go out untouched. A human will often improve it, and often will not.
 
-## Step 6 - add them to the queue
+### How to be funnier
 
-One `soc_nominate` call per candidate.
+The bar: **would a stranger screenshot it?** Not smile. Screenshot. If a line only earns a
+nod, it is a caption, not a joke, and the candidate is not ready.
+
+Ways in that keep working:
+
+- **Appraise it.** The Antiques Roadshow voice, dead straight, over something that
+  deserves none of it. Provenance, condition, a valuation. The gap is the joke.
+- **The price is the punchline.** Put the number where the laugh goes. Open the bidding
+  at something stupid. Knock it down. Add a shipping charge.
+- **Take it on consignment.** Talk about the item as stock we now have to move, and about
+  the seller as a Willing Prop Seller we are stuck with.
+- **The specific detail.** The one thing in the photo nobody else would mention. The
+  stain, the cat, the reflection, the second item in the background. Specific beats
+  general every time.
+- **Undercut.** Set up the polite version, then say the true one.
+
+Things that are not jokes, and get a line cut: a pun as the whole joke; "when you..." and
+"who else..." and "this is sending me"; exclamation marks doing the work the words should
+do; any line the poster could not defend at a dinner party.
+
+**Write three, keep one.** For every candidate, draft three different lines, then keep the
+sharpest and throw the others away. Do not average them into one. Before you write, reread
+what `soc_taste` returned: those are the lines somebody actually put their name to, and
+they are the register to match.
+
+Three more in the register, for shape rather than reuse:
+
+> Fifty dollars, "smells a bit like dog". Bidding opens at the dog.
+
+> A bread maker, used once, in 2009. We are pricing it as a time capsule and the bread as
+> an artefact.
+
+> Four hundred dollars for a used toilet, seat included, which at that price reads less
+> like a feature and more like a threat.
+
+## Step 7 - add them to the queue
+
+One `soc_nominate` call per candidate, reposts and Originals alike.
+
+An Original is filed the same way, with the story standing in for the post: **p_source**
+is `Web`, **p_post_url** is the page you read the trend from (the article, the listing,
+the trend entry, never a search results page), **p_post_key** is `url:host/path` built
+from it, **p_headline** is the story's own words, **p_author** is empty, **p_has_media** is
+`false` and **p_media_url** is empty. **p_why** is the line. The card then offers the
+composers for every platform with our line and the link, which is all an Original needs.
 
 - Strip tracking parameters (`utm_*`, `fbclid`, `igshid`, `si`, `ref`, and the like) from
   every URL before it goes in **p_post_url**, and before you derive **p_post_key** from it.
@@ -276,7 +404,7 @@ One `soc_nominate` call per candidate.
 - There is nothing else you can do to this table. Editing a row, overturning a ruling and
   deleting anything are all closed to you at the database, not merely asked against.
 
-## Step 7 - send a notification
+## Step 8 - send a notification
 
 This runs while nobody is watching, so finish by pushing a notification. Nobody should have
 to go and check whether it ran.
@@ -284,7 +412,7 @@ to go and check whether it ran.
 One line, plus the link:
 
 ```
-3 new post candidates
+6 reposts and 2 originals to look at
 https://www.soldoutcomedy.com/socializer/
 ```
 
@@ -296,9 +424,48 @@ is worth knowing, because silence is indistinguishable from a run that crashed. 
 table could not be read or written, say that in the notification instead of a count, so the
 failure is the thing that arrives rather than nothing at all.
 
-## Step 8 - say what you did
+## Step 9 - say what you did
 
-End your run with a short plain-language note: how many you added, what you skipped and
-why, and anything about the search that was unusually good or unusually barren. This is the
+End your run with a short plain-language note: how many of each kind you added, which
+platforms you covered and which you could not, which trends you rode and which you passed
+on, what else you skipped and why, and anything about the search that was unusually good
+or unusually barren. This is the
 longer version of the notification, for whoever opens the run itself. If the table could
 not be read or written, say that instead of reporting a run that did not happen.
+
+## The routine itself
+
+The routine was created in the web UI, so only a person can change its settings, at
+<https://claude.ai/code/routines/trig_01TwjWSP2bjnhptQgtg7DcQa>. These are the settings
+the orders above assume. If the routine's page disagrees with this list, this list is the
+decision and the page needs updating.
+
+- **Schedule:** `12 12 * * *` UTC, which is 7:12 in the morning in New Orleans during
+  daylight time and 6:12 in winter.
+- **Model:** Opus. The whole job is judging what is funny, and it runs once a day.
+- **Tools:** Bash, Read, Glob, Grep, WebSearch, WebFetch. Not Write or Edit: the job
+  changes nothing but queue rows.
+- **Notifications:** push on. The push is built from how the run ends, which is why
+  Step 8 puts the count and the link first.
+- **Prompt:** the text below, as it stands. It is deliberately short and it defers to this
+  file; when this file changes, the prompt usually does not need to.
+
+```
+You are SOC SOCIALIZER BOT for SOLD OUT! Comedy. Read tools/socializer-bot.md in this repo
+and carry out the standing orders you find there, exactly as written. That file is the
+whole job description; treat it as authoritative over anything you remember about this
+routine, including this summary. In short: find funny selling-related or found-object
+posts to repost, from the popular sources listed in that file and from open search; read
+what is trending today and write two or three original lines of ours riding it, from the
+show's angle; write the caption for every one in the show's voice; and file each with one
+call to the soc_nominate function in the SOLD OUT! Supabase project, using the publishable
+key committed in assets/js/auth.js, exactly as the file describes. Read soc_taste first
+every run: it is your guide to taste. You cannot read or edit the queue, and you never try
+to; the database answers "duplicate" when something is already there. The queue is the
+only output; a candidate not filed there did not happen. Post nothing anywhere, make no
+git commits, write no files. A repost is only real with a confirmed permalink to the post
+itself; never invent a URL, a handle or post text. Finding nothing worth nominating is a
+normal outcome: file nothing and say so. End your run with a one-line summary (a count and
+the Socializer link) as the first line of your final message, then a short note on what
+you did.
+```
