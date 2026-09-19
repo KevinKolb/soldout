@@ -108,6 +108,7 @@ Secrets), and only the function that needs one can read it.
 | --- | --- | --- |
 | `GITHUB_TOKEN_SOC` | `build-shop` | Starting a deploy so a shop edit goes live |
 | `SOC_SECRET_KEY` | `soc-connect`, `soc-publish` | Sealing and opening the stored platform credentials. `openssl rand -base64 32` |
+| `THREADS_APP_SECRET` | `soc-connect` | Exchanging a short-lived Threads token for a 60-day one. Without it a pasted token is stored as-is and its lifetime is reported as unknown |
 | `BLUESKY_HANDLE`, `BLUESKY_APP_PASSWORD` | `soc-publish` | Optional fallback, from before credentials were enterable on the page |
 | `FACEBOOK_PAGE_ID`, `FACEBOOK_PAGE_TOKEN` | `soc-publish` | Optional fallback, as above |
 
@@ -125,7 +126,12 @@ platforms itself. Where to get each credential:
   with `pages_manage_posts`, `pages_read_engagement` and `pages_show_list`. A token from the
   Graph API Explorer expires in an hour and will strand you.
 - **Threads** — a Meta app with the Threads API product and the `threads_basic` and
-  `threads_content_publish` scopes. Lasts 60 days; `soc-publish` renews it on use.
+  `threads_content_publish` scopes. Generate a token in the Graph API Explorer with **User or
+  Page** set to `threads.net`. That token is **short-lived — one or two hours** — so set
+  `THREADS_APP_SECRET` (App settings -> Basic -> App secret) and `soc-connect` will exchange it
+  for the 60-day kind on the way in. `soc-publish` then renews it on use. Without the app
+  secret the token is kept as pasted and the settings page says its lifetime is unknown, which
+  is the honest answer: nothing can tell the two apart by looking.
 
 App Review and Business Verification are only needed to publish to **other people's**
 accounts. Publishing to accounts you administer works with the app in development mode.
@@ -140,7 +146,9 @@ decides who gets in.
 to the subdomain: Cloudflare points the subdomain here, so the two would loop. It did,
 once. Notion is a different origin, so the redirect there now is safe.
 
-Notion holds show material and the social account list, and nothing the site depends on.
+Notion is Backstage for people and is not read by Claude; the show's own material lives in
+[CLAUDE.md](CLAUDE.md) and the account handles live in the `socializer_channel` table. Nothing
+the site depends on is in Notion.
 
 The Socializer is at `/socializer/` and the browser tools live in `tools/`. Nothing links
 to them now — reach them by URL.

@@ -29,7 +29,8 @@ import { seal } from '../_shared/secretbox.ts';
 
 const OWNER = 'kevinmkolb@gmail.com';
 const GRAPH = 'v23.0';
-const THREADS = 'https://graph.threads.net/v1.0';
+const THREADS_ROOT = 'https://graph.threads.net';
+const THREADS = `${THREADS_ROOT}/v1.0`;
 
 const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -43,15 +44,52 @@ const json = (body: unknown, status = 200) =>
         headers: { ...cors, 'Content-Type': 'application/json' },
     });
 
-/* What a check found out: which account the credential is for, what to call it on the page,
-   and when it runs out if it ever does. */
-type Checked = { account: string; says: string; expires: string | null };
+/* What a check found out: which account the credential is for, what to call it on the page, and
+   when it runs out if it ever does.
+ *
+ * `token` is set when the check obtained a BETTER credential than the one it was given - a
+ * long-lived Threads token in place of the short-lived one that was pasted - and it is that one
+ * that gets sealed. `warning` is for a credential that works but is not in the state we would
+ * like, which the page says out loud rather than discovering later. */
+type Checked = {
+    account: string;
+    says: string;
+    expires: string | null;
+    token?: string;
+    warning?: string;
+};
 
 /* --- proving a credential before trusting it ------------------------------------------ */
 
-/* Threads hands out a user token tied to one account, and /me is the cheapest way to ask it
-   who that is. The token arrives as the long-lived kind, good for 60 days; soc-publish
-   renews it on use before it runs out, so this only records when that clock started. */
+/* Threads hands out a user token tied to one account, and /me is the cheapest way to ask it who
+   that is.
+ *
+ * The awkward part is the token's life. What the Graph API Explorer gives you - which is what
+ * every guide tells you to click - is SHORT-lived: one or two hours. The 60-day kind only exists
+ * after exchanging it, and that exchange needs the app secret. So this tries the exchange and
+ * stores what comes back, because the alternative is a settings page confidently showing 60 days
+ * next to a token that stops working before lunch.
+ *
+ * Nothing here can tell a short-lived token from a long-lived one by looking: they are the same
+ * shape and /me accepts both. The exchange is the thing that resolves it - on an already-long
+ * token it fails harmlessly and we keep the one we have. */
+async function exchangeThreads(token: string): Promise<{ token: string; expires: string } | null> {
+    const secret = Deno.env.get('THREADS_APP_SECRET');
+    if (!secret) return null;
+
+    const res = await fetch(`${THREADS_ROOT}/access_token`
+        + `?grant_type=th_exchange_token&client_secret=${encodeURIComponent(secret)}`
+        + `&access_token=${encodeURIComponent(token)}`);
+    const out = await res.json().catch(() => null);
+    if (!res.ok || !out?.access_token) return null;
+
+    const seconds = Number(out.expires_in) || 60 * 86400;
+    return {
+        token: String(out.access_token),
+        expires: new Date(Date.now() + seconds * 1000).toISOString(),
+    };
+}
+
 async function checkThreads(token: string): Promise<Checked> {
     const res = await fetch(`${THREADS}/me?fields=id,username&access_token=${encodeURIComponent(token)}`);
     const out = await res.json().catch(() => null);
@@ -59,10 +97,20 @@ async function checkThreads(token: string): Promise<Checked> {
         throw new Error(`Threads would not take that token. ${out?.error?.message ?? res.status}`);
     }
 
-    /* 60 days, which is what a long-lived Threads token is worth. Recorded rather than
-       measured: the API does not say how long is left on a token it is handed. */
-    const expires = new Date(Date.now() + 60 * 864e5).toISOString();
-    return { account: String(out.id), says: '@' + (out.username ?? out.id), expires };
+    const who = { account: String(out.id), says: '@' + (out.username ?? out.id) };
+    const long = await exchangeThreads(token);
+    if (long) return { ...who, expires: long.expires, token: long.token };
+
+    /* No exchange, so the life is genuinely unknown and is left null rather than guessed at. The
+       page reads a null Threads expiry as unknown, not as "never" - a Threads token always
+       expires, so claiming otherwise would be the one wrong answer. */
+    return {
+        ...who,
+        expires: null,
+        warning: 'Saved, but its lifetime could not be confirmed: THREADS_APP_SECRET is not set'
+            + ' on the function, so a short-lived token cannot be exchanged for a 60-day one.'
+            + ' If this came from the Graph API Explorer it will stop working within hours.',
+    };
 }
 
 async function checkBluesky(handle: string, appPassword: string): Promise<Checked> {
@@ -146,9 +194,12 @@ Deno.serve(async (req) => {
         return json({ error: (e as Error).message }, 422);
     }
 
+    /* The token the check ended up with, which is not always the one that was typed. */
+    const keep = found.token ?? token;
+
     let sealed: string;
     try {
-        sealed = await seal(token);
+        sealed = await seal(keep);
     } catch (e) {
         return json({ error: (e as Error).message }, 500);
     }
@@ -169,5 +220,11 @@ Deno.serve(async (req) => {
         }, 500);
     }
 
-    return json({ ok: true, says: found.says, account: found.account, expires: found.expires });
+    return json({
+        ok: true,
+        says: found.says,
+        account: found.account,
+        expires: found.expires,
+        warning: found.warning,
+    });
 });

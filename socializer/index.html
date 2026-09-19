@@ -514,7 +514,7 @@
                 </div>
 
                 <div class="actions">
-                    <button id="save" type="button">Send</button>
+                    <button id="save" type="button">SAVE POST CANDIDATE</button>
                     <button id="clear" class="ghost" type="button">Clear</button>
                 </div>
             </details>
@@ -1146,7 +1146,8 @@ async function connect(platform, account, token, said) {
             updated_at: new Date().toISOString(),
             set_by: me,
         };
-        status('Connected to ' + platform + (out.says ? ' as ' + out.says : '') + '.', 'good');
+        if (out.warning) status(platform + ': ' + out.warning, 'err');
+        else status('Connected to ' + platform + (out.says ? ' as ' + out.says : '') + '.', 'good');
         paintChannels();
         paint();
     } catch (e) {
@@ -1166,11 +1167,20 @@ async function disconnect(platform, said) {
     }
 }
 
-/* How long a token has, in the words you would use about it. Null means it does not expire,
-   which is true of a Bluesky app password and a Facebook System User token - they are revoked
-   instead, and nothing here can see that coming. */
-function credLife(row) {
-    if (!row.expires_at) return { text: 'Does not expire.', tone: 'on' };
+/* How long a token has, in the words you would use about it. Null usually means it does not
+   expire, which is true of a Bluesky app password and a Facebook System User token - they are
+   revoked instead, and nothing here can see that coming.
+ *
+ * Threads is the exception and has to be named: its tokens ALWAYS expire, so a null there means
+ * soc-connect could not find out when, and saying "does not expire" would be the one answer
+ * that is certainly wrong. */
+function credLife(platform, row) {
+    if (!row.expires_at) {
+        return platform === 'Threads'
+            ? { text: 'Lifetime unknown - set THREADS_APP_SECRET on the function so a'
+                + ' short-lived token can be exchanged for a 60-day one.', tone: 'warn' }
+            : { text: 'Does not expire.', tone: 'on' };
+    }
     const days = Math.floor((new Date(row.expires_at).getTime() - Date.now()) / 864e5);
     if (days < 0) return { text: 'Expired. Enter a new one.', tone: 'warn' };
     if (days <= 7) {
@@ -1381,7 +1391,7 @@ function credBox(name, fields) {
     box.appendChild(row);
 
     if (held) {
-        const life = credLife(held);
+        const life = credLife(name, held);
         say('Connected' + (held.account ? ' as ' + held.account : '') + '. ' + life.text, life.tone);
     } else {
         say('No token saved. Automatic cannot publish until there is one.', 'warn');
@@ -1798,20 +1808,31 @@ function card(row) {
 
     /* Somewhere to send it is the POST tab's question, and only its question. */
     if (row.status === 'POST' && link) {
+        /* What a destination reads as once it has had this one. Past tense, and the same
+           sentence whichever of the three got it there: Post, Paste and Publish are three ways
+           of asking, and there is only one way of having done it. */
+        const went = (id) => 'Posted on ' + id;
+
         const dest = (label, url, id, paste) => {
+            const sent = gone.includes(id);
             const b = document.createElement('a');
-            b.className = 'btn' + (gone.includes(id) ? ' sent' : '');
+            b.className = 'btn' + (sent ? ' sent' : '');
             b.href = url;
             b.target = '_blank';
             b.rel = 'noopener';
-            b.textContent = label;
+            b.textContent = sent ? went(id) : label;
+            /* Still a link when it is done, because the obvious thing to want next is a look at
+               where it went. Pressing it again records nothing: markSent stops at a destination
+               it already holds. */
+
             /* Turned round on the press, not on the reload that follows it: the tab for
                the destination opens over this page, and the button has to have changed
-               by the time you come back to it. markSent's own repaint agrees a moment
-               later, or puts it back if the save did not take. */
+               by the time you come back to it - in colour and in what it says. markSent's
+               own repaint agrees a moment later, or puts it back if the save did not take. */
             b.onclick = () => {
                 if (paste && row.why) handOver(row.why);
                 b.classList.add('sent');
+                b.textContent = went(id);
                 markSent(row, id);
             };
             acts.appendChild(b);
@@ -1826,9 +1847,13 @@ function card(row) {
            "Publish to Bluesky" does it, and the difference matters more than the two words
            it costs. */
         const auto = (label, id) => {
-            const b = confirmBtn(label, 'SURE? ' + label.toUpperCase(),
+            const sent = gone.includes(id);
+            /* The done label is handed to confirmBtn rather than set afterwards, so that its own
+               reset() on a failed publish restores the right one. The question keeps the asking
+               label: SURE? POSTED ON BLUESKY would be agreeing with itself. */
+            const b = confirmBtn(sent ? went(id) : label, 'SURE? ' + label.toUpperCase(),
                 () => publishNow(row, id, b), 'pubbtn');
-            if (gone.includes(id)) {
+            if (sent) {
                 b.classList.add('sent');
                 b.disabled = true;
                 b.title = 'Already went out this way.';
@@ -2372,8 +2397,18 @@ function prefill() {
        and stays empty until somebody writes in it. */
     const t = (q.get('t') || '').trim();
     if (t && !$('headline').value) $('headline').value = t;
+    /* Facebook and a good many news sites put a URL in their author meta tag rather than a
+       name, and the funny button hands over whatever it finds. Prefixing that with @ produced
+       handles like @https://www.facebook.com/foodandwine - which then turned up in soc_sources
+       as though it were an account worth going back to, in the middle of the one signal that is
+       supposed to tell the bot where to look. cleanHandle reduces a URL to its last path
+       segment, which is the name in every shape that matters here. u/ and r/ are Reddit's own
+       and are left alone. */
     const h = (q.get('h') || '').trim();
-    if (h) $('who').value = /^[@]|^[ur]\//.test(h) ? h : '@' + h.replace(/^@+/, '');
+    if (h) {
+        const name = /^[ur]\//.test(h) ? h : cleanHandle(h);
+        if (name) $('who').value = /^[ur]\//.test(name) ? name : '@' + name;
+    }
     pendingShot = (q.get('m') || '').trim();
     readSource();
 

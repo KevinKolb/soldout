@@ -10,17 +10,48 @@ update it here.
 
 ## The show
 
-SOLD OUT! Comedy is "consignment theater": live improv where audience members bring items
-to sell. The items become props in improvised scenes while live and online audiences bid
-on them.
+SOLD OUT! Comedy is "consignment theater": the stage as the world's first live theatrical
+marketplace, where audience members' own items become improv props and are sold in real time.
+Consignment reinvented through comedy.
+
+**The thesis, in one line.** Like Seinfeld made fun of the J. Peterman catalog, we make fun of
+online selling — while online selling.
+
+That line is the whole position and it settles more arguments than anything else on this page.
+It is why the show can sell sincerely and mock selling at the same time, and it is the brief the
+SOC SOCIALIZER BOT is working to when it goes looking for posts.
+
+**Why it exists.** Live online selling is projected at $68 billion next year, and almost none of
+it is watchable: the worst of QVC crossed with the worst of influencer culture — boring hosts,
+pushy tactics, no entertainment value. SOLD OUT! is the first live shopping experience that is
+entertaining rather than excruciating.
 
 - **Stage Edition:** live theater
 - **Screen Edition:** streamed on Whatnot (portrait format, OBS, "SOLD!" / "NO SALE!" overlays)
+
+### How it works
+
+1. Audience members bring props they want to sell, in **mail-ready boxes** — the thing gets
+   shipped to whoever buys it, so it arrives ready to go.
+2. They pay admission, then meet the **appraiser**: Antiques Roadshow, played straight. The
+   appraisal is, in effect, taking the item on consignment.
+3. The Sell Outs turn the object into scenes. A forgotten bread maker becomes a time machine, an
+   exercise ball becomes a crystal ball dispensing terrible life advice, an old juicer stars in
+   a medical drama.
+4. Live and online audiences bid while it happens.
+
+### The experience
+
+Phones stay **on**, deliberately — the opposite of the usual theater rule, and worth saying out
+loud in copy because audiences expect the opposite. People chat with online viewers, bid in real
+time, and can come up on stage to help sell their own things. The room and the stream are one
+show with two audiences, not a performance and a recording of it.
 
 ### Terminology (use consistently)
 
 - Performers: **"Sell Outs"**
 - Audience members who bring items: **"Willing Prop Sellers"**
+- The Antiques Roadshow figure who takes an item in: the **appraiser**
 - Named scenarios: The Bridal Shower, Law & Order, The Dating Game, Emergency Room X-Rays
 
 ### Voice and style
@@ -37,9 +68,8 @@ on them.
 - **Site:** this repo, deployed to GitHub Pages by
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
   `main`, every 6 hours on a schedule, and on manual runs.
-- **Notion:** show material, and the social account list. Connected to Claude Code
-  through the Notion MCP, reached from the Bible and Socials cards in Backstage. Nothing
-  the site runs on lives there.
+- **Notion:** Backstage for people, and not read by Claude — see "Notion" below. Nothing the
+  site runs on lives there.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the `shop` table that curates the shop, `socializer` for the repost
   queue, `socializer_channel` for how each platform gets posted to, and `prop_candidates`
@@ -50,19 +80,17 @@ Never commit real credentials. See "Deployment secrets" in [README.md](README.md
 
 ## Notion
 
-Notion is Backstage, and the source of truth for show material. Its root page, **BACKSTAGE**
-(`d350ecaf50bc4f1893ba5ab53590ef3e`), holds OVERVIEW, WEBSITE, EDITIONS,
-EMAIL, PROPS, SCRIPTS, SCENES, BITS/EFFECTS & GAGS, SHOW TIME!, KREWE, SOCIALS, TECH,
-PLAYLISTS, NOTES, and SHOP.
+**Do not read Notion.** It is Backstage for people — `/backstage` redirects there and the root
+page (`d350ecaf50bc4f1893ba5ab53590ef3e`) holds OVERVIEW, EDITIONS, PROPS, SCRIPTS, SCENES,
+SHOW TIME!, KREWE, SOCIALS, NOTES and the rest — but it is no longer a source Claude consults,
+and the Notion MCP is not to be used for show material.
 
-Read the relevant page before:
+Why: the pages were thin or empty where it mattered, so a fetch cost a round trip and returned
+less than this file already says. Nothing the site runs on was ever in there.
 
-- writing or editing show copy, or changing terminology
-- touching `/shop`
-- answering questions about scenes, props, or the prop check-in flow
-
-Re-fetch rather than trusting an earlier read in the same session — NOTES and SHOP change
-often. Skip Notion for pure code work with no show-material component.
+**So this file is the show's source of truth.** Anything above about the premise, the flow, the
+terminology or the voice is the version to write from, and when it changes it changes here.
+If something is genuinely missing, ask rather than going to look.
 
 ## Shop (`/shop`)
 
