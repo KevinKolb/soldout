@@ -2366,22 +2366,89 @@ $('gateOut').onclick = async () => { await signOut(); location.reload(); };
  * you were filing used to die there: the queue opened on an empty form as though the
  * button had done nothing. It lives in the tab, so it goes when the tab does. */
 const STASH = 'soc.capture';
+const RULED = 'soc.rule';
 
-function caught() {
+/* Whatever arrived in the address bar, kept safe across the sign-in redirect.
+ *
+ * `needs` is the parameter that says this kind of instruction is present. When it is, the whole
+ * query string goes into sessionStorage under `stash` - because a lapsed session sends you to
+ * Google and brings you back to a bare /socializer/, and without this the instruction dies
+ * there. It lives in the tab, so it goes when the tab does. */
+function heldSearch(stash, needs) {
     const q = new URLSearchParams(location.search);
-    if (q.has('u')) {
-        try { sessionStorage.setItem(STASH, location.search); } catch (e) { /* private mode */ }
+    if (q.has(needs)) {
+        try { sessionStorage.setItem(stash, location.search); } catch (e) { /* private mode */ }
         return q;
     }
     try {
-        const held = sessionStorage.getItem(STASH);
+        const held = sessionStorage.getItem(stash);
         if (held) return new URLSearchParams(held);
     } catch (e) { /* private mode */ }
     return null;
 }
 
-const CAUGHT = caught();
+const CAUGHT = heldSearch(STASH, 'u');
 const CAPTURE = !!CAUGHT;
+
+/* A ruling arriving from somewhere else - the bot's email or its notification, where a button
+ * can only ever be a link.
+ *
+ * WHY IT GOES THROUGH THIS PAGE rather than straight at an endpoint. A link that changes
+ * something the moment it is fetched gets fetched by things that are not you: Outlook rewrites
+ * and follows links, scanners open them, some clients prefetch. Candidates would rule on
+ * themselves in the inbox. Routing the press through here means the change is made by a signed-in
+ * owner with row-level security applying, so a forwarded or leaked email can do nothing - and it
+ * lands you on the queue afterwards, where the next thing you want is already on screen.
+ *
+ * ?rule=<row id>&to=POST or &to=SKIPPED. Nothing else is accepted. */
+const ASKED = heldSearch(RULED, 'rule');
+
+function askedRule() {
+    if (!ASKED) return null;
+    const id = Number(ASKED.get('rule'));
+    const to = String(ASKED.get('to') || '').toUpperCase();
+    if (!Number.isInteger(id) || id <= 0) return null;
+    /* POST and SKIPPED only. Neither publishes anything: one moves the card to the POST tab and
+       one moves it to the archive, and going out to a platform is still a press on the card. A
+       link that could publish is not a thing that should exist in an inbox. */
+    if (to !== 'POST' && to !== 'SKIPPED') return null;
+    return { id, to };
+}
+
+/* Done with it, so a refresh does not rule on the same card twice. */
+function forgetRule() {
+    try { sessionStorage.removeItem(RULED); } catch (e) { /* private mode */ }
+    const clean = new URL(location.href);
+    clean.search = '';
+    history.replaceState(null, '', clean);
+}
+
+/* Applies it, once the queue has been read and we know who is asking. */
+async function applyAskedRule() {
+    const want = askedRule();
+    if (!want) return;
+
+    const row = all.find((r) => r.id === want.id);
+    if (!row) {
+        status('That candidate is not in the queue any more - somebody has already dealt with it,'
+            + ' or it was deleted.', 'err');
+        forgetRule();
+        return;
+    }
+    if (row.status === want.to) {
+        status('Already ' + (want.to === 'POST' ? 'queued to post' : 'archived') + '.', 'good');
+        forgetRule();
+        show(want.to === 'POST' ? 'POST' : 'SKIPPED');
+        return;
+    }
+
+    forgetRule();
+    /* The ordinary ruling path, so the age reset on a card coming back out of the archive and
+       everything else behaves exactly as it does from a press on the card. */
+    await rule(row, want.to);
+    status(want.to === 'POST' ? 'Queued to post. It is on the POST tab.' : 'Archived.', 'good');
+    show(want.to === 'POST' ? 'POST' : 'SKIPPED');
+}
 
 /* What the bookmarklet handed over, cleared from the address bar and from the tab
    afterwards so a refresh does not silently re-fill a form you have already emptied. */
@@ -2509,11 +2576,12 @@ async function render(user) {
     await loadMethods();
     paintChannels();
 
-    /* The whole page either way - the tabs already show one thing at a time, which is
-       all the old stripped-down capture mode was doing. A bookmarklet press just picks
-       which tab you land on, and it outranks the hash: pressing the funny button says
-       what you want more recently than the address bar does. */
-    show(CAPTURE ? 'ADD' : (tabFromHash() || 'NEW'));
+    /* The whole page either way - the tabs already show one thing at a time, which is all the
+       old stripped-down capture mode was doing. An arriving instruction just picks which tab you
+       land on, and it outranks the hash: pressing a button somewhere says what you want more
+       recently than the address bar does. A ruling outranks a capture, because it names one card
+       and is about to move it. */
+    show(askedRule() ? 'NEW' : CAPTURE ? 'ADD' : (tabFromHash() || 'NEW'));
 
     /* Filling the form comes after showing it. A throw in here used to leave every pane
        hidden and the page blank, which looks like a dead site rather than a bad link. */
@@ -2523,7 +2591,15 @@ async function render(user) {
         status('Could not read what the funny button sent: ' + e.message, 'err');
     }
 
-    load();
+    /* Awaited, because a ruling that arrived by link needs the row it names, and the rows are
+       what load() fetches. */
+    await load();
+
+    try {
+        await applyAskedRule();
+    } catch (e) {
+        status('Could not apply that: ' + e.message, 'err');
+    }
 }
 
 /* Typing a tab into the address bar, or reaching one with Back from wherever the hash

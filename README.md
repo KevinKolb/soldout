@@ -109,12 +109,19 @@ Secrets), and only the function that needs one can read it.
 | `GITHUB_TOKEN_SOC` | `build-shop` | Starting a deploy so a shop edit goes live |
 | `SOC_SECRET_KEY` | `soc-connect`, `soc-publish` | Sealing and opening the stored platform credentials. `openssl rand -base64 32` |
 | `THREADS_APP_SECRET` | `soc-connect` | Exchanging a short-lived Threads token for a 60-day one. Without it a pasted token is stored as-is and its lifetime is reported as unknown |
+| `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN` | `soc-digest` | Sending the bot's run-end email as soldoutcomedy@gmail.com. Scope `gmail.send` only — it cannot read a mailbox |
 | `BLUESKY_HANDLE`, `BLUESKY_APP_PASSWORD` | `soc-publish` | Optional fallback, from before credentials were enterable on the page |
 | `FACEBOOK_PAGE_ID`, `FACEBOOK_PAGE_TOKEN` | `soc-publish` | Optional fallback, as above |
 
 `SOC_SECRET_KEY` is the only one of these you need now. Per-platform credentials are entered
 on the Socializer's SETTINGS tab and stored sealed in `socializer_secret`; the two fallback
 pairs are read only when no stored credential exists, so an older setup keeps working.
+
+`soc-digest` is the one function deployed with `--no-verify-jwt`, because the bot calls it
+holding only the publishable key, which is not a JWT. It never trusted its caller anyway: the
+recipient address is a constant in the code and `soc_digest_claim` allows one send per twenty
+minutes, so the worst a stranger with the URL can do is a duplicate copy of your own digest.
+Everything else keeps JWT verification, because everything else acts on the caller's behalf.
 
 A publishing token is worth more than the publishable key by a wide margin: it can post as
 the show. That is the whole reason these functions exist rather than the page calling the

@@ -436,10 +436,39 @@ One `soc_nominate` call per candidate.
 - There is nothing else you can do to this table. Editing a row, overturning a ruling and
   deleting anything are all closed to you at the database, not merely asked against.
 
-## Step 7 - send a notification
+## Step 7 - send the email, then the notification
 
-This runs while nobody is watching, so finish by pushing a notification. Nobody should have
-to go and check whether it ran.
+### The email
+
+**On every run, without exception**, call the digest function. It reads the queue itself and
+sends one email with every unread candidate in it, each with a Post button and a Skip button that
+work - so a run can be dealt with from a phone without opening anything else.
+
+```
+POST https://tjteeqofqozmncfoiofy.supabase.co/functions/v1/soc-digest
+  apikey: <publishable key>
+  Authorization: Bearer <publishable key>
+  Content-Type: application/json
+
+  {"added": 3}
+```
+
+`added` is how many you filed this run, and it is the only thing you tell it - the candidates
+themselves it reads from the table, so nothing you send can end up in the email. It answers
+`{"ok":true,...}`, or `{"ok":false,"skipped":...}` with status 429 if a digest went out in the
+last twenty minutes, which is not a failure and is worth one line in your notes and nothing more.
+
+Call it **after** your nominate calls, so the email contains what you just added. Call it even
+when you added nothing: an email saying the queue is empty is the proof the run happened, and
+that is the whole point of it.
+
+If it fails with anything else, say so in the notification and in your notes - the same rule as
+a failed nominate. A silent run is the one thing this job must never do.
+
+### The notification
+
+Then push a notification as well. Nobody should have to go and check whether it ran, and a push
+arrives where an email might sit.
 
 One line, plus the link. Say how many are waiting in total when it is more than a handful, so
 a queue quietly filling up is visible before it is a chore:
