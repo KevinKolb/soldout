@@ -10,17 +10,48 @@ update it here.
 
 ## The show
 
-SOLD OUT! Comedy is "consignment theater": live improv where audience members bring items
-to sell. The items become props in improvised scenes while live and online audiences bid
-on them.
+SOLD OUT! Comedy is "consignment theater": the stage as the world's first live theatrical
+marketplace, where audience members' own items become improv props and are sold in real time.
+Consignment reinvented through comedy.
+
+**The thesis, in one line.** Like Seinfeld made fun of the J. Peterman catalog, we make fun of
+online selling — while online selling.
+
+That line is the whole position and it settles more arguments than anything else on this page.
+It is why the show can sell sincerely and mock selling at the same time, and it is the brief the
+SOC SOCIALIZER BOT is working to when it goes looking for posts.
+
+**Why it exists.** Live online selling is projected at $68 billion next year, and almost none of
+it is watchable: the worst of QVC crossed with the worst of influencer culture — boring hosts,
+pushy tactics, no entertainment value. SOLD OUT! is the first live shopping experience that is
+entertaining rather than excruciating.
 
 - **Stage Edition:** live theater
 - **Screen Edition:** streamed on Whatnot (portrait format, OBS, "SOLD!" / "NO SALE!" overlays)
+
+### How it works
+
+1. Audience members bring props they want to sell, in **mail-ready boxes** — the thing gets
+   shipped to whoever buys it, so it arrives ready to go.
+2. They pay admission, then meet the **appraiser**: Antiques Roadshow, played straight. The
+   appraisal is, in effect, taking the item on consignment.
+3. The Sell Outs turn the object into scenes. A forgotten bread maker becomes a time machine, an
+   exercise ball becomes a crystal ball dispensing terrible life advice, an old juicer stars in
+   a medical drama.
+4. Live and online audiences bid while it happens.
+
+### The experience
+
+Phones stay **on**, deliberately — the opposite of the usual theater rule, and worth saying out
+loud in copy because audiences expect the opposite. People chat with online viewers, bid in real
+time, and can come up on stage to help sell their own things. The room and the stream are one
+show with two audiences, not a performance and a recording of it.
 
 ### Terminology (use consistently)
 
 - Performers: **"Sell Outs"**
 - Audience members who bring items: **"Willing Prop Sellers"**
+- The Antiques Roadshow figure who takes an item in: the **appraiser**
 - Named scenarios: The Bridal Shower, Law & Order, The Dating Game, Emergency Room X-Rays
 
 ### Voice and style
@@ -37,30 +68,29 @@ on them.
 - **Site:** this repo, deployed to GitHub Pages by
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
   `main`, every 6 hours on a schedule, and on manual runs.
-- **Notion:** show material, and the social account list. Connected to Claude Code
-  through the Notion MCP, reached from the Bible and Socials cards in Backstage. Nothing
-  the site runs on lives there.
+- **Notion:** Backstage for people, and not read by Claude — see "Notion" below. Nothing the
+  site runs on lives there.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the `shop` table that curates the shop, `socializer` for the repost
-  queue, and `prop_candidates` for the prop bot.
+  queue, `socializer_channel` for how each platform gets posted to, and `prop_candidates`
+  for the prop bot. Two Edge Functions: `build-shop` starts a deploy, `soc-publish`
+  publishes a queued post to a platform outright.
 
 Never commit real credentials. See "Deployment secrets" in [README.md](README.md).
 
 ## Notion
 
-Notion is Backstage, and the source of truth for show material. Its root page, **BACKSTAGE**
-(`d350ecaf50bc4f1893ba5ab53590ef3e`), holds OVERVIEW, WEBSITE, EDITIONS,
-EMAIL, PROPS, SCRIPTS, SCENES, BITS/EFFECTS & GAGS, SHOW TIME!, KREWE, SOCIALS, TECH,
-PLAYLISTS, NOTES, and SHOP.
+**Do not read Notion.** It is Backstage for people — `/backstage` redirects there and the root
+page (`d350ecaf50bc4f1893ba5ab53590ef3e`) holds OVERVIEW, EDITIONS, PROPS, SCRIPTS, SCENES,
+SHOW TIME!, KREWE, SOCIALS, NOTES and the rest — but it is no longer a source Claude consults,
+and the Notion MCP is not to be used for show material.
 
-Read the relevant page before:
+Why: the pages were thin or empty where it mattered, so a fetch cost a round trip and returned
+less than this file already says. Nothing the site runs on was ever in there.
 
-- writing or editing show copy, or changing terminology
-- touching `/shop`
-- answering questions about scenes, props, or the prop check-in flow
-
-Re-fetch rather than trusting an earlier read in the same session — NOTES and SHOP change
-often. Skip Notion for pure code work with no show-material component.
+**So this file is the show's source of truth.** Anything above about the premise, the flow, the
+terminology or the voice is the version to write from, and when it changes it changes here.
+If something is genuinely missing, ask rather than going to look.
 
 ## Shop (`/shop`)
 
@@ -108,6 +138,75 @@ How it works now:
 - A `shop` row whose listing has dropped off the storefront still publishes, and its
   link is dead.
 - `assets/storefronts.html` looks like an older copy of the shop page.
+
+## Posting (the Socializer)
+
+Each account tile on the SETTINGS tab holds that platform's **username**
+(`socializer_channel.handle`). The profile address is computed from it by a template per
+platform in `PUBLISH`, and never stored — the tile's View link and its copy box are both views
+of the handle, so they cannot drift from it the way three hand-written copies had already begun
+to. A pasted profile URL or an `@name` is reduced to the name.
+
+Every platform also has a checkbox (`socializer_channel.enabled`). Unchecked, the POST tab
+offers no button for it at all — that is what keeps a card down to the three places you
+actually use. Checked, it leaves the queue one of three ways, picked with a radio in its own
+box on the tile and stored in `socializer_channel.method`:
+
+- **By hand (`INTENT`)** — the platform's composer opens with our words already in the URL,
+  and a human presses their Post button. Needs no credentials and cannot half-work.
+- **Paste (`PASTE`)** — our words go to the clipboard, the destination opens, you paste. The
+  only manual route where a composer URL will not carry text, and the only route at all for
+  a platform with no composer.
+- **Automatic (`API`)** — [supabase/functions/soc-publish](supabase/functions/soc-publish/index.ts)
+  publishes it. Live for Bluesky, Threads and the Facebook **Page**. Two presses on the card,
+  because it puts words on the internet under the show's name with no undo.
+
+### Credentials
+
+Entered on the SETTINGS tab under Automatic, not from a terminal. The page posts the token to
+[soc-connect](supabase/functions/soc-connect/index.ts), which **proves it works with the
+platform** before keeping it — so "Connected" means connected — then seals it with AES-256-GCM
+under `SOC_SECRET_KEY` and writes the ciphertext to `socializer_secret`.
+
+The sealing is what makes this safe without a service-role key, and that is the point. The
+usual shape — tokens in a table, a function with a service key to read them — would bypass
+row-level security for the whole project. Here `soc-publish` reads the row with the *caller's*
+own session, RLS applies throughout, and only the function's key opens the value. **Still no
+service-role key anywhere, and there must never be one.** See
+[_shared/secretbox.ts](supabase/functions/_shared/secretbox.ts).
+
+A token is never read back into the page: the credential field starts empty, and what is known
+about a saved one is stated in words beneath it. Disconnect deletes the row rather than
+flagging it — a token left behind with something saying to ignore it is still a token that can
+post. Changing `SOC_SECRET_KEY` while credentials are stored strands them; they are re-entered
+on the page, which is a nuisance rather than a catastrophe.
+
+Threads tokens last 60 days and `soc-publish` renews one on use when it is within a week of
+expiring, so posting once a month keeps it alive. The settings page shows the clock either way.
+
+Which of the three a platform can carry out is declared in `PUBLISH` in
+[socializer/index.html](socializer/index.html) — the table holds only the choice. A platform
+lists `API` there when `soc-publish` can publish to it **today**, not when the platform would
+allow it; a switch that turns on nothing is worse than no switch. A stored method the
+platform no longer offers falls back to one it does, so nothing strands a card behind a dead
+button.
+
+Facts worth not rediscovering:
+
+- **Nothing can post to a personal Facebook profile.** `publish_actions` was withdrawn in
+  2018 and never replaced. Facebook publishes as a Page or not at all.
+- **`sharer.php` ignores prefilled text.** The `quote` parameter is dead; Facebook reads what
+  it shows from the shared URL's Open Graph tags, which belong to whoever we are reposting.
+- **App Review is only for other people's accounts.** Publishing to a Page we administer
+  works with the app in development mode. Review plus Business Verification is the gate on a
+  multi-tenant product, and it is calendar time, not engineering time.
+- Instagram will not take a text-only post, which is what `has_media` on the queue is for.
+
+Pressing a destination records that it went there and nothing else. Only **DONE** archives a
+card — a post can go to one platform today and another tomorrow.
+
+Never put a publishing credential in a page. See "Edge Function secrets" in
+[README.md](README.md).
 
 ## Backstage and login
 

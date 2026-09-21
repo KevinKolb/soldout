@@ -153,6 +153,23 @@
         .donebtn { background: #ff6b6b; color: #000; }
         .donebtn:hover:not(:disabled) { background: #000; color: #ff6b6b; }
 
+        /* A destination this card has already gone to, wearing the button's colours the
+           other way round. The card now stays on POST through as many destinations as you
+           care to press, so the buttons themselves have to carry which ones are done -
+           otherwise the only record of a press is a tab that opened and closed. The
+           Posted to line says the same thing in words. */
+        .card .acts > .sent { background: #fff; color: #000; }
+        .card .acts > .sent:hover { background: #000; color: #fff; }
+
+        /* Publishing outright, in the green the POST tab wears - it is the same errand as
+           the other destination buttons, so it is not a warning colour. Armed goes black
+           with green lettering, the way DELETE's second press does: the press that puts
+           something on the internet has to look like a different button. */
+        .pubbtn { background: #5ce08a; color: #000; }
+        .pubbtn:hover:not(:disabled) { background: #000; color: #5ce08a; }
+        .pubbtn.armed { background: #000; color: #5ce08a; }
+        .pubbtn.armed:hover:not(:disabled) { background: #5ce08a; color: #000; }
+
         /* The deep red, matching the band a card wears as you swipe it away - the two
            do the same thing, so they are the same colour. Armed goes black with red
            lettering rather than a redder red: the second press has to look like a
@@ -352,6 +369,72 @@
             display: block; font-size: 10px; letter-spacing: 0.5px;
             text-transform: uppercase; color: #999; font-weight: 700;
         }
+        /* How this platform gets posted to, on the tile for the account it posts to. Two
+           buttons rather than a menu: there are two answers and both are worth seeing at
+           once, since the whole point is that they are a choice. */
+        /* Whether we post to this platform at all, above how. Unchecked, the tile keeps its
+           note and loses everything else - there is nothing to decide about a destination we
+           are not using, and a chooser left behind would look like it still applied. */
+        .social .onoff {
+            display: flex; align-items: center; gap: 7px; margin-top: 10px; cursor: pointer;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+        }
+        .social .onoff input {
+            flex: none; width: 15px; height: 15px; margin: 0; accent-color: #000; cursor: pointer;
+        }
+        .social .onoff.off { color: #999; }
+
+        /* The credential. type=password on the token, so a screen share or a photographed
+           laptop does not hand it over - and it is never read back out of the database, so an
+           empty field means "unchanged", not "no token". */
+        .social .cred { margin-top: 9px; }
+        .social .cred input {
+            width: 100%; margin-top: 5px; padding: 5px 7px; border: 2px solid #000;
+            font-family: 'Courier New', Courier, monospace; font-size: 11px; background: #fff;
+        }
+        .social .cred .credrow { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
+        .social .cred .credrow button {
+            flex: 1 1 auto; font-size: 10px; padding: 5px 6px; letter-spacing: 0.4px;
+            text-transform: uppercase; white-space: nowrap;
+        }
+        .social .credsays { font-size: 11px; line-height: 1.4; color: #444; margin-top: 6px; }
+        .social .credsays.on { color: #167c3c; font-weight: 600; }
+        .social .credsays.warn { color: #b3541e; font-weight: 600; }
+
+        /* The account name, which is the one fact a tile holds about where it posts. The
+           address below it is worked out from this, so the two cannot disagree. */
+        .social .handle { margin-top: 10px; }
+        .social .handle label {
+            display: block; font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+            text-transform: uppercase; color: #999;
+        }
+        .social .handle input {
+            width: 100%; margin-top: 4px; padding: 5px 7px; border: 2px solid #000;
+            font-family: 'Courier New', Courier, monospace; font-size: 12px; background: #fff;
+        }
+
+        /* One box per way of posting, stacked. Boxes rather than a row of buttons because each
+           one now carries its own sentence, and the automatic one carries a token field as
+           well - which is not something that fits in a segment of a toggle. */
+        .social .method { margin-top: 10px; }
+        .social .ptype {
+            display: block; border: 2px solid #000; padding: 7px 9px; cursor: pointer;
+            background: #fff;
+        }
+        .social .ptype + .ptype { margin-top: 5px; }
+        .social .ptype.on { background: #ffd93d; }
+        .social .ptype .pick {
+            display: flex; align-items: center; gap: 7px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase;
+        }
+        .social .ptype .pick input {
+            flex: none; width: 14px; height: 14px; margin: 0; accent-color: #000;
+            cursor: pointer;
+        }
+        .social .ptype .blurb {
+            font-size: 11px; line-height: 1.4; color: #444; margin: 5px 0 0 21px;
+        }
+        .social .ptype.on .blurb { color: #000; }
 
         @media (max-width: 620px) {
             .card { display: block; }
@@ -431,7 +514,7 @@
                 </div>
 
                 <div class="actions">
-                    <button id="save" type="button">Send</button>
+                    <button id="save" type="button">SAVE POST CANDIDATE</button>
                     <button id="clear" class="ghost" type="button">Clear</button>
                 </div>
             </details>
@@ -839,6 +922,496 @@ const NATIVE = ['X', 'Bluesky', 'Threads', 'Facebook', 'Reddit', 'Instagram', 'T
    sit in the order. */
 const PLATFORMS = ['X', 'Bluesky', 'Threads', 'Facebook', 'Reddit', 'Instagram', 'TikTok'];
 
+/* --- how each platform gets posted to ------------------------------------------------
+ *
+ * INTENT is the composer URL this page has always used: their tab opens with our words
+ * already in it, and a human presses their Post button. Every platform has one, it needs no
+ * credentials, and it cannot half-work - which is why it is the default and stays the
+ * fallback for good.
+ *
+ * API is supabase/functions/soc-publish doing it outright. That needs a credential per
+ * platform and is not available everywhere, so it is a choice made per platform on the
+ * SETTINGS tab rather than a mode the whole page is in.
+ *
+ *   api: 'live'   soc-publish can publish there today.
+ *   api: 'soon'   the platform allows it; the function does not do it yet.
+ *   api: false    the platform will not allow it, and `note` says why.
+ */
+const METHOD = {
+    INTENT: { label: 'By hand', only: 'By hand only',
+        blurb: 'Their composer opens in a tab with the two cents already in it. You press'
+            + ' their Post button.' },
+    PASTE: { label: 'Paste', only: 'Paste only',
+        blurb: 'The two cents go to the clipboard and their page opens. You paste and post.' },
+    API: { label: 'Automatic', only: 'Automatic only',
+        blurb: 'Published from here outright. Nothing opens and nothing waits for you.' },
+};
+
+/* `methods` is what the SETTINGS tab offers for that platform, in order, and the first one
+   is what it does until somebody chooses otherwise. A platform only lists a method it can
+   actually carry out:
+ *
+ *   INTENT  its composer takes our words in the URL. Facebook's does not, which is the
+ *           whole reason PASTE exists, so Facebook does not offer INTENT - opening the
+ *           sharer with the words dropped is not a way of posting them.
+ *   PASTE   there is somewhere to open and our words go to the clipboard on the way.
+ *           The only manual route for anything with no composer at all.
+ *   API     soc-publish can publish there TODAY. Not "the platform allows it" - a switch
+ *           that turns on nothing is worse than no switch.
+ *
+ * `api` is separately what the platform would allow, which is what the note talks about.
+ * The two differ on purpose: X allows publishing and we have not wired it, and saying so is
+ * more use than hiding it.
+ */
+const PUBLISH = {
+    Bluesky: { methods: ['INTENT', 'PASTE', 'API'], api: 'live',
+        /* The whole handle, including the .bsky.social, because that is what the address
+           wants and a bare name would give a profile that does not exist. */
+        at: (h) => 'https://bsky.app/profile/' + h,
+        creds: { account: 'Handle', token: 'App password' },
+        note: 'An app password from bsky.app, and that is all - no review, no cost.' },
+    Facebook: { methods: ['PASTE', 'API'], api: 'live',
+        /* No www, matching the address this tile has always linked to. Facebook redirects
+           either way; computing the URL is not the moment to quietly change one. */
+        at: (h) => 'https://facebook.com/' + h,
+        creds: { account: 'Page ID', token: 'Page access token' },
+        note: 'Automatic publishes as the PAGE. Nothing can post to a personal profile,'
+            + ' and no composer URL will carry our words - hence Paste.' },
+    Threads: { methods: ['INTENT', 'PASTE', 'API'], api: 'live',
+        at: (h) => 'https://www.threads.com/@' + h,
+        /* No account field: the token names its own account, and /me is asked for it when the
+           token is saved. Typing it in as well would be a second chance to get it wrong. */
+        creds: { token: 'Access token' },
+        note: 'A token from a Meta app with threads_content_publish. It lasts 60 days and is'
+            + ' renewed on use, so posting once a month keeps it alive by itself.' },
+    Instagram: { methods: ['PASTE'], api: 'soon',
+        at: (h) => 'https://www.instagram.com/' + h,
+        note: 'No composer URL at all, so Paste is the only way by hand. A Business or'
+            + ' Creator account can publish, but only with a picture.' },
+    X: { methods: ['INTENT', 'PASTE'], api: 'soon',
+        at: (h) => 'https://x.com/' + h,
+        note: 'Publishing needs a paid API tier. The free one cannot post often enough'
+            + ' to be worth the wiring.' },
+    Reddit: { methods: ['INTENT', 'PASTE'], api: 'soon',
+        at: (h) => 'https://www.reddit.com/user/' + h,
+        note: 'The API can publish. Automated self-promotion is how accounts get banned,'
+            + ' so this one wants a human more than the others do.' },
+    TikTok: { methods: ['PASTE'], api: false,
+        at: (h) => 'https://www.tiktok.com/@' + h,
+        note: 'Its posting API is video only and needs an audit to leave sandbox.' },
+    YouTube: { methods: [], api: false,
+        at: (h) => 'https://www.youtube.com/@' + h,
+        note: 'Video uploads only. There is nothing in this queue it would take.' },
+    Whatnot: { methods: [], api: false,
+        at: (h) => 'https://www.whatnot.com/user/' + h,
+        note: 'No public API and nothing in this queue goes there.' },
+    Poshmark: { methods: [], api: false,
+        at: (h) => 'https://poshmark.com/closet/' + h,
+        note: 'No public API and nothing in this queue goes there.' },
+};
+
+/* platform -> 'INTENT' | 'PASTE' | 'API', as the socializer_channel table has it. Empty
+   until the first read, and empty means each platform's own default, so the page works
+   before the migration is run. */
+let methods = {};
+
+/* platform -> whether we post there at all. Same table, and the same rule for an empty one:
+   before the migration the page behaves as it always did, which is that everything with a
+   composer gets a button. */
+let onPlat = {};
+
+/* platform -> what is known about its stored credential, which is everything except the
+   credential. The token itself is sealed in the database and cannot be read back by anything
+   but the publishing function, so the page can say when it was saved and never what it is. */
+let creds = {};
+
+/* platform -> the account name there. Empty before the migration, which is why every tile's
+   own markup still carries its address: an unknown handle shows what the page always showed
+   rather than an empty box where a link used to be. */
+let handles = {};
+
+function isOn(id) {
+    return onPlat[id] !== false;
+}
+
+/* The address of our account there, or '' if we do not know the handle. Worked out rather than
+   stored, so there is one copy of the fact and the link cannot drift from the name above it. */
+function accountUrl(id) {
+    const h = (handles[id] || '').trim();
+    const def = PUBLISH[id];
+    return h && def && def.at ? def.at(h) : '';
+}
+
+/* What somebody types into a handle field is whatever was on the clipboard: a bare name, an
+   @name, or the whole profile URL they were just looking at. All three mean the same thing, so
+   all three are accepted and reduced to the name.
+ *
+ * The URL case takes the last non-empty path segment, which is right for every template in
+ * PUBLISH - profile/<handle>, user/<handle>, closet/<handle>, @<handle> and a bare /<handle>
+ * all put it last. */
+function cleanHandle(said) {
+    let h = (said || '').trim();
+    if (/^https?:\/\//i.test(h)) {
+        try {
+            const parts = new URL(h).pathname.split('/').filter(Boolean);
+            h = parts.length ? parts[parts.length - 1] : '';
+        } catch (e) { /* not a URL after all; leave it be */ }
+    }
+    return h.replace(/^@+/, '').trim();
+}
+
+async function setHandle(platform, said, tile) {
+    const handle = cleanHandle(said);
+    if (handle === (handles[platform] || '')) return;
+
+    const { data, error } = await supabase
+        .from('socializer_channel')
+        .update({ handle, updated_at: new Date().toISOString() })
+        .eq('platform', platform)
+        .select('platform');
+    if (error || !(data || []).length) {
+        status('Could not save the ' + platform + ' account name: '
+            + (error ? error.message : 'the channel table has no row for it.')
+            + ' Has tools/socializer-migration-20-handles.sql been run?', 'err');
+        return;
+    }
+
+    handles[platform] = handle;
+    status(handle ? platform + ' is @' + handle + ' - ' + accountUrl(platform)
+        : platform + ' has no account name now.', 'good');
+    /* Just this tile. Repainting all ten would take the focus out of the field somebody is
+       still in, and nothing else on the page depends on one platform's handle. */
+    paintTile(tile);
+}
+
+/* The method actually in force, which is not always the one stored: a platform that stops
+   offering a method - because it was wired up and then was not, or because this list
+   changed under a row - falls back to its first. Nothing should be able to strand a card
+   behind a button that does nothing. */
+function methodFor(id) {
+    const def = PUBLISH[id];
+    if (!def || !def.methods.length) return 'INTENT';
+    const want = methods[id];
+    return def.methods.includes(want) ? want : def.methods[0];
+}
+
+async function loadMethods() {
+    methods = {};
+    onPlat = {};
+    creds = {};
+    handles = {};
+
+    const { data, error } = await supabase
+        .from('socializer_channel').select('platform, method, enabled, handle');
+    if (!error) {
+        (data || []).forEach((r) => {
+            methods[r.platform] = r.method;
+            onPlat[r.platform] = r.enabled !== false;
+            handles[r.platform] = r.handle || '';
+        });
+    }
+    /* Before the migration is run neither table is there, which is not worth shouting about:
+       everything posts by hand until they exist, which is what it did before. The settings tab
+       says so in the one place somebody is looking for the switch. */
+
+    /* Named columns, not *: there is no reason to pull the sealed credential into a browser
+       that has nothing to open it with. It would be harmless - that is what sealing it buys -
+       but a page that never holds one cannot leak one. */
+    const said = await supabase
+        .from('socializer_secret').select('platform, account, expires_at, updated_at, set_by');
+    if (!said.error) {
+        (said.data || []).forEach((r) => { creds[r.platform] = r; });
+    }
+}
+
+async function setEnabled(platform, on) {
+    const { data, error } = await supabase
+        .from('socializer_channel')
+        .update({ enabled: on, updated_at: new Date().toISOString() })
+        .eq('platform', platform)
+        .select('platform');
+    if (error || !(data || []).length) {
+        status('Could not turn ' + platform + (on ? ' on: ' : ' off: ')
+            + (error ? error.message : 'the channel table has no row for it.')
+            + ' Has tools/socializer-migration-19-credentials.sql been run?', 'err');
+        return;
+    }
+    onPlat[platform] = on;
+    status(on ? platform + ' is a destination again.'
+        : platform + ' will not be offered on a card any more.', 'good');
+    paintChannels();
+    paint();
+}
+
+/* Saving a credential goes through soc-connect, never straight into the table: the function
+   holds the key that seals it, and it proves the credential works with the platform before
+   keeping it. So a green line here means it really is connected. */
+async function connect(platform, account, token, said) {
+    said('Checking it with ' + platform + '...', '');
+    try {
+        const out = await callFn('soc-connect', { platform, account, token });
+        creds[platform] = {
+            platform,
+            account: out.account || '',
+            expires_at: out.expires || null,
+            updated_at: new Date().toISOString(),
+            set_by: me,
+        };
+        if (out.warning) status(platform + ': ' + out.warning, 'err');
+        else status('Connected to ' + platform + (out.says ? ' as ' + out.says : '') + '.', 'good');
+        paintChannels();
+        paint();
+    } catch (e) {
+        said(e.message, 'warn');
+    }
+}
+
+async function disconnect(platform, said) {
+    try {
+        await callFn('soc-connect', { platform, forget: true });
+        delete creds[platform];
+        status(platform + ' is disconnected. Its token is gone, not disabled.', 'good');
+        paintChannels();
+        paint();
+    } catch (e) {
+        said(e.message, 'warn');
+    }
+}
+
+/* How long a token has, in the words you would use about it. Null usually means it does not
+   expire, which is true of a Bluesky app password and a Facebook System User token - they are
+   revoked instead, and nothing here can see that coming.
+ *
+ * Threads is the exception and has to be named: its tokens ALWAYS expire, so a null there means
+ * soc-connect could not find out when, and saying "does not expire" would be the one answer
+ * that is certainly wrong. */
+function credLife(platform, row) {
+    if (!row.expires_at) {
+        return platform === 'Threads'
+            ? { text: 'Lifetime unknown - set THREADS_APP_SECRET on the function so a'
+                + ' short-lived token can be exchanged for a 60-day one.', tone: 'warn' }
+            : { text: 'Does not expire.', tone: 'on' };
+    }
+    const days = Math.floor((new Date(row.expires_at).getTime() - Date.now()) / 864e5);
+    if (days < 0) return { text: 'Expired. Enter a new one.', tone: 'warn' };
+    if (days <= 7) {
+        return { text: days + ' day' + (days === 1 ? '' : 's') + ' left - publish something'
+            + ' and it renews itself, or enter a new token.', tone: 'warn' };
+    }
+    return { text: days + ' days left, renewed automatically when it publishes.', tone: 'on' };
+}
+
+async function setMethod(platform, method) {
+    const { data, error } = await supabase
+        .from('socializer_channel')
+        .update({ method, updated_at: new Date().toISOString() })
+        .eq('platform', platform)
+        .select('platform');
+    if (error || !(data || []).length) {
+        status('Could not change how ' + platform + ' posts: '
+            + (error ? error.message : 'the channel table has no row for it.')
+            + ' Has tools/socializer-migration-18-publish-methods.sql been run?', 'err');
+        return;
+    }
+    methods[platform] = method;
+    status(platform + ': ' + {
+        INTENT: 'its composer will open with the words already in it.',
+        PASTE: 'the words go to the clipboard and its page opens, for you to paste.',
+        API: 'it will be published to outright, no tab, no pressing.',
+    }[method], 'good');
+    paintChannels();
+    /* The POST tab's buttons are built out of this, so they change with it. */
+    paint();
+}
+
+/* Everything the SETTINGS tab decides, on each account tile: which account, whether we post
+   there, how, and the credential if the how needs one. The tiles are static markup - one per
+   account, with the platform's name in .plat - so this reads the name off the tile rather than
+   keeping a second list of platforms in step with the first. */
+function paintChannels() {
+    document.querySelectorAll('#paneSettings .social').forEach(paintTile);
+}
+
+function platformOf(tile) {
+    const head = tile.querySelector('.plat');
+    return ((head && head.textContent) || '').trim();
+}
+
+function paintTile(tile) {
+    const name = platformOf(tile);
+    const can = PUBLISH[name];
+    if (!can) return;
+
+    tile.querySelectorAll('.onoff, .handle, .method, .methodnote').forEach((o) => o.remove());
+
+    const live = can.methods.length > 0;
+    const on = isOn(name);
+
+    /* The handle, and the address worked out from it. Both of the tile's own copies of that
+       address are overwritten here rather than left as they were: the View link and the box you
+       copy out of are now views of the handle, and a stale one beside a live one is worse than
+       either. Until the migration runs there is no handle, and the markup's own address stands -
+       which is the address that was always there, so nothing looks broken in the meantime. */
+    const url = accountUrl(name);
+    if (url) {
+        const at = tile.querySelector('.at');
+        if (at) at.textContent = (handles[name] || '');
+        const view = tile.querySelector('.view');
+        if (view) view.href = url;
+        const box = tile.querySelector('input.url');
+        if (box) box.value = url;
+    }
+
+    const field = document.createElement('div');
+    field.className = 'handle';
+    const tag = document.createElement('label');
+    tag.textContent = 'Username';
+    const put = document.createElement('input');
+    put.type = 'text';
+    put.value = handles[name] || '';
+    put.placeholder = 'the account name on ' + name;
+    put.autocomplete = 'off';
+    put.spellcheck = false;
+    /* On change, not on every keystroke: a write per letter would be a write per letter, and
+       change fires on blur and on Enter, which is when somebody has finished saying it. */
+    put.onchange = () => setHandle(name, put.value, tile);
+    put.onkeydown = (e) => { if (e.key === 'Enter') put.blur(); };
+    tag.appendChild(put);
+    field.appendChild(tag);
+    tile.appendChild(field);
+
+    /* The checkbox, wherever there is anything to post. A platform with no way in at all does
+       not get one: unchecking something that was never offered is not a choice. */
+    if (live) {
+        const label = document.createElement('label');
+        label.className = 'onoff' + (on ? '' : ' off');
+        const box = document.createElement('input');
+        box.type = 'checkbox';
+        box.checked = on;
+        box.onchange = () => setEnabled(name, box.checked);
+        label.append(box, document.createTextNode(on ? 'Posting here' : 'Not posting here'));
+        tile.appendChild(label);
+    }
+
+    /* Off, the tile keeps its note and nothing else. How to post somewhere we are not posting is
+       not a question, and a chooser left sitting there would read as though it still applied. */
+    if (live && on) {
+        const now = methodFor(name);
+        const box = document.createElement('div');
+        box.className = 'method';
+
+        can.methods.forEach((key) => {
+            /* One box per post type, and the whole box is the label - so the sentence explaining
+               a method is part of pressing it rather than something to read first and then go
+               and find the right radio for. */
+            const pick = document.createElement('label');
+            pick.className = 'ptype' + (now === key ? ' on' : '');
+
+            const head = document.createElement('div');
+            head.className = 'pick';
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            /* One group per platform. A single name across the page would make choosing Paste on
+               Bluesky un-choose whatever Facebook was on. */
+            radio.name = 'ptype-' + name;
+            radio.value = key;
+            radio.checked = now === key;
+            radio.onchange = () => { if (methodFor(name) !== key) setMethod(name, key); };
+            head.append(radio, document.createTextNode(METHOD[key].label));
+            pick.appendChild(head);
+
+            const blurb = document.createElement('p');
+            blurb.className = 'blurb';
+            blurb.textContent = METHOD[key].blurb;
+            pick.appendChild(blurb);
+
+            /* The credential lives in the box for the method that uses it, and stays visible
+               whether or not that method is the chosen one - so a token can be set up before
+               switching over, rather than only after. */
+            if (key === 'API' && can.creds) pick.appendChild(credBox(name, can.creds));
+
+            box.appendChild(pick);
+        });
+
+        tile.appendChild(box);
+    }
+
+    const note = document.createElement('p');
+    note.className = 'how methodnote';
+    const label = document.createElement('b');
+    label.textContent = !live ? 'Nothing to post'
+        : !on ? 'Off'
+        : can.methods.length > 1 ? 'Posting'
+        : METHOD[can.methods[0]].only;
+    note.append(label, document.createTextNode(can.note));
+    tile.appendChild(note);
+}
+
+/* The credential fields for one platform. Nothing here ever shows a token: the stored one
+   cannot be read back by this page at all, so the fields start empty and what is known about
+   the saved credential is said in words underneath it. */
+function credBox(name, fields) {
+    const box = document.createElement('div');
+    box.className = 'cred';
+
+    /* This sits inside the post type's <label>, so without this a press on the token field or
+       the Connect button would also tick that label's radio and switch the method. Typing a
+       credential is not the same act as choosing to use it. */
+    box.onclick = (e) => e.preventDefault();
+
+    const line = document.createElement('p');
+    line.className = 'credsays';
+
+    const say = (text, tone) => {
+        line.textContent = text;
+        line.className = 'credsays' + (tone ? ' ' + tone : '');
+    };
+
+    const inputs = {};
+    Object.keys(fields).forEach((key) => {
+        const i = document.createElement('input');
+        i.type = key === 'token' ? 'password' : 'text';
+        i.placeholder = fields[key];
+        i.autocomplete = 'off';
+        i.spellcheck = false;
+        /* The account half is not a secret and is worth showing, so a wrong Page is something
+           you can see rather than something you find out from a post. */
+        if (key === 'account' && creds[name]) i.value = creds[name].account || '';
+        inputs[key] = i;
+        box.appendChild(i);
+    });
+
+    const row = document.createElement('div');
+    row.className = 'credrow';
+
+    const held = creds[name];
+    const save = btn(held ? 'Replace' : 'Connect', async () => {
+        const token = (inputs.token.value || '').trim();
+        if (!token) { say('Paste the token in first.', 'warn'); save.disabled = false; return; }
+        await connect(name, (inputs.account ? inputs.account.value : '').trim(), token, say);
+        /* Out of the DOM either way: a token left in a field is a token on the screen. */
+        inputs.token.value = '';
+        save.disabled = false;
+    });
+    row.appendChild(save);
+
+    if (held) {
+        row.appendChild(confirmBtn('Disconnect', 'Sure? Remove',
+            () => disconnect(name, say), 'delbtn'));
+    }
+    box.appendChild(row);
+
+    if (held) {
+        const life = credLife(name, held);
+        say('Connected' + (held.account ? ' as ' + held.account : '') + '. ' + life.text, life.tone);
+    } else {
+        say('No token saved. Automatic cannot publish until there is one.', 'warn');
+    }
+    box.appendChild(line);
+
+    return box;
+}
+
 function nativeUrl(row) {
     if (row.source === 'X') {
         const m = row.post_url.match(/status(?:es)?\/(\d+)/);
@@ -855,9 +1428,28 @@ function composers(row) {
         { id: 'X',        url: 'https://x.com/intent/post?text=' + e(t) + '&url=' + e(u) },
         { id: 'Bluesky',  url: 'https://bsky.app/intent/compose?text=' + e(t + ' ' + u) },
         { id: 'Threads',  url: 'https://www.threads.net/intent/post?text=' + e(t + ' ' + u) },
+        /* No text on this one, because there is no parameter left that carries it. The
+           quote= that sharer.php used to honour is ignored, and what Facebook shows is
+           read from the Open Graph tags of the page being shared - somebody else's post,
+           whose tags are not ours to write. Which is why Facebook offers no INTENT in
+           PUBLISH above: the clipboard is the only way our words reach the box. */
         { id: 'Facebook', url: 'https://www.facebook.com/sharer/sharer.php?u=' + e(u) },
         { id: 'Reddit',   url: 'https://www.reddit.com/submit?url=' + e(u) + '&title=' + e(t) },
     ];
+}
+
+/* The two cents, handed over on the clipboard for the destinations that will not take
+   them in a URL. Fired inside the press so the write happens while this page still has
+   focus - a moment later the destination's own tab has it, and the clipboard is closed to
+   a document that does not. On failure the words go in the status line, so they are still
+   somewhere you can select them from. */
+async function handOver(why) {
+    try {
+        await navigator.clipboard.writeText(why);
+        status('Your two cents are on the clipboard - paste them into the box.', 'good');
+    } catch {
+        status('Could not reach the clipboard. Your two cents, to copy by hand: ' + why, 'err');
+    }
 }
 
 /* soc_nominate refuses a post_url that is not http(s), because from now on a stranger
@@ -904,15 +1496,15 @@ const TABS = [
         key: 'ADD', label: '+', tone: 'plus',
         hint: 'Add one by hand, or set up the funny button',
     },
+    { key: 'NEW',   label: 'Candidates', bin: true, empty: 'Your work here is done!' },
     {
-        key: 'SKIPPED', label: 'Archive', bin: true, tone: 'skip',
+        key: 'SKIPPED', label: 'Archive', bin: true, tone: 'skip', slug: 'archive',
         /* Everything no longer in play: the ones you passed on, and the ones that have
            been and gone. A tab's key is its own status; `holds` is for the ones that
            gather up more than one. */
         holds: ['SKIPPED', 'POSTED'],
         empty: 'Your work here is done!',
     },
-    { key: 'NEW',   label: 'Candidates', bin: true, empty: 'Your work here is done!' },
     { key: 'POST',  label: 'Post', bin: true, tone: 'post', empty: 'Your work here is done!' },
     { key: 'SETTINGS', label: 'Settings', far: true },
 ];
@@ -987,8 +1579,47 @@ function paintTabs() {
 
 /* One pane at a time. The queue pane answers for all four bins; ADD and SETTINGS
    have a pane each. */
+/* Which tab the address bar is pointing at, or '' if it is not pointing at one.
+ *
+ * The hash rather than a query parameter, because the query string is already spoken for:
+ * the funny button arrives on ?u=, Supabase hands a session back on ?code=, and prefill()
+ * clears the whole of it when it is done. A key has to be one we know - the hash is also
+ * where an implicit-flow sign-in would put its tokens, and #access_token is not a tab.
+ * Each tab's slug is its key lowercased unless it carries one of its own, which only
+ * ARCHIVE does - a link should say what the tab on screen says, and that tab's key is the
+ * status it holds rather than the word above it. */
+function slugOf(t) {
+    return t.slug || t.key.toLowerCase();
+}
+
+function hashNow() {
+    return location.hash.replace(/^#/, '').toLowerCase();
+}
+
+function tabFromHash() {
+    const want = hashNow();
+    if (!want) return '';
+    /* The slug first, then the bare key, so #skipped still opens the ARCHIVE tab: that is
+       the status's own name, and it is what a link saved before the tab had a slug says. */
+    const hit = TABS.find((t) => slugOf(t) === want)
+        || TABS.find((t) => t.key.toLowerCase() === want);
+    return hit ? hit.key : '';
+}
+
 function show(key) {
     tab = key;
+
+    /* So a refresh comes back to the tab you were on rather than to CANDIDATES, and so a
+       link to one tab is a thing you can send. replaceState, not pushState: the tabs are
+       one page showing one thing at a time, and making each glance at one its own history
+       entry would turn Back into an undo for looking around. */
+    const def = TABS.find((t) => t.key === key);
+    const slug = def ? slugOf(def) : key.toLowerCase();
+    if (hashNow() !== slug) {
+        const at = new URL(location.href);
+        at.hash = slug;
+        history.replaceState(history.state, '', at);
+    }
     $('paneAdd').hidden = key !== 'ADD';
     $('paneSettings').hidden = key !== 'SETTINGS';
     $('paneQueue').hidden = !isBin(key);
@@ -1188,25 +1819,85 @@ function card(row) {
 
     /* Somewhere to send it is the POST tab's question, and only its question. */
     if (row.status === 'POST' && link) {
-        const dest = (label, url, id) => {
+        /* What a destination reads as once it has had this one. Past tense, and the same
+           sentence whichever of the three got it there: Post, Paste and Publish are three ways
+           of asking, and there is only one way of having done it. */
+        const went = (id) => 'Posted on ' + id;
+
+        const dest = (label, url, id, paste) => {
+            const sent = gone.includes(id);
             const b = document.createElement('a');
-            b.className = 'btn';
+            b.className = 'btn' + (sent ? ' sent' : '');
             b.href = url;
             b.target = '_blank';
             b.rel = 'noopener';
-            b.textContent = label;
-            b.onclick = () => markSent(row, id);
+            b.textContent = sent ? went(id) : label;
+            /* Still a link when it is done, because the obvious thing to want next is a look at
+               where it went. Pressing it again records nothing: markSent stops at a destination
+               it already holds. */
+
+            /* Turned round on the press, not on the reload that follows it: the tab for
+               the destination opens over this page, and the button has to have changed
+               by the time you come back to it - in colour and in what it says. markSent's
+               own repaint agrees a moment later, or puts it back if the save did not take. */
+            b.onclick = () => {
+                if (paste && row.why) handOver(row.why);
+                b.classList.add('sent');
+                b.textContent = went(id);
+                markSent(row, id);
+            };
+            acts.appendChild(b);
+        };
+
+        /* The automatic kind. A <button>, not a link, because nothing opens: the press is
+           the posting. Two presses, borrowed from DELETE - this one puts words on the
+           internet under the show's name and there is no taking them back, so it should not
+           be something a thumb can do on the way past.
+
+           The label says which it is. "Post on Bluesky" opens Bluesky for you to post in;
+           "Publish to Bluesky" does it, and the difference matters more than the two words
+           it costs. */
+        const auto = (label, id) => {
+            const sent = gone.includes(id);
+            /* The done label is handed to confirmBtn rather than set afterwards, so that its own
+               reset() on a failed publish restores the right one. The question keeps the asking
+               label: SURE? POSTED ON BLUESKY would be agreeing with itself. */
+            const b = confirmBtn(sent ? went(id) : label, 'SURE? ' + label.toUpperCase(),
+                () => publishNow(row, id, b), 'pubbtn');
+            if (sent) {
+                b.classList.add('sent');
+                b.disabled = true;
+                b.title = 'Already went out this way.';
+            }
             acts.appendChild(b);
         };
 
         const posts = {};
-        composers(row).forEach((c) => { posts[c.id] = c.url; });
+        composers(row).forEach((c) => { posts[c.id] = c; });
 
         PLATFORMS.forEach((id) => {
+            /* Unchecked on SETTINGS means not a destination, so not a button. This is the one
+               place that decides it: leaving the button out is the whole feature, and a card
+               offering nine places to post when three are in use is the thing it fixes. */
+            if (!isOn(id)) return;
+
             /* Reposting where it already lives comes before posting a link to it there,
-               because it is the better move - but only within that platform's turn. */
-            if (id === row.source && native) dest('Repost on ' + id, nativeUrl(row), id);
-            if (posts[id]) dest('Post on ' + id, posts[id], id);
+               because it is the better move - but only within that platform's turn. It takes
+               the clipboard where the platform is set to PASTE: you are about to be looking
+               at a box to type in either way. Never the API, which publishes our own post
+               and is not what reposting someone else's means. */
+            if (id === row.source && native) {
+                dest('Repost on ' + id, nativeUrl(row), id, methodFor(id) === 'PASTE');
+            }
+            if (!posts[id]) return;
+
+            /* Which of the three a platform gets is the SETTINGS tab's business. The card
+               only asks - and the label says which, because a button that posts outright
+               and a button that opens a tab should not read the same. */
+            const how = methodFor(id);
+            if (how === 'API') auto('Publish to ' + id, id);
+            else if (how === 'PASTE') dest('Paste on ' + id, posts[id].url, id, true);
+            else dest('Post on ' + id, posts[id].url, id, false);
         });
     }
 
@@ -1250,10 +1941,11 @@ function card(row) {
         del = confirmBtn('DELETE', 'SURE? DELETE', () => hide(row));
         rules.appendChild(del);
     } else {
-        /* Posted by hand, or posted from here and the destination press did not happen.
-           Either way this is the only thing that can say so - pressing a destination was
-           the only route to the archive, and there is no destination for "I did it on my
-           phone". Left, because that is where the ARCHIVE tab is, same as SKIP. */
+        /* The only route to the archive, and deliberately a press of its own: a card
+           stays here through as many destinations as you care to send it to, and you say
+           when you are finished with it. That also covers the ones with no destination to
+           press - posted by hand, or posted from your phone. Left, because that is where
+           the ARCHIVE tab is, same as SKIP. */
         const done = btn('← DONE', () => rule(row, 'POSTED'));
         done.classList.add('donebtn');
         rules.appendChild(done);
@@ -1478,10 +2170,13 @@ async function repeat(row) {
  * The arming is exposed rather than kept inside the click handler, because the swipe
  * asks the same question and has to be able to see the same answer. Two ways in, one
  * state - or a card could be armed by one of them and deleted by the other. */
-function confirmBtn(label, question, fn) {
+function confirmBtn(label, question, fn, cls) {
     const b = document.createElement('button');
     b.type = 'button';
-    b.className = 'delbtn';
+    /* DELETE was the only two-press button for a long time and the colour was baked in.
+       Publishing is the second one and it is not a destructive act, so the colour is the
+       caller's to say - the arming is what they are really borrowing. */
+    b.className = cls || 'delbtn';
     b.textContent = label;
 
     let armed = 0;
@@ -1506,28 +2201,81 @@ function confirmBtn(label, question, fn) {
         await fn();
     };
 
+    /* For a caller whose action can fail and leave the card in place. Without this the
+       button sits there still asking SURE? about something that did not happen. */
+    b.reset = () => {
+        b.textContent = label;
+        b.classList.remove('armed');
+        b.disabled = false;
+    };
+
     b.onclick = () => (armed ? b.fire() : b.arm());
     return b;
 }
 
-/* Pressing a destination records that it went there, and the first one moves the card
-   out of CANDIDATES - with no Post button left, sending it somewhere is what posting means.
-   The other destinations stay on the card afterwards, because a thing can go to Bluesky
-   today and X tomorrow and those remain two separate questions. Fired on the link's own
-   click, so the tab opens either way. */
+/* Pressing a destination records that it went there, and nothing else. It used to archive
+   the card on the first press, which contradicted the whole point of leaving the other
+   destinations up: a thing can go to Bluesky today and X tomorrow, and the card was gone
+   before tomorrow. Leaving the POST tab is DONE's job now. Fired on the link's own click,
+   so the tab opens either way. */
 async function markSent(row, dest) {
     const seen = row.posted_to || [];
-    const patch = {};
-
-    if (!seen.includes(dest)) patch.posted_to = seen.concat([dest]);
-    if (row.status === 'POST') {
-        patch.status = 'POSTED';
-        patch.handled_at = new Date().toISOString();
-    }
-    if (!Object.keys(patch).length) return;
+    if (seen.includes(dest)) return;
+    const patch = { posted_to: seen.concat([dest]) };
 
     const { error } = await supabase.from('socializer').update(patch).eq('id', row.id);
-    if (!error) load();
+    if (error) {
+        /* The button was turned round before this ran. Repainting from the rows we
+           already hold puts it back, so a failed save does not leave the card claiming
+           the post went somewhere it did not. */
+        status('Could not record that it went to ' + dest + ': ' + error.message, 'err');
+        paint();
+        return;
+    }
+
+    /* Recorded on the row we already hold as well as in the table, so the Posted to line
+       names the new destination on this repaint rather than on the next read. */
+    row.posted_to = patch.posted_to;
+    paint();
+    load();
+}
+
+/* Publishing outright, through supabase/functions/soc-publish - which is where the tokens
+   live, because a token in this page would be readable by everyone who loads it.
+ *
+ * The card is NOT moved to the archive by this, any more than pressing a destination is.
+ * Going out somewhere and being finished with are two different things, and DONE is still
+ * the only thing that says the second one. */
+async function publishNow(row, platform, b) {
+    status('Publishing to ' + platform + '...', 'busy');
+
+    let out;
+    try {
+        out = await callFn('soc-publish', { id: row.id, platform });
+    } catch (e) {
+        status(e.message, 'err');
+        b.reset();
+        return;
+    }
+
+    /* A warning means it went out but the queue did not record it. Saying so matters more
+       than anything else on the page: the one thing not to do next is press it again. */
+    if (out.warning) status(out.warning, 'err');
+    else status('Published to ' + platform + '.' + (out.url ? ' ' + out.url : ''), 'good');
+
+    load();
+}
+
+/* An edge function's real complaint is in the body of its response, not in error.message -
+   which for any non-2xx says only that it was a non-2xx, and tells you nothing you can do
+   anything about. */
+async function callFn(name, body) {
+    const { data, error } = await supabase.functions.invoke(name, { body });
+    if (!error) return data || {};
+
+    let said = '';
+    try { said = ((await error.context.json()) || {}).error || ''; } catch (e) { /* not json */ }
+    throw new Error(said || error.message || 'It did not say why.');
 }
 
 /* --- adding one -------------------------------------------------------------------- */
@@ -1617,14 +2365,107 @@ $('signin').onclick = async (e) => {
 $('gateOut').onclick = async () => { await signOut(); location.reload(); };
 
 /* A bookmarklet press is the only thing that arrives with ?u=, and it means "file this
-   one post". Read it now: prefill() strips the query string, so by the time anything
-   else asks, the evidence is gone. */
-const CAPTURE = new URLSearchParams(location.search).has('u');
+   one post".
+ *
+ * Read at module load, before the first await, and held in CAUGHT rather than re-read
+ * later - because by the time prefill() runs, two different things have had a go at the
+ * address bar. prefill clears it itself, and Supabase strips its own ?code= after an
+ * OAuth round trip. A payload read late is a payload sometimes gone.
+ *
+ * The copy in sessionStorage covers the sign-in redirect. Pressing FUNNY with a lapsed
+ * session sends you to Google and brings you back to a bare /socializer/, and the post
+ * you were filing used to die there: the queue opened on an empty form as though the
+ * button had done nothing. It lives in the tab, so it goes when the tab does. */
+const STASH = 'soc.capture';
+const RULED = 'soc.rule';
 
-/* What the bookmarklet handed over, cleared from the address bar afterwards so a refresh
-   does not silently re-fill a form you have already emptied. */
-function prefill() {
+/* Whatever arrived in the address bar, kept safe across the sign-in redirect.
+ *
+ * `needs` is the parameter that says this kind of instruction is present. When it is, the whole
+ * query string goes into sessionStorage under `stash` - because a lapsed session sends you to
+ * Google and brings you back to a bare /socializer/, and without this the instruction dies
+ * there. It lives in the tab, so it goes when the tab does. */
+function heldSearch(stash, needs) {
     const q = new URLSearchParams(location.search);
+    if (q.has(needs)) {
+        try { sessionStorage.setItem(stash, location.search); } catch (e) { /* private mode */ }
+        return q;
+    }
+    try {
+        const held = sessionStorage.getItem(stash);
+        if (held) return new URLSearchParams(held);
+    } catch (e) { /* private mode */ }
+    return null;
+}
+
+const CAUGHT = heldSearch(STASH, 'u');
+const CAPTURE = !!CAUGHT;
+
+/* A ruling arriving from somewhere else - the bot's email or its notification, where a button
+ * can only ever be a link.
+ *
+ * WHY IT GOES THROUGH THIS PAGE rather than straight at an endpoint. A link that changes
+ * something the moment it is fetched gets fetched by things that are not you: Outlook rewrites
+ * and follows links, scanners open them, some clients prefetch. Candidates would rule on
+ * themselves in the inbox. Routing the press through here means the change is made by a signed-in
+ * owner with row-level security applying, so a forwarded or leaked email can do nothing - and it
+ * lands you on the queue afterwards, where the next thing you want is already on screen.
+ *
+ * ?rule=<row id>&to=POST or &to=SKIPPED. Nothing else is accepted. */
+const ASKED = heldSearch(RULED, 'rule');
+
+function askedRule() {
+    if (!ASKED) return null;
+    const id = Number(ASKED.get('rule'));
+    const to = String(ASKED.get('to') || '').toUpperCase();
+    if (!Number.isInteger(id) || id <= 0) return null;
+    /* POST and SKIPPED only. Neither publishes anything: one moves the card to the POST tab and
+       one moves it to the archive, and going out to a platform is still a press on the card. A
+       link that could publish is not a thing that should exist in an inbox. */
+    if (to !== 'POST' && to !== 'SKIPPED') return null;
+    return { id, to };
+}
+
+/* Done with it, so a refresh does not rule on the same card twice. */
+function forgetRule() {
+    try { sessionStorage.removeItem(RULED); } catch (e) { /* private mode */ }
+    const clean = new URL(location.href);
+    clean.search = '';
+    history.replaceState(null, '', clean);
+}
+
+/* Applies it, once the queue has been read and we know who is asking. */
+async function applyAskedRule() {
+    const want = askedRule();
+    if (!want) return;
+
+    const row = all.find((r) => r.id === want.id);
+    if (!row) {
+        status('That candidate is not in the queue any more - somebody has already dealt with it,'
+            + ' or it was deleted.', 'err');
+        forgetRule();
+        return;
+    }
+    if (row.status === want.to) {
+        status('Already ' + (want.to === 'POST' ? 'queued to post' : 'archived') + '.', 'good');
+        forgetRule();
+        show(want.to === 'POST' ? 'POST' : 'SKIPPED');
+        return;
+    }
+
+    forgetRule();
+    /* The ordinary ruling path, so the age reset on a card coming back out of the archive and
+       everything else behaves exactly as it does from a press on the card. */
+    await rule(row, want.to);
+    status(want.to === 'POST' ? 'Queued to post. It is on the POST tab.' : 'Archived.', 'good');
+    show(want.to === 'POST' ? 'POST' : 'SKIPPED');
+}
+
+/* What the bookmarklet handed over, cleared from the address bar and from the tab
+   afterwards so a refresh does not silently re-fill a form you have already emptied. */
+function prefill() {
+    if (!CAUGHT) return;
+    const q = CAUGHT;
     const u = q.get('u');
     if (!u) return;
 
@@ -1634,10 +2475,22 @@ function prefill() {
        and stays empty until somebody writes in it. */
     const t = (q.get('t') || '').trim();
     if (t && !$('headline').value) $('headline').value = t;
+    /* Facebook and a good many news sites put a URL in their author meta tag rather than a
+       name, and the funny button hands over whatever it finds. Prefixing that with @ produced
+       handles like @https://www.facebook.com/foodandwine - which then turned up in soc_sources
+       as though it were an account worth going back to, in the middle of the one signal that is
+       supposed to tell the bot where to look. cleanHandle reduces a URL to its last path
+       segment, which is the name in every shape that matters here. u/ and r/ are Reddit's own
+       and are left alone. */
     const h = (q.get('h') || '').trim();
-    if (h) $('who').value = /^[@]|^[ur]\//.test(h) ? h : '@' + h.replace(/^@+/, '');
+    if (h) {
+        const name = /^[ur]\//.test(h) ? h : cleanHandle(h);
+        if (name) $('who').value = /^[ur]\//.test(name) ? name : '@' + name;
+    }
     pendingShot = (q.get('m') || '').trim();
     readSource();
+
+    try { sessionStorage.removeItem(STASH); } catch (e) { /* private mode */ }
 
     const clean = new URL(location.href);
     clean.search = '';
@@ -1712,7 +2565,7 @@ $('mark').addEventListener('click', (e) => {
     status('Drag it to your bookmarks bar, or paste the line above into a new bookmark.', 'busy');
 });
 
-function render(user) {
+async function render(user) {
     const ok = isOwner(user);
     $('app').hidden = !ok;
     $('gate').hidden = ok;
@@ -1729,10 +2582,17 @@ function render(user) {
     me = user.email || '';
     $('out').hidden = false;
 
-    /* The whole page either way - the tabs already show one thing at a time, which is
-       all the old stripped-down capture mode was doing. A bookmarklet press just picks
-       which tab you land on. */
-    show(CAPTURE ? 'ADD' : 'NEW');
+    /* Before the first paint, because the POST tab's buttons are built out of it: reading it
+       afterwards would draw every destination as a by-hand link and then swap them. */
+    await loadMethods();
+    paintChannels();
+
+    /* The whole page either way - the tabs already show one thing at a time, which is all the
+       old stripped-down capture mode was doing. An arriving instruction just picks which tab you
+       land on, and it outranks the hash: pressing a button somewhere says what you want more
+       recently than the address bar does. A ruling outranks a capture, because it names one card
+       and is about to move it. */
+    show(askedRule() ? 'NEW' : CAPTURE ? 'ADD' : (tabFromHash() || 'NEW'));
 
     /* Filling the form comes after showing it. A throw in here used to leave every pane
        hidden and the page blank, which looks like a dead site rather than a bad link. */
@@ -1742,10 +2602,25 @@ function render(user) {
         status('Could not read what the funny button sent: ' + e.message, 'err');
     }
 
-    load();
+    /* Awaited, because a ruling that arrived by link needs the row it names, and the rows are
+       what load() fetches. */
+    await load();
+
+    try {
+        await applyAskedRule();
+    } catch (e) {
+        status('Could not apply that: ' + e.message, 'err');
+    }
 }
 
-render(await currentUser());
+/* Typing a tab into the address bar, or reaching one with Back from wherever the hash
+   last changed for another reason. show()'s own replaceState never fires this. */
+addEventListener('hashchange', () => {
+    const want = tabFromHash();
+    if (want && want !== tab) show(want);
+});
+
+await render(await currentUser());
 </script>
 </body>
 </html>
