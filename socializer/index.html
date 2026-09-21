@@ -117,9 +117,19 @@
             border: 2px solid #000; padding: 16px 18px; margin-bottom: 14px;
             display: flex; gap: 18px;
         }
-        /* The card is the link. The button that used to be is gone. No hover tint,
-           because the card already has one and a second would fight it. */
-        .card.open { cursor: pointer; }
+        /* Nothing on the card opens the post but the one button for it, top right. The
+           card used to be the link, and a press anywhere that was not a button opened a
+           tab - which on a phone is most presses. */
+        .card { position: relative; }
+        .card .view {
+            position: absolute; top: 10px; right: 12px;
+            font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+            text-decoration: none; color: #000; background: #fff;
+            border: 2px solid #000; padding: 4px 9px; line-height: 1;
+        }
+        .card .view:hover { background: #000; color: #fff; }
+        /* The head runs under the button otherwise. */
+        .card .head { padding-right: 70px; }
 
         .card.tone-post { background: #d9f7e3; }
         .card.tone-skip { background: #ffd9d6; }
@@ -1490,6 +1500,73 @@ function shotOf(row) {
     return '';
 }
 
+/* The picture, as an element. A dead or hotlink-blocked thumbnail leaves the browser's
+   broken-image icon, which reads as a fault in the page. Swap the empty frame in instead -
+   the card keeps its shape - and, if the address came from the table, ask soc-thumb once
+   whether the post has a better one now. */
+function shotImg(src, row) {
+    const img = document.createElement('img');
+    img.className = 'shot';
+    img.src = safeUrl(src);
+    img.alt = '';
+    img.loading = 'lazy';
+    img.onerror = () => {
+        const frame = blankShot();
+        img.replaceWith(frame);
+        if (row && row.media_url === src && !row._retried) {
+            row._retried = true;
+            wantShot(row, frame);
+        }
+    };
+    return img;
+}
+
+/* Rows without a picture ask soc-thumb for one, a few at a time, in the order the cards
+   were drawn. What comes back is shown at once and, where the address will keep, written
+   into media_url so the question is asked once per post. A signed address (TikTok, the
+   Instagram CDN) is shown and not stored: it would be dead by tomorrow. */
+const shotCache = new Map();
+const shotQueue = [];
+let shotBusy = 0;
+
+function wantShot(row, frame) {
+    const link = safeUrl(row.post_url);
+    if (!link) return;
+    if (shotCache.has(link)) { placeShot(row, frame, shotCache.get(link)); return; }
+    shotQueue.push({ row, frame, link });
+    pumpShots();
+}
+
+function placeShot(row, frame, found) {
+    if (!found || !found.image || found.image === row.media_url) return;
+    if (!frame.isConnected) return;
+    frame.replaceWith(shotImg(found.image, null));
+}
+
+async function pumpShots() {
+    while (shotBusy < 3 && shotQueue.length) {
+        const job = shotQueue.shift();
+        shotBusy++;
+        lookUpShot(job).finally(() => { shotBusy--; pumpShots(); });
+    }
+}
+
+async function lookUpShot({ row, frame, link }) {
+    let found = null;
+    try {
+        found = await callFn('soc-thumb', { url: link });
+    } catch (e) {
+        found = null;
+    }
+    shotCache.set(link, found);
+    placeShot(row, frame, found);
+    if (found && found.image && found.persist && found.image !== row.media_url) {
+        const { error } = await supabase
+            .from('socializer').update({ media_url: found.image }).eq('id', row.id);
+        if (!error) row.media_url = found.image;
+    }
+}
+
 /* --- the queue --------------------------------------------------------------------- */
 const TABS = [
     {
@@ -1746,18 +1823,11 @@ function card(row) {
 
     const shot = shotOf(row);
     if (shot) {
-        const img = document.createElement('img');
-        img.className = 'shot';
-        img.src = safeUrl(shot);
-        img.alt = '';
-        img.loading = 'lazy';
-        /* A dead or hotlink-blocked thumbnail leaves the browser's broken-image icon,
-           which reads as a fault in the page. Swap the empty frame in instead - the card
-           keeps its shape and the row simply has no picture. */
-        img.onerror = () => img.replaceWith(blankShot());
-        main.appendChild(img);
+        main.appendChild(shotImg(shot, row));
     } else {
-        main.appendChild(blankShot());
+        const frame = blankShot();
+        main.appendChild(frame);
+        wantShot(row, frame);
     }
 
     /* What the post itself says, under its picture where a caption goes. */
@@ -1956,17 +2026,16 @@ function card(row) {
     el.appendChild(main);
     if (acts.children.length) el.appendChild(acts);
 
-    /* The card is the link. Anything you can press, type in, or drag is that thing's
-       business first - and a press that finished a swipe is not a click on the card,
-       whatever the browser says next. */
+    /* The one way to the post: a button, top right. Nothing else on the card opens it,
+       so a press that lands anywhere else does what it looks like it does, or nothing. */
     if (link) {
-        el.classList.add('open');
-        el.addEventListener('click', (e) => {
-            if (e.target.closest('a, button, input, textarea, [contenteditable]')) return;
-            if (Date.now() - swipedAt < 300) return;
-            if (!window.getSelection().isCollapsed) return;
-            window.open(link, '_blank', 'noopener');
-        });
+        const view = document.createElement('a');
+        view.className = 'view';
+        view.href = link;
+        view.target = '_blank';
+        view.rel = 'noopener';
+        view.textContent = 'VIEW ↗';
+        el.appendChild(view);
     }
 
     if (row.status === 'NEW') {

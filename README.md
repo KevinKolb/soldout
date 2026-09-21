@@ -120,6 +120,15 @@ Secrets), and only the function that needs one can read it.
 on the Socializer's SETTINGS tab and stored sealed in `socializer_secret`; the two fallback
 pairs are read only when no stored credential exists, so an older setup keeps working.
 
+`soc-thumb` finds the picture for a card whose row has none, from the post's address
+alone: X to a Twitterbot fetch, TikTok through its oEmbed, Bluesky and Reddit through their
+public APIs, YouTube by derivation, and anything else by its `og:image`. Instagram, Threads
+and Facebook give nothing to a fetch without a login, and the card stays blank. The page
+asks once per row and stores what it gets where the address will keep, so the queue fills
+with pictures as it is read rather than needing the bot or the bookmarklet to have found
+one. Deploy with `supabase functions deploy soc-thumb`; it takes no secrets and keeps the
+JWT check.
+
 `soc-digest` is the one function deployed with `--no-verify-jwt`, because the bot calls it
 holding only the publishable key, which is not a JWT. It never trusted its caller anyway: the
 recipient address is a constant in the code and `soc_digest_claim` allows one send per twenty

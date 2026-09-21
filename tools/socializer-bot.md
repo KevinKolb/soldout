@@ -486,7 +486,8 @@ While you have the page open to confirm the permalink, take its `og:image` (or
 `twitter:image`) and put it in **media_url**. The queue shows it on the card, so whoever
 reads the row sees the joke rather than a description of it. Leave it empty rather than
 guessing: a wrong picture is worse than none, and a URL you did not read out of that
-page's own head is a guess.
+page's own head is a guess. An empty one is not a failure: the Socializer looks a picture
+up for itself, from the permalink, the first time a card without one is drawn.
 
 ## How the caption has to sound
 
