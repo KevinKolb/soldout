@@ -166,9 +166,8 @@ def main():
             changed += 1
         print(f"  {page.relative_to(ROOT)}  [{variant}]")
 
-    print(f"inlined the footer into {len(
-        [p for p in pages if START in p.read_text(encoding='utf-8')])} page(s); "
-        f"{changed} rewritten")
+    mounted = len([p for p in pages if START in p.read_text(encoding="utf-8")])
+    print(f"inlined the footer into {mounted} page(s); {changed} rewritten")
     return 0
 
 
