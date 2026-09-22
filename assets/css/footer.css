@@ -254,6 +254,13 @@ footer::before {
   padding: 1rem;
   z-index: 1000;
 }
+/* [hidden] is a browser default, not something a class selector normally
+   beats on specificity - but author CSS always outranks the browser's own
+   stylesheet regardless of specificity, so the display:flex above was
+   showing this on every page load until this restates the hidden state
+   explicitly. Caught by actually loading the page rather than trusting the
+   markup. */
+.mc-overlay[hidden] { display: none; }
 
 .mc-box {
   position: relative;
