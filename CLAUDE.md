@@ -225,6 +225,16 @@ write; the policies in [tools/shop-migration-01-auth.sql](tools/shop-migration-0
 and [tools/socializer-migration-04-auth.sql](tools/socializer-migration-04-auth.sql)
 enforce that in the database, so a page's own checks are manners rather than security.
 
+**Mission Control** is the sign-in door, not a page. A `MISSION CONTROL` button sits in the
+footer's bottom bar on every page that carries one (the shared footer in
+[assets/footer.html](assets/footer.html), plus `/` by hand, since that page opts out of the
+shared footer entirely). It only pops a small box for signing in or out of the same shared
+Supabase session — nothing on the page changes because of it. A page that wants an admin
+control checks that session for itself and shows the control when it is signed in as the
+owner, the way [assets/js/shop-edit.js](assets/js/shop-edit.js) already does on `/shop`.
+**Proposed:** if Mission Control ever grows a page of its own, it holds utilities that have
+no page of their own to live on — not a destination for the sign-in itself.
+
 There is no service-role key in this repo and there must never be one. Any key in a static
 page is readable by every visitor, and a service key bypasses row-level security entirely.
 The committed publishable key is powerless until someone proves who they are.

@@ -238,7 +238,30 @@
   <span class="footer-separator">•</span>
   <a href="/privacy/" class="backstage-link-bottom">PRIVACY</a>
   <span class="footer-separator">•</span>
+  <button type="button" class="backstage-link-bottom mc-trigger" id="mcTrigger">MISSION CONTROL</button>
+  <span class="footer-separator">•</span>
   <span class="footer-copyright">&copy; <span class="footer-year">2025</span> SOLD OUT! COMEDY</span>
+
+  <!-- Mission Control has no page of its own. This button is the one door into
+       every admin control on the site: it only signs you in or out, through the
+       same shared Supabase session /shop already uses (assets/js/auth.js). A page
+       that wants an admin control checks that session for itself and shows it -
+       see assets/js/shop-edit.js - so signing in here does nothing by itself
+       beyond leaving that session behind for the page you land back on to find.
+
+       Nested inside .footer-bottom, not after it, so tools/build-footer.py's
+       minimal variant - which extracts that one div - carries this along with
+       it without needing its own case. position:fixed does not care where in
+       the document a thing sits. -->
+  <div class="mc-overlay" id="mcOverlay" hidden>
+    <div class="mc-box" role="dialog" aria-modal="true" aria-labelledby="mcTitle">
+      <button type="button" class="mc-close" id="mcClose" aria-label="Close">&times;</button>
+      <div class="mc-title" id="mcTitle">MISSION CONTROL</div>
+      <p class="mc-msg" id="mcMsg">Sign in to enable admin controls on this page.</p>
+      <button type="button" class="mc-btn" id="mcSignIn">Sign in with Google</button>
+      <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden>Sign out</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -268,6 +291,53 @@
       link.style.transform = 'rotate(' + ((Math.random() - 0.5) * 30) + 'deg)';
     }
   );
+
+  /* Mission Control. A dynamic import rather than a module script, on purpose:
+     this stays the plain <script> the minimal footer variant looks for by that
+     exact string, and a module tag would slip past that search and vanish from
+     three of the four pages that use it. */
+  var mcTrigger = document.getElementById('mcTrigger');
+  var mcOverlay = document.getElementById('mcOverlay');
+  if (mcTrigger && mcOverlay) {
+    var mcMsg = document.getElementById('mcMsg');
+    var mcIn = document.getElementById('mcSignIn');
+    var mcOut = document.getElementById('mcSignOut');
+    var authReady = import('/assets/js/auth.js');
+
+    var paint = function (user) {
+      var signedIn = !!user;
+      mcMsg.textContent = signedIn
+        ? 'Signed in as ' + user.email + '.'
+        : 'Sign in to enable admin controls on this page.';
+      mcIn.hidden = signedIn;
+      mcOut.hidden = !signedIn;
+    };
+
+    var closeMc = function () { mcOverlay.hidden = true; };
+
+    mcTrigger.addEventListener('click', function () {
+      mcOverlay.hidden = false;
+      authReady.then(function (auth) { return auth.currentUser(); }).then(paint);
+    });
+    document.getElementById('mcClose').addEventListener('click', closeMc);
+    mcOverlay.addEventListener('click', function (e) {
+      if (e.target === mcOverlay) closeMc();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !mcOverlay.hidden) closeMc();
+    });
+    mcIn.addEventListener('click', function () {
+      authReady.then(function (auth) { return auth.signIn(); })
+        .catch(function (e) { mcMsg.textContent = 'Could not sign in: ' + e.message; });
+    });
+    mcOut.addEventListener('click', function () {
+      authReady.then(function (auth) { return auth.signOut(); })
+        .then(function () { location.reload(); });
+    });
+    /* Fires the moment the OAuth redirect hands a session back, and in any other
+       tab that signs in or out - so a card left open elsewhere updates itself. */
+    authReady.then(function (auth) { auth.onAuthChange(paint); });
+  }
 })();
 </script>
 <!-- footer:end -->

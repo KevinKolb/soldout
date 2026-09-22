@@ -228,6 +228,104 @@ footer::before {
   font-weight: 400;
 }
 
+/* === MISSION CONTROL === */
+/* The trigger sits among the <a> links either side of it and has to read as one
+   of them - a <button> inherits none of that on its own in most browsers, so
+   every property .backstage-link-bottom or .footer-bottom would otherwise have
+   handed it for free is restated here. */
+.mc-trigger {
+  background: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  cursor: pointer;
+}
+
+.mc-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 1000;
+}
+
+.mc-box {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  background: #fff;
+  color: var(--comic-black);
+  border: 3px solid var(--comic-black);
+  box-shadow: 8px 8px 0 var(--comic-black);
+  padding: 2rem 1.5rem 1.5rem;
+  text-align: center;
+}
+
+.mc-close {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: var(--comic-black);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.mc-title {
+  font-family: 'Bangers', cursive;
+  font-size: 1.6rem;
+  letter-spacing: 2px;
+  margin-bottom: 0.75rem;
+}
+
+.mc-msg {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0 0 1.25rem;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.mc-btn {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: var(--comic-black);
+  color: #fff;
+  border: 3px solid var(--comic-black);
+  padding: 0.65rem 1.25rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.mc-btn:hover {
+  background: var(--comic-red);
+  border-color: var(--comic-red);
+}
+
+.mc-btn-ghost {
+  background: #fff;
+  color: var(--comic-black);
+}
+
+.mc-btn-ghost:hover {
+  background: #f2f2f2;
+  color: var(--comic-black);
+  border-color: var(--comic-black);
+}
+
 /* Footer mobile responsive */
 @media (max-width: 768px) {
   .footer-content {

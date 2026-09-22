@@ -142,6 +142,44 @@
 
     .footer-separator { margin: 0 0.75rem; opacity: 0.5; }
     .footer-copyright { font-weight: 400; }
+
+    /* Mission Control - see assets/footer.html for the full explanation kept
+       next to the copy this was copied from. Duplicated by hand rather than
+       inlined by tools/build-footer.py: this page opts out of the shared
+       footer entirely (no burst graphic, no social row, no store menu), so it
+       carries its own small version of the same door. */
+    .mc-trigger {
+      background: none; border: none; margin: 0; padding: 0;
+      font: inherit; text-transform: inherit; letter-spacing: inherit; cursor: pointer;
+    }
+    .mc-overlay {
+      position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65);
+      display: flex; align-items: center; justify-content: center;
+      padding: 1rem; z-index: 1000;
+    }
+    .mc-box {
+      position: relative; width: 100%; max-width: 340px;
+      background: var(--comic-white); color: var(--comic-black);
+      border: 3px solid var(--comic-black); box-shadow: 8px 8px 0 var(--comic-black);
+      padding: 2rem 1.5rem 1.5rem; text-align: center;
+    }
+    .mc-close {
+      position: absolute; top: 0.4rem; right: 0.75rem;
+      background: none; border: none; color: var(--comic-black);
+      font-size: 1.6rem; line-height: 1; cursor: pointer;
+    }
+    .mc-title { font-family: 'Bangers', cursive; font-size: 1.6rem; letter-spacing: 2px; margin-bottom: 0.75rem; }
+    .mc-msg { font-size: 0.85rem; line-height: 1.5; margin: 0 0 1.25rem; text-transform: none; letter-spacing: normal; }
+    .mc-btn {
+      display: inline-block; font-weight: 700; font-size: 0.8rem;
+      letter-spacing: 1px; text-transform: uppercase;
+      background: var(--comic-black); color: var(--comic-white);
+      border: 3px solid var(--comic-black); padding: 0.65rem 1.25rem; cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .mc-btn:hover { background: var(--comic-red); border-color: var(--comic-red); }
+    .mc-btn-ghost { background: var(--comic-white); color: var(--comic-black); }
+    .mc-btn-ghost:hover { background: #f2f2f2; color: var(--comic-black); border-color: var(--comic-black); }
   </style>
 </head>
 <body>
@@ -162,7 +200,61 @@
     <span class="footer-separator">&bull;</span>
     <a href="/privacy/" class="backstage-link-bottom">PRIVACY</a>
     <span class="footer-separator">&bull;</span>
+    <button type="button" class="backstage-link-bottom mc-trigger" id="mcTrigger">MISSION CONTROL</button>
+    <span class="footer-separator">&bull;</span>
     <span class="footer-copyright">&copy; 2025 SOLD OUT! COMEDY</span>
   </div>
+
+  <div class="mc-overlay" id="mcOverlay" hidden>
+    <div class="mc-box" role="dialog" aria-modal="true" aria-labelledby="mcTitle">
+      <button type="button" class="mc-close" id="mcClose" aria-label="Close">&times;</button>
+      <div class="mc-title" id="mcTitle">MISSION CONTROL</div>
+      <p class="mc-msg" id="mcMsg">Sign in to enable admin controls on this page.</p>
+      <button type="button" class="mc-btn" id="mcSignIn">Sign in with Google</button>
+      <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden>Sign out</button>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    var trigger = document.getElementById('mcTrigger');
+    var overlay = document.getElementById('mcOverlay');
+    if (!trigger || !overlay) return;
+    var msg = document.getElementById('mcMsg');
+    var signIn = document.getElementById('mcSignIn');
+    var signOut = document.getElementById('mcSignOut');
+    var authReady = import('/assets/js/auth.js');
+
+    var paint = function (user) {
+      var signedIn = !!user;
+      msg.textContent = signedIn
+        ? 'Signed in as ' + user.email + '.'
+        : 'Sign in to enable admin controls on this page.';
+      signIn.hidden = signedIn;
+      signOut.hidden = !signedIn;
+    };
+
+    var close = function () { overlay.hidden = true; };
+
+    trigger.addEventListener('click', function () {
+      overlay.hidden = false;
+      authReady.then(function (auth) { return auth.currentUser(); }).then(paint);
+    });
+    document.getElementById('mcClose').addEventListener('click', close);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !overlay.hidden) close();
+    });
+    signIn.addEventListener('click', function () {
+      authReady.then(function (auth) { return auth.signIn(); })
+        .catch(function (e) { msg.textContent = 'Could not sign in: ' + e.message; });
+    });
+    signOut.addEventListener('click', function () {
+      authReady.then(function (auth) { return auth.signOut(); })
+        .then(function () { location.reload(); });
+    });
+    authReady.then(function (auth) { auth.onAuthChange(paint); });
+  })();
+  </script>
 </body>
 </html>
