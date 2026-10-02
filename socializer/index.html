@@ -402,6 +402,10 @@
             width: 100%; margin-top: 5px; padding: 5px 7px; border: 2px solid #000;
             font-family: 'Courier New', Courier, monospace; font-size: 11px; background: #fff;
         }
+        .social .cred select {
+            width: 100%; margin-top: 5px; padding: 5px 7px; border: 2px solid #000;
+            font-family: 'Courier New', Courier, monospace; font-size: 11px; background: #fff;
+        }
         .social .cred .credrow { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
         .social .cred .credrow button {
             flex: 1 1 auto; font-size: 10px; padding: 5px 6px; letter-spacing: 0.4px;
@@ -759,6 +763,27 @@
                     </div>
                 </div>
             </details>
+
+            <details>
+                <summary>POSTIZ</summary>
+                <p>One key, from a Postiz account, reaches whichever platforms you have
+                   connected there - up to 28 of them. It is not itself a place to post: connect
+                   it here, then on any platform below with a <b>Route through Postiz</b> choice,
+                   pick which of your Postiz-connected accounts answers for it. Get the key from
+                   Postiz's own settings page (<code>platform.postiz.com/settings</code> for the
+                   hosted service), under API, then <b>Reveal</b>.</p>
+                <div class="socials">
+                    <div class="social" id="postizTile">
+                        <div class="sochead">
+                            <div>
+                                <div class="plat">Postiz</div>
+                                <div class="at">the key, not an account</div>
+                            </div>
+                        </div>
+                        <div id="postizCred"></div>
+                    </div>
+                </div>
+            </details>
         </div>
     </div>
 </div>
@@ -994,21 +1019,23 @@ const PUBLISH = {
         creds: { token: 'Access token' },
         note: 'A token from a Meta app with threads_content_publish. It lasts 60 days and is'
             + ' renewed on use, so posting once a month keeps it alive by itself.' },
-    Instagram: { methods: ['PASTE'], api: 'soon',
+    Instagram: { methods: ['PASTE', 'API'], api: 'live', viaPostiz: true,
         at: (h) => 'https://www.instagram.com/' + h,
-        note: 'No composer URL at all, so Paste is the only way by hand. A Business or'
-            + ' Creator account can publish, but only with a picture.' },
-    X: { methods: ['INTENT', 'PASTE'], api: 'soon',
+        note: 'No composer URL at all, so Paste is the only way by hand. Automatic routes'
+            + ' through Postiz and needs a Business or Creator account connected there - and'
+            + ' still needs a picture either way, since a text-only post is not an option.' },
+    X: { methods: ['INTENT', 'PASTE', 'API'], api: 'live', viaPostiz: true,
         at: (h) => 'https://x.com/' + h,
-        note: 'Publishing needs a paid API tier. The free one cannot post often enough'
-            + ' to be worth the wiring.' },
-    Reddit: { methods: ['INTENT', 'PASTE'], api: 'soon',
+        note: 'Publishing direct needs a paid API tier not worth wiring for this. Automatic'
+            + ' here routes through Postiz instead, which already paid for one.' },
+    Reddit: { methods: ['INTENT', 'PASTE', 'API'], api: 'live', viaPostiz: true,
         at: (h) => 'https://www.reddit.com/user/' + h,
-        note: 'The API can publish. Automated self-promotion is how accounts get banned,'
-            + ' so this one wants a human more than the others do.' },
-    TikTok: { methods: ['PASTE'], api: false,
+        note: 'Automatic routes through Postiz. Automated self-promotion is how accounts get'
+            + ' banned, so this one wants a human pressing it more than the others do.' },
+    TikTok: { methods: ['PASTE', 'API'], api: 'live', viaPostiz: true,
         at: (h) => 'https://www.tiktok.com/@' + h,
-        note: 'Its posting API is video only and needs an audit to leave sandbox.' },
+        note: 'Its own posting API is video only and needs an audit to leave sandbox.'
+            + ' Automatic here routes through Postiz instead.' },
     YouTube: { methods: [], api: false,
         at: (h) => 'https://www.youtube.com/@' + h,
         note: 'Video uploads only. There is nothing in this queue it would take.' },
@@ -1039,6 +1066,30 @@ let creds = {};
    own markup still carries its address: an unknown handle shows what the page always showed
    rather than an empty box where a link used to be. */
 let handles = {};
+
+/* platform -> { id, identifier, label }, the Postiz-connected account that platform's API
+   method routes through, or absent when it does not. Same emptiness rule as the rest of this
+   state: before tools/socializer-migration-23-postiz.sql is run the columns are not there, so
+   this stays empty and every "API" platform falls back to its own direct publisher. */
+let postizRouting = {};
+
+/* The Postiz-connected accounts themselves, fetched once and reused by every platform's picker
+   - they are all choosing from the same list. null means not fetched yet; an empty array means
+   fetched and Postiz has nothing connected. Cleared when the Postiz key itself changes, in
+   connect() below, so a freshly connected key does not keep showing yesterday's "not fetched". */
+let postizIntegrations = null;
+
+async function loadPostizIntegrations() {
+    if (postizIntegrations) return postizIntegrations;
+    try {
+        const out = await callFn('soc-connect', { action: 'postiz-integrations' });
+        postizIntegrations = out.integrations || [];
+    } catch (e) {
+        postizIntegrations = [];
+        status('Postiz: ' + e.message, 'err');
+    }
+    return postizIntegrations;
+}
 
 function isOn(id) {
     return onPlat[id] !== false;
@@ -1110,14 +1161,31 @@ async function loadMethods() {
     onPlat = {};
     creds = {};
     handles = {};
+    postizRouting = {};
 
-    const { data, error } = await supabase
-        .from('socializer_channel').select('platform, method, enabled, handle');
-    if (!error) {
-        (data || []).forEach((r) => {
+    /* The Postiz columns asked for here do not exist until migration 23 is run, and PostgREST
+       fails a select whole rather than returning the columns it does have - so a page that has
+       not had that migration run would lose methods, onPlat and handles too, not just routing.
+       Ask for them first and fall back to the plain select on exactly that failure, rather than
+       let one new, optional feature take the working settings tab down with it. */
+    let got = await supabase
+        .from('socializer_channel')
+        .select('platform, method, enabled, handle, postiz_integration_id, postiz_identifier, postiz_label');
+    if (got.error) {
+        got = await supabase.from('socializer_channel').select('platform, method, enabled, handle');
+    }
+    if (!got.error) {
+        (got.data || []).forEach((r) => {
             methods[r.platform] = r.method;
             onPlat[r.platform] = r.enabled !== false;
             handles[r.platform] = r.handle || '';
+            if (r.postiz_integration_id) {
+                postizRouting[r.platform] = {
+                    id: r.postiz_integration_id,
+                    identifier: r.postiz_identifier || '',
+                    label: r.postiz_label || '',
+                };
+            }
         });
     }
     /* Before the migration is run neither table is there, which is not worth shouting about:
@@ -1169,6 +1237,9 @@ async function connect(platform, account, token, said) {
         };
         if (out.warning) status(platform + ': ' + out.warning, 'err');
         else status('Connected to ' + platform + (out.says ? ' as ' + out.says : '') + '.', 'good');
+        /* A freshly connected or replaced key may answer for different accounts than the last
+           one did, so the cached list it would be picked from has to go with it. */
+        if (platform === 'Postiz') postizIntegrations = null;
         paintChannels();
         paint();
     } catch (e) {
@@ -1180,6 +1251,7 @@ async function disconnect(platform, said) {
     try {
         await callFn('soc-connect', { platform, forget: true });
         delete creds[platform];
+        if (platform === 'Postiz') postizIntegrations = null;
         status(platform + ' is disconnected. Its token is gone, not disabled.', 'good');
         paintChannels();
         paint();
@@ -1240,6 +1312,21 @@ async function setMethod(platform, method) {
    keeping a second list of platforms in step with the first. */
 function paintChannels() {
     document.querySelectorAll('#paneSettings .social').forEach(paintTile);
+    paintPostizCred();
+}
+
+/* The Postiz tile is not in PUBLISH - it is a key, not a platform with its own methods and
+   account URL - so paintTile skips it and this mounts credBox for it directly instead. The
+   fields it asks for match the account/token shape credBox already knows how to render and
+   save; nothing about credBox itself needed to change for this to work. */
+function paintPostizCred() {
+    const mount = $('postizCred');
+    if (!mount) return;
+    mount.innerHTML = '';
+    mount.appendChild(credBox('Postiz', {
+        account: 'API base URL - blank for the hosted service',
+        token: 'API key',
+    }));
 }
 
 function platformOf(tile) {
@@ -1339,6 +1426,7 @@ function paintTile(tile) {
                whether or not that method is the chosen one - so a token can be set up before
                switching over, rather than only after. */
             if (key === 'API' && can.creds) pick.appendChild(credBox(name, can.creds));
+            if (key === 'API' && can.viaPostiz) pick.appendChild(postizPickerBox(name));
 
             box.appendChild(pick);
         });
@@ -1418,6 +1506,93 @@ function credBox(name, fields) {
         say('No token saved. Automatic cannot publish until there is one.', 'warn');
     }
     box.appendChild(line);
+
+    return box;
+}
+
+/* What a platform with no direct publisher of its own shows under Automatic instead: a picker
+   for which Postiz-connected account answers for it. There is no second credential to type in
+   here - the key entered once on the Postiz tile is all any of these borrow - so this is a
+   choice, not a form, and it only ever writes the three postiz_* columns on this one platform's
+   own row. */
+function postizPickerBox(name) {
+    const box = document.createElement('div');
+    box.className = 'cred postizroute';
+    box.onclick = (e) => e.preventDefault();
+
+    const current = postizRouting[name];
+
+    const select = document.createElement('select');
+    select.disabled = true;
+    select.appendChild(new Option(
+        current ? (current.label || current.identifier || current.id) : 'Choose a Postiz account...',
+        current ? current.id : '', true, true,
+    ));
+    box.appendChild(select);
+
+    const line = document.createElement('p');
+    line.className = 'credsays';
+    const say = (text, tone) => {
+        line.textContent = text;
+        line.className = 'credsays' + (tone ? ' ' + tone : '');
+    };
+    box.appendChild(line);
+
+    if (!creds.Postiz) {
+        say('Connect Postiz above, then come back and pick an account here.', 'warn');
+        return box;
+    }
+
+    say(current ? 'Routed through Postiz.'
+        : 'Not routed through Postiz yet - ' + name + ' still posts by its other methods.',
+        current ? 'on' : '');
+
+    loadPostizIntegrations().then((list) => {
+        /* The tab may have moved on, or this tile may have been repainted, by the time Postiz
+           answers - nothing to finish in that case. */
+        if (!select.isConnected) return;
+
+        select.innerHTML = '';
+        select.appendChild(new Option('Not routed through Postiz', '', !current, !current));
+        list.forEach((it) => {
+            const label = (it.name || it.profile || it.id) + (it.identifier ? ' (' + it.identifier + ')' : '');
+            select.appendChild(new Option(label, it.id, false, !!current && current.id === it.id));
+        });
+        select.disabled = false;
+
+        if (!list.length) {
+            say('Postiz is connected, but nothing is linked there yet - add an account on its'
+                + ' own dashboard first.', 'warn');
+        }
+    });
+
+    select.onchange = async () => {
+        const id = select.value;
+        const picked = id ? (postizIntegrations || []).find((i) => i.id === id) : null;
+        const patch = id
+            ? {
+                postiz_integration_id: id,
+                postiz_identifier: picked ? picked.identifier : '',
+                postiz_label: picked ? (picked.name || picked.profile || '') : '',
+            }
+            : { postiz_integration_id: null, postiz_identifier: null, postiz_label: null };
+
+        const { error } = await supabase
+            .from('socializer_channel')
+            .update({ ...patch, updated_at: new Date().toISOString() })
+            .eq('platform', name);
+        if (error) {
+            say('Could not save that: ' + error.message
+                + ' Has tools/socializer-migration-23-postiz.sql been run?', 'warn');
+            return;
+        }
+
+        if (id) postizRouting[name] = { id, identifier: patch.postiz_identifier, label: patch.postiz_label };
+        else delete postizRouting[name];
+        say(id ? 'Routed through Postiz as ' + (patch.postiz_label || patch.postiz_identifier || id) + '.'
+            : 'Not routed through Postiz. ' + name + ' falls back to its other methods.',
+            id ? 'on' : '');
+    };
 
     return box;
 }

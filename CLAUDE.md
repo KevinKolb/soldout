@@ -158,8 +158,30 @@ box on the tile and stored in `socializer_channel.method`:
   only manual route where a composer URL will not carry text, and the only route at all for
   a platform with no composer.
 - **Automatic (`API`)** — [supabase/functions/soc-publish](supabase/functions/soc-publish/index.ts)
-  publishes it. Live for Bluesky, Threads and the Facebook **Page**. Two presses on the card,
-  because it puts words on the internet under the show's name with no undo.
+  publishes it. Live for Bluesky, Threads and the Facebook **Page** directly, and for
+  Instagram, X, Reddit and TikTok through Postiz (below). Two presses on the card, because it
+  puts words on the internet under the show's name with no undo.
+
+### Postiz
+
+One Postiz account reaches the platforms this project has not wired a direct publisher for —
+up to 28 of them — so a platform's **API** method can mean either its own direct publisher or
+Postiz, decided by whether its `socializer_channel` row carries a `postiz_integration_id`
+(added by [tools/socializer-migration-23-postiz.sql](tools/socializer-migration-23-postiz.sql)).
+Postiz is not itself a platform: its tile on SETTINGS holds one key, connected the same way
+and sealed the same way as any other credential, and every platform routed through it borrows
+that one key rather than holding a credential of its own.
+
+`postiz_identifier` is never guessed at: it is copied verbatim from what Postiz's own
+`GET /integrations` says about the account you pick, because that exact string is what a post
+has to be labelled with (`settings.__type`) to go out to the right place. Media goes through
+Postiz's own upload endpoint first, since it takes a file rather than a URL.
+
+**Written against Postiz's publicly documented API, not tested against the live service** —
+there was no key available to test it with. The client-side wiring (the credential tile, the
+picker, what each state shows) has been exercised in a browser against a stand-in for that
+API; the two edge functions type-check cleanly; the actual HTTP calls to Postiz have not run
+once. Confirm the first real post through it lands where it should.
 
 ### Credentials
 

@@ -308,6 +308,88 @@ const PUBLISHERS: Record<string, (c: Cred, why: string, url: string) => Promise<
     Threads: toThreads,
 };
 
+/* --- Postiz ------------------------------------------------------------------------------
+   Not a platform of its own: one key that reaches whichever accounts Kevin connected on
+   Postiz's own dashboard. A platform routes through it by having a postiz_integration_id on
+   its socializer_channel row - see tools/socializer-migration-23-postiz.sql - and that id, not
+   the platform's name, is what decides this runs instead of a PUBLISHERS entry. */
+
+const POSTIZ_DEFAULT = 'https://api.postiz.com/public/v1';
+
+/* Postiz takes a file, not a URL: POST /upload, multipart, field name "file". The media this
+   queue already has is a URL - soc-thumb's own finding, or whatever the bot or the bookmarklet
+   left in media_url - so it is fetched here and handed on as bytes. A picture that cannot be
+   fetched or that Postiz refuses costs the picture, not the post: the text still goes out. */
+async function postizUpload(base: string, token: string, mediaUrl: string):
+    Promise<{ id: string; path: string } | null> {
+    try {
+        const got = await fetch(mediaUrl);
+        if (!got.ok) return null;
+        const blob = await got.blob();
+
+        const form = new FormData();
+        form.append('file', blob, 'image.jpg');
+        const res = await fetch(`${base}/upload`, {
+            method: 'POST',
+            headers: { Authorization: token },
+            body: form,
+        });
+        const out = await res.json().catch(() => null);
+        if (!res.ok || !out?.id) return null;
+        return { id: String(out.id), path: String(out.path ?? '') };
+    } catch {
+        return null;
+    }
+}
+
+/* Where to send a human who wants to see what happened. Postiz's create-post response is not
+   documented to carry a permalink - understandably, since a platform can take a moment to make
+   one - so this names the dashboard it came from rather than guess at a deep link into it. */
+function postizDashboard(base: string): string {
+    return base === POSTIZ_DEFAULT ? 'https://platform.postiz.com'
+        : base.replace(/\/api\/public\/v1\/?$/, '') || base;
+}
+
+async function toPostiz(
+    cred: Cred,
+    route: { postiz_integration_id: string; postiz_identifier: string },
+    why: string,
+    url: string,
+    mediaUrl: string | null,
+): Promise<Receipt> {
+    const base = cred.account || POSTIZ_DEFAULT;
+    const text = `${why.trim()} ${url}`.trim();
+    const image = mediaUrl ? await postizUpload(base, cred.token, mediaUrl) : null;
+
+    const res = await fetch(`${base}/posts`, {
+        method: 'POST',
+        headers: { Authorization: cred.token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            type: 'now',
+            date: new Date().toISOString(),
+            shortLink: false,
+            tags: [],
+            posts: [{
+                integration: { id: route.postiz_integration_id },
+                value: [{ content: text, image: image ? [image] : [] }],
+                settings: { __type: route.postiz_identifier },
+            }],
+        }),
+    });
+
+    const out = await res.json().catch(() => null);
+    if (!res.ok) {
+        const detail = out?.message ?? out?.error
+            ?? (await res.text().catch(() => '')).slice(0, 300);
+        throw new Error(`Postiz refused the post (${res.status}). ${detail}`);
+    }
+
+    /* Take whatever looks like an id rather than insist on a shape nothing here has confirmed
+       against a real response yet - this function has not had a live key to test against. */
+    const ref = String(out?.id ?? out?.posts?.[0]?.id ?? out?.postId ?? 'sent');
+    return { ref, url: postizDashboard(base) };
+}
+
 Deno.serve(async (req) => {
     if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
     if (req.method !== 'POST') return json({ error: 'POST only' }, 405);
@@ -332,23 +414,27 @@ Deno.serve(async (req) => {
     const platform = String(body?.platform ?? '');
     if (!id || !platform) return json({ error: 'Which row, and which platform?' }, 400);
 
-    const publish = PUBLISHERS[platform];
-    if (!publish) {
-        return json({ error: `Nothing here knows how to publish to ${platform} yet.` }, 400);
-    }
-
     /* The switch on the SETTINGS tab is the only thing that decides whether a platform goes out
        this way. Checking it here as well as in the page means the setting cannot be got round by
-       a request that skips the page. */
+       a request that skips the page. postiz_integration_id, not the platform's name, decides
+       whether this platform's "API" means Postiz or its own direct publisher. */
     const { data: channel } = await supabase
-        .from('socializer_channel').select('method').eq('platform', platform).maybeSingle();
+        .from('socializer_channel')
+        .select('method, postiz_integration_id, postiz_identifier')
+        .eq('platform', platform).maybeSingle();
     if (channel?.method !== 'API') {
         return json({ error: `${platform} is set to post by hand. Change it on SETTINGS first.` }, 409);
     }
 
+    const viaPostiz = !!channel?.postiz_integration_id;
+    if (!viaPostiz && !PUBLISHERS[platform]) {
+        return json({ error: `Nothing here knows how to publish to ${platform} yet.` }, 400);
+    }
+
     /* Read with the caller's own session, so row-level security decides what is visible. */
     const { data: row, error: rowErr } = await supabase
-        .from('socializer').select('id, post_url, why, posted_to, posted_ref').eq('id', id).single();
+        .from('socializer')
+        .select('id, post_url, why, media_url, posted_to, posted_ref').eq('id', id).single();
     if (rowErr || !row) return json({ error: 'That row is not there.' }, 404);
     if (!/^https?:\/\//i.test(row.post_url ?? '')) {
         return json({ error: 'That row has no usable link.' }, 422);
@@ -359,9 +445,18 @@ Deno.serve(async (req) => {
 
     let receipt: Receipt;
     try {
-        let cred = await credential(supabase, platform);
-        if (platform === 'Threads') cred = await renewThreads(supabase, cred);
-        receipt = await publish(cred, row.why ?? '', row.post_url);
+        if (viaPostiz) {
+            const cred = await credential(supabase, 'Postiz');
+            receipt = await toPostiz(
+                cred,
+                { postiz_integration_id: channel!.postiz_integration_id!, postiz_identifier: channel!.postiz_identifier ?? '' },
+                row.why ?? '', row.post_url, row.media_url ?? null,
+            );
+        } else {
+            let cred = await credential(supabase, platform);
+            if (platform === 'Threads') cred = await renewThreads(supabase, cred);
+            receipt = await PUBLISHERS[platform](cred, row.why ?? '', row.post_url);
+        }
     } catch (e) {
         return json({ error: (e as Error).message }, 502);
     }

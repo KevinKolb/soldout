@@ -25,12 +25,19 @@
  */
 
 import { createClient } from 'jsr:@supabase/supabase-js@2';
-import { seal } from '../_shared/secretbox.ts';
+import { seal, unseal } from '../_shared/secretbox.ts';
 
 const OWNER = 'kevinmkolb@gmail.com';
 const GRAPH = 'v23.0';
 const THREADS_ROOT = 'https://graph.threads.net';
 const THREADS = `${THREADS_ROOT}/v1.0`;
+
+/* Postiz is reached by one key and, unlike everything else here, is not itself a platform: it
+   is a key that unlocks whichever of Kevin's own accounts he has connected on its own
+   dashboard. The hosted service's API lives at a fixed address; a self-hosted one is reached by
+   pasting that instead into the account field, the one field this credential uses for something
+   other than an identity. */
+const POSTIZ_DEFAULT = 'https://api.postiz.com/public/v1';
 
 const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -142,10 +149,32 @@ async function checkFacebook(pageId: string, token: string): Promise<Checked> {
     return { account: String(out.id), says: out.name ?? String(out.id), expires: null };
 }
 
+/* Proving a Postiz key is the same ask as using it for real: list what it can see. A key that
+   cannot do that could not publish either, and this is the one call with nothing on the other
+   end to go wrong - no post, no platform, just "does this key work". */
+async function checkPostiz(account: string, token: string): Promise<Checked> {
+    const base = (account || '').trim().replace(/\/+$/, '') || POSTIZ_DEFAULT;
+    const res = await fetch(`${base}/integrations`, { headers: { Authorization: token } });
+    const out = await res.json().catch(() => null);
+    if (!res.ok || !Array.isArray(out)) {
+        const detail = (out && (out.message ?? out.error)) ?? res.status;
+        throw new Error(`Postiz would not take that key. ${detail}`);
+    }
+    const n = out.length;
+    return {
+        account: base,
+        says: n
+            ? `${n} channel${n === 1 ? '' : 's'} connected in Postiz`
+            : 'connected, but nothing is linked in Postiz yet - add an account there first',
+        expires: null,
+    };
+}
+
 const CHECKS: Record<string, (account: string, token: string) => Promise<Checked>> = {
     Threads: (_account, token) => checkThreads(token),
     Bluesky: (account, token) => checkBluesky(account, token),
     Facebook: (account, token) => checkFacebook(account, token),
+    Postiz: (account, token) => checkPostiz(account, token),
 };
 
 Deno.serve(async (req) => {
@@ -166,6 +195,41 @@ Deno.serve(async (req) => {
     if (whoErr || email !== OWNER) return json({ error: 'That account cannot connect one.' }, 403);
 
     const body = await req.json().catch(() => null);
+
+    /* Asked by the SETTINGS tab to fill a platform's "route through Postiz" picker. This reads
+       the stored Postiz key rather than taking one in the request, so the key is never typed
+       twice and never leaves this function a second time. */
+    if (body?.action === 'postiz-integrations') {
+        const { data } = await supabase
+            .from('socializer_secret').select('secret, account').eq('platform', 'Postiz').maybeSingle();
+        if (!data?.secret) return json({ error: 'Connect Postiz first, above.' }, 400);
+
+        let token: string;
+        try {
+            token = await unseal(data.secret);
+        } catch (e) {
+            return json({ error: (e as Error).message }, 500);
+        }
+
+        const base = data.account || POSTIZ_DEFAULT;
+        const res = await fetch(`${base}/integrations`, { headers: { Authorization: token } });
+        const out = await res.json().catch(() => null);
+        if (!res.ok || !Array.isArray(out)) {
+            const detail = (out && (out.message ?? out.error)) ?? res.status;
+            return json({ error: `Postiz would not list its integrations. ${detail}` }, 502);
+        }
+
+        return json({
+            ok: true,
+            integrations: out.map((i: Record<string, unknown>) => ({
+                id: String(i.id ?? ''),
+                identifier: String(i.identifier ?? ''),
+                name: String(i.name ?? ''),
+                profile: String(i.profile ?? ''),
+            })).filter((i) => i.id),
+        });
+    }
+
     const platform = String(body?.platform ?? '');
     const account = String(body?.account ?? '').trim();
     const token = String(body?.token ?? '').trim();

@@ -116,6 +116,9 @@ Secrets), and only the function that needs one can read it.
 | `BLUESKY_HANDLE`, `BLUESKY_APP_PASSWORD` | `soc-publish` | Optional fallback, from before credentials were enterable on the page |
 | `FACEBOOK_PAGE_ID`, `FACEBOOK_PAGE_TOKEN` | `soc-publish` | Optional fallback, as above |
 
+Postiz needs no secret of its own: its key is entered on the SETTINGS tab like any other
+credential and sealed under `SOC_SECRET_KEY`, the same as the three above.
+
 `SOC_SECRET_KEY` is the only one of these you need now. Per-platform credentials are entered
 on the Socializer's SETTINGS tab and stored sealed in `socializer_secret`; the two fallback
 pairs are read only when no stored credential exists, so an older setup keeps working.
@@ -154,6 +157,20 @@ platforms itself. Where to get each credential:
 
 App Review and Business Verification are only needed to publish to **other people's**
 accounts. Publishing to accounts you administer works with the app in development mode.
+
+- **Postiz** — not a platform of its own, but a way to reach the 28+ Postiz supports without
+  wiring each one here. Connect your actual accounts on Postiz's own dashboard
+  (`platform.postiz.com` for the hosted service, or your own domain if self-hosted), then get
+  the API key from its Settings page. Paste that into the **POSTIZ** tile on SETTINGS - account
+  field blank unless self-hosted, in which case it is the base URL ending `/api/public/v1`.
+  Once connected, any platform whose own direct publishing is not wired here (Instagram, X,
+  Reddit, TikTok) gets a **Route through Postiz** picker under Automatic, listing the accounts
+  Postiz already knows about; pick one and that platform publishes through it.
+  [tools/socializer-migration-23-postiz.sql](tools/socializer-migration-23-postiz.sql) has to be
+  run first, the same as any other migration. soc-publish's Postiz path has been checked for
+  syntax and exercised against a stand-in for Postiz's own documented API, but has not been run
+  against the real service - there was no key available to test it with when it was written.
+  The first real post through it is worth watching.
 
 ## Backstage
 
