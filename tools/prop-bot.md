@@ -109,6 +109,16 @@ discontinued lines, motivational tat, novelty items nobody asked for, prototypes
 described in far too much detail by their owner, anything where the seller's photograph is
 the joke.
 
+**Get the photo from the search result.** Every eBay search result carries a thumbnail, an
+image address on `i.ebayimg.com` (it looks like
+`https://i.ebayimg.com/images/g/<code>/s-l225.jpg`). When you find a candidate in eBay's
+search results, take that address from the **same result** as the item — next to its own
+`/itm/<digits>` link, not a neighbour's — and put it in `image_url`. Change the `s-l<number>`
+part to `s-l500` so it is big enough to see. If the page you got back does not show you an
+image address for that result, leave `image_url` empty: never build one, never reuse one from
+a different listing, and never take a stock photo from somewhere else. An empty photo is
+filled in later from eBay's API; a wrong one shows the wrong thing beside the listing.
+
 **A candidate is only real if you have a working `ebay.com/itm/<digits>` URL.** No item id,
 no candidate. Never invent an id, a title or a price, and never guess at one. If you could
 not confirm a detail, leave that column empty rather than filling it with a plausible
@@ -154,7 +164,7 @@ Send all of a run's candidates as one array. Each row:
 | `item_url` | `https://www.ebay.com/itm/<id>` — strip every tracking parameter |
 | `title` | the listing's own title. Could not read it? Empty string. |
 | `price` | the asking price as a number, or omit it entirely if unconfirmed |
-| `image_url` | a listing photo if you have a real one, else empty string |
+| `image_url` | the `i.ebayimg.com` thumbnail from that item's own search result, resized to `s-l500` (see Step 3), else empty string |
 | `why` | one sentence: which criterion it hits, and why it is funny |
 | `status` | always `NEW` |
 

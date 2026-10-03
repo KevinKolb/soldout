@@ -1,31 +1,34 @@
 #!/usr/bin/env python3
 """Find a photo for every PROP POOL candidate that has none.
 
-The SOC PROP BOT never has a photo to save: eBay serves its /itm/ pages a 403 to
-anything that is not a browser, and the bot is told not to invent one. So every
-row in prop_candidates arrives with image_url empty, and PROP POOL shows blank
-frames.
+The SOC PROP BOT can rarely save a photo itself: eBay turns automated visitors away
+from its listing pages, and the bot is told not to guess. So most rows in
+prop_candidates arrive with image_url empty, and PROP POOL would show blank frames.
 
-This runs in the daily build instead, from GitHub's own runners, which eBay does
-serve - the same reason build-inventory.py can read the storefront. For each NEW
-candidate with no image_url it reads the listing page's og:image - or, if eBay
-refuses that page, the thumbnail from eBay's search results for that item number -
-and writes the results to assets/data/pool-images.json, keyed by item_key. PROP POOL reads that
-file and uses it wherever a row's own image_url is empty.
+This runs in the daily build and asks eBay's official Browse API instead, which
+answers a registered app rather than turning it away. (Scraping the listing page or
+eBay's search results was tried first, from GitHub's runners; eBay refused both.)
+For each NEW candidate with no image_url it writes the listing's main photo to
+assets/data/pool-images.json, keyed by item_key. PROP POOL reads that file and uses
+it wherever a row's own image_url is empty.
 
-It writes nothing to Supabase. Updating prop_candidates is the owner's alone
-under its row-level security, and a file built here needs no new permission.
+Needs two repository secrets, from a free eBay developer account's production
+keyset: EBAY_CLIENT_ID (the App ID) and EBAY_CLIENT_SECRET (the Cert ID). Without
+them it skips, carrying over whatever photos the deployed file already had.
 
-Photos already found are carried over from the deployed copy of the file, so a
-day's build only fetches the candidates that are new since yesterday. Never
-fails the build: any error leaves whatever it managed to find.
+It writes nothing to Supabase - updating prop_candidates is the owner's alone under
+its row-level security, and a file built here needs no new permission. Photos
+already found are carried over from the deployed copy of the file, so a day's build
+only asks about candidates that are new since yesterday. Never fails the build.
 """
 
+import base64
 import json
+import os
 import re
 import sys
-import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -34,130 +37,121 @@ SUPABASE_KEY = "sb_publishable_AHzqW00erP1wModfz3mzVA_dxM6RtPr"
 LIVE = "https://www.soldoutcomedy.com/assets/data/pool-images.json"
 OUT = Path(__file__).parent.parent / "assets" / "data" / "pool-images.json"
 
-UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/125.0 Safari/537.36")
+EBAY_TOKEN = "https://api.ebay.com/identity/v1/oauth2/token"
+EBAY_BROWSE = "https://api.ebay.com/buy/browse/v1/item"
 
 
-def get(url, headers=None, timeout=15):
-    req = urllib.request.Request(url, headers=headers or {})
+def request(url, headers=None, data=None, timeout=20):
+    req = urllib.request.Request(url, headers=headers or {}, data=data)
     with urllib.request.urlopen(req, timeout=timeout) as r:
-        return r.read().decode("utf-8", "replace")
+        return json.loads(r.read().decode("utf-8", "replace"))
 
 
 def candidates():
     """NEW rows only - nothing else is ever shown in the pool."""
-    url = (f"{SUPABASE_URL}/rest/v1/prop_candidates"
-           "?status=eq.NEW&select=item_key,item_url,image_url")
-    return json.loads(get(url, {"apikey": SUPABASE_KEY,
-                                "Authorization": f"Bearer {SUPABASE_KEY}"}))
+    return request(
+        f"{SUPABASE_URL}/rest/v1/prop_candidates?status=eq.NEW&select=item_key,item_url,image_url",
+        {"apikey": SUPABASE_KEY, "Authorization": f"Bearer {SUPABASE_KEY}"})
 
 
 def previous():
     try:
-        data = json.loads(get(LIVE, {"User-Agent": UA}))
+        data = request(LIVE, {"User-Agent": "soldout-build"})
         return data if isinstance(data, dict) else {}
     except Exception:
         return {}
 
 
-PAGE_HEADERS = {
-    "User-Agent": UA,
-    "Accept": "text/html,application/xhtml+xml",
-    "Accept-Language": "en-US,en;q=0.9",
-}
-EBAYIMG = r'https://i\.ebayimg\.com/images/g/[A-Za-z0-9_~-]+/s-l\d+\.(?:jpg|jpeg|png|webp)'
-
-
-class NoRedirect(urllib.request.HTTPRedirectHandler):
-    # A search for an exact item number can bounce straight to the listing page,
-    # which is the one page eBay refuses - so the bounce is treated as a miss.
-    def redirect_request(self, *args, **kwargs):
-        return None
+def app_token(client_id, secret):
+    """An application token: it can read public listings and nothing else."""
+    basic = base64.b64encode(f"{client_id}:{secret}".encode()).decode()
+    body = urllib.parse.urlencode({
+        "grant_type": "client_credentials",
+        "scope": "https://api.ebay.com/oauth/api_scope",
+    }).encode()
+    return request(EBAY_TOKEN, {
+        "Authorization": f"Basic {basic}",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }, body)["access_token"]
 
 
 def sized(url):
     # The card is about 300px wide; the full-size asset is wasted bandwidth.
-    return re.sub(r"/s-l\d+\.", "/s-l500.", url)
+    return re.sub(r"/s-l\d+\.", "/s-l500.", url or "")
 
 
-def from_listing(item_url):
-    html = get(item_url, PAGE_HEADERS)
-    m = (re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', html)
-         or re.search(f"({EBAYIMG})", html))
-    return sized(m.group(1)) if m else ""
-
-
-def from_search(item_id):
-    """eBay serves its search results more freely than listing pages, and every
-    result carries a thumbnail. Take the one from the result for this item."""
-    req = urllib.request.Request(
-        f"https://www.ebay.com/sch/i.html?_nkw={item_id}", headers=PAGE_HEADERS)
-    with urllib.request.build_opener(NoRedirect).open(req, timeout=15) as r:
-        html = r.read().decode("utf-8", "replace")
-    at = html.find(f"/itm/{item_id}")
-    if at < 0:
-        return ""
-    # The thumbnail sits in the same result card as the link, a little before it.
-    m = re.search(f"({EBAYIMG})", html[max(0, at - 4000):at + 4000])
-    return sized(m.group(1)) if m else ""
-
-
-def photo(item_url, item_id):
-    """Listing page first, then search. Raises only if both were refused."""
+def photo(token, item_id):
+    """The listing's main photo, or '' if eBay has none to give (ended, removed)."""
+    headers = {"Authorization": f"Bearer {token}", "X-EBAY-C-MARKETPLACE-ID": "EBAY_US"}
     try:
-        return from_listing(item_url)
+        item = request(f"{EBAY_BROWSE}/get_item_by_legacy_id?legacy_item_id={item_id}", headers)
+        return sized((item.get("image") or {}).get("imageUrl"))
     except urllib.error.HTTPError as e:
-        first = e
+        if e.code == 404:
+            return ""
+        if e.code != 400:
+            raise
+    # A 400 here is almost always a listing with variations (sizes, colours), which
+    # this endpoint will not answer for by its plain item number. The same number is
+    # its item group id, and every variation in the group carries the listing photo.
     try:
-        return from_search(item_id)
-    except urllib.error.HTTPError:
-        raise first
+        group = request(f"{EBAY_BROWSE}/get_items_by_item_group?item_group_id={item_id}", headers)
+    except urllib.error.HTTPError as e:
+        if e.code in (400, 404):
+            return ""
+        raise
+    for item in group.get("items") or []:
+        url = (item.get("image") or {}).get("imageUrl")
+        if url:
+            return sized(url)
+    return ""
 
 
 def main():
     print("Finding PROP POOL photos")
+    known = previous()
     try:
         rows = candidates()
     except Exception as e:
         print(f"  could not read prop_candidates ({e}); leaving the pool as it is")
         return
-    known = previous()
-    out, fetched, found, blocked = {}, 0, 0, 0
 
+    client_id = os.environ.get("EBAY_CLIENT_ID", "").strip()
+    secret = os.environ.get("EBAY_CLIENT_SECRET", "").strip()
+    token = None
+    if client_id and secret:
+        try:
+            token = app_token(client_id, secret)
+        except Exception as e:
+            print(f"  eBay would not issue a token ({e}); check EBAY_CLIENT_ID / EBAY_CLIENT_SECRET")
+    else:
+        print("  EBAY_CLIENT_ID / EBAY_CLIENT_SECRET not set; carrying over known photos only")
+
+    out, asked, found, missing = {}, 0, 0, 0
     for row in rows:
-        key, url = row.get("item_key") or "", row.get("item_url") or ""
+        key = row.get("item_key") or ""
         if not key or row.get("image_url"):
             continue
         if known.get(key):
             out[key] = known[key]
             continue
-        if not url.startswith("https://www.ebay.com/itm/"):
+        if not token or not key.isdigit():
             continue
-        # Three refusals in a row means eBay is turning this runner away; asking
-        # for the rest would only be refused too.
-        if blocked >= 3:
-            break
-        fetched += 1
+        asked += 1
         try:
-            img = photo(url, url.rsplit("/", 1)[-1])
-            blocked = 0
-        except urllib.error.HTTPError as e:
-            blocked = blocked + 1 if e.code in (403, 429) else 0
-            print(f"  {key}: HTTP {e.code}")
-            continue
+            img = photo(token, key)
         except Exception as e:
             print(f"  {key}: {e}")
             continue
         if img:
             out[key] = img
             found += 1
-        time.sleep(0.5)
+        else:
+            missing += 1
 
     OUT.write_text(json.dumps(out, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-    print(f"  {len(rows)} NEW candidate(s); fetched {fetched} listing page(s), "
-          f"found {found} new photo(s); {len(out)} photo(s) in {OUT.name}")
-    if blocked >= 3:
-        print("  stopped early: eBay refused three listing pages in a row")
+    print(f"  {len(rows)} NEW candidate(s); asked eBay about {asked}, found {found} photo(s), "
+          f"{missing} with none (ended or removed); {len(out)} photo(s) in {OUT.name}")
 
 
 if __name__ == "__main__":

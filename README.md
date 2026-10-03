@@ -101,6 +101,13 @@ These are for prop check-in (`live/`) only. The shop build needs no secret: it r
 `shop` table in Supabase through a public select policy, with the publishable key
 committed in `tools/build-inventory.py`.
 
+Optional, for PROP POOL photos: `EBAY_CLIENT_ID` and `EBAY_CLIENT_SECRET`, the App ID and
+Cert ID of a free eBay developer account's **production** keyset
+(<https://developer.ebay.com/my/keys>). `tools/build-pool-images.py` uses them to ask eBay's
+Browse API for each candidate's photo. Without them that step skips and the build carries on.
+They only ever reach the build, never a page: an app token reads public listings and
+nothing else.
+
 ### Edge Function secrets
 
 These are not GitHub secrets and never reach the repo or a page. They are set on the

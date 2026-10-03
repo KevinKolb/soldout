@@ -141,7 +141,16 @@ How it works now:
    yet, so it gets its own pane instead. **Skip** marks it `SKIPPED` and it is gone from the
    pool. **Keep** marks it `KEPT` and opens the same Add prop panel the bookmarklet opens,
    prefilled with the listing URL — Keep itself never writes to the `shop` table, since only
-   the Add panel knows how to write a row the way that table expects.
+   the Add panel knows how to write a row the way that table expects. Not shown in Hide
+   mode or to anyone signed out.
+
+   **Photos.** eBay turns automated visitors away from listing pages and from its search
+   (tried from GitHub's runners as well as here), so the bot can only save a photo when its
+   search results happen to show one — `tools/prop-bot.md` tells it how, and never to guess.
+   The rest come from the daily build: `tools/build-pool-images.py` asks eBay's Browse API
+   for each NEW candidate with no `image_url` and writes `assets/data/pool-images.json`
+   (generated, not committed), which the pool falls back to. That step needs the
+   `EBAY_CLIENT_ID` / `EBAY_CLIENT_SECRET` repository secrets; until they exist it skips.
 
 ### Observed gaps (noted, nothing decided yet)
 

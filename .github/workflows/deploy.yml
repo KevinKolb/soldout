@@ -113,13 +113,16 @@ jobs:
       continue-on-error: true
       run: python3 tools/build-inventory.py
 
-    # Photos for PROP POOL. The prop bot can never get one (eBay turns it away from
-    # listing pages), so this fetches them from here and writes
-    # assets/data/pool-images.json. Not a hard failure: without it the pool just
-    # shows blank frames, as it always has.
+    # Photos for PROP POOL, from eBay's Browse API, written to
+    # assets/data/pool-images.json. The two secrets are a free eBay developer
+    # account's production keyset; without them the step skips. Not a hard
+    # failure: without it the pool just shows blank frames.
     - name: Find PROP POOL photos
       continue-on-error: true
       run: python3 tools/build-pool-images.py
+      env:
+        EBAY_CLIENT_ID: ${{ secrets.EBAY_CLIENT_ID }}
+        EBAY_CLIENT_SECRET: ${{ secrets.EBAY_CLIENT_SECRET }}
 
     # Re-inlines assets/footer.html into every page carrying the markers, so a
     # footer edit cannot ship half-applied if someone forgot to run it locally.
