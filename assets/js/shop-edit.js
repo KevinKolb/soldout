@@ -480,6 +480,9 @@ function injectStyles() {
        shorthand would hand it back a default-width dashed line nothing else on the
        bar has. */
     .tab-pool { border-top-style: dashed; border-left-style: dashed; border-right-style: dashed; }
+    /* Hide is the visitor's-eye view, and a visitor has no PROP POOL. Flipping to it
+       re-renders the grid, which fires shop:rendered and closes the pool if it was open. */
+    body.viewing-public .tab-pool { display: none; }
     .tab-pool[aria-selected="true"] {
       border-style: solid; background: var(--ink); color: var(--paper);
     }
@@ -1022,10 +1025,25 @@ function buildPoolPane() {
     document.getElementById('itemGrid').insertAdjacentElement('afterend', pane);
 }
 
+/* Photos for candidates whose own image_url is empty - which is all of them, since
+   eBay turns the bot away from listing pages. The daily build fetches them instead
+   (tools/build-pool-images.py). Missing file or bad JSON just means no photos. */
+let poolImages = {};
+async function loadPoolImages() {
+    try {
+        const r = await fetch('/assets/data/pool-images.json', { cache: 'no-cache' });
+        poolImages = r.ok ? await r.json() : {};
+    } catch {
+        poolImages = {};
+    }
+}
+
 async function loadPool() {
-    const { data, error } = await supabase
-        .from(POOL_TABLE).select('*').eq('status', 'NEW').order('found_at', { ascending: false })
-        .limit(60);
+    const [{ data, error }] = await Promise.all([
+        supabase.from(POOL_TABLE).select('*').eq('status', 'NEW')
+            .order('found_at', { ascending: false }).limit(60),
+        loadPoolImages(),
+    ]);
     if (error) {
         poolRows = [];
         renderPool(`Could not load the pool: ${error.message}`
@@ -1065,9 +1083,10 @@ function poolCard(row) {
 
     const shot = document.createElement('div');
     shot.className = 'shot';
-    if (row.image_url) {
+    const src = row.image_url || poolImages[row.item_key] || '';
+    if (src) {
         const img = document.createElement('img');
-        img.src = row.image_url;
+        img.src = src;
         img.alt = '';
         img.loading = 'lazy';
         /* A dead image is the common case here - the bot found the listing, not a
