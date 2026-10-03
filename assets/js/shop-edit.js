@@ -500,7 +500,9 @@ function injectStyles() {
       letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink);
     }
     .pool-note { font-family: var(--sans); font-size: 0.78rem; color: #666; min-height: 1.1em; margin: 0; }
-    .pool-actions { display: flex; gap: 8px; margin-top: 0.2rem; }
+    /* margin-top: auto pins Keep/Skip to the bottom of the card, so they line up
+       across a row whatever the title and the why run to. */
+    .pool-actions { display: flex; gap: 8px; margin-top: auto; }
     .pool-actions button {
       flex: 1; font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
       letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
