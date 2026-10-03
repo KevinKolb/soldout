@@ -359,21 +359,6 @@ footer::before {
 
 .mc-btn-ghost:hover { background: #e3ecfc; }
 
-/* The one link in the box rather than a third button - it leaves rather than
-   doing anything here, so it reads as a note at the bottom of the page, not
-   another action alongside sign in/out. */
-.mc-link {
-  display: block;
-  margin: 1rem 0 0;
-  font-family: 'Caveat', cursive;
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0.03em;
-  color: #1d3f91;
-  text-decoration: underline;
-}
-.mc-link:hover { color: #0f2a63; }
-
 /* Footer mobile responsive */
 @media (max-width: 768px) {
   .footer-content {

@@ -602,6 +602,14 @@ function buildBar() {
     bot.rel = 'noopener';
     bot.textContent = 'SOC PROP BOT';
 
+    /* Used to sit in the Mission Control sign-in box, which does nothing but sign
+       you in or out - a link that goes somewhere belongs with the panel that
+       actually does things. */
+    const backstage = document.createElement('a');
+    backstage.className = 'linkbtn';
+    backstage.href = '/backstage/';
+    backstage.textContent = 'BACKSTAGE ACCESS';
+
     const saveAll = buildSaveAll(said);
 
     const out = document.createElement('button');
@@ -614,7 +622,7 @@ function buildBar() {
        everything below it only makes sense in one of them. The message sits directly
        under Build, because that is the only thing that writes to it - a report belongs
        against the button that caused it, not at the top of the panel. */
-    bar.append(buildDragHandle(bar), buildViewToggle(said), add, mark, bot, saveAll, said, out, who);
+    bar.append(buildDragHandle(bar), buildViewToggle(said), add, mark, bot, backstage, saveAll, said, out, who);
     document.body.appendChild(bar);
     trackHeaderHeight();
     makePanelDraggable(bar);
