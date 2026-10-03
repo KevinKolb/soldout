@@ -253,6 +253,10 @@ Facts worth not rediscovering:
 Pressing a destination records that it went there and nothing else. Only **DONE** archives a
 card — a post can go to one platform today and another tomorrow.
 
+The first button on every POST card is **Copy blurb + link**: the two cents, a line break,
+then the post's link, onto the clipboard, for anywhere the card has no button for. It is not
+a destination and records nothing.
+
 Never put a publishing credential in a page. See "Edge Function secrets" in
 [README.md](README.md).
 

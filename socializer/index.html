@@ -2064,6 +2064,28 @@ function card(row) {
 
     /* Somewhere to send it is the POST tab's question, and only its question. */
     if (row.status === 'POST' && link) {
+        /* First, ahead of the destinations: the two cents and the link together on the
+           clipboard, for anywhere this card has no button for. Not a destination, so it
+           records nothing. It reads the words off the card as they are now rather than off
+           the row, so an edit whose save has not landed yet still makes it in. */
+        const copyLabel = 'Copy blurb + link';
+        const copy = document.createElement('button');
+        copy.type = 'button';
+        copy.className = 'btn ghost copybtn';
+        copy.textContent = copyLabel;
+        copy.onclick = async () => {
+            const words = why.textContent.replace(/\s+/g, ' ').trim();
+            const text = words ? words + '\n' + link : link;
+            try {
+                await navigator.clipboard.writeText(text);
+                copy.textContent = 'Copied!';
+                setTimeout(() => { copy.textContent = copyLabel; }, 1500);
+            } catch {
+                status('Could not reach the clipboard. To copy by hand: ' + text, 'err');
+            }
+        };
+        acts.appendChild(copy);
+
         /* What a destination reads as once it has had this one. Past tense, and the same
            sentence whichever of the three got it there: Post, Paste and Publish are three ways
            of asking, and there is only one way of having done it. */
