@@ -226,13 +226,7 @@
       line-height: 1.25;
       letter-spacing: 0.02em;
       margin: 0 0.5rem 0.6rem;
-      cursor: move;
-      touch-action: none;
-      user-select: none;
-      -webkit-user-select: none;
     }
-    .mc-box.dragging { transition: none; }
-    .mc-box.dragging .mc-title { cursor: grabbing; }
     .mc-msg {
       font-family: 'Caveat', cursive;
       font-size: 1.15rem;
@@ -297,7 +291,7 @@
   <div class="mc-overlay" id="mcOverlay" hidden>
     <div class="mc-box" role="dialog" aria-modal="true" aria-labelledby="mcTitle">
       <button type="button" class="mc-close" id="mcClose" aria-label="Close">&times;</button>
-      <div class="mc-title" id="mcTitle">MISSION CONTROL PROP SHOP ADMIN</div>
+      <div class="mc-title" id="mcTitle">MISSION CONTROL<br>SIGN IN</div>
       <p class="mc-msg" id="mcMsg">Sign in to enable admin controls on this page.</p>
       <button type="button" class="mc-btn" id="mcSignIn">Sign in with Google</button>
       <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden></button>
@@ -310,8 +304,6 @@
     var trigger = document.getElementById('mcTrigger');
     var overlay = document.getElementById('mcOverlay');
     if (!trigger || !overlay) return;
-    var box = overlay.querySelector('.mc-box');
-    var title = document.getElementById('mcTitle');
     var msg = document.getElementById('mcMsg');
     var signIn = document.getElementById('mcSignIn');
     var signOut = document.getElementById('mcSignOut');
@@ -372,32 +364,6 @@
         .then(function () { location.reload(); });
     });
     authReady.then(function (auth) { auth.onAuthChange(paint); });
-
-    if (box && title) {
-      var dragging = false, offX = 0, offY = 0;
-
-      title.addEventListener('pointerdown', function (e) {
-        var r = box.getBoundingClientRect();
-        dragging = true;
-        offX = e.clientX - r.left;
-        offY = e.clientY - r.top;
-        box.style.left = r.left + 'px';
-        box.style.top = r.top + 'px';
-        box.style.transform = 'rotate(-0.6deg)';
-        box.classList.add('dragging');
-        title.setPointerCapture(e.pointerId);
-      });
-      title.addEventListener('pointermove', function (e) {
-        if (!dragging) return;
-        var maxX = Math.max(0, window.innerWidth - box.offsetWidth);
-        var maxY = Math.max(0, window.innerHeight - box.offsetHeight);
-        box.style.left = Math.min(Math.max(0, e.clientX - offX), maxX) + 'px';
-        box.style.top = Math.min(Math.max(0, e.clientY - offY), maxY) + 'px';
-      });
-      var stopDrag = function () { dragging = false; box.classList.remove('dragging'); };
-      title.addEventListener('pointerup', stopDrag);
-      title.addEventListener('pointercancel', stopDrag);
-    }
   })();
   </script>
 </body>

@@ -312,9 +312,6 @@ footer::before {
   cursor: pointer;
 }
 
-/* The one thing you can grab: cursor: move says so, and touch-action: none
-   stops a finger dragging the box from also trying to scroll the page
-   underneath it. */
 .mc-title {
   font-family: 'Caveat', cursive;
   font-weight: 700;
@@ -322,13 +319,7 @@ footer::before {
   line-height: 1.25;
   letter-spacing: 0.02em;
   margin: 0 0.5rem 0.6rem;
-  cursor: move;
-  touch-action: none;
-  user-select: none;
-  -webkit-user-select: none;
 }
-.mc-box.dragging { transition: none; }
-.mc-box.dragging .mc-title { cursor: grabbing; }
 
 .mc-msg {
   font-family: 'Caveat', cursive;

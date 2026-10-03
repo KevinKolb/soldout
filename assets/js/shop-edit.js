@@ -106,6 +106,20 @@ function injectStyles() {
       font-family: 'Caveat', cursive; font-weight: 700;
       font-size: 1.05rem; letter-spacing: 0.02em;
     }
+    .edit-panel.dragging { transition: none; }
+
+    .panel-handle {
+      text-align: center;
+      letter-spacing: 0.3em;
+      cursor: move;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      margin: -2px -2px 2px;
+      padding: 4px;
+      border-bottom: 2px dashed rgba(29, 63, 145, 0.35);
+    }
+    .edit-panel.dragging .panel-handle { cursor: grabbing; }
 
     .edit-panel button {
       width: 100%;
@@ -600,9 +614,10 @@ function buildBar() {
        everything below it only makes sense in one of them. The message sits directly
        under Build, because that is the only thing that writes to it - a report belongs
        against the button that caused it, not at the top of the panel. */
-    bar.append(buildViewToggle(said), add, mark, bot, saveAll, said, out, who);
+    bar.append(buildDragHandle(bar), buildViewToggle(said), add, mark, bot, saveAll, said, out, who);
     document.body.appendChild(bar);
     trackHeaderHeight();
+    makePanelDraggable(bar);
 
     const panel = buildAddPanel();
     add.onclick = () => {
@@ -612,6 +627,52 @@ function buildBar() {
     };
 
     document.body.appendChild(panel);
+}
+
+/* A dedicated grip rather than making the whole panel draggable: every other inch of
+   it is a button, a link, or a switch, and a drag handler competing with those for the
+   same pointerdown would mean picking one meaning for a click that lands on both. */
+function buildDragHandle(bar) {
+    const handle = document.createElement('div');
+    handle.className = 'panel-handle';
+    handle.textContent = '⠿ ⠿ ⠿';
+    handle.title = 'Drag to move';
+    return handle;
+}
+
+/* Pointer events cover a mouse and a finger the same way, so touch needs no separate
+   handling - the same technique Mission Control's own box uses to drag by its title.
+   The panel starts positioned with top/right from injectStyles(); the first press reads
+   its real on-screen position and size with getBoundingClientRect() and switches to
+   plain left/top/width in pixels, so nothing jumps at the moment the drag begins and the
+   row-layout breakpoint losing its width: auto does not collapse the panel. */
+function makePanelDraggable(bar) {
+    const handle = bar.querySelector('.panel-handle');
+    if (!handle) return;
+    let dragging = false, offX = 0, offY = 0;
+
+    handle.addEventListener('pointerdown', e => {
+        const r = bar.getBoundingClientRect();
+        dragging = true;
+        offX = e.clientX - r.left;
+        offY = e.clientY - r.top;
+        bar.style.width = r.width + 'px';
+        bar.style.left = r.left + 'px';
+        bar.style.top = r.top + 'px';
+        bar.style.right = 'auto';
+        bar.classList.add('dragging');
+        handle.setPointerCapture(e.pointerId);
+    });
+    handle.addEventListener('pointermove', e => {
+        if (!dragging) return;
+        const maxX = Math.max(0, window.innerWidth - bar.offsetWidth);
+        const maxY = Math.max(0, window.innerHeight - bar.offsetHeight);
+        bar.style.left = Math.min(Math.max(0, e.clientX - offX), maxX) + 'px';
+        bar.style.top = Math.min(Math.max(0, e.clientY - offY), maxY) + 'px';
+    });
+    const stopDrag = () => { dragging = false; bar.classList.remove('dragging'); };
+    handle.addEventListener('pointerup', stopDrag);
+    handle.addEventListener('pointercancel', stopDrag);
 }
 
 /* Build. There is nothing left to save all of - every control on a card commits the

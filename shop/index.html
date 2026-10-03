@@ -588,7 +588,7 @@
   <div class="mc-overlay" id="mcOverlay" hidden>
     <div class="mc-box" role="dialog" aria-modal="true" aria-labelledby="mcTitle">
       <button type="button" class="mc-close" id="mcClose" aria-label="Close">&times;</button>
-      <div class="mc-title" id="mcTitle">MISSION CONTROL PROP SHOP ADMIN</div>
+      <div class="mc-title" id="mcTitle">MISSION CONTROL<br>SIGN IN</div>
       <p class="mc-msg" id="mcMsg">Sign in to enable admin controls on this page.</p>
       <button type="button" class="mc-btn" id="mcSignIn">Sign in with Google</button>
       <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden></button>
@@ -632,8 +632,6 @@
   var mcTrigger = document.getElementById('mcTrigger');
   var mcOverlay = document.getElementById('mcOverlay');
   if (mcTrigger && mcOverlay) {
-    var mcBox = mcOverlay.querySelector('.mc-box');
-    var mcTitle = document.getElementById('mcTitle');
     var mcMsg = document.getElementById('mcMsg');
     var mcIn = document.getElementById('mcSignIn');
     var mcOut = document.getElementById('mcSignOut');
@@ -706,40 +704,6 @@
     /* Fires the moment the OAuth redirect hands a session back, and in any other
        tab that signs in or out - so a card left open elsewhere updates itself. */
     authReady.then(function (auth) { auth.onAuthChange(paint); });
-
-    /* Dragging. The title is the one thing cursor: move invites you to grab, and
-       pointer events cover a mouse and a finger the same way, so touch needs no
-       separate handling. The box starts centered with a translate(-50%,-50%);
-       the first press reads its real on-screen position with
-       getBoundingClientRect() and switches to plain left/top in pixels, so
-       nothing jumps at the moment the drag begins. Kept on screen afterwards -
-       a box dragged by its only handle has no way to be dragged back if it
-       goes fully out of view. */
-    if (mcBox && mcTitle) {
-      var dragging = false, offX = 0, offY = 0;
-
-      mcTitle.addEventListener('pointerdown', function (e) {
-        var r = mcBox.getBoundingClientRect();
-        dragging = true;
-        offX = e.clientX - r.left;
-        offY = e.clientY - r.top;
-        mcBox.style.left = r.left + 'px';
-        mcBox.style.top = r.top + 'px';
-        mcBox.style.transform = 'rotate(-0.6deg)';
-        mcBox.classList.add('dragging');
-        mcTitle.setPointerCapture(e.pointerId);
-      });
-      mcTitle.addEventListener('pointermove', function (e) {
-        if (!dragging) return;
-        var maxX = Math.max(0, window.innerWidth - mcBox.offsetWidth);
-        var maxY = Math.max(0, window.innerHeight - mcBox.offsetHeight);
-        mcBox.style.left = Math.min(Math.max(0, e.clientX - offX), maxX) + 'px';
-        mcBox.style.top = Math.min(Math.max(0, e.clientY - offY), maxY) + 'px';
-      });
-      var stopDrag = function () { dragging = false; mcBox.classList.remove('dragging'); };
-      mcTitle.addEventListener('pointerup', stopDrag);
-      mcTitle.addEventListener('pointercancel', stopDrag);
-    }
   }
 })();
 </script>
