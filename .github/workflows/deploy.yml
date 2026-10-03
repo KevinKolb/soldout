@@ -3,16 +3,45 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
-  # No schedule. The shop used to rebuild every six hours whether anything had
-  # changed or not; captions, tabs and status now go live the moment they are saved,
-  # so the only thing a build still does is pick up a newly listed prop and refresh
-  # eBay's prices. That is worth a deliberate run, not a standing one.
+  # Every morning at 6:15 Central, to pick up props newly listed on the eBay
+  # storefront and refresh eBay's prices, photos and remaining counts. Captions, tabs
+  # and status don't need it - the shop reads those from Supabase live.
+  #
+  # Cron only speaks UTC, and Central moves an hour with daylight saving, so both
+  # UTC times are scheduled and the gate job below lets through only the one that
+  # is 6:15 in Chicago today.
+  schedule:
+    - cron: '15 11 * * *'   # 6:15 am CDT (daylight saving)
+    - cron: '15 12 * * *'   # 6:15 am CST (standard time)
   workflow_dispatch:
 
 jobs:
-  deploy:
+  gate:
     runs-on: ubuntu-latest
-    
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+    - id: check
+      env:
+        EVENT: ${{ github.event_name }}
+        CRON: ${{ github.event.schedule }}
+      run: |
+        run=true
+        if [ "$EVENT" = schedule ]; then
+          zone=$(TZ=America/Chicago date +%Z)
+          case "$zone|$CRON" in
+            "CDT|15 11 * * *"|"CST|15 12 * * *") run=true ;;
+            *) run=false ;;
+          esac
+          echo "Chicago is on $zone; this is the '$CRON' run; deploy=$run"
+        fi
+        echo "run=$run" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: gate
+    if: needs.gate.outputs.run == 'true'
+    runs-on: ubuntu-latest
+
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}

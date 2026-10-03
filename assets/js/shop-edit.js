@@ -13,8 +13,10 @@
  * keeps the published card as the thing on screen and attaches an editor to it, rather
  * than re-rendering from the table and losing everything eBay knows.
  *
- * The consequence, which the bar says out loud: a save lands in Supabase immediately
- * and reaches the public page at the next build, within six hours.
+ * A save lands in Supabase immediately, and the public page reads captions, tabs and
+ * status from there live. What only a build refreshes is the eBay half - title, price,
+ * photo, remaining count, and props newly listed on the storefront - and the site
+ * rebuilds itself every morning at 6:15 Central (see .github/workflows/deploy.yml).
  */
 
 import { currentUser, isOwner, onAuthChange, signOut, supabase, OWNER } from '/assets/js/auth.js';
@@ -211,6 +213,7 @@ function injectStyles() {
        jump sideways on every flip, and the switch is the one thing that has to stay
        under the cursor - you flip it twice in a row more often than once. */
     body.viewing-public .edit-panel > *:not(.view-toggle) { display: none; }
+    body.viewing-public .edit-panel { opacity: 0.5; }
 
     /* With no title left to grab, the whole box drags - everywhere but the track,
        which is the switch itself. touch-action: none so a finger drags rather than
@@ -655,8 +658,6 @@ function buildBar() {
     backstage.rel = 'noopener';
     backstage.textContent = 'Backstage';
 
-    const saveAll = buildSaveAll(said);
-
     const out = buildSignOut();
 
     const title = document.createElement('div');
@@ -665,10 +666,9 @@ function buildBar() {
     title.title = 'Drag to move';
 
     /* The switch right under the title: it decides which of the two pages you are
-       looking at, and everything below it only makes sense in one of them. The message
-       sits directly under Build, because that is the only thing that writes to it - a
-       report belongs against the button that caused it, not at the top of the panel. */
-    bar.append(title, buildViewToggle(said), add, bot, mark, saveAll, said, backstage, out);
+       looking at, and everything below it only makes sense in one of them. There is
+       no BUILD button: the site rebuilds itself every morning (see deploy.yml). */
+    bar.append(title, buildViewToggle(said), add, bot, mark, backstage, said, out);
     document.body.appendChild(bar);
     trackHeaderHeight();
     makePanelDraggable(bar, title);
@@ -790,51 +790,6 @@ function makePanelDraggable(bar, title) {
         e.preventDefault();
         e.stopPropagation();
     }, true);
-}
-
-/* Build. There is nothing left to save all of - every control on a card commits the
-   moment it is used - so what this does is the half that actually matters. Nothing
-   rebuilds on a schedule any more, and a prop listed on the eBay storefront does not
-   reach the shop until a build reads the storefront, so this is the button that puts
-   it there.
-
-   The build is started by a Supabase Edge Function, not from here: it needs a GitHub
-   token with actions:write, and a token in a static page is readable by everyone who
-   loads the page. See supabase/functions/build-shop/index.ts. */
-function buildSaveAll(said) {
-    /* The message hides itself when empty, so writing to it has to say so - otherwise
-       the build reports into an element nobody can see. */
-    const say = text => { said.textContent = text; said.hidden = !text; };
-
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.textContent = 'Build';
-
-    btn.onclick = async () => {
-        /* An editor still focused has not committed yet; blurring it does that first,
-           so a half-typed caption is not left behind by the build. */
-        if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
-
-
-        btn.disabled = true;
-        const note = '';
-
-        say('Starting a build...');
-        const { data: built, error: buildError } = await supabase.functions.invoke('build-shop');
-
-        btn.disabled = false;
-        if (buildError || (built && built.error)) {
-            const why = (built && built.error) || buildError.message || 'it did not say why';
-            say(note + 'Build did not start: ' + why);
-            setTimeout(() => say(''), 8000);
-            return;
-        }
-
-        say(note + 'Build started. New props appear in a couple of minutes.');
-        setTimeout(() => say(''), 8000);
-    };
-
-    return btn;
 }
 
 /* Flips the page between the editing view and what a visitor sees. The choice is

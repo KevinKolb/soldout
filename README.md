@@ -109,7 +109,7 @@ Secrets), and only the function that needs one can read it.
 
 | Secret | Used by | For |
 | --- | --- | --- |
-| `GITHUB_TOKEN_SOC` | `build-shop` | Starting a deploy so a shop edit goes live |
+| `GITHUB_TOKEN_SOC` | `build-shop` | Unused since 2026-10-03: the site rebuilds daily on a schedule, and nothing calls `build-shop` any more. Safe to delete with the function. |
 | `SOC_SECRET_KEY` | `soc-connect`, `soc-publish` | Sealing and opening the stored platform credentials. `openssl rand -base64 32` |
 | `THREADS_APP_SECRET` | `soc-connect` | Exchanging a short-lived Threads token for a 60-day one. Without it a pasted token is stored as-is and its lifetime is reported as unknown |
 | `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN` | `soc-digest` | Sending the bot's run-end email as soldoutcomedy@gmail.com. Scope `gmail.send` only — it cannot read a mailbox |

@@ -67,16 +67,20 @@ show with two audiences, not a performance and a recording of it.
 
 - **Site:** this repo, deployed to GitHub Pages by
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
-  `main` and on manual runs, which include the BUILD button on the control panel. There is
-  no schedule any more, so a prop newly listed on the eBay storefront, and eBay's current
-  prices, only reach the shop when one of those runs.
+  `main`, on manual runs, and every morning at 6:15 Central. That daily run is what brings
+  in a prop newly listed on the eBay storefront and eBay's current prices; captions, tabs
+  and status don't wait for it, since the shop reads those from Supabase live. Cron only
+  speaks UTC, so two times are scheduled and a gate job lets through whichever one is 6:15
+  in Chicago that day.
 - **Notion:** Backstage for people, and not read by Claude — see "Notion" below. Nothing the
   site runs on lives there.
 - **Airtable:** prop check-in (the `live/` pages).
 - **Supabase:** the `shop` table that curates the shop, `socializer` for the repost
   queue, `socializer_channel` for how each platform gets posted to, and `prop_candidates`
-  for the prop bot. Two Edge Functions: `build-shop` starts a deploy, `soc-publish`
-  publishes a queued post to a platform outright.
+  for the prop bot. Edge Function `soc-publish` publishes a queued post to a platform
+  outright. `build-shop`, which started a deploy for the old BUILD button, is no longer
+  called by anything since the daily rebuild replaced that button (2026-10-03); it can be
+  deleted from Supabase along with its `GITHUB_TOKEN_SOC` secret.
 
 Never commit real credentials. See "Deployment secrets" in [README.md](README.md).
 
@@ -273,11 +277,11 @@ Two boxes carry the name, so keep them apart:
   signed in your first name as the sign-out button. It does not drag.
 - **Mission Control control panel** is the owner's toolbar on `/shop`, built by
   [assets/js/shop-edit.js](assets/js/shop-edit.js). Under its title, a Full / Hide switch:
-  Hide shows the shop as a visitor sees it and shrinks the panel to just that switch. In
-  Full it drags by its title; in Hide, which has no title, by any part of the box but the
-  switch's track. Top to bottom in Full: ADD PROP MANUALLY, PROP BOT, FUNNY PRODUCT (the
-  bookmarklet, explained on hover), BUILD, BACKSTAGE, then your name, which asks SIGN OUT?
-  YES / NO. PROP BOT and BACKSTAGE open in a new tab. The BACKSTAGE link lives only here
+  Hide shows the shop as a visitor sees it and shrinks the panel to just that switch, at
+  half opacity. In Full it drags by its title; in Hide, which has no title, by any part of
+  the box but the switch's track. Top to bottom in Full: ADD PROP MANUALLY, PROP BOT, FUNNY
+  PRODUCT (the bookmarklet, explained on hover), BACKSTAGE, then your name, which asks SIGN
+  OUT? YES / NO. PROP BOT and BACKSTAGE open in a new tab. The BACKSTAGE link lives only here
   now; nothing a visitor sees links to it.
 
 Both `footer.css` and `shop-edit.js` are loaded with a `?v=` query string, because
