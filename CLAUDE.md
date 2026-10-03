@@ -67,7 +67,9 @@ show with two audiences, not a performance and a recording of it.
 
 - **Site:** this repo, deployed to GitHub Pages by
   [.github/workflows/deploy.yml](.github/workflows/deploy.yml). It deploys on every push to
-  `main`, every 6 hours on a schedule, and on manual runs.
+  `main` and on manual runs, which include the BUILD button on the control panel. There is
+  no schedule any more, so a prop newly listed on the eBay storefront, and eBay's current
+  prices, only reach the shop when one of those runs.
 - **Notion:** Backstage for people, and not read by Claude — see "Notion" below. Nothing the
   site runs on lives there.
 - **Airtable:** prop check-in (the `live/` pages).

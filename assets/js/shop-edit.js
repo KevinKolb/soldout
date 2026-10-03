@@ -251,7 +251,12 @@ function injectStyles() {
     }
     .view-toggle input:checked + .track .knob { transform: translateX(20px); }
     .view-toggle input:focus-visible + .track { outline: 2px solid #1d3f91; outline-offset: 3px; }
-    .view-toggle .lbl { opacity: 0.45; }
+    /* Caps, like the buttons below - same font size already, but mixed case read as
+       smaller next to them. Each word takes half the room beside the track and hugs it:
+       FULL right-aligned on its left, HIDE left-aligned on its right. */
+    .view-toggle .lbl { opacity: 0.45; flex: 1 1 0; text-transform: uppercase; }
+    .view-toggle .lbl-full { text-align: right; }
+    .view-toggle .lbl-hide { text-align: left; }
     .view-toggle .lbl.active { opacity: 1; }
 
     /* Previewing the public page. The editors are hidden rather than torn down, so
@@ -853,7 +858,7 @@ function buildViewToggle(said) {
     wrap.className = 'view-toggle';
 
     const back = document.createElement('span');
-    back.className = 'lbl';
+    back.className = 'lbl lbl-full';
     back.textContent = 'Full';
 
     const cb = document.createElement('input');
@@ -868,7 +873,7 @@ function buildViewToggle(said) {
     track.appendChild(knob);
 
     const pub = document.createElement('span');
-    pub.className = 'lbl';
+    pub.className = 'lbl lbl-hide';
     pub.textContent = 'Hide';
 
     const apply = () => {
