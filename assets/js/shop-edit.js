@@ -81,6 +81,10 @@ function unlink(card) {
 /* ---------- styles, injected so the public page never carries them ---------- */
 function injectStyles() {
     const css = `
+    /* Graph paper and blue ink, the same look Mission Control uses - this panel is the
+       other admin-only surface on the site, never seen by a visitor, so it is free to
+       depart from the shop's own brutalist/three-typeface rule the way Mission Control
+       already does. */
     .edit-panel {
       position: fixed;
       top: calc(var(--topbar-h, 40px) + 10px);
@@ -88,54 +92,71 @@ function injectStyles() {
       z-index: 30;
       width: 232px;
       display: flex; flex-direction: column; gap: 8px;
-      background: var(--ink); color: var(--paper);
-      border: var(--rule) solid var(--ink);
-      box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.25);
+      background-color: #f4f8ff;
+      background-image:
+        linear-gradient(#c6d9f5 1px, transparent 1px),
+        linear-gradient(90deg, #c6d9f5 1px, transparent 1px);
+      background-size: 18px 18px;
+      background-position: -1px -1px;
+      color: #1d3f91;
+      border: 2px solid #1d3f91;
+      border-radius: 1px;
+      box-shadow: 2px 2px 0 0 #1d3f91, 1px -1px 0 0 #1d3f91;
       padding: 10px;
-      font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-family: 'Caveat', cursive; font-weight: 700;
+      font-size: 1.05rem; letter-spacing: 0.02em;
     }
 
     .edit-panel button {
       width: 100%;
-      font-family: var(--mono); font-size: 0.76rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      background: var(--acid); color: var(--ink);
-      border: 2px solid var(--acid); padding: 7px 10px; cursor: pointer;
+      font-family: 'Caveat', cursive; font-weight: 700;
+      font-size: 1.05rem; letter-spacing: 0.02em;
+      background: #fff; color: #1d3f91;
+      border: 2px solid #1d3f91; border-radius: 1px;
+      box-shadow: 1.5px 1.5px 0 0 #1d3f91;
+      padding: 7px 10px; cursor: pointer;
+      transform: rotate(0.4deg);
+      transition: background 0.15s;
     }
-    .edit-panel button.ghost { background: transparent; color: var(--paper); border-color: var(--paper); }
+    .edit-panel button:hover { background: #e3ecfc; }
+    .edit-panel button.ghost { transform: rotate(-0.5deg); }
 
     /* A link that has to sit in a row of buttons without looking like the odd one. */
     .edit-panel .linkbtn {
       display: block; width: 100%; box-sizing: border-box; text-align: center;
-      font-family: var(--mono); font-size: 0.76rem; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none;
-      background: var(--acid); color: var(--ink);
-      border: 2px solid var(--acid); padding: 7px 10px;
+      font-family: 'Caveat', cursive; font-weight: 700;
+      font-size: 1.05rem; letter-spacing: 0.02em; text-decoration: none;
+      background: #fff; color: #1d3f91;
+      border: 2px solid #1d3f91; border-radius: 1px;
+      box-shadow: 1.5px 1.5px 0 0 #1d3f91;
+      padding: 7px 10px;
+      transform: rotate(-0.3deg);
+      transition: background 0.15s;
     }
-    .edit-panel .linkbtn:hover { background: var(--paper); border-color: var(--paper); }
+    .edit-panel .linkbtn:hover { background: #e3ecfc; }
 
     /* Dashed, like the ghost tab: something to pick up and put somewhere, rather than
        something to press. */
     .edit-panel .bookmarklet {
       display: block; text-align: center; cursor: grab;
-      font-family: var(--mono); font-size: 0.72rem; font-weight: 700;
-      letter-spacing: 0.09em; text-transform: uppercase; text-decoration: none;
-      color: var(--paper); border: 2px dashed var(--paper); padding: 7px 10px;
+      font-family: 'Caveat', cursive; font-weight: 700;
+      font-size: 1rem; letter-spacing: 0.02em; text-decoration: underline;
+      color: #1d3f91; border: 2px dashed #1d3f91; border-radius: 1px;
+      padding: 7px 10px;
     }
-    .edit-panel .bookmarklet:hover { background: var(--paper); color: var(--ink); }
+    .edit-panel .bookmarklet:hover { background: #e3ecfc; }
 
     .edit-panel .said {
-      text-transform: none; letter-spacing: 0; font-family: var(--sans);
-      font-size: 0.82rem; line-height: 1.45;
+      letter-spacing: 0; font-family: 'Caveat', cursive; font-weight: 400;
+      font-size: 1.05rem; line-height: 1.4;
     }
     .edit-panel .said[hidden] { display: none; }
 
     /* Last, and quiet: useful to confirm once, not worth the top of the panel. */
     .edit-panel .who {
-      text-transform: none; letter-spacing: 0; font-family: var(--sans);
-      font-size: 0.8rem; opacity: 0.6; word-break: break-all;
-      border-top: 2px solid rgba(255, 255, 255, 0.25); padding-top: 7px;
+      letter-spacing: 0; font-family: 'Caveat', cursive; font-weight: 400;
+      font-size: 1rem; opacity: 0.7; word-break: break-all;
+      border-top: 2px solid rgba(29, 63, 145, 0.3); padding-top: 7px;
     }
 
     /* In the public preview everything but the switch goes: the rest acts on a page
@@ -157,26 +178,24 @@ function injectStyles() {
       .edit-panel .who { border-top: 0; padding-top: 0; width: 100%; }
     }
 
-    /* Backstage / public, the first item in the panel. Hard-edged, because nothing
-       else on this page is rounded. */
     .view-toggle {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       cursor: pointer;
-      border: 2px solid var(--paper); padding: 7px 9px;
-      font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.1em;
-      text-transform: uppercase; user-select: none;
+      border: 2px solid #1d3f91; border-radius: 1px; padding: 7px 9px;
+      font-family: 'Caveat', cursive; font-weight: 700;
+      font-size: 1.05rem; letter-spacing: 0.02em; user-select: none;
     }
     .view-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
     .view-toggle .track {
       width: 40px; height: 20px; flex: none; position: relative;
-      border: 2px solid var(--paper); background: transparent;
+      border: 2px solid #1d3f91; background: transparent;
     }
     .view-toggle .knob {
       position: absolute; top: 2px; left: 2px; width: 12px; height: 12px;
-      background: var(--acid); transition: transform 0.12s;
+      background: #1d3f91; transition: transform 0.12s;
     }
     .view-toggle input:checked + .track .knob { transform: translateX(20px); }
-    .view-toggle input:focus-visible + .track { outline: 2px solid var(--acid); outline-offset: 3px; }
+    .view-toggle input:focus-visible + .track { outline: 2px solid #1d3f91; outline-offset: 3px; }
     .view-toggle .lbl { opacity: 0.45; }
     .view-toggle .lbl.active { opacity: 1; }
 
