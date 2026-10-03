@@ -195,11 +195,16 @@ footer::before {
   text-shadow: 0 0 10px rgba(255,217,61,0.5);
 }
 
-/* Footer bottom bar - black on white */
+/* Footer bottom bar - black on white. Three equal-width columns rather than
+   one centered line of bullet-separated links, so PRIVACY, the copyright and
+   MISSION CONTROL can sit left/center/right without the copyright drifting
+   off true center whenever the links either side of it change length. */
 .footer-bottom {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   background: white;
   color: var(--comic-black);
-  text-align: center;
   padding: 0.75rem 2rem;
   margin-top: 3rem;
   font-family: 'Inter', sans-serif;
@@ -219,10 +224,14 @@ footer::before {
   color: var(--comic-red);
 }
 
-.footer-separator {
-  margin: 0 0.75rem;
-  opacity: 0.5;
+.footer-bottom-left,
+.footer-bottom-center,
+.footer-bottom-right {
+  flex: 1 1 0;
 }
+.footer-bottom-left { text-align: left; }
+.footer-bottom-center { text-align: center; }
+.footer-bottom-right { text-align: right; }
 
 .footer-copyright {
   font-weight: 400;
@@ -353,6 +362,21 @@ footer::before {
 .mc-btn-ghost { transform: rotate(-0.5deg); }
 
 .mc-btn-ghost:hover { background: #e3ecfc; }
+
+/* The one link in the box rather than a third button - it leaves rather than
+   doing anything here, so it reads as a note at the bottom of the page, not
+   another action alongside sign in/out. */
+.mc-link {
+  display: block;
+  margin: 1rem 0 0;
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  color: #1d3f91;
+  text-decoration: underline;
+}
+.mc-link:hover { color: #0f2a63; }
 
 /* Footer mobile responsive */
 @media (max-width: 768px) {

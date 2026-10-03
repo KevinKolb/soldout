@@ -137,13 +137,9 @@
 
 <!-- Bottom border section -->
 <div class="footer-bottom">
-  <a href="/backstage/" class="backstage-link-bottom">BACKSTAGE ACCESS</a>
-  <span class="footer-separator">•</span>
-  <a href="/privacy/" class="backstage-link-bottom">PRIVACY</a>
-  <span class="footer-separator">•</span>
-  <button type="button" class="backstage-link-bottom mc-trigger" id="mcTrigger">MISSION CONTROL</button>
-  <span class="footer-separator">•</span>
-  <span class="footer-copyright">&copy; <span class="footer-year">2025</span> SOLD OUT! COMEDY</span>
+  <a href="/privacy/" class="backstage-link-bottom footer-bottom-left">PRIVACY</a>
+  <span class="footer-copyright footer-bottom-center">&copy; <span class="footer-year">2025</span> SOLD OUT! COMEDY</span>
+  <button type="button" class="backstage-link-bottom mc-trigger footer-bottom-right" id="mcTrigger">MISSION CONTROL</button>
 
   <!-- Mission Control has no page of its own. This button is the one door into
        every admin control on the site: it only signs you in or out, through the
@@ -163,6 +159,7 @@
       <p class="mc-msg" id="mcMsg">Sign in to enable admin controls on this page.</p>
       <button type="button" class="mc-btn" id="mcSignIn">Sign in with Google</button>
       <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden></button>
+      <a href="/backstage/" class="mc-link">BACKSTAGE ACCESS</a>
     </div>
   </div>
 </div>

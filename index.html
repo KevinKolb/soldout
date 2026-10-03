@@ -120,6 +120,9 @@
        white card floating on the dots. The rule on top does the same job the dark
        footer does on every other page: give the bar something to sit against. */
     .footer-bottom {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
       width: calc(100% + 48px);
       margin: 0 -24px -24px;
       padding: 0.75rem 1rem;
@@ -140,7 +143,15 @@
 
     .backstage-link-bottom:hover { color: var(--comic-red); }
 
-    .footer-separator { margin: 0 0.75rem; opacity: 0.5; }
+    .footer-bottom-left,
+    .footer-bottom-center,
+    .footer-bottom-right {
+      flex: 1 1 0;
+    }
+    .footer-bottom-left { text-align: left; }
+    .footer-bottom-center { text-align: center; }
+    .footer-bottom-right { text-align: right; }
+
     .footer-copyright { font-weight: 400; }
 
     /* Mission Control - see assets/footer.html for the full explanation kept
@@ -234,6 +245,17 @@
     .mc-btn:hover { background: #e3ecfc; }
     .mc-btn-ghost { transform: rotate(-0.5deg); }
     .mc-btn-ghost:hover { background: #e3ecfc; }
+    .mc-link {
+      display: block;
+      margin: 1rem 0 0;
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 1.05rem;
+      letter-spacing: 0.03em;
+      color: #1d3f91;
+      text-decoration: underline;
+    }
+    .mc-link:hover { color: #0f2a63; }
   </style>
 </head>
 <body>
@@ -250,13 +272,9 @@
   </div>
 
   <div class="footer-bottom">
-    <a href="/backstage/" class="backstage-link-bottom">BACKSTAGE ACCESS</a>
-    <span class="footer-separator">&bull;</span>
-    <a href="/privacy/" class="backstage-link-bottom">PRIVACY</a>
-    <span class="footer-separator">&bull;</span>
-    <button type="button" class="backstage-link-bottom mc-trigger" id="mcTrigger">MISSION CONTROL</button>
-    <span class="footer-separator">&bull;</span>
-    <span class="footer-copyright">&copy; 2025 SOLD OUT! COMEDY</span>
+    <a href="/privacy/" class="backstage-link-bottom footer-bottom-left">PRIVACY</a>
+    <span class="footer-copyright footer-bottom-center">&copy; 2025 SOLD OUT! COMEDY</span>
+    <button type="button" class="backstage-link-bottom mc-trigger footer-bottom-right" id="mcTrigger">MISSION CONTROL</button>
   </div>
 
   <div class="mc-overlay" id="mcOverlay" hidden>
@@ -266,6 +284,7 @@
       <p class="mc-msg" id="mcMsg">Sign in to enable admin controls on this page.</p>
       <button type="button" class="mc-btn" id="mcSignIn">Sign in with Google</button>
       <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden></button>
+      <a href="/backstage/" class="mc-link">BACKSTAGE ACCESS</a>
     </div>
   </div>
 
