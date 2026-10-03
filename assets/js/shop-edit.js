@@ -819,7 +819,7 @@ function buildViewToggle(said) {
 
     const back = document.createElement('span');
     back.className = 'lbl';
-    back.textContent = 'Backstage';
+    back.textContent = 'Full';
 
     const cb = document.createElement('input');
     cb.type = 'checkbox';
@@ -834,7 +834,7 @@ function buildViewToggle(said) {
 
     const pub = document.createElement('span');
     pub.className = 'lbl';
-    pub.textContent = 'Public';
+    pub.textContent = 'Hide';
 
     const apply = () => {
         const publicView = cb.checked;
