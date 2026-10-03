@@ -108,41 +108,25 @@ function injectStyles() {
     }
     .edit-panel.dragging { transition: none; }
 
-    /* A drawn grip rather than a text glyph - a braille/dot character here fell back to
-       whatever font actually has it, which is never Caveat, so it rendered as a
-       mismatched little icon in the middle of handwritten text. Three plain bars read
-       as a handle in any font because they are not font at all. */
-    .panel-handle {
-      position: relative;
-      height: 16px;
+    /* The title is the drag handle. touch-action: none stops a finger dragging it from
+       also scrolling the page underneath. */
+    .panel-title {
+      text-align: center;
+      white-space: nowrap;
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 1.2rem;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+      margin: -2px 0 2px;
+      padding-bottom: 4px;
+      border-bottom: 2px dashed rgba(29, 63, 145, 0.35);
       cursor: move;
       touch-action: none;
       user-select: none;
       -webkit-user-select: none;
-      margin: -2px -2px 2px;
-      padding: 4px;
-      border-bottom: 2px dashed rgba(29, 63, 145, 0.35);
     }
-    .panel-handle::before {
-      content: '';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 28px; height: 2px;
-      background: #1d3f91;
-      box-shadow: 0 5px 0 #1d3f91, 0 -5px 0 #1d3f91;
-    }
-    .edit-panel.dragging .panel-handle { cursor: grabbing; }
-
-    .panel-title {
-      text-align: center;
-      font-family: 'Caveat', cursive;
-      font-weight: 700;
-      font-size: 1.3rem;
-      line-height: 1.15;
-      letter-spacing: 0.02em;
-      margin: 0 0 2px;
-    }
+    .edit-panel.dragging .panel-title { cursor: grabbing; }
 
     .edit-panel button {
       width: 100%;
@@ -183,18 +167,41 @@ function injectStyles() {
     }
     .edit-panel .bookmarklet:hover { background: #e3ecfc; }
 
+    /* The explanation is a pseudo-element, not a child span or a title: dragging the
+       link makes a bookmark named after its text, and a span would land in that name.
+       It shows at once on hover, where a native title waits a second or more. */
+    .edit-panel .bookmarklet { position: relative; }
+    .edit-panel .bookmarklet::after {
+      content: attr(data-tip);
+      position: absolute;
+      left: -2px; right: -2px; top: calc(100% + 6px);
+      z-index: 2;
+      display: none;
+      background: #fff; color: #1d3f91;
+      border: 2px solid #1d3f91; box-shadow: 1.5px 1.5px 0 0 #1d3f91;
+      padding: 6px 8px;
+      font-weight: 400; font-size: 1rem; line-height: 1.3;
+      text-transform: none; text-decoration: none; text-align: left;
+      white-space: normal; pointer-events: none;
+    }
+    .edit-panel .bookmarklet:hover::after,
+    .edit-panel .bookmarklet:focus-visible::after { display: block; }
+
     .edit-panel .said {
       letter-spacing: 0; font-family: 'Caveat', cursive; font-weight: 400;
       font-size: 1.05rem; line-height: 1.4;
     }
     .edit-panel .said[hidden] { display: none; }
 
-    /* Last, and quiet: useful to confirm once, not worth the top of the panel. */
-    .edit-panel .who {
-      letter-spacing: 0; font-family: 'Caveat', cursive; font-weight: 400;
-      font-size: 1rem; opacity: 0.7; word-break: break-all;
-      border-top: 2px solid rgba(29, 63, 145, 0.3); padding-top: 7px;
+    /* Your name is the sign-out button. Pressing it asks first, since there is no undo
+       short of the Google round trip back in. */
+    .edit-panel .out-ask {
+      display: flex; align-items: center; gap: 6px;
+      text-transform: uppercase;
     }
+    .edit-panel .out-ask[hidden] { display: none; }
+    .edit-panel .out-ask span { flex: 1 1 auto; white-space: nowrap; }
+    .edit-panel .out-ask button { width: auto; flex: 0 0 auto; padding: 5px 10px; }
 
     /* In the public preview everything but the switch goes: the rest acts on a page
        you are not currently looking at, and hanging a slab of controls over a
@@ -203,7 +210,8 @@ function injectStyles() {
        The width does not change with it. Shrinking to fit the switch made the panel
        jump sideways on every flip, and the switch is the one thing that has to stay
        under the cursor - you flip it twice in a row more often than once. */
-    body.viewing-public .edit-panel > *:not(.view-toggle) { display: none; }
+    /* The title stays too: it is the only way to move the panel. */
+    body.viewing-public .edit-panel > *:not(.view-toggle):not(.panel-title) { display: none; }
 
     /* Too narrow for a column beside the grid, so it lies down under the header. */
     @media (max-width: 900px) {
@@ -212,7 +220,7 @@ function injectStyles() {
         flex-direction: row; flex-wrap: wrap; align-items: center;
       }
       .edit-panel button, .edit-panel .linkbtn { width: auto; flex: 1 1 auto; }
-      .edit-panel .who { border-top: 0; padding-top: 0; width: 100%; }
+      .edit-panel .panel-title { flex: 1 1 100%; }
     }
 
     .view-toggle {
@@ -575,13 +583,9 @@ function buildBar() {
     said.hidden = true;
     saidEl = said;
 
-    const who = document.createElement('span');
-    who.className = 'who';
-    who.textContent = user.email;
-
     const add = document.createElement('button');
     add.type = 'button';
-    add.textContent = '+ Add prop';
+    add.textContent = 'Add prop manually';
 
     /* A bookmarklet, so a listing can be sent here from eBay without copying its URL
        back and forth. It cannot write to Supabase itself: it runs on ebay.com, and the
@@ -596,7 +600,8 @@ function buildBar() {
        thing you are about to press on a listing rather than as an instruction that
        would then live in the bookmarks bar forever. */
     mark.textContent = 'FUNNY PRODUCT';
-    mark.title = 'Drag to your bookmarks bar, then press it on any listing';
+    mark.dataset.tip = 'A bookmarklet. Drag it to your bookmarks bar, then press it '
+        + 'while you are looking at any eBay listing to add that listing here.';
     /* The live site, not location.origin. A bookmarklet built from wherever the page
        happened to be served would point at 127.0.0.1 forever once dragged from a local
        session - and a bookmark that only works on the machine it was made on is not a
@@ -623,7 +628,7 @@ function buildBar() {
     bot.href = 'https://claude.ai/code/routines/trig_01HzNErWquYbDdYY7eqRKXS2';
     bot.target = '_blank';
     bot.rel = 'noopener';
-    bot.textContent = 'SOC PROP BOT';
+    bot.textContent = 'Prop bot';
 
     /* Used to sit in the Mission Control sign-in box, which does nothing but sign
        you in or out - a link that goes somewhere belongs with the panel that
@@ -631,28 +636,25 @@ function buildBar() {
     const backstage = document.createElement('a');
     backstage.className = 'linkbtn';
     backstage.href = '/backstage/';
-    backstage.textContent = 'BACKSTAGE ACCESS';
+    backstage.textContent = 'Backstage';
 
     const saveAll = buildSaveAll(said);
 
-    const out = document.createElement('button');
-    out.type = 'button';
-    out.className = 'ghost';
-    out.textContent = 'Sign out';
-    out.onclick = async () => { await signOut(); location.reload(); };
+    const out = buildSignOut();
 
-    /* The switch first: it decides which of the two pages you are looking at, and
-       everything below it only makes sense in one of them. The message sits directly
-       under Build, because that is the only thing that writes to it - a report belongs
-       against the button that caused it, not at the top of the panel. */
     const title = document.createElement('div');
     title.className = 'panel-title';
     title.textContent = 'MISSION CONTROL PANEL';
+    title.title = 'Drag to move';
 
-    bar.append(buildDragHandle(bar), title, buildViewToggle(said), add, mark, bot, backstage, saveAll, said, out, who);
+    /* The switch right under the title: it decides which of the two pages you are
+       looking at, and everything below it only makes sense in one of them. The message
+       sits directly under Build, because that is the only thing that writes to it - a
+       report belongs against the button that caused it, not at the top of the panel. */
+    bar.append(title, buildViewToggle(said), add, bot, mark, saveAll, said, backstage, out);
     document.body.appendChild(bar);
     trackHeaderHeight();
-    makePanelDraggable(bar);
+    makePanelDraggable(bar, title);
 
     const panel = buildAddPanel();
     add.onclick = () => {
@@ -664,25 +666,64 @@ function buildBar() {
     document.body.appendChild(panel);
 }
 
-/* A dedicated grip rather than making the whole panel draggable: every other inch of
-   it is a button, a link, or a switch, and a drag handler competing with those for the
-   same pointerdown would mean picking one meaning for a click that lands on both. */
-function buildDragHandle(bar) {
-    const handle = document.createElement('div');
-    handle.className = 'panel-handle';
-    handle.title = 'Drag to move';
-    return handle;
+/* First name off the Google profile, else whatever is in front of the @. */
+function nameOf(u) {
+    const meta = (u && u.user_metadata) || {};
+    const full = String(meta.full_name || meta.name || '').trim();
+    if (full) return full.split(/\s+/)[0];
+    return String((u && u.email) || '').split('@')[0] || 'Sign out';
 }
 
-/* Pointer events cover a mouse and a finger the same way, so touch needs no separate
-   handling - the same technique Mission Control's own box uses to drag by its title.
-   The panel starts positioned with top/right from injectStyles(); the first press reads
-   its real on-screen position and size with getBoundingClientRect() and switches to
-   plain left/top/width in pixels, so nothing jumps at the moment the drag begins and the
-   row-layout breakpoint losing its width: auto does not collapse the panel. */
-function makePanelDraggable(bar) {
-    const handle = bar.querySelector('.panel-handle');
-    if (!handle) return;
+/* Your name is the button; pressing it swaps in SIGN OUT? YES / NO, and only YES
+   signs out. NO puts the name back. */
+function buildSignOut() {
+    const wrap = document.createElement('div');
+    wrap.className = 'out-wrap';
+
+    const nameBtn = document.createElement('button');
+    nameBtn.type = 'button';
+    nameBtn.className = 'ghost';
+    nameBtn.textContent = nameOf(user);
+
+    const ask = document.createElement('div');
+    ask.className = 'out-ask';
+    ask.hidden = true;
+
+    const q = document.createElement('span');
+    q.textContent = 'Sign out?';
+
+    const yes = document.createElement('button');
+    yes.type = 'button';
+    yes.textContent = 'Yes';
+
+    const no = document.createElement('button');
+    no.type = 'button';
+    no.className = 'ghost';
+    no.textContent = 'No';
+
+    nameBtn.onclick = () => { nameBtn.hidden = true; ask.hidden = false; no.focus(); };
+    no.onclick = () => { ask.hidden = true; nameBtn.hidden = false; nameBtn.focus(); };
+    yes.onclick = async () => {
+        yes.disabled = no.disabled = true;
+        await signOut();
+        location.reload();
+    };
+
+    ask.append(q, yes, no);
+    wrap.append(nameBtn, ask);
+    return wrap;
+}
+
+/* The title is the only handle: every other inch of the panel is a button, a link or
+   a switch, and a drag competing with those for the same press would have to guess
+   which one you meant.
+
+   Pointer events cover a mouse and a finger the same way. The panel starts positioned
+   with top/right from injectStyles(); the first press reads its real on-screen position
+   and size with getBoundingClientRect() and switches to plain left/top/width in pixels,
+   so nothing jumps at the moment the drag begins and the row-layout breakpoint losing
+   its width: auto does not collapse the panel. */
+function makePanelDraggable(bar, handle) {
     let dragging = false, offX = 0, offY = 0;
 
     handle.addEventListener('pointerdown', e => {

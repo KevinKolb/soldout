@@ -265,6 +265,20 @@ owner, the way [assets/js/shop-edit.js](assets/js/shop-edit.js) already does on 
 **Proposed:** if Mission Control ever grows a page of its own, it holds utilities that have
 no page of their own to live on — not a destination for the sign-in itself.
 
+Two boxes carry the name, so keep them apart:
+
+- **Mission Control sign in** is that footer popup: title, Sign in with Google, and once
+  signed in your first name as the sign-out button. It does not drag.
+- **Mission Control control panel** is the owner's toolbar on `/shop`, built by
+  [assets/js/shop-edit.js](assets/js/shop-edit.js). It drags by its title, in public preview
+  too. Top to bottom: ADD PROP MANUALLY, PROP BOT, FUNNY PRODUCT (the bookmarklet, explained
+  on hover), BUILD, BACKSTAGE, then your name, which asks SIGN OUT? YES / NO. The BACKSTAGE
+  link lives only here now; nothing a visitor sees links to it.
+
+Both `footer.css` and `shop-edit.js` are loaded with a `?v=` query string, because
+Cloudflare caches them for four hours and a fix can otherwise sit behind a stale copy.
+Bump the string on every page that loads the file whenever the file changes.
+
 There is no service-role key in this repo and there must never be one. Any key in a static
 page is readable by every visitor, and a service key bypasses row-level security entirely.
 The committed publishable key is powerless until someone proves who they are.
