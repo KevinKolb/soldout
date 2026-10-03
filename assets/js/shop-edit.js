@@ -108,9 +108,13 @@ function injectStyles() {
     }
     .edit-panel.dragging { transition: none; }
 
+    /* A drawn grip rather than a text glyph - a braille/dot character here fell back to
+       whatever font actually has it, which is never Caveat, so it rendered as a
+       mismatched little icon in the middle of handwritten text. Three plain bars read
+       as a handle in any font because they are not font at all. */
     .panel-handle {
-      text-align: center;
-      letter-spacing: 0.3em;
+      position: relative;
+      height: 16px;
       cursor: move;
       touch-action: none;
       user-select: none;
@@ -119,12 +123,31 @@ function injectStyles() {
       padding: 4px;
       border-bottom: 2px dashed rgba(29, 63, 145, 0.35);
     }
+    .panel-handle::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px; height: 2px;
+      background: #1d3f91;
+      box-shadow: 0 5px 0 #1d3f91, 0 -5px 0 #1d3f91;
+    }
     .edit-panel.dragging .panel-handle { cursor: grabbing; }
+
+    .panel-title {
+      text-align: center;
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 1.3rem;
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+      margin: 0 0 2px;
+    }
 
     .edit-panel button {
       width: 100%;
       font-family: 'Caveat', cursive; font-weight: 700;
-      font-size: 1.05rem; letter-spacing: 0.02em;
+      font-size: 1.05rem; letter-spacing: 0.02em; text-transform: uppercase;
       background: #fff; color: #1d3f91;
       border: 2px solid #1d3f91; border-radius: 1px;
       box-shadow: 1.5px 1.5px 0 0 #1d3f91;
@@ -139,7 +162,7 @@ function injectStyles() {
     .edit-panel .linkbtn {
       display: block; width: 100%; box-sizing: border-box; text-align: center;
       font-family: 'Caveat', cursive; font-weight: 700;
-      font-size: 1.05rem; letter-spacing: 0.02em; text-decoration: none;
+      font-size: 1.05rem; letter-spacing: 0.02em; text-transform: uppercase; text-decoration: none;
       background: #fff; color: #1d3f91;
       border: 2px solid #1d3f91; border-radius: 1px;
       box-shadow: 1.5px 1.5px 0 0 #1d3f91;
@@ -154,7 +177,7 @@ function injectStyles() {
     .edit-panel .bookmarklet {
       display: block; text-align: center; cursor: grab;
       font-family: 'Caveat', cursive; font-weight: 700;
-      font-size: 1rem; letter-spacing: 0.02em; text-decoration: underline;
+      font-size: 1rem; letter-spacing: 0.02em; text-transform: uppercase; text-decoration: underline;
       color: #1d3f91; border: 2px dashed #1d3f91; border-radius: 1px;
       padding: 7px 10px;
     }
@@ -622,7 +645,11 @@ function buildBar() {
        everything below it only makes sense in one of them. The message sits directly
        under Build, because that is the only thing that writes to it - a report belongs
        against the button that caused it, not at the top of the panel. */
-    bar.append(buildDragHandle(bar), buildViewToggle(said), add, mark, bot, backstage, saveAll, said, out, who);
+    const title = document.createElement('div');
+    title.className = 'panel-title';
+    title.textContent = 'MISSION CONTROL PANEL';
+
+    bar.append(buildDragHandle(bar), title, buildViewToggle(said), add, mark, bot, backstage, saveAll, said, out, who);
     document.body.appendChild(bar);
     trackHeaderHeight();
     makePanelDraggable(bar);
@@ -643,7 +670,6 @@ function buildBar() {
 function buildDragHandle(bar) {
     const handle = document.createElement('div');
     handle.className = 'panel-handle';
-    handle.textContent = '⠿ ⠿ ⠿';
     handle.title = 'Drag to move';
     return handle;
 }
