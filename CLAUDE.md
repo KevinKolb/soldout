@@ -270,10 +270,13 @@ Two boxes carry the name, so keep them apart:
 - **Mission Control sign in** is that footer popup: title, Sign in with Google, and once
   signed in your first name as the sign-out button. It does not drag.
 - **Mission Control control panel** is the owner's toolbar on `/shop`, built by
-  [assets/js/shop-edit.js](assets/js/shop-edit.js). It drags by its title, in public preview
-  too. Top to bottom: ADD PROP MANUALLY, PROP BOT, FUNNY PRODUCT (the bookmarklet, explained
-  on hover), BUILD, BACKSTAGE, then your name, which asks SIGN OUT? YES / NO. The BACKSTAGE
-  link lives only here now; nothing a visitor sees links to it.
+  [assets/js/shop-edit.js](assets/js/shop-edit.js). Under its title, a Full / Hide switch:
+  Hide shows the shop as a visitor sees it and shrinks the panel to just that switch. In
+  Full it drags by its title; in Hide, which has no title, by any part of the box but the
+  switch's track. Top to bottom in Full: ADD PROP MANUALLY, PROP BOT, FUNNY PRODUCT (the
+  bookmarklet, explained on hover), BUILD, BACKSTAGE, then your name, which asks SIGN OUT?
+  YES / NO. PROP BOT and BACKSTAGE open in a new tab. The BACKSTAGE link lives only here
+  now; nothing a visitor sees links to it.
 
 Both `footer.css` and `shop-edit.js` are loaded with a `?v=` query string, because
 Cloudflare caches them for four hours and a fix can otherwise sit behind a stale copy.

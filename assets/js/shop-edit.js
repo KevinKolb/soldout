@@ -210,8 +210,18 @@ function injectStyles() {
        The width does not change with it. Shrinking to fit the switch made the panel
        jump sideways on every flip, and the switch is the one thing that has to stay
        under the cursor - you flip it twice in a row more often than once. */
-    /* The title stays too: it is the only way to move the panel. */
-    body.viewing-public .edit-panel > *:not(.view-toggle):not(.panel-title) { display: none; }
+    body.viewing-public .edit-panel > *:not(.view-toggle) { display: none; }
+
+    /* With no title left to grab, the whole box drags - everywhere but the track,
+       which is the switch itself. touch-action: none so a finger drags rather than
+       scrolls the page under it. */
+    body.viewing-public .edit-panel,
+    body.viewing-public .view-toggle {
+      cursor: move; touch-action: none; user-select: none; -webkit-user-select: none;
+    }
+    body.viewing-public .view-toggle .track { cursor: pointer; }
+    body.viewing-public .edit-panel.dragging,
+    body.viewing-public .edit-panel.dragging .view-toggle { cursor: grabbing; }
 
     /* Too narrow for a column beside the grid, so it lies down under the header. */
     @media (max-width: 900px) {
@@ -716,40 +726,65 @@ function buildSignOut() {
     return wrap;
 }
 
-/* The title is the only handle: every other inch of the panel is a button, a link or
-   a switch, and a drag competing with those for the same press would have to guess
-   which one you meant.
+/* In Full mode the title is the only handle: every other inch of the panel is a
+   button, a link or a switch. In Hide mode the panel is down to the Full/Hide switch
+   and no title, so a press anywhere but the track (the switch itself) can start a drag.
+
+   A drag only starts once the pointer has moved a few pixels, so a plain click on the
+   Full/Hide words still flips the switch the way a label always has. Once it does
+   start, the click that follows the release is swallowed, or letting go over those
+   words would flip it by accident.
 
    Pointer events cover a mouse and a finger the same way. The panel starts positioned
-   with top/right from injectStyles(); the first press reads its real on-screen position
-   and size with getBoundingClientRect() and switches to plain left/top/width in pixels,
-   so nothing jumps at the moment the drag begins and the row-layout breakpoint losing
-   its width: auto does not collapse the panel. */
-function makePanelDraggable(bar, handle) {
-    let dragging = false, offX = 0, offY = 0;
+   with top/right from injectStyles(); the drag reads its real on-screen position and
+   size with getBoundingClientRect() and switches to plain left/top/width in pixels, so
+   nothing jumps at the moment it begins and the row-layout breakpoint losing its
+   width: auto does not collapse the panel. */
+function makePanelDraggable(bar, title) {
+    let press = null, dragging = false, dragged = false, offX = 0, offY = 0;
 
-    handle.addEventListener('pointerdown', e => {
-        const r = bar.getBoundingClientRect();
-        dragging = true;
-        offX = e.clientX - r.left;
-        offY = e.clientY - r.top;
-        bar.style.width = r.width + 'px';
-        bar.style.left = r.left + 'px';
-        bar.style.top = r.top + 'px';
-        bar.style.right = 'auto';
-        bar.classList.add('dragging');
-        handle.setPointerCapture(e.pointerId);
+    const canStart = e => {
+        if (e.button !== 0) return false;
+        if (title.contains(e.target)) return true;
+        return document.body.classList.contains('viewing-public')
+            && !e.target.closest('.track, input');
+    };
+
+    bar.addEventListener('pointerdown', e => {
+        dragged = false;
+        if (canStart(e)) press = { x: e.clientX, y: e.clientY, id: e.pointerId };
     });
-    handle.addEventListener('pointermove', e => {
-        if (!dragging) return;
+    window.addEventListener('pointermove', e => {
+        if (!press || e.pointerId !== press.id) return;
+        if (!dragging) {
+            if (Math.hypot(e.clientX - press.x, e.clientY - press.y) < 4) return;
+            const r = bar.getBoundingClientRect();
+            offX = press.x - r.left;
+            offY = press.y - r.top;
+            bar.style.width = r.width + 'px';
+            bar.style.right = 'auto';
+            bar.classList.add('dragging');
+            dragging = dragged = true;
+        }
         const maxX = Math.max(0, window.innerWidth - bar.offsetWidth);
         const maxY = Math.max(0, window.innerHeight - bar.offsetHeight);
         bar.style.left = Math.min(Math.max(0, e.clientX - offX), maxX) + 'px';
         bar.style.top = Math.min(Math.max(0, e.clientY - offY), maxY) + 'px';
     });
-    const stopDrag = () => { dragging = false; bar.classList.remove('dragging'); };
-    handle.addEventListener('pointerup', stopDrag);
-    handle.addEventListener('pointercancel', stopDrag);
+    const stop = e => {
+        if (!press || e.pointerId !== press.id) return;
+        press = null;
+        dragging = false;
+        bar.classList.remove('dragging');
+    };
+    window.addEventListener('pointerup', stop);
+    window.addEventListener('pointercancel', stop);
+    bar.addEventListener('click', e => {
+        if (!dragged) return;
+        dragged = false;
+        e.preventDefault();
+        e.stopPropagation();
+    }, true);
 }
 
 /* Build. There is nothing left to save all of - every control on a card commits the
