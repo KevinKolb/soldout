@@ -17,7 +17,7 @@
  * and reaches the public page at the next build, within six hours.
  */
 
-import { currentUser, isOwner, signOut, supabase, OWNER } from '/assets/js/auth.js';
+import { currentUser, isOwner, onAuthChange, signOut, supabase, OWNER } from '/assets/js/auth.js';
 
 const TABLE = 'shop';
 
@@ -1742,4 +1742,18 @@ document.addEventListener('shop:rendered', () => {
     }
 });
 
-start(await currentUser());
+/* currentUser() races the OAuth redirect back to this page: detectSessionInUrl still
+   has the token hash to parse when this first read lands, so it can resolve to
+   signed-out a beat before the real sign-in lands. That one read used to be the only
+   check this file ever made - missing the race meant the whole editor, PROP POOL
+   included, silently never started for the rest of the page's life, even though
+   Mission Control's own script (which does listen) showed you signed in the whole
+   time. onAuthChange catches the sign-in whenever it actually lands instead. */
+let started = false;
+function boot(u) {
+    if (started || !isOwner(u)) return;
+    started = true;
+    start(u);
+}
+currentUser().then(boot);
+onAuthChange(boot);
