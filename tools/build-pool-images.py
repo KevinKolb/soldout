@@ -8,8 +8,9 @@ frames.
 
 This runs in the daily build instead, from GitHub's own runners, which eBay does
 serve - the same reason build-inventory.py can read the storefront. For each NEW
-candidate with no image_url it reads the listing page's og:image and writes the
-results to assets/data/pool-images.json, keyed by item_key. PROP POOL reads that
+candidate with no image_url it reads the listing page's og:image - or, if eBay
+refuses that page, the thumbnail from eBay's search results for that item number -
+and writes the results to assets/data/pool-images.json, keyed by item_key. PROP POOL reads that
 file and uses it wherever a row's own image_url is empty.
 
 It writes nothing to Supabase. Updating prop_candidates is the owner's alone
@@ -59,18 +60,58 @@ def previous():
         return {}
 
 
-def photo(item_url):
-    html = get(item_url, {
-        "User-Agent": UA,
-        "Accept": "text/html,application/xhtml+xml",
-        "Accept-Language": "en-US,en;q=0.9",
-    })
-    m = (re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', html)
-         or re.search(r'(https://i\.ebayimg\.com/images/g/[A-Za-z0-9_~-]+/s-l\d+\.(?:jpg|jpeg|png|webp))', html))
-    if not m:
-        return ""
+PAGE_HEADERS = {
+    "User-Agent": UA,
+    "Accept": "text/html,application/xhtml+xml",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+EBAYIMG = r'https://i\.ebayimg\.com/images/g/[A-Za-z0-9_~-]+/s-l\d+\.(?:jpg|jpeg|png|webp)'
+
+
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    # A search for an exact item number can bounce straight to the listing page,
+    # which is the one page eBay refuses - so the bounce is treated as a miss.
+    def redirect_request(self, *args, **kwargs):
+        return None
+
+
+def sized(url):
     # The card is about 300px wide; the full-size asset is wasted bandwidth.
-    return re.sub(r"/s-l\d+\.", "/s-l500.", m.group(1))
+    return re.sub(r"/s-l\d+\.", "/s-l500.", url)
+
+
+def from_listing(item_url):
+    html = get(item_url, PAGE_HEADERS)
+    m = (re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', html)
+         or re.search(f"({EBAYIMG})", html))
+    return sized(m.group(1)) if m else ""
+
+
+def from_search(item_id):
+    """eBay serves its search results more freely than listing pages, and every
+    result carries a thumbnail. Take the one from the result for this item."""
+    req = urllib.request.Request(
+        f"https://www.ebay.com/sch/i.html?_nkw={item_id}", headers=PAGE_HEADERS)
+    with urllib.request.build_opener(NoRedirect).open(req, timeout=15) as r:
+        html = r.read().decode("utf-8", "replace")
+    at = html.find(f"/itm/{item_id}")
+    if at < 0:
+        return ""
+    # The thumbnail sits in the same result card as the link, a little before it.
+    m = re.search(f"({EBAYIMG})", html[max(0, at - 4000):at + 4000])
+    return sized(m.group(1)) if m else ""
+
+
+def photo(item_url, item_id):
+    """Listing page first, then search. Raises only if both were refused."""
+    try:
+        return from_listing(item_url)
+    except urllib.error.HTTPError as e:
+        first = e
+    try:
+        return from_search(item_id)
+    except urllib.error.HTTPError:
+        raise first
 
 
 def main():
@@ -98,7 +139,7 @@ def main():
             break
         fetched += 1
         try:
-            img = photo(url)
+            img = photo(url, url.rsplit("/", 1)[-1])
             blocked = 0
         except urllib.error.HTTPError as e:
             blocked = blocked + 1 if e.code in (403, 429) else 0
