@@ -292,7 +292,7 @@
     <div class="mc-box" role="dialog" aria-modal="true" aria-labelledby="mcTitle">
       <button type="button" class="mc-close" id="mcClose" aria-label="Close">&times;</button>
       <div class="mc-title" id="mcTitle">MISSION CONTROL<br>SIGN IN</div>
-      <p class="mc-msg" id="mcMsg">Sign in to enable admin controls on this page.</p>
+      <p class="mc-msg" id="mcMsg">Admins, sign in to enable the control panel.</p>
       <button type="button" class="mc-btn" id="mcSignIn">Sign in with Google</button>
       <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden></button>
       <a href="/backstage/" class="mc-link">BACKSTAGE ACCESS</a>
@@ -329,7 +329,7 @@
       var signedIn = !!user;
       msg.textContent = signedIn
         ? 'Signed in as ' + nameOf(user) + '.'
-        : 'Sign in to enable admin controls on this page.';
+        : 'Admins, sign in to enable the control panel.';
       signIn.hidden = signedIn;
       signOut.hidden = !signedIn;
       if (signedIn) outName = nameOf(user);
