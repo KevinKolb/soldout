@@ -248,90 +248,111 @@ footer::before {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.65);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
   z-index: 1000;
 }
 /* [hidden] is a browser default, not something a class selector normally
    beats on specificity - but author CSS always outranks the browser's own
-   stylesheet regardless of specificity, so the display:flex above was
-   showing this on every page load until this restates the hidden state
-   explicitly. Caught by actually loading the page rather than trusting the
-   markup. */
+   stylesheet regardless of specificity, so a plain display rule here would
+   show this on every page load. Caught by actually loading the page rather
+   than trusting the markup. */
 .mc-overlay[hidden] { display: none; }
 
+/* The box centers itself, rather than the overlay centering it with flex, so
+   dragging only ever has to change left/top: nothing about the overlay's own
+   layout has to change underneath it once a drag starts. */
 .mc-box {
-  position: relative;
-  width: 100%;
-  max-width: 340px;
-  background: #fff;
-  color: var(--comic-black);
-  border: 3px solid var(--comic-black);
-  box-shadow: 8px 8px 0 var(--comic-black);
-  padding: 2rem 1.5rem 1.5rem;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-0.6deg);
+  width: min(360px, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+  box-sizing: border-box;
+
+  /* Graph paper: two faint rules, one every 18px, so the box reads as a page
+     torn out of a pad rather than a plain blue-tinted card. */
+  background-color: #f4f8ff;
+  background-image:
+    linear-gradient(#c6d9f5 1px, transparent 1px),
+    linear-gradient(90deg, #c6d9f5 1px, transparent 1px);
+  background-size: 18px 18px;
+  background-position: -1px -1px;
+
+  color: #1d3f91;
+  border: 2px solid #1d3f91;
+  border-radius: 1px;
+  /* A line drawn twice, the way a ballpoint redraws an edge it was not quite
+     happy with the first time - cheaper and steadier than an SVG wobble, and
+     it reads the same way at a glance. */
+  box-shadow: 2px 2px 0 0 #1d3f91, 1px -1px 0 0 #1d3f91;
+  padding: 1.9rem 1.5rem 1.6rem;
   text-align: center;
 }
 
 .mc-close {
   position: absolute;
-  top: 0.4rem;
-  right: 0.75rem;
+  top: 0.3rem;
+  right: 0.85rem;
   background: none;
   border: none;
-  color: var(--comic-black);
-  font-size: 1.6rem;
+  color: #1d3f91;
+  font-family: 'Caveat', cursive;
+  font-size: 1.8rem;
   line-height: 1;
   cursor: pointer;
 }
 
+/* The one thing you can grab: cursor: move says so, and touch-action: none
+   stops a finger dragging the box from also trying to scroll the page
+   underneath it. */
 .mc-title {
-  font-family: 'Bangers', cursive;
-  font-size: 1.6rem;
-  letter-spacing: 2px;
-  margin-bottom: 0.75rem;
+  font-family: 'Caveat', cursive;
+  font-weight: 700;
+  font-size: 1.7rem;
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  margin: 0 0.5rem 0.6rem;
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
+.mc-box.dragging { transition: none; }
+.mc-box.dragging .mc-title { cursor: grabbing; }
 
 .mc-msg {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  margin: 0 0 1.25rem;
+  font-family: 'Caveat', cursive;
+  font-size: 1.15rem;
+  line-height: 1.4;
+  margin: 0 0 1.1rem;
   text-transform: none;
   letter-spacing: normal;
 }
 
 .mc-btn {
   display: inline-block;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Caveat', cursive;
   font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  background: var(--comic-black);
-  color: #fff;
-  border: 3px solid var(--comic-black);
-  padding: 0.65rem 1.25rem;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s, border-color 0.15s;
-}
-
-.mc-btn:hover {
-  background: var(--comic-red);
-  border-color: var(--comic-red);
-}
-
-.mc-btn-ghost {
+  font-size: 1.15rem;
+  letter-spacing: 0.03em;
+  text-transform: none;
   background: #fff;
-  color: var(--comic-black);
+  color: #1d3f91;
+  border: 2px solid #1d3f91;
+  border-radius: 1px;
+  box-shadow: 1.5px 1.5px 0 0 #1d3f91;
+  padding: 0.45rem 1.2rem;
+  cursor: pointer;
+  transform: rotate(0.4deg);
+  transition: background 0.15s;
 }
 
-.mc-btn-ghost:hover {
-  background: #f2f2f2;
-  color: var(--comic-black);
-  border-color: var(--comic-black);
-}
+.mc-btn:hover { background: #e3ecfc; }
+
+.mc-btn-ghost { transform: rotate(-0.5deg); }
+
+.mc-btn-ghost:hover { background: #e3ecfc; }
 
 /* Footer mobile responsive */
 @media (max-width: 768px) {

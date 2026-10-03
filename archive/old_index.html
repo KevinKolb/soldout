@@ -28,7 +28,7 @@
   <meta name="twitter:creator" content="@soldoutcomedy">
 
   <!-- Google Fonts: Bangers (comic book style) and Inter (body text) -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&family=Caveat:wght@400;700&display=swap">
 
   <!-- Main Stylesheet -->
   <link rel="stylesheet" href="../assets/css/style.css" id="main-stylesheet">
@@ -412,10 +412,10 @@
   <div class="mc-overlay" id="mcOverlay" hidden>
     <div class="mc-box" role="dialog" aria-modal="true" aria-labelledby="mcTitle">
       <button type="button" class="mc-close" id="mcClose" aria-label="Close">&times;</button>
-      <div class="mc-title" id="mcTitle">MISSION CONTROL</div>
+      <div class="mc-title" id="mcTitle">MISSION CONTROL PROP SHOP ADMIN</div>
       <p class="mc-msg" id="mcMsg">Sign in to enable admin controls on this page.</p>
       <button type="button" class="mc-btn" id="mcSignIn">Sign in with Google</button>
-      <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden>Sign out</button>
+      <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden></button>
     </div>
   </div>
 </div>
@@ -455,18 +455,46 @@
   var mcTrigger = document.getElementById('mcTrigger');
   var mcOverlay = document.getElementById('mcOverlay');
   if (mcTrigger && mcOverlay) {
+    var mcBox = mcOverlay.querySelector('.mc-box');
+    var mcTitle = document.getElementById('mcTitle');
     var mcMsg = document.getElementById('mcMsg');
     var mcIn = document.getElementById('mcSignIn');
     var mcOut = document.getElementById('mcSignOut');
     var authReady = import('/assets/js/auth.js');
 
+    /* First name off the Google profile if there is one, otherwise whatever is
+       in front of the @ - either way, something shorter than the full address
+       to put on a button. */
+    var nameOf = function (user) {
+      var meta = user.user_metadata || {};
+      var full = (meta.full_name || meta.name || '').trim();
+      if (full) return full.split(' ')[0];
+      return String(user.email || '').split('@')[0] || 'account';
+    };
+
+    /* The sign-out button is a two-step press, the same shape as DELETE and
+       Disconnect elsewhere on this site: the first press asks, armed re-asks
+       nothing, and only the second press inside the window actually signs out.
+       disarmOut also runs every time the box repaints, so reopening it or a
+       sign-in elsewhere never leaves a stale "SIGN OUT?" sitting there. */
+    var outName = '';
+    var outArmed = false;
+    var outTimer = null;
+    var disarmOut = function () {
+      outArmed = false;
+      clearTimeout(outTimer);
+      mcOut.textContent = outName;
+    };
+
     var paint = function (user) {
       var signedIn = !!user;
       mcMsg.textContent = signedIn
-        ? 'Signed in as ' + user.email + '.'
+        ? 'Signed in as ' + nameOf(user) + '.'
         : 'Sign in to enable admin controls on this page.';
       mcIn.hidden = signedIn;
       mcOut.hidden = !signedIn;
+      if (signedIn) outName = nameOf(user);
+      disarmOut();
     };
 
     var closeMc = function () { mcOverlay.hidden = true; };
@@ -487,12 +515,54 @@
         .catch(function (e) { mcMsg.textContent = 'Could not sign in: ' + e.message; });
     });
     mcOut.addEventListener('click', function () {
+      if (!outArmed) {
+        outArmed = true;
+        mcOut.textContent = 'SIGN OUT?';
+        outTimer = setTimeout(disarmOut, 4000);
+        return;
+      }
+      clearTimeout(outTimer);
+      mcOut.disabled = true;
       authReady.then(function (auth) { return auth.signOut(); })
         .then(function () { location.reload(); });
     });
     /* Fires the moment the OAuth redirect hands a session back, and in any other
        tab that signs in or out - so a card left open elsewhere updates itself. */
     authReady.then(function (auth) { auth.onAuthChange(paint); });
+
+    /* Dragging. The title is the one thing cursor: move invites you to grab, and
+       pointer events cover a mouse and a finger the same way, so touch needs no
+       separate handling. The box starts centered with a translate(-50%,-50%);
+       the first press reads its real on-screen position with
+       getBoundingClientRect() and switches to plain left/top in pixels, so
+       nothing jumps at the moment the drag begins. Kept on screen afterwards -
+       a box dragged by its only handle has no way to be dragged back if it
+       goes fully out of view. */
+    if (mcBox && mcTitle) {
+      var dragging = false, offX = 0, offY = 0;
+
+      mcTitle.addEventListener('pointerdown', function (e) {
+        var r = mcBox.getBoundingClientRect();
+        dragging = true;
+        offX = e.clientX - r.left;
+        offY = e.clientY - r.top;
+        mcBox.style.left = r.left + 'px';
+        mcBox.style.top = r.top + 'px';
+        mcBox.style.transform = 'rotate(-0.6deg)';
+        mcBox.classList.add('dragging');
+        mcTitle.setPointerCapture(e.pointerId);
+      });
+      mcTitle.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        var maxX = Math.max(0, window.innerWidth - mcBox.offsetWidth);
+        var maxY = Math.max(0, window.innerHeight - mcBox.offsetHeight);
+        mcBox.style.left = Math.min(Math.max(0, e.clientX - offX), maxX) + 'px';
+        mcBox.style.top = Math.min(Math.max(0, e.clientY - offY), maxY) + 'px';
+      });
+      var stopDrag = function () { dragging = false; mcBox.classList.remove('dragging'); };
+      mcTitle.addEventListener('pointerup', stopDrag);
+      mcTitle.addEventListener('pointercancel', stopDrag);
+    }
   }
 })();
 </script>

@@ -25,7 +25,7 @@
   <meta name="twitter:site" content="@soldoutcomedy">
   <meta name="twitter:creator" content="@soldoutcomedy">
 
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers:wght@400&family=Inter:wght@300;400;600;700&family=Caveat:wght@400;700&display=swap">
 
   <style>
     :root {
@@ -159,28 +159,81 @@
     }
     .mc-overlay[hidden] { display: none; }
     .mc-box {
-      position: relative; width: 100%; max-width: 340px;
-      background: var(--comic-white); color: var(--comic-black);
-      border: 3px solid var(--comic-black); box-shadow: 8px 8px 0 var(--comic-black);
-      padding: 2rem 1.5rem 1.5rem; text-align: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-0.6deg);
+      width: min(360px, calc(100vw - 2rem));
+      max-height: calc(100vh - 2rem);
+      overflow: auto;
+      box-sizing: border-box;
+      background-color: #f4f8ff;
+      background-image:
+        linear-gradient(#c6d9f5 1px, transparent 1px),
+        linear-gradient(90deg, #c6d9f5 1px, transparent 1px);
+      background-size: 18px 18px;
+      background-position: -1px -1px;
+      color: #1d3f91;
+      border: 2px solid #1d3f91;
+      border-radius: 1px;
+      box-shadow: 2px 2px 0 0 #1d3f91, 1px -1px 0 0 #1d3f91;
+      padding: 1.9rem 1.5rem 1.6rem;
+      text-align: center;
     }
     .mc-close {
-      position: absolute; top: 0.4rem; right: 0.75rem;
-      background: none; border: none; color: var(--comic-black);
-      font-size: 1.6rem; line-height: 1; cursor: pointer;
+      position: absolute;
+      top: 0.3rem;
+      right: 0.85rem;
+      background: none;
+      border: none;
+      color: #1d3f91;
+      font-family: 'Caveat', cursive;
+      font-size: 1.8rem;
+      line-height: 1;
+      cursor: pointer;
     }
-    .mc-title { font-family: 'Bangers', cursive; font-size: 1.6rem; letter-spacing: 2px; margin-bottom: 0.75rem; }
-    .mc-msg { font-size: 0.85rem; line-height: 1.5; margin: 0 0 1.25rem; text-transform: none; letter-spacing: normal; }
+    .mc-title {
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 1.7rem;
+      line-height: 1.25;
+      letter-spacing: 0.02em;
+      margin: 0 0.5rem 0.6rem;
+      cursor: move;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .mc-box.dragging { transition: none; }
+    .mc-box.dragging .mc-title { cursor: grabbing; }
+    .mc-msg {
+      font-family: 'Caveat', cursive;
+      font-size: 1.15rem;
+      line-height: 1.4;
+      margin: 0 0 1.1rem;
+      text-transform: none;
+      letter-spacing: normal;
+    }
     .mc-btn {
-      display: inline-block; font-weight: 700; font-size: 0.8rem;
-      letter-spacing: 1px; text-transform: uppercase;
-      background: var(--comic-black); color: var(--comic-white);
-      border: 3px solid var(--comic-black); padding: 0.65rem 1.25rem; cursor: pointer;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      display: inline-block;
+      font-family: 'Caveat', cursive;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.03em;
+      text-transform: none;
+      background: #fff;
+      color: #1d3f91;
+      border: 2px solid #1d3f91;
+      border-radius: 1px;
+      box-shadow: 1.5px 1.5px 0 0 #1d3f91;
+      padding: 0.45rem 1.2rem;
+      cursor: pointer;
+      transform: rotate(0.4deg);
+      transition: background 0.15s;
     }
-    .mc-btn:hover { background: var(--comic-red); border-color: var(--comic-red); }
-    .mc-btn-ghost { background: var(--comic-white); color: var(--comic-black); }
-    .mc-btn-ghost:hover { background: #f2f2f2; color: var(--comic-black); border-color: var(--comic-black); }
+    .mc-btn:hover { background: #e3ecfc; }
+    .mc-btn-ghost { transform: rotate(-0.5deg); }
+    .mc-btn-ghost:hover { background: #e3ecfc; }
   </style>
 </head>
 <body>
@@ -209,10 +262,10 @@
   <div class="mc-overlay" id="mcOverlay" hidden>
     <div class="mc-box" role="dialog" aria-modal="true" aria-labelledby="mcTitle">
       <button type="button" class="mc-close" id="mcClose" aria-label="Close">&times;</button>
-      <div class="mc-title" id="mcTitle">MISSION CONTROL</div>
+      <div class="mc-title" id="mcTitle">MISSION CONTROL PROP SHOP ADMIN</div>
       <p class="mc-msg" id="mcMsg">Sign in to enable admin controls on this page.</p>
       <button type="button" class="mc-btn" id="mcSignIn">Sign in with Google</button>
-      <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden>Sign out</button>
+      <button type="button" class="mc-btn mc-btn-ghost" id="mcSignOut" hidden></button>
     </div>
   </div>
 
@@ -221,18 +274,38 @@
     var trigger = document.getElementById('mcTrigger');
     var overlay = document.getElementById('mcOverlay');
     if (!trigger || !overlay) return;
+    var box = overlay.querySelector('.mc-box');
+    var title = document.getElementById('mcTitle');
     var msg = document.getElementById('mcMsg');
     var signIn = document.getElementById('mcSignIn');
     var signOut = document.getElementById('mcSignOut');
     var authReady = import('/assets/js/auth.js');
 
+    var nameOf = function (user) {
+      var meta = user.user_metadata || {};
+      var full = (meta.full_name || meta.name || '').trim();
+      if (full) return full.split(' ')[0];
+      return String(user.email || '').split('@')[0] || 'account';
+    };
+
+    var outName = '';
+    var outArmed = false;
+    var outTimer = null;
+    var disarmOut = function () {
+      outArmed = false;
+      clearTimeout(outTimer);
+      signOut.textContent = outName;
+    };
+
     var paint = function (user) {
       var signedIn = !!user;
       msg.textContent = signedIn
-        ? 'Signed in as ' + user.email + '.'
+        ? 'Signed in as ' + nameOf(user) + '.'
         : 'Sign in to enable admin controls on this page.';
       signIn.hidden = signedIn;
       signOut.hidden = !signedIn;
+      if (signedIn) outName = nameOf(user);
+      disarmOut();
     };
 
     var close = function () { overlay.hidden = true; };
@@ -251,10 +324,44 @@
         .catch(function (e) { msg.textContent = 'Could not sign in: ' + e.message; });
     });
     signOut.addEventListener('click', function () {
+      if (!outArmed) {
+        outArmed = true;
+        signOut.textContent = 'SIGN OUT?';
+        outTimer = setTimeout(disarmOut, 4000);
+        return;
+      }
+      clearTimeout(outTimer);
+      signOut.disabled = true;
       authReady.then(function (auth) { return auth.signOut(); })
         .then(function () { location.reload(); });
     });
     authReady.then(function (auth) { auth.onAuthChange(paint); });
+
+    if (box && title) {
+      var dragging = false, offX = 0, offY = 0;
+
+      title.addEventListener('pointerdown', function (e) {
+        var r = box.getBoundingClientRect();
+        dragging = true;
+        offX = e.clientX - r.left;
+        offY = e.clientY - r.top;
+        box.style.left = r.left + 'px';
+        box.style.top = r.top + 'px';
+        box.style.transform = 'rotate(-0.6deg)';
+        box.classList.add('dragging');
+        title.setPointerCapture(e.pointerId);
+      });
+      title.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        var maxX = Math.max(0, window.innerWidth - box.offsetWidth);
+        var maxY = Math.max(0, window.innerHeight - box.offsetHeight);
+        box.style.left = Math.min(Math.max(0, e.clientX - offX), maxX) + 'px';
+        box.style.top = Math.min(Math.max(0, e.clientY - offY), maxY) + 'px';
+      });
+      var stopDrag = function () { dragging = false; box.classList.remove('dragging'); };
+      title.addEventListener('pointerup', stopDrag);
+      title.addEventListener('pointercancel', stopDrag);
+    }
   })();
   </script>
 </body>
