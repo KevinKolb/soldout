@@ -154,6 +154,22 @@
 
     .footer-copyright { font-weight: 400; }
 
+    /* Three equal flex columns run out of room at phone width before the
+       text does - PRIVACY held one line but the copyright and MISSION
+       CONTROL both wrapped to two, each at a different ragged width.
+       Stacked and centered reads as one clean block instead. */
+    @media (max-width: 560px) {
+      .footer-bottom {
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+      .footer-bottom-left,
+      .footer-bottom-center,
+      .footer-bottom-right {
+        text-align: center;
+      }
+    }
+
     /* Mission Control - see assets/footer.html for the full explanation kept
        next to the copy this was copied from. Duplicated by hand rather than
        inlined by tools/build-footer.py: this page opts out of the shared
@@ -242,6 +258,7 @@
       transform: rotate(0.4deg);
       transition: background 0.15s;
     }
+    .mc-btn[hidden] { display: none; }
     .mc-btn:hover { background: #e3ecfc; }
     .mc-btn-ghost { transform: rotate(-0.5deg); }
     .mc-btn-ghost:hover { background: #e3ecfc; }

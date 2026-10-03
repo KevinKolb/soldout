@@ -450,10 +450,13 @@
     }
 
     .serious-body {
+      /* No measure cap: .serious is full width on purpose (see its own
+         comment above), and a 68ch cap on just the text left most of that
+         width sitting empty as blank paper to the right of a narrow column -
+         the opposite of reading as the page's own closing word. */
       margin: 0;
       font-size: 1.05rem;
       line-height: 1.7;
-      max-width: 68ch;
     }
 
     /* Below this the banner is too narrow for the logo to sit beside the

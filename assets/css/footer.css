@@ -356,6 +356,11 @@ footer::before {
   transform: rotate(0.4deg);
   transition: background 0.15s;
 }
+/* Same [hidden]-vs-display trap as .mc-overlay above: an explicit display
+   rule always beats the browser's own [hidden] default, so the signed-out
+   mcSignOut button - empty of text, hidden set, but never actually hidden -
+   was rendering as a blank outlined box next to Sign in with Google. */
+.mc-btn[hidden] { display: none; }
 
 .mc-btn:hover { background: #e3ecfc; }
 
@@ -399,6 +404,20 @@ footer::before {
 
   .credits-title {
     font-size: 1.2rem;
+  }
+
+  /* Three equal flex columns run out of room at phone width before the
+     text does - PRIVACY held one line but the copyright and MISSION
+     CONTROL both wrapped to two, each at a different ragged width. Stacked
+     and centered reads as one clean block instead. */
+  .footer-bottom {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .footer-bottom-left,
+  .footer-bottom-center,
+  .footer-bottom-right {
+    text-align: center;
   }
 }
 
