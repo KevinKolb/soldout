@@ -108,7 +108,8 @@ How it works now:
    default tags, but **hidden** — as is anything added through the shop page itself, and
    anything added any other way: `status` defaults to `Hidden` on the table
    ([tools/shop-migration-02-hidden-default.sql](tools/shop-migration-02-hidden-default.sql)).
-   Nothing reaches a visitor until somebody presses ACTIVE on its card. Rows in the
+   Nothing reaches a visitor until somebody presses ACTIVE on its card — the one exception
+   is POST in PROP POOL (item 5), which is that decision made up front. Rows in the
    `shop` table in Supabase ([tools/shop-schema.sql](tools/shop-schema.sql)) say what we
    want to add: a row carries the listing URL, three classification fields, and optional
    title/price/image overrides:
@@ -139,10 +140,12 @@ How it works now:
    reviewed — nothing anywhere rendered that table before this. It is not a `tab_tag`: the
    real tabs all filter the one shop grid by that column, and a candidate is not a shop row
    yet, so it gets its own pane instead. **Skip** marks it `SKIPPED` and it is gone from the
-   pool. **Keep** marks it `KEPT` and opens the same Add prop panel the bookmarklet opens,
-   prefilled with the listing URL — Keep itself never writes to the `shop` table, since only
-   the Add panel knows how to write a row the way that table expects. Not shown in Hide
-   mode or to anyone signed out.
+   pool. **POST** puts it straight on the shop: a `shop` row with status `Active`, carrying
+   the bot's title, price and photo as the row's own overrides, so the card is complete
+   even though the listing is not on the influencer storefront (the build adds our EPN
+   tracking to any eBay item). The candidate is then marked `KEPT`. The card appears on
+   the public page after the next rebuild; a listing already in the shop is just marked
+   `KEPT`, never added twice. Not shown in Hide mode or to anyone signed out.
 
    **Photos.** eBay turns automated visitors away from listing pages and from its search
    (tried from GitHub's runners as well as here), so the bot can only save a photo when its

@@ -935,7 +935,7 @@ function buildAddPanel() {
             return;
         }
         url.value = '';
-        note.textContent = 'Added, hidden. Build to pull its title and price from eBay, then press ACTIVE on the card.';
+        note.textContent = 'Added, hidden. Its card appears after the next rebuild (6:15 tomorrow morning); press ACTIVE on it then.';
         await loadRows();
     };
 
@@ -1135,31 +1135,28 @@ function poolCard(row) {
     const actions = document.createElement('div');
     actions.className = 'pool-actions';
 
-    const keep = document.createElement('button');
-    keep.type = 'button';
-    keep.textContent = 'Keep';
-    keep.onclick = () => rulePool(row, 'KEPT', note, card);
+    const post = document.createElement('button');
+    post.type = 'button';
+    post.textContent = 'Post';
+    post.onclick = () => postPool(row, note, card);
 
     const skip = document.createElement('button');
     skip.type = 'button';
     skip.className = 'ghost';
     skip.textContent = 'Skip';
-    skip.onclick = () => rulePool(row, 'SKIPPED', note, card);
+    skip.onclick = () => {
+        note.textContent = 'Skipping...';
+        rulePool(row, 'SKIPPED', note, card);
+    };
 
-    actions.append(keep, skip);
+    actions.append(post, skip);
     body.appendChild(actions);
     card.appendChild(body);
     return card;
 }
 
-/* Keeping or skipping is the whole of this job - it never adds the listing to the shop
-   itself. That is still the Add panel's job, because only it knows how to write a row
-   the way the shop table expects (Hidden, a position, nothing guessed) - so Keep opens
-   that same panel, prefilled, exactly as the bookmarklet does via openFromBookmarklet()
-   rather than duplicating what it does. */
+/* Marks the candidate and takes its card out of the pool. */
 async function rulePool(row, status, note, card) {
-    note.textContent = status === 'KEPT' ? 'Keeping...' : 'Skipping...';
-
     const { error } = await supabase
         .from(POOL_TABLE)
         .update({ status, handled_at: new Date().toISOString() })
@@ -1167,7 +1164,7 @@ async function rulePool(row, status, note, card) {
 
     if (error) {
         note.textContent = 'Could not save that: ' + error.message;
-        return;
+        return false;
     }
 
     poolRows = poolRows.filter((r) => r.id !== row.id);
@@ -1175,17 +1172,44 @@ async function rulePool(row, status, note, card) {
     addPoolTab();
     card.remove();
     if (!poolRows.length) renderPool();
+    return true;
+}
 
-    if (status === 'KEPT') {
-        const panel = document.getElementById('addPanel');
-        if (panel) {
-            const field = panel.querySelector('input');
-            if (field) field.value = row.item_url;
-            panel.showModal();
-            const go = panel.querySelector('button');
-            if (go) go.focus();
+/* POST puts the candidate straight on the shop: a shop row carrying the bot's own
+   title, price and photo (or the photo the build found for it), status Active. The
+   build uses a row's own title, price and photo over the storefront's, and adds our
+   EPN tracking to any eBay item, so the card is complete without the listing being
+   on the influencer storefront first. Cards come from the build, though, so it shows
+   up on the public page after the next rebuild - every morning at 6:15 Central.
+
+   The shop row goes in first and the candidate is marked KEPT only once it has: if
+   the second half fails, pressing POST again finds the row already there and just
+   finishes the job instead of adding it twice. */
+async function postPool(row, note, card) {
+    note.textContent = 'Posting...';
+    let already = rows.has(keyOf(row.item_url));
+
+    if (!already) {
+        const { error } = await supabase.from(TABLE).insert({
+            item_url: row.item_url,
+            title: row.title || '',
+            price: row.price ?? null,
+            image_url: row.image_url || poolImages[row.item_key] || '',
+            status: 'Active',
+            position: Math.max(0, ...[...rows.values()].map(r => r.position || 0)) + 10,
+        });
+        if (error && !error.message.includes('duplicate')) {
+            note.textContent = 'Could not post that: ' + error.message;
+            return;
         }
+        already = !!error;
     }
+
+    if (!await rulePool(row, 'KEPT', note, card)) return;
+    await loadRows();
+    panelSay(already
+        ? 'That listing was already in the shop.'
+        : 'Posted. It goes up on the shop at the next rebuild, 6:15 tomorrow morning.', 8000);
 }
 
 /* A tab exists only as a value on a row, so a name invented before any prop wears it
