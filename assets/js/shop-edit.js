@@ -21,6 +21,10 @@ import { currentUser, isOwner, signOut, supabase, OWNER } from '/assets/js/auth.
 
 const TABLE = 'shop';
 
+/* What the SOC PROP BOT found, in tools/prop-bot-schema.sql. A nomination, not a shop
+   row - see PROP POOL below for why the two never merge automatically. */
+const POOL_TABLE = 'prop_candidates';
+
 /* Cards carry the full tracking URL and rows carry the clean one, so neither matches
    the other as a string. The eBay item id is the part that is actually the same. */
 function keyOf(url) {
@@ -30,6 +34,10 @@ function keyOf(url) {
 
 let rows = new Map();     // key -> the row in Supabase
 let user = null;
+
+let poolRows = [];        // the prop_candidates rows still NEW, most recently found first
+let poolCount = null;     // how many, for the tab's own badge - null until first counted
+let poolOpen = false;     // true while PROP POOL, not the shop grid, is on screen
 
 /* The panel's one line of feedback, shared so anything can report into it. */
 let saidEl = null;
@@ -375,6 +383,47 @@ function injectStyles() {
       font-family: var(--sans); font-size: 0.7rem; line-height: 1.5; color: #555;
       user-select: text; -webkit-user-select: text;
     }
+
+    /* .item-grid sets display: grid directly, which beats the browser's own [hidden]
+       default regardless of selector specificity - author CSS always outranks the
+       user-agent stylesheet. Without this, setting .hidden on #itemGrid or #propPool
+       in JS would do nothing visible, and both panes would show at once. */
+    .item-grid[hidden] { display: none; }
+
+    /* PROP POOL. The tab itself borrows .tab's own look and only adds the dashed
+       border ghostTab's "+ New" already uses for an admin-only control sitting among
+       the real ones, so the two read as the same kind of thing. */
+    /* The three sides named explicitly, not border-style's shorthand: .tab's own
+       border-bottom: none resets that edge's width along with its style, and the
+       shorthand would hand it back a default-width dashed line nothing else on the
+       bar has. */
+    .tab-pool { border-top-style: dashed; border-left-style: dashed; border-right-style: dashed; }
+    .tab-pool[aria-selected="true"] {
+      border-style: solid; background: var(--ink); color: var(--paper);
+    }
+
+    /* The pane sits in the same grid .item-grid already lays out; only the cards
+       inside it are new. */
+    .pool-card { cursor: default; }
+    .pool-card .shot { background: #eee; }
+    .pool-why {
+      font-family: var(--sans); font-size: 0.86rem; line-height: 1.45; color: #444;
+      font-style: italic; margin: 0;
+    }
+    .pool-view {
+      font-family: var(--mono); font-size: 0.74rem; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink);
+    }
+    .pool-note { font-family: var(--sans); font-size: 0.78rem; color: #666; min-height: 1.1em; margin: 0; }
+    .pool-actions { display: flex; gap: 8px; margin-top: 0.2rem; }
+    .pool-actions button {
+      flex: 1; font-family: var(--mono); font-size: 0.78rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+      background: var(--acid); color: var(--ink); border: var(--rule) solid var(--ink);
+      padding: 7px 10px;
+    }
+    .pool-actions button.ghost { background: var(--paper); }
+    .pool-actions button.ghost:hover { background: #f2f2f2; }
 
     `;
     const el = document.createElement('style');
@@ -744,6 +793,226 @@ function buildAddPanel() {
 
     panel.append(head, form);
     return panel;
+}
+
+/* ---------- the prop pool ----------
+   Where the SOC PROP BOT's finds go, and the one place anyone reads them: until this,
+   prop_candidates filled up with nobody looking, because nothing anywhere rendered it.
+
+   It is a fifth tab, not a tab_tag: the real tabs all filter the one shop grid by that
+   column, and a prop candidate is not a shop row at all yet, so it gets its own pane
+   instead of a value real props could accidentally be filed under. The tab sits beside
+   them in the same bar for the same reason ghostTab's "+ New" does - it is a page-level
+   control, not a filter, and the bar is where a control like that reads as one. */
+
+/* One query at the quiet moment this file always runs it: load, not on a schedule and
+   not on a timer, so the badge is honest as of when you arrived rather than claiming to
+   be live. Opening the tab itself re-fetches properly. */
+async function loadPoolCount() {
+    const { count, error } = await supabase
+        .from(POOL_TABLE).select('id', { count: 'exact', head: true }).eq('status', 'NEW');
+    poolCount = error ? null : (count ?? 0);
+}
+
+function addPoolTab() {
+    const bar = document.getElementById('tabBar');
+    if (!bar) return;
+    /* buildTabs() wipes the whole bar on every real render, same as ghostTab handles for
+       "+ New" - so this redraws rather than assuming yesterday's button survived. */
+    bar.querySelectorAll('.tab-pool').forEach((b) => b.remove());
+
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'tab tab-pool';
+    b.setAttribute('aria-selected', String(poolOpen));
+    b.textContent = 'PROP POOL' + (poolCount ? ' (' + poolCount + ')' : '');
+    b.onclick = () => openPool();
+    bar.appendChild(b);
+}
+
+/* The one real render the shop page's own script does NOT cause: nothing here calls
+   buildTabs() or renderGrid(), so shop:rendered never fires from opening this, and
+   closePool() below never fights itself. */
+async function openPool() {
+    poolOpen = true;
+    document.querySelectorAll('#tabBar .tab').forEach((b) => {
+        b.setAttribute('aria-selected', String(b.classList.contains('tab-pool')));
+    });
+    const grid = document.getElementById('itemGrid');
+    if (grid) grid.hidden = true;
+    buildPoolPane();
+    document.getElementById('propPool').hidden = false;
+    await loadPool();
+    renderPool();
+}
+
+/* Called on every shop:rendered - which only fires from the public script's own
+   buildTabs()/renderGrid() pair, which only a REAL tab's click causes - so this is
+   "a real tab was just chosen" without needing to listen for that click directly. */
+function closePool() {
+    if (!poolOpen) return;
+    poolOpen = false;
+    const grid = document.getElementById('itemGrid');
+    if (grid) grid.hidden = false;
+    const pool = document.getElementById('propPool');
+    if (pool) pool.hidden = true;
+}
+
+function buildPoolPane() {
+    if (document.getElementById('propPool')) return;
+    const pane = document.createElement('div');
+    pane.id = 'propPool';
+    /* item-grid's own class, not a copy of its rules: candidate cards sit in the exact
+       same grid a shop card does, so they do not need their own layout, only their own
+       card. */
+    pane.className = 'item-grid prop-pool';
+    pane.hidden = true;
+    document.getElementById('itemGrid').insertAdjacentElement('afterend', pane);
+}
+
+async function loadPool() {
+    const { data, error } = await supabase
+        .from(POOL_TABLE).select('*').eq('status', 'NEW').order('found_at', { ascending: false })
+        .limit(60);
+    if (error) {
+        poolRows = [];
+        renderPool(`Could not load the pool: ${error.message}`
+            + ' Has tools/prop-bot-schema.sql been run?');
+        return;
+    }
+    poolRows = data || [];
+}
+
+function renderPool(message) {
+    const pane = document.getElementById('propPool');
+    if (!pane) return;
+    pane.innerHTML = '';
+
+    if (message) {
+        const p = document.createElement('p');
+        p.className = 'section-note';
+        p.textContent = message;
+        pane.appendChild(p);
+        return;
+    }
+
+    if (!poolRows.length) {
+        const p = document.createElement('p');
+        p.className = 'section-note';
+        p.textContent = 'Nothing waiting. The bot runs once a day; check back after it has.';
+        pane.appendChild(p);
+        return;
+    }
+
+    for (const row of poolRows) pane.appendChild(poolCard(row));
+}
+
+function poolCard(row) {
+    const card = document.createElement('div');
+    card.className = 'item-card pool-card';
+
+    const shot = document.createElement('div');
+    shot.className = 'shot';
+    if (row.image_url) {
+        const img = document.createElement('img');
+        img.src = row.image_url;
+        img.alt = '';
+        img.loading = 'lazy';
+        /* A dead image is the common case here - the bot found the listing, not a
+           picture it had already confirmed loads - so the frame just goes quiet rather
+           than showing the browser's broken-image icon. */
+        img.onerror = () => img.remove();
+        shot.appendChild(img);
+    }
+    if (row.price != null) {
+        const badge = document.createElement('div');
+        badge.className = 'item-badge';
+        badge.textContent = '$' + Number(row.price).toFixed(2);
+        shot.appendChild(badge);
+    }
+    card.appendChild(shot);
+
+    const body = document.createElement('div');
+    body.className = 'body';
+
+    const title = document.createElement('p');
+    title.className = 'item-title';
+    title.textContent = row.title || row.item_url;
+    body.appendChild(title);
+
+    if (row.why) {
+        const why = document.createElement('p');
+        why.className = 'pool-why';
+        why.textContent = row.why;
+        body.appendChild(why);
+    }
+
+    const view = document.createElement('a');
+    view.className = 'pool-view';
+    view.href = row.item_url;
+    view.target = '_blank';
+    view.rel = 'noopener';
+    view.textContent = 'View the listing';
+    body.appendChild(view);
+
+    const note = document.createElement('p');
+    note.className = 'pool-note';
+    body.appendChild(note);
+
+    const actions = document.createElement('div');
+    actions.className = 'pool-actions';
+
+    const keep = document.createElement('button');
+    keep.type = 'button';
+    keep.textContent = 'Keep';
+    keep.onclick = () => rulePool(row, 'KEPT', note, card);
+
+    const skip = document.createElement('button');
+    skip.type = 'button';
+    skip.className = 'ghost';
+    skip.textContent = 'Skip';
+    skip.onclick = () => rulePool(row, 'SKIPPED', note, card);
+
+    actions.append(keep, skip);
+    body.appendChild(actions);
+    card.appendChild(body);
+    return card;
+}
+
+/* Keeping or skipping is the whole of this job - it never adds the listing to the shop
+   itself. That is still the Add panel's job, because only it knows how to write a row
+   the way the shop table expects (Hidden, a position, nothing guessed) - so Keep opens
+   that same panel, prefilled, exactly as the bookmarklet does via openFromBookmarklet()
+   rather than duplicating what it does. */
+async function rulePool(row, status, note, card) {
+    note.textContent = status === 'KEPT' ? 'Keeping...' : 'Skipping...';
+
+    const { error } = await supabase
+        .from(POOL_TABLE)
+        .update({ status, handled_at: new Date().toISOString() })
+        .eq('id', row.id);
+
+    if (error) {
+        note.textContent = 'Could not save that: ' + error.message;
+        return;
+    }
+
+    poolRows = poolRows.filter((r) => r.id !== row.id);
+    if (poolCount != null) poolCount = Math.max(0, poolCount - 1);
+    addPoolTab();
+    card.remove();
+    if (!poolRows.length) renderPool();
+
+    if (status === 'KEPT') {
+        const panel = document.getElementById('addPanel');
+        if (panel) {
+            const field = panel.querySelector('input');
+            if (field) field.value = row.item_url;
+            panel.showModal();
+            const go = panel.querySelector('button');
+            if (go) go.focus();
+        }
+    }
 }
 
 /* A tab exists only as a value on a row, so a name invented before any prop wears it
@@ -1143,6 +1412,8 @@ async function start(u) {
     ghostTab();
     tabDeleters();
     makeTabsDraggable();
+    await loadPoolCount();
+    addPoolTab();
 }
 
 /* ---------- dragging props into order ----------
@@ -1436,12 +1707,17 @@ function ghostTab() {
     bar.appendChild(b);
 }
 
-/* The grid re-renders on every tab click, which throws the editors away with it. */
+/* The grid re-renders on every tab click, which throws the editors away with it. This
+   only ever fires from the public script's own buildTabs()/renderGrid(), which only a
+   real tab's click causes - so it doubles as "a real tab was just chosen", which is
+   what closePool() needs to know and has no more direct way to hear. */
 document.addEventListener('shop:rendered', () => {
+    closePool();
     if (isOwner(user)) {
         decorate();
         makeCardsDraggable();
         ghostTab();
+        addPoolTab();
         tabDeleters();
         makeTabsDraggable();
     }

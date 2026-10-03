@@ -128,6 +128,14 @@ How it works now:
    card rather than re-rendering from the table, because the title, price, photo and
    remaining count only exist in the built XML. A save is live in the table at once and on
    the public page at the next build.
+5. **PROP POOL** is a fifth tab, visible only when signed in as the owner, showing what
+   the SOC PROP BOT found in `prop_candidates` (`tools/prop-bot-schema.sql`) and nobody had
+   reviewed — nothing anywhere rendered that table before this. It is not a `tab_tag`: the
+   real tabs all filter the one shop grid by that column, and a candidate is not a shop row
+   yet, so it gets its own pane instead. **Skip** marks it `SKIPPED` and it is gone from the
+   pool. **Keep** marks it `KEPT` and opens the same Add prop panel the bookmarklet opens,
+   prefilled with the listing URL — Keep itself never writes to the `shop` table, since only
+   the Add panel knows how to write a row the way that table expects.
 
 ### Observed gaps (noted, nothing decided yet)
 
