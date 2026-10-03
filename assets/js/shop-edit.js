@@ -636,6 +636,8 @@ function buildBar() {
     const backstage = document.createElement('a');
     backstage.className = 'linkbtn';
     backstage.href = '/backstage/';
+    backstage.target = '_blank';
+    backstage.rel = 'noopener';
     backstage.textContent = 'Backstage';
 
     const saveAll = buildSaveAll(said);
